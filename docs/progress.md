@@ -36,6 +36,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1b. New tools approved and added: Supabase sign-in libraries, Vitest (unit tests), Playwright (browser tests)
 ✅ 1b. Sign-in screens: sign in (email first, then password), create account, confirm email, forgot and reset password, sign out
 ✅ 1b. Unit tests (27) and browser tests (18, phone and desktop) passing
+✅ 1b. Supabase project `lawdeck-dev` created (West EU, Ireland; free plan)
 ⚠️ 1b. Live sign-in — needs the Supabase project (URL and publishable key) and its settings from the founder (see docs/specs/sign-in.md)
 ⬜ 1c. Database tables with row-level security, and permission tests
 ⬜ 1d. Projects and chats saved per student
@@ -48,3 +49,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-20: Live on Vercel; Claude connection confirmed. Phase 0 exit checklist met; Supabase and Voyage set-up moved to the phases that first use them.
 - 2026-10-20: Phase 1 step 1a: dark-default theme with light switch, three-pane shell, home screen, loading/empty/error screens.
 - 2026-10-20: Phase 1 step 1b: sign-in screens and server logic, unit and browser tests. Waiting on Supabase project to switch on.
+- 2026-10-20: Supabase project lawdeck-dev created in West EU (Ireland).
