@@ -21,13 +21,14 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ `.env.example` listing every setting; real keys ignored by git
 ✅ Single AI module (`src/server/ai`) and the protected `/health` connection check
 ✅ Secret scanning (Secret Protection) and push protection switched on in GitHub
-⬜ Vercel connected; app live on a Vercel address
-⬜ Supabase development project created (EU region, pgvector on)
-⬜ Anthropic account with credit and a $20 monthly limit; key added to Vercel
-⬜ Voyage AI account and key
-⬜ Health check shows Claude's "OK" on the live site
+✅ Vercel connected; app live at lawdeck.vercel.app (framework preset set to Next.js)
+⬜ Supabase development project created (EU region, pgvector on) — moved to the start of Phase 1, where it is first used
+✅ Anthropic account with $10 credit; key added to Vercel as a secret (⬜ confirm the $20 monthly limit is set)
+⬜ Voyage AI account and key — moved to Phase 2, where it is first used
+✅ Health check shows Claude's "OK" on the live site (claude-haiku-5-5, about 1.1 s)
 
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
 - 2026-10-20: GitHub Secret Protection and push protection switched on.
+- 2026-10-20: Live on Vercel; Claude connection confirmed. Phase 0 exit checklist met; Supabase and Voyage set-up moved to the phases that first use them.
