@@ -20,7 +20,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Design tokens: colours, fonts, underlined links, placeholder style
 ✅ `.env.example` listing every setting; real keys ignored by git
 ✅ Single AI module (`src/server/ai`) and the protected `/health` connection check
-⬜ Secret scanning and push protection switched on in GitHub settings
+✅ Secret scanning (Secret Protection) and push protection switched on in GitHub
 ⬜ Vercel connected; app live on a Vercel address
 ⬜ Supabase development project created (EU region, pgvector on)
 ⬜ Anthropic account with credit and a $20 monthly limit; key added to Vercel
@@ -30,3 +30,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
+- 2026-10-20: GitHub Secret Protection and push protection switched on.

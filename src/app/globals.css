@@ -1,0 +1,64 @@
+@import "tailwindcss";
+
+/* Lawdeck design tokens. Change colours and fonts here only (rule M-03). */
+:root {
+  --ink: #141414;
+  --muted: #6b6b6b;
+  --line: #e7e5e0;
+  --panel: #f3f2ef;
+  --paper: #faf9f7;
+  --surface: #ffffff;
+  --highlight: #e4e1d9;
+  --success: #1f7a4d;
+  --warning: #9a5b00;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --ink: #f2f1ee;
+    --muted: #a8a6a1;
+    --line: #34332f;
+    --panel: #1d1c1a;
+    --paper: #161614;
+    --surface: #22211f;
+    --highlight: #3a3833;
+    --success: #5cc48f;
+    --warning: #e0a44a;
+  }
+}
+
+@theme inline {
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-panel: var(--panel);
+  --color-paper: var(--paper);
+  --color-surface: var(--surface);
+  --color-highlight: var(--highlight);
+  --color-success: var(--success);
+  --color-warning: var(--warning);
+  --font-sans: var(--font-inter);
+  --font-serif: var(--font-newsreader);
+  --font-brand: var(--font-outfit);
+}
+
+body {
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--font-inter), system-ui, sans-serif;
+}
+
+/* Text links are underlined so they are visibly clickable. */
+a {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+/* Placeholder for a missing fact in a document, e.g. [DEFENDANT'S ADDRESS]. */
+.placeholder {
+  background: var(--highlight);
+  border-bottom: 2px dashed var(--ink);
+  padding: 0 3px;
+  font-weight: 700;
+}
