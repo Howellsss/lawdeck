@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { BrandMark, Wordmark } from "@/components/ui/BrandMark";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
+import { SidebarContext } from "./sidebarContext";
 
 const MAIN_LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/courses", label: "Courses", icon: "book" },
@@ -18,9 +19,11 @@ type SidebarProps = {
   onToggleCollapse?: () => void;
   onNavigate?: () => void;
   closeButton?: React.ReactNode;
+  // The account button, checked on the server (see AccountSlot).
+  account?: React.ReactNode;
 };
 
-export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton }: SidebarProps) {
+export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account }: SidebarProps) {
   const pathname = usePathname();
   const itemClass = (active: boolean) =>
     `flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
@@ -78,12 +81,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
       )}
 
       <div className={`mt-auto flex items-center gap-2 border-t border-line pt-3 ${collapsed ? "flex-col" : ""}`}>
-        <Link href="/sign-in" onClick={onNavigate} className={`${itemClass(pathname === "/sign-in")} flex-1`}>
-          <span aria-hidden="true" className="flex size-8 items-center justify-center rounded-full bg-pill text-sm font-semibold">
-            ?
-          </span>
-          {label("Sign in")}
-        </Link>
+        <SidebarContext.Provider value={{ collapsed, onNavigate }}>{account}</SidebarContext.Provider>
         <ThemeToggle />
       </div>
     </nav>

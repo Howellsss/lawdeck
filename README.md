@@ -30,8 +30,12 @@ npm run dev
 ```bash
 npm run lint
 npm run typecheck
+npm test            # unit tests (logic)
 npm run build
+npm run test:e2e    # browser tests of the main journeys (needs the build)
 ```
+
+The first time, browser tests need Chromium: `npx playwright install chromium`.
 
 ## Stack
 

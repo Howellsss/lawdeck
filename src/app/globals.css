@@ -59,11 +59,14 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-/* Text links are underlined so they are visibly clickable. Menu links opt out with no-underline. */
-a {
-  color: var(--ink);
-  text-decoration: underline;
-  text-underline-offset: 3px;
+/* Text links are underlined so they are visibly clickable. Menu links opt out with no-underline.
+   Kept in the base layer so utility classes like no-underline can override it. */
+@layer base {
+  a {
+    color: var(--ink);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
 }
 
 /* Placeholder for a missing fact in a document, e.g. [DEFENDANT'S ADDRESS]. */
