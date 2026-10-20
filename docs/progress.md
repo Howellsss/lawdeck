@@ -27,8 +27,20 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ Voyage AI account and key — moved to Phase 2, where it is first used
 ✅ Health check shows Claude's "OK" on the live site (claude-haiku-5-5, about 1.1 s)
 
+## Phase 1. Shell, accounts and data
+
+✅ 1a. Dark mode by default with a light switch (choice remembered, no flash on load)
+✅ 1a. Three-pane workspace: left navigation (collapsible on desktop, drawer on mobile), middle work area, right panel closed until needed
+✅ 1a. Home screen: greeting, message box, mode and course pickers, shortcuts (no AI yet)
+✅ 1a. Standard loading, empty, error and "page not found" screens
+⚠️ 1b. Email sign-in and sign-in screen — needs the Supabase project from the founder, and approval of the new tools
+⬜ 1c. Database tables with row-level security, and permission tests
+⬜ 1d. Projects and chats saved per student
+⬜ 1e. Automatic checks on every pull request; Google sign-in
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
 - 2026-10-20: GitHub Secret Protection and push protection switched on.
 - 2026-10-20: Live on Vercel; Claude connection confirmed. Phase 0 exit checklist met; Supabase and Voyage set-up moved to the phases that first use them.
+- 2026-10-20: Phase 1 step 1a: dark-default theme with light switch, three-pane shell, home screen, loading/empty/error screens.

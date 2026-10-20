@@ -1,39 +1,50 @@
 @import "tailwindcss";
 
-/* Lawdeck design tokens. Change colours and fonts here only (rule M-03). */
-:root {
+/* Lawdeck design tokens (rule M-03). Dark is the default; light is chosen per student.
+   The theme is set on <html data-theme> by an inline script before the page paints. */
+:root,
+[data-theme="dark"] {
+  color-scheme: dark;
+  --ink: #eceae4;
+  --on-ink: #141413;
+  --muted: #a3a09a;
+  --line: #3a3936;
+  --sidebar: #141413;
+  --paper: #1a1a19;
+  --surface: #262624;
+  --pill: #2e2d2b;
+  --greeting: #d6d2c8;
+  --highlight: #3a3833;
+  --success: #5cc48f;
+  --warning: #e0a44a;
+}
+
+[data-theme="light"] {
+  color-scheme: light;
   --ink: #141414;
+  --on-ink: #ffffff;
   --muted: #6b6b6b;
   --line: #e7e5e0;
-  --panel: #f3f2ef;
+  --sidebar: #f3f2ef;
   --paper: #faf9f7;
   --surface: #ffffff;
+  --pill: #efede8;
+  --greeting: #2a2926;
   --highlight: #e4e1d9;
   --success: #1f7a4d;
   --warning: #9a5b00;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --ink: #f2f1ee;
-    --muted: #a8a6a1;
-    --line: #34332f;
-    --panel: #1d1c1a;
-    --paper: #161614;
-    --surface: #22211f;
-    --highlight: #3a3833;
-    --success: #5cc48f;
-    --warning: #e0a44a;
-  }
-}
-
 @theme inline {
   --color-ink: var(--ink);
+  --color-on-ink: var(--on-ink);
   --color-muted: var(--muted);
   --color-line: var(--line);
-  --color-panel: var(--panel);
+  --color-sidebar: var(--sidebar);
   --color-paper: var(--paper);
   --color-surface: var(--surface);
+  --color-pill: var(--pill);
+  --color-greeting: var(--greeting);
   --color-highlight: var(--highlight);
   --color-success: var(--success);
   --color-warning: var(--warning);
@@ -48,7 +59,7 @@ body {
   font-family: var(--font-inter), system-ui, sans-serif;
 }
 
-/* Text links are underlined so they are visibly clickable. */
+/* Text links are underlined so they are visibly clickable. Menu links opt out with no-underline. */
 a {
   color: var(--ink);
   text-decoration: underline;
@@ -61,4 +72,20 @@ a {
   border-bottom: 2px dashed var(--ink);
   padding: 0 3px;
   font-weight: 700;
+}
+
+/* The logo image is black on white: blend it into light pages, invert it on dark ones. */
+.brand-mark {
+  mix-blend-mode: multiply;
+}
+[data-theme="dark"] .brand-mark,
+:root:not([data-theme="light"]) .brand-mark {
+  filter: invert(1);
+  mix-blend-mode: lighten;
+}
+
+/* Show the right icon on the theme switch without waiting for JavaScript. */
+[data-theme="light"] .only-dark,
+:root:not([data-theme="light"]) .only-light {
+  display: none;
 }
