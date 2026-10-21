@@ -2,7 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { librarySearchSchema } from "@/schemas/library";
 import { fuseRankings, rankByMeaning } from "@/server/retrieval/fuse";
 import { passageSearchText } from "@/server/retrieval/indexJob";
-import { embedTexts, toVectorText } from "@/server/retrieval/voyage";
+import { batchByTokens, embedTexts, embedWithRetry, toVectorText } from "@/server/retrieval/voyage";
 
 const vector = (hot: number) => Array.from({ length: 1024 }, (_, i) => (i === hot ? 1 : 0));
 
@@ -84,13 +84,36 @@ describe("Voyage AI", () => {
   it("reports busy, refused and unusable replies plainly", async () => {
     vi.stubEnv("VOYAGE_API_KEY", "test-key");
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 429 })));
-    expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "busy" });
+    expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "busy", retryAfterMs: 20_000 });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 429, headers: { "retry-after": "7" } })));
+    expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "busy", retryAfterMs: 7_000 });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 401 })));
     expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "refused" });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: [{ index: 0, embedding: [1, 2] }] }))));
     expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "unavailable" });
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new Error("network")));
     expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "unavailable" });
+  });
+
+  it("waits and tries again while Voyage is busy, until the deadline", async () => {
+    vi.stubEnv("VOYAGE_API_KEY", "test-key");
+    const ok = () => new Response(JSON.stringify({ data: [{ index: 0, embedding: vector(3) }] }));
+    const fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("", { status: 429, headers: { "retry-after": "2" } }))
+      .mockResolvedValueOnce(ok());
+    vi.stubGlobal("fetch", fetchSpy);
+    const waits: number[] = [];
+    const wait = async (ms: number) => void waits.push(ms);
+    expect(await embedWithRetry(["a"], "document", "voyage-4", "test", Date.now() + 60_000, wait)).toEqual({
+      ok: true,
+      vectors: [vector(3)],
+    });
+    expect(waits).toEqual([2_000]);
+
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 429 })));
+    const result = await embedWithRetry(["a"], "document", "voyage-4", "test", Date.now() + 1_000, wait);
+    expect(result).toMatchObject({ ok: false, reason: "busy" });
   });
 
   it("writes vectors in the form the database accepts", () => {
@@ -109,5 +132,18 @@ describe("test search input", () => {
     expect(librarySearchSchema.safeParse({ ...valid, question: " " }).success).toBe(false);
     expect(librarySearchSchema.safeParse({ ...valid, question: "a".repeat(1001) }).success).toBe(false);
     expect(librarySearchSchema.safeParse({ ...valid, courseId: "civil" }).success).toBe(false);
+  });
+});
+
+describe("batches for Voyage", () => {
+  it("keeps each batch under the token allowance and the count limit", () => {
+    const text = "x".repeat(4_000); // about 1,000 tokens
+    const batches = batchByTokens(Array.from({ length: 10 }, () => text), 3_000, 32);
+    expect(batches.map((b) => b.length)).toEqual([3, 3, 3, 1]);
+    expect(batchByTokens(Array.from({ length: 5 }, () => "a"), 6_000, 2).map((b) => b.length)).toEqual([2, 2, 1]);
+  });
+
+  it("gives an oversized text a batch of its own", () => {
+    expect(batchByTokens(["x".repeat(100_000), "small"], 6_000).map((b) => b.length)).toEqual([1, 1]);
   });
 });

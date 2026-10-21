@@ -7,7 +7,7 @@ import { createAdminClient } from "@/server/db/admin";
 import { fuseRankings, rankByMeaning } from "@/server/retrieval/fuse";
 import { passageSearchText } from "@/server/retrieval/indexJob";
 import { EMBEDDING_MODELS, type EmbeddingModel } from "@/server/retrieval/settings";
-import { EMBED_BATCH, embedTexts } from "@/server/retrieval/voyage";
+import { batchByTokens, embedWithRetry } from "@/server/retrieval/voyage";
 
 const TOP = 5;
 const TARGET = 25;
@@ -33,8 +33,9 @@ const normalise = (text: string) => text.toLowerCase().replace(/\s+/g, " ").trim
 
 async function embedAll(texts: string[], inputType: "document" | "query", model: EmbeddingModel) {
   const vectors: number[][] = [];
-  for (let i = 0; i < texts.length; i += EMBED_BATCH) {
-    const result = await embedTexts(texts.slice(i, i + EMBED_BATCH), inputType, model, "eval");
+  for (const batch of batchByTokens(texts)) {
+    // Waits out Voyage's per-minute limits for up to five minutes per batch.
+    const result = await embedWithRetry(batch, inputType, model, "eval", Date.now() + 5 * 60_000);
     if (!result.ok) throw new Error(`Voyage (${model}) failed: ${result.reason}`);
     vectors.push(...result.vectors);
   }
