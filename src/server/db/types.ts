@@ -227,6 +227,12 @@ export type Database = {
         Update: { title?: string; effective_on?: string; note?: string | null; source?: string | null };
         Relationships: [];
       };
+      search_events: {
+        Row: { id: number; owner_id: string; created_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
     };
     Views: {
       kb_items_needing_recheck: {

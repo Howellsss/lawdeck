@@ -6,8 +6,8 @@ import { RERANK_MODELS, type RerankModel } from "./settings";
 // the passage answers it. Called directly over HTTPS (same account and key as the search
 // vectors), so no extra library is needed. Server only.
 const ENDPOINT = "https://api.voyageai.com/v1/rerank";
-// Rule G-10: no call waits longer than 60 seconds.
-const TIMEOUT_MS = 60_000;
+// Rule G-10: no call waits longer than 60 seconds (the live search waits much less).
+const MAX_TIMEOUT_MS = 60_000;
 
 const responseSchema = z.object({
   data: z.array(z.object({ index: z.number().int(), relevance_score: z.number() })),
@@ -20,7 +20,13 @@ export type RerankResult =
 
 // Returns the documents' positions, best first. Library text is content, never instructions:
 // it is only scored here, not followed.
-export async function rerankTexts(query: string, documents: string[], model: RerankModel, job: string): Promise<RerankResult> {
+export async function rerankTexts(
+  query: string,
+  documents: string[],
+  model: RerankModel,
+  job: string,
+  timeoutMs = MAX_TIMEOUT_MS,
+): Promise<RerankResult> {
   const key = process.env.VOYAGE_API_KEY;
   if (!key) return { ok: false, reason: "no_key" };
   if (documents.length === 0) return { ok: true, order: [] };
@@ -31,7 +37,7 @@ export async function rerankTexts(query: string, documents: string[], model: Rer
       method: "POST",
       headers: { Authorization: `Bearer ${key}`, "Content-Type": "application/json" },
       body: JSON.stringify({ query, documents, model, truncation: true }),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(Math.min(timeoutMs, MAX_TIMEOUT_MS)),
     });
     if (!response.ok) {
       console.error("rerank call failed", { job, model, status: response.status, ms: Date.now() - started });

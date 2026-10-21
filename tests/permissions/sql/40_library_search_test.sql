@@ -1,5 +1,5 @@
 -- Permission tests at database level: searching the library (step 2d).
--- Students get at most 8 approved passages of the chosen course; never pending, rejected,
+-- Students get at most 30 approved passages (8 before migration 10) of the chosen course; never pending, rejected,
 -- withdrawn or other courses' material. Reviewers may include material awaiting review.
 \set ON_ERROR_STOP on
 \set QUIET on
@@ -27,9 +27,9 @@ insert into public.kb_items (title, type, course_id)
   select 'Search other course', 'note', id from public.courses where slug = 'criminal-litigation';
 insert into public.kb_passages (item_id, position, text)
   select id, 0, 'Zebra marker words about ' || title from public.kb_items where title like 'Search %';
--- Ten more approved passages, to test the limit of 8.
+-- Forty more approved passages, to test the limit of 30 (migration 10).
 insert into public.kb_passages (item_id, position, text)
-  select id, n, 'Zebra marker extra passage ' || n from public.kb_items, generate_series(1, 10) n
+  select id, n, 'Zebra marker extra passage ' || n from public.kb_items, generate_series(1, 40) n
   where title = 'Search approved';
 select test.make_reviewable('Search %');
 update public.kb_items set review_status = 'approved' where title in ('Search approved', 'Search other course');
@@ -49,8 +49,8 @@ grant select on test.search to authenticated, anon;
 -- A student --------------------------------------------------------------------
 select test.as_user('cccccccc-0000-0000-0000-000000000023');
 select test.check(
-  (select count(*) from public.search_library('zebra marker', (select course_id from test.search), null, null, 100)) = 8,
-  'students get at most 8 passages, however many they ask for');
+  (select count(*) from public.search_library('zebra marker', (select course_id from test.search), null, null, 100)) = 30,
+  'students get at most 30 passages, however many they ask for');
 select test.check(
   (select bool_and(item_title = 'Search approved')
      from public.search_library('zebra marker', (select course_id from test.search), test.vec(1), 'model-a')),
