@@ -39,7 +39,7 @@ export function LibraryList({
     <ul aria-label="Library items" className="flex flex-col divide-y divide-line rounded-2xl border border-line bg-surface">
       {items.map((item) => (
         <li key={item.id} className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
-          <div className="min-w-0">
+          <div className="min-w-0 flex-1">
             <p className="break-words text-[15px] font-medium">{item.title}</p>
             <p className="text-sm text-muted">
               {[item.courseName, KB_ITEM_TYPES[item.type], item.year, item.fileName, megabytes(item.sizeBytes)]
@@ -58,7 +58,7 @@ export function LibraryList({
             </p>
           </div>
           {isAdmin && (
-            <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
+            <div className="flex flex-col items-start gap-3 sm:w-56 sm:shrink-0 sm:items-end">
               <ReadItemButton id={item.id} title={item.title} status={item.reading.status} />
               {needsIndexing(item, currentModel) && <IndexItemButton id={item.id} title={item.title} />}
               <RemoveItemButton id={item.id} title={item.title} />
