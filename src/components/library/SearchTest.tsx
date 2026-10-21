@@ -10,7 +10,7 @@ import { testLibrarySearch } from "@/server/retrieval/actions";
 import { SearchResults } from "./SearchResults";
 import { SelectField } from "./SelectField";
 
-type Outcome = { hits: SearchHit[]; meaningUsed: boolean } | null;
+type Outcome = { hits: SearchHit[]; meaningUsed: boolean; reranked: boolean } | null;
 
 // A reviewer types a question and sees the passages search would give an answer.
 export function SearchTest({ courses }: { courses: { id: string; name: string }[] }) {
@@ -36,7 +36,7 @@ export function SearchTest({ courses }: { courses: { id: string; name: string }[
       return;
     }
     setErrors({});
-    setOutcome({ hits: result.hits, meaningUsed: result.meaningUsed });
+    setOutcome({ hits: result.hits, meaningUsed: result.meaningUsed, reranked: result.reranked });
   }
 
   return (
@@ -65,7 +65,7 @@ export function SearchTest({ courses }: { courses: { id: string; name: string }[
           Searching…
         </p>
       )}
-      {outcome && <SearchResults hits={outcome.hits} meaningUsed={outcome.meaningUsed} />}
+      {outcome && <SearchResults hits={outcome.hits} meaningUsed={outcome.meaningUsed} reranked={outcome.reranked} />}
     </div>
   );
 }

@@ -73,7 +73,7 @@ Paste `supabase/migrations/20261021000600_library_reading.sql` into the Supabase
 
 | Part | Students | Reviewers | Admins | Admin jobs (service key) |
 | --- | --- | --- | --- | --- |
-| `search_library` | Approved passages of one course, at most 8 | Also material awaiting review | Same as reviewers | Same as reviewers |
+| `search_library` | Approved passages of one course, at most 30 to the server (8 shown or sent to the AI); 40 searches an hour, 200 a day | Also material awaiting review | Same as reviewers | Same as reviewers |
 | Search vectors and index details | No | No | No | Write |
 
 Tests: `tests/permissions/sql/40_library_search_test.sql` (15 checks), `tests/unit/retrieval.test.ts` (12 checks), and the browser test that the test page is hidden from visitors.
@@ -125,3 +125,12 @@ Tests: `tests/permissions/sql/50_library_review_test.sql` (16 checks); approvals
 - Students and visitors cannot see law changes or the warnings.
 
 Tests: `tests/permissions/sql/60_law_changes_test.sql` (13 checks).
+
+## Re-ranking and the search limit (migration 10)
+
+- **Why:** the retrieval test showed the right passage was not always in the top 8 (34/35). Voyage's re-ranker, reading the top 30, put it in the top 8 for 35/35 and the top 5 for 35/35 (`docs/specs/retrieval-eval.md`).
+- **How:** `search_library` now returns up to 30 candidates to the server. `src/server/retrieval/search.ts` sends them with the question to Voyage `rerank-2.5` (`src/server/retrieval/rerank.ts`; setting `RERANK_MODEL`) and keeps the best 8. It waits at most 5 seconds; if the re-ranker fails or is slow, the search keeps its own order, logs it, and the test page says so. Each call logs model, tokens, cost and time, never text. Cost: about $0.001 per search.
+- **Copy protection:** students may search 40 times an hour and 200 times a day (database rule, `search_events` table with row-level security: people see only their own searches; nobody can add or delete them directly). Reviewers, admins and the marked admin jobs are not limited. The screen and the AI still get at most 8 passages.
+- **Tests:** `tests/permissions/sql/70_search_limit_test.sql` (12 checks), `40_library_search_test.sql` updated to the 30 cap, `tests/unit/search.test.ts` and `rerank.test.ts`. The retrieval test now checks the live search: every question in the top 8 and all but one in the top 5.
+
+Founder step: paste `supabase/migrations/20261021001000_search_rerank.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it.

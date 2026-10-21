@@ -14,7 +14,15 @@ function foundBy(hit: SearchHit) {
 }
 
 // The passages a test search returned, best first.
-export function SearchResults({ hits, meaningUsed }: { hits: SearchHit[]; meaningUsed: boolean }) {
+export function SearchResults({
+  hits,
+  meaningUsed,
+  reranked,
+}: {
+  hits: SearchHit[];
+  meaningUsed: boolean;
+  reranked: boolean;
+}) {
   return (
     <section aria-labelledby="search-results" className="flex flex-col gap-3">
       <h2 id="search-results" className="text-lg font-medium">
@@ -24,6 +32,12 @@ export function SearchResults({ hits, meaningUsed }: { hits: SearchHit[]; meanin
         <p role="alert" className="rounded-2xl border border-warning px-4 py-3 text-sm text-warning">
           Search by meaning is not available (Voyage AI could not be reached or the key is missing), so these
           results use exact words only.
+        </p>
+      )}
+      {meaningUsed && !reranked && hits.length > 1 && (
+        <p role="alert" className="rounded-2xl border border-warning px-4 py-3 text-sm text-warning">
+          The re-ranking step did not answer in time, so these results are in the search&apos;s own order and may be
+          less precise. Try again in a moment.
         </p>
       )}
       {hits.length === 0 ? (

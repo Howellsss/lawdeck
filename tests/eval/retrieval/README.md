@@ -16,7 +16,7 @@ capitals ignored), so the test still works if passages are split differently lat
 For each model it turns every Civil Litigation passage (approved and awaiting review) and every
 question into search vectors, ranks passages by meaning, ranks them by exact words through
 `search_library`, and combines the two the same way the database does (reciprocal rank fusion,
-k = 60). It prints hits out of 30 for each model, and fails if the best model is below 25.
+k = 60). It prints hits for each model, then runs the live search (top 30, then the Voyage re-ranker) and fails unless every question's passage is in the top 8 and all but one are in the top 5.
 The words ranking from `search_library` is its top 8, so places 9–40 are not counted; they
 add at most 1/69 each to a passage's score and do not change the top 5 in practice.
 

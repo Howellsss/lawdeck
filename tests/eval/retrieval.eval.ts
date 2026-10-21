@@ -6,14 +6,14 @@ import { z } from "zod";
 import { createAdminClient } from "@/server/db/admin";
 import { fuseRankings, rankByMeaning } from "@/server/retrieval/fuse";
 import { passageSearchText } from "@/server/retrieval/indexJob";
-import { EMBEDDING_MODEL, EMBEDDING_MODELS, type EmbeddingModel } from "@/server/retrieval/settings";
-import { anyWordsQuery } from "@/lib/wordsQuery";
-import { compareSetups } from "./retrieval/compare";
+import { EMBEDDING_MODEL, EMBEDDING_MODELS, SEARCH_CANDIDATES, type EmbeddingModel } from "@/server/retrieval/settings";
+import { describe as describeCounts, LIVE_RERANKER, scorePipeline, type Counts } from "./retrieval/compare";
 import { EMBED_BATCH, embedTexts, fitTokenBudget } from "@/server/retrieval/voyage";
 
 const TOP = 5;
-// Build Phases target: 25 of 30 in the top 5, i.e. five in six, whatever the number of questions.
-const targetFor = (count: number) => Math.ceil((count * 25) / 30);
+// Target for the live search (re-ranker on), set 2026-10-21 after the re-ranking experiment:
+// every question's passage in the top 8 (what the AI receives), and all but one in the top 5.
+// Stricter than the Build Phases target (25 of 30 in the top 5).
 const FILE = process.env.EVAL_QUESTIONS ?? "tests/eval/retrieval/civil-litigation.json";
 
 const questionsSchema = z.object({
@@ -62,7 +62,7 @@ async function embedAll(texts: string[], inputType: "document" | "query", model:
 }
 
 describe("retrieval test", () => {
-  it(`finds the right passage in the top ${TOP} for at least five in six questions`, async () => {
+  it("the live search finds the right passage in the top 8 for every question", async () => {
     if (!existsSync(FILE)) throw new Error(`Questions file not found: ${FILE}. See tests/eval/retrieval/README.md.`);
     const { course: slug, questions } = questionsSchema.parse(JSON.parse(readFileSync(FILE, "utf8")));
     const db = createAdminClient();
@@ -108,21 +108,11 @@ describe("retrieval test", () => {
       const { data, error } = await db.rpc("search_library", {
         query_text: q.question,
         course: course.data.id,
+        match_count: SEARCH_CANDIDATES,
         include_pending: true,
       });
       if (error) throw new Error(`search_library failed (${error.code})`);
       byWords.set(String(q.id), data.map((row) => row.passage_id));
-    }
-    // The same, matching passages that contain most of the words (src/lib/wordsQuery.ts).
-    const byMostWords = new Map<string, string[]>();
-    for (const q of questions) {
-      const { data, error } = await db.rpc("search_library", {
-        query_text: anyWordsQuery(q.question),
-        course: course.data.id,
-        include_pending: true,
-      });
-      if (error) throw new Error(`search_library failed (${error.code})`);
-      byMostWords.set(String(q.id), data.map((row) => row.passage_id));
     }
 
     const answers = (q: (typeof questions)[number], p: Passage | undefined) =>
@@ -149,7 +139,7 @@ describe("retrieval test", () => {
     };
 
     const lines = [`Retrieval test: ${questions.length} questions, ${passages.length} passages, top ${TOP}`, ""];
-    const scores: Record<string, number> = {};
+    let live: Counts | null = null;
     const wordsOnly = questions.filter((q) => isHit(q, (byWords.get(String(q.id)) ?? []).slice(0, TOP))).length;
     for (const model of Object.keys(EMBEDDING_MODELS) as EmbeddingModel[]) {
       const docVectors = await embedAll(passages.map((p) => passageSearchText(p.heading, p.text)), "document", model);
@@ -174,40 +164,49 @@ describe("retrieval test", () => {
           );
         }
       });
-      scores[model] = hybrid;
       lines.push(
         `${EMBEDDING_MODELS[model].label}: hybrid ${hybrid}/${questions.length} (top ${AI_RECEIVES}: ${hybridAi}/${questions.length}), meaning only ${meaningOnly}/${questions.length}; missed: ${misses.join(", ") || "none"}`,
         ...details,
       );
-      // The live model only: try "most words" and the re-ranker (tests/eval/retrieval/compare.ts).
+      // The live search (this model, top 30, then the re-ranker), and without the re-ranker.
       if (model === EMBEDDING_MODEL) {
         const meanings = queryVectors.map((vector) => rankByMeaning(vector, indexed));
+        const pipeline = {
+          questions,
+          meaningOf: (index: number) => meanings[index],
+          wordsOf: (q: { id: number | string }) => byWords.get(String(q.id)) ?? [],
+          textOf: (id: string) => {
+            const p = byId.get(id);
+            return p ? passageSearchText(p.heading, p.text) : "";
+          },
+          isHit: (q: { id: number | string }, ids: string[]) => isHit(q as (typeof questions)[number], ids),
+          placeOf: (q: { id: number | string }, ids: string[]) => placeOf(q as (typeof questions)[number], ids),
+          top: TOP,
+          ai: AI_RECEIVES,
+        };
+        const exactTotal = questions.filter((q) => q.kind === "exact").length;
+        live = await scorePipeline({ ...pipeline, reranker: LIVE_RERANKER.model });
+        const fallback = await scorePipeline({ ...pipeline, reranker: null });
         lines.push(
-          `Setups compared with ${EMBEDDING_MODELS[model].label}:`,
-          ...(await compareSetups({
-            questions,
-            meaningOf: (index) => meanings[index],
-            wordsOf: (q, words) => (words === "all" ? byWords : byMostWords).get(String(q.id)) ?? [],
-            textOf: (id) => {
-              const p = byId.get(id);
-              return p ? passageSearchText(p.heading, p.text) : "";
-            },
-            isHit: (q, ids) => isHit(q as (typeof questions)[number], ids),
-            placeOf: (q, ids) => placeOf(q as (typeof questions)[number], ids),
-            top: TOP,
-            ai: AI_RECEIVES,
-          })),
+          `Live search with ${EMBEDDING_MODELS[model].label}:`,
+          describeCounts(`with ${LIVE_RERANKER.label} (live)`, live, questions.length, exactTotal, TOP, AI_RECEIVES),
+          describeCounts("without the re-ranker (fallback)", fallback, questions.length, exactTotal, TOP, AI_RECEIVES),
         );
       }
     }
     lines.push(`Exact words only: ${wordsOnly}/${questions.length}`);
-    const best = Math.max(...Object.values(scores));
-    lines.push("", `Best (live setting): ${best}/${questions.length} (target ${targetFor(questions.length)})`);
+    if (!live) throw new Error(`The live model ${EMBEDDING_MODEL} was not tested.`);
+    const liveResult: Counts = live;
+    lines.push(
+      "",
+      `Live search: top ${AI_RECEIVES} ${liveResult.ai}/${questions.length} (target ${questions.length}), top ${TOP} ${liveResult.top}/${questions.length} (target ${questions.length - 1})`,
+    );
     console.info(lines.join("\n"));
     if (process.env.GITHUB_STEP_SUMMARY) {
       const { appendFileSync } = await import("node:fs");
       appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.map((line) => (line ? `- ${line}` : "")).join("\n") + "\n");
     }
-    expect(best).toBeGreaterThanOrEqual(targetFor(questions.length));
+    expect(liveResult.ai, `not in the top ${AI_RECEIVES}: ${liveResult.misses.join(", ")}`).toBe(questions.length);
+    expect(liveResult.top).toBeGreaterThanOrEqual(questions.length - 1);
   });
 });

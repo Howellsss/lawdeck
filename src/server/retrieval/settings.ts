@@ -18,16 +18,19 @@ export const EMBEDDING_MODEL: EmbeddingModel = "voyage-4";
 
 export const EMBEDDING_DIMENSIONS = 1024;
 
-// How many passages a search returns at most (the database also caps this at 8).
+// How many passages a search hands to the screen or the AI at most.
 export const SEARCH_RESULTS = 8;
+// How many candidates the database returns for the re-ranker to choose from (migration 10 caps
+// this at 30, with a search limit for students).
+export const SEARCH_CANDIDATES = 30;
 
 // Hybrid search: each ranking keeps its top 40, and they are combined by reciprocal rank
 // fusion with k = 60. The same numbers are in search_library (migration 7).
 export const FUSION_K = 60;
 export const FUSION_DEPTH = 40;
 
-// Re-rankers tried in the retrieval test (not used by the live search yet). US dollars per
-// million tokens, from Voyage's price list; check voyageai.com/pricing before relying on it.
+// Re-rankers tried in the retrieval test. US dollars per million tokens, from Voyage's price
+// list; check voyageai.com/pricing before relying on it.
 export const RERANK_MODELS = {
   "rerank-2.5": { label: "rerank-2.5", pricePerMillion: 0.05 },
   "rerank-2.5-lite": { label: "rerank-2.5-lite", pricePerMillion: 0.02 },
@@ -35,5 +38,7 @@ export const RERANK_MODELS = {
 
 export type RerankModel = keyof typeof RERANK_MODELS;
 
-// How many combined results the re-ranker reads before picking the best.
-export const RERANK_CANDIDATES = 30;
+// The re-ranker the live search uses (retrieval test: 35/35, docs/specs/retrieval-eval.md), and
+// how long a search waits for it before falling back to the combined ranking.
+export const RERANK_MODEL: RerankModel = "rerank-2.5";
+export const RERANK_TIMEOUT_MS = 5_000;

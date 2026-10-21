@@ -19,7 +19,7 @@ export async function indexLibraryItem(id: string): Promise<IndexStepResult> {
 }
 
 export type TestSearchResult =
-  | { ok: true; hits: SearchHit[]; meaningUsed: boolean }
+  | { ok: true; hits: SearchHit[]; meaningUsed: boolean; reranked: boolean }
   | { ok: false; message?: string; fieldErrors?: FieldErrors };
 
 // A reviewer's test search. Students will search through answers in Phase 3, never this page.
