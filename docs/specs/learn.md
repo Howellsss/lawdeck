@@ -9,7 +9,7 @@ PRD LN-01 to LN-04, WS-04; Engineering Rules G-01 to G-10; System Design §2 and
   1. The chat must be the student's own (row-level security). The question is saved.
   2. Email addresses and phone numbers are removed from what leaves Lawdeck (`src/server/learn/redact.ts`, rule G-06). The student's own copy is unchanged.
   3. The library is searched as the student through `search_library`: approved material only, the chat's course or all courses, never out-of-date material, at most 8 passages after re-ranking. Each question counts towards the student search limit.
-  4. If nothing is found, Lawdeck says so plainly and does not call Claude.
+  4. If nothing is found, Lawdeck says so plainly and does not call Claude. But if search by meaning could not run (Voyage busy or unreachable) and the exact-words search found nothing, it asks the student to try again in a minute instead: "nothing found" would not be reliable then.
   5. Otherwise Claude (`MODELS.explain`, Sonnet 5.5 until the 3e model test) gets the versioned instructions (`src/prompts/explain.ts`), the last few messages and the passages, marked as material with numbers S1, S2 … It answers in the set structure (short answer, rule, authority, application, exam tip) and cites passages as [S1].
   6. Every sentence is checked before the student sees it (`src/server/learn/answerFilter.ts`):
      - citations to passages that were not supplied are removed;

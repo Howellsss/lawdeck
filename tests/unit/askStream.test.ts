@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { askQuestion, takePendingQuestion } from "@/components/learn/askStream";
-import { titleFrom } from "@/server/learn/ask";
+import { SEARCH_BUSY, searchUnsure, titleFrom } from "@/server/learn/ask";
 import type { AnswerEvent } from "@/server/learn/ask";
 
 function streamOf(chunks: string[]): ReadableStream<Uint8Array> {
@@ -62,3 +62,15 @@ describe("chat titles", () => {
     expect(titleFrom("x".repeat(100)).endsWith("…")).toBe(true);
   });
 });
+
+describe("when the library search is unsure", () => {
+  it("asks the student to try again rather than saying the library has nothing", () => {
+    expect(searchUnsure({ hits: [], meaningUsed: false })).toBe(SEARCH_BUSY);
+  });
+
+  it("goes ahead when search by meaning ran, or when exact words found passages", () => {
+    expect(searchUnsure({ hits: [], meaningUsed: true })).toBeNull();
+    expect(searchUnsure({ hits: [{}], meaningUsed: false })).toBeNull();
+  });
+});
+

@@ -96,7 +96,8 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ 3a/3b. Founder asks a few Civil Litigation questions on the live site
 ✅ 3c. Simple and Exam-ready levels on every answer; course hubs list topics and start explanations; admin topics editor
 ✅ 3c. Auto mode routing with Haiku and the "Treated as" chip; 100-request routing test ready
-⬜ 3c. Migration 13 applied; topics added; routing test run and at least 90/100 (founder: GitHub secret ANTHROPIC_API_KEY)
+✅ 3c. Migration 13 applied (founder, 2026-10-21); merged and live
+⬜ 3c. Topics added; routing test run and at least 90/100 (founder: GitHub secret ANTHROPIC_API_KEY)
 ⬜ 3d. Usage logging per call, and per-student limits checked before each call
 ⚠️ 3e. Evaluation set v1: 40+ Civil Litigation questions plus pushback cases, reviewed by a legal reviewer — founder and reviewer
 ⬜ 3e. Model quality test: Haiku, Sonnet and Opus for explanations; choose by quality and cost
@@ -150,3 +151,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Phase 3 started. Steps 3a and 3b: streamed, sourced answers with citation check, quote limit and "not enough" answer; migration 12 (answer sources).
 - 2026-10-21: Migration 12 applied (founder); steps 3a and 3b merged.
 - 2026-10-21: Step 3c: answer levels, course hubs with admin topics editor, Auto routing with Haiku and the "Treated as" chip; migration 13.
+- 2026-10-21: Migration 13 applied (founder); step 3c merged.
+- 2026-10-22: Fix: when search by meaning is unavailable and nothing is found, answers ask the student to try again instead of saying the library has nothing (found on the live site).
