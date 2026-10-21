@@ -67,15 +67,16 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2d. Migration 7 applied in Supabase; service-role key added in Vercel (founder, 2026-10-21); search merged and live
 ⬜ 2d. Test the two Voyage models on 30 Civil Litigation questions and record the choice (needs 2g material and the 30 questions)
 ✅ Extra (founder request). Import library files from Google Drive: pick several files, details suggested from file names
-⬜ Extra. Google Cloud set-up for the Drive import (founder)
+✅ Extra. Google Cloud set-up for the Drive import (founder); Drive import works on the live site
 ✅ 2e. Reviewer console: approve, correct, reject, withdraw; "law current as of" date; approval rules and audit record enforced by the database; 16 new permission checks and 10 logic tests
 ✅ 2e. Migration 8 applied in Supabase (founder); reviewer console merged and live
 ✅ 2f. Out-of-date warning: law changes recorded by reviewers; items checked before a change are marked "Needs re-check" (worked out live by the database); 13 new permission checks and 4 logic tests
-⬜ 2f. Founder applies migration 9 in Supabase
-⬜ 2g. Civil Litigation material loaded and approved
+✅ 2f. Migration 9 applied in Supabase (founder, 2026-10-21); merged and live
+✅ 2g. Civil Litigation material loaded and approved (founder approved as interim reviewer, 2026-10-21)
+⬜ 2g. A qualified legal reviewer rechecks the founder-approved material before launch
 ✅ Voyage AI key added in Vercel (founder, 2026-10-21)
-⚠️ Civil Litigation material — founder, by 2g
-⚠️ Legal reviewer and 30 test questions — founder, by 2e
+✅ Civil Litigation material (founder, 2026-10-21)
+⚠️ Legal reviewer and 30 test questions — founder, needed for 2d and the recheck
 
 ## Change log
 
@@ -110,7 +111,6 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Step 2b: admin Library page with upload, real file-type check, list and remove.
 - 2026-10-21: Step 2c: reading library files into passages (PDF, Word, scans and photos). Libraries unpdf and mammoth approved; scans read by Claude Haiku 5.5.
 - 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
-- 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
 - 2026-10-21: Founder confirmed a test upload on the live Library page (step 2b).
 - 2026-10-21: Step 2d: hybrid library search (Voyage AI + exact words), indexing admin job, reviewer test page and retrieval test.
 - 2026-10-21: Migration 7 applied and service-role key added (founder); step 2d merged.
@@ -118,3 +118,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Fix: indexing sends batches that fit Voyage AI's per-minute limit and waits and carries on when asked to slow down; Library list layout no longer squeezes long titles.
 - 2026-10-21: Founder indexed the Civil Litigation notes (165 of 165 passages). Step 2e: reviewer console, approval rules and audit record.
 - 2026-10-21: Migration 8 applied; step 2e merged. Step 2f: law changes and the "Needs re-check" warning.
+- 2026-10-21: Migration 9 applied; step 2f merged. Founder approved the Civil Litigation material as interim reviewer (2g); a legal reviewer will recheck it before launch.
