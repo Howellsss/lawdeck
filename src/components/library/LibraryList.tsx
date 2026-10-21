@@ -2,8 +2,10 @@ import { formatWat } from "@/lib/dates";
 import { KB_ITEM_TYPES, REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
 import type { LibraryItemSummary } from "@/server/db/library";
 import { ReadingSummary } from "./ReadingSummary";
+import { IndexItemButton } from "./IndexItemButton";
 import { ReadItemButton } from "./ReadItemButton";
 import { RemoveItemButton } from "./RemoveItemButton";
+import { needsIndexing, SearchSummary } from "./SearchSummary";
 
 const STATUS_TONE = {
   pending: "text-muted",
@@ -17,7 +19,15 @@ function megabytes(bytes: number | null) {
 }
 
 // Library items, newest first. Cards rather than a wide table, so it works at 360 px.
-export function LibraryList({ items, isAdmin }: { items: LibraryItemSummary[]; isAdmin: boolean }) {
+export function LibraryList({
+  items,
+  isAdmin,
+  currentModel,
+}: {
+  items: LibraryItemSummary[];
+  isAdmin: boolean;
+  currentModel: string;
+}) {
   if (items.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-line px-4 py-8 text-center text-muted">
@@ -43,10 +53,14 @@ export function LibraryList({ items, isAdmin }: { items: LibraryItemSummary[]; i
             <p className="text-sm">
               <ReadingSummary reading={item.reading} />
             </p>
+            <p className="text-sm">
+              <SearchSummary item={item} currentModel={currentModel} />
+            </p>
           </div>
           {isAdmin && (
             <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
               <ReadItemButton id={item.id} title={item.title} status={item.reading.status} />
+              {needsIndexing(item, currentModel) && <IndexItemButton id={item.id} title={item.title} />}
               <RemoveItemButton id={item.id} title={item.title} />
             </div>
           )}

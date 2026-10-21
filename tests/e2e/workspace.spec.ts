@@ -40,6 +40,13 @@ test("the Library page is hidden from visitors", async ({ page }) => {
   await expect(page.locator('input[type="file"]')).toHaveCount(0);
 });
 
+test("the library search test page is hidden from visitors", async ({ page }) => {
+  await page.goto("/admin/library/search");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Test the search" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "Search" })).toHaveCount(0);
+});
+
 test("visitors do not see the Library link", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Library" })).toHaveCount(0);

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LibraryList } from "@/components/library/LibraryList";
@@ -8,6 +9,7 @@ import { getStaffRole } from "@/server/auth/roles";
 import { getSupabaseConfig } from "@/server/auth/config";
 import { listLibraryItems } from "@/server/db/library";
 import { listCourses } from "@/server/db/workspace";
+import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
 
 export const metadata: Metadata = { title: "Library · Lawdeck" };
 // Reading a file is done by server actions on this page, in steps of up to about 3 minutes.
@@ -37,13 +39,18 @@ async function Library() {
         <p className="text-muted">
           Source material for answers. Students never see these files; they only benefit from approved passages.
         </p>
+        <p>
+          <Link href="/admin/library/search" className="underline underline-offset-2">
+            Test the search
+          </Link>
+        </p>
       </div>
       {role === "admin" && courses.status === "ok" && <UploadForm courses={courses.data} apiKey={apiKey} />}
       <section aria-labelledby="library-items" className="flex flex-col gap-3">
         <h2 id="library-items" className="text-lg font-medium">
           Items ({items.length})
         </h2>
-        <LibraryList items={items} isAdmin={role === "admin"} />
+        <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} />
       </section>
     </>
   );

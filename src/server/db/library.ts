@@ -21,6 +21,7 @@ export type LibraryItemSummary = {
     passages: number;
     error: string | null;
   };
+  search: { indexed: number; model: string | null; indexedAt: string | null };
 };
 
 // The library list for reviewers and admins. Callers check the role first;
@@ -31,7 +32,7 @@ export async function listLibraryItems(): Promise<LibraryItemSummary[]> {
     supabase
       .from("kb_items")
       .select(
-        "id, title, type, course_id, year, review_status, file_name, size_bytes, created_at, reading_status, reading_method, reading_quality, page_count, reading_error, kb_passages(count), kb_item_pages(count)",
+        "id, title, type, course_id, year, review_status, file_name, size_bytes, created_at, reading_status, reading_method, reading_quality, page_count, reading_error, indexed_passages, index_model, indexed_at, kb_passages(count), kb_item_pages(count)",
       )
       .order("created_at", { ascending: false })
       .limit(500),
@@ -61,5 +62,6 @@ export async function listLibraryItems(): Promise<LibraryItemSummary[]> {
       passages: item.kb_passages[0]?.count ?? 0,
       error: item.reading_error,
     },
+    search: { indexed: item.indexed_passages, model: item.index_model, indexedAt: item.indexed_at },
   }));
 }

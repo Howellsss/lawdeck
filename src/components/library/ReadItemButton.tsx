@@ -4,7 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { compactSecondaryButton } from "@/components/ui/buttons";
 import type { LibraryItemSummary } from "@/server/db/library";
-import { progressText, readUntilDone } from "./readItem";
+import { readAndIndex } from "./readItem";
 
 const LABELS = {
   waiting: "Read file",
@@ -25,9 +25,9 @@ export function ReadItemButton({ id, title, status }: { id: string; title: strin
     setMessage(undefined);
     setProgress("Reading…");
     // "Continue reading" carries on; every other choice starts from the first page.
-    const result = await readUntilDone(id, status !== "reading", (step) => setProgress(progressText(step)));
+    const result = await readAndIndex(id, status !== "reading", setProgress);
     setBusy(false);
-    if (!result.ok) setMessage(result.message);
+    if (!result.ok) setMessage(result.stage === "index" ? `Read, but not yet indexed for search: ${result.message}` : result.message);
     router.refresh();
   }
 
@@ -39,7 +39,7 @@ export function ReadItemButton({ id, title, status }: { id: string; title: strin
       </button>
       {busy && (
         <p role="status" className="text-sm text-muted">
-          {progress}. Keep this page open.
+          {progress} Keep this page open.
         </p>
       )}
       {message && (
