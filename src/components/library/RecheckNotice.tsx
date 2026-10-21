@@ -6,7 +6,10 @@ export function RecheckNotice({ reasons }: { reasons: RecheckReason[] }) {
   if (reasons.length === 0) return null;
   return (
     <div role="status" className="flex flex-col gap-2 rounded-2xl border border-warning px-4 py-3 text-sm">
-      <p className="font-medium text-warning">Needs re-check: the law has changed since this was last checked.</p>
+      <p className="font-medium text-warning">
+        Needs re-check: the law has changed since this was last checked. Students cannot find it in search until it is
+        re-checked.
+      </p>
       <ul className="list-disc pl-5">
         {reasons.map((reason) => (
           <li key={`${reason.changeTitle}-${reason.effectiveOn}`}>

@@ -134,3 +134,12 @@ Tests: `tests/permissions/sql/60_law_changes_test.sql` (13 checks).
 - **Tests:** `tests/permissions/sql/70_search_limit_test.sql` (12 checks), `40_library_search_test.sql` updated to the 30 cap, `tests/unit/search.test.ts` and `rerank.test.ts`. The retrieval test now checks the live search: every question in the top 8 and all but one in the top 5.
 
 Founder step: paste `supabase/migrations/20261021001000_search_rerank.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it.
+
+## Out-of-date material and the archive of originals (migration 11)
+
+- **Out of date means out of search for students.** When a reviewer records a law change, approved items in that course checked only up to an earlier date ("Needs re-check") are left out of student search straight away, inside `search_library`. They come back when a reviewer saves a "law current as of" date on or after the change. Reviewers and the admin jobs still find them, so they can check them. Screens say "hidden from students".
+- **What this cannot catch:** approved material that is out of date with no law change recorded. The legal reviewer must record changes as they happen.
+- **Archive of originals (rule Q-03).** A separate private store, `library-archive`, keeps each item's original file under its content fingerprint (`course/item/sha256.ext`). Admins may add and read; nobody, admins included, can overwrite or delete (no such rule exists). The reading step archives a file before reading it, once per item, and records `kb_items.archive_path` (admins only, write-once). The archive is never read, split, indexed or searched. Files read before migration 11 are archived by the one-off admin job `jobs/archive-originals.job.ts` (GitHub Actions, "Archive library originals").
+- **Tests:** `tests/permissions/sql/80_recheck_and_archive_test.sql` (14 checks), `tests/unit/archive.test.ts`.
+
+Founder step: paste `supabase/migrations/20261021001100_recheck_and_archive.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it.

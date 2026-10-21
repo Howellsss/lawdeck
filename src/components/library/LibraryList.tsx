@@ -61,7 +61,7 @@ export function LibraryList({
             </p>
             {recheck.has(item.id) && (
               <p className="text-sm text-warning">
-                Needs re-check: {recheck.get(item.id)?.[0]?.changeTitle}
+                Needs re-check (hidden from students): {recheck.get(item.id)?.[0]?.changeTitle}
                 {(recheck.get(item.id)?.length ?? 0) > 1 ? ` and ${(recheck.get(item.id)?.length ?? 1) - 1} more` : ""}
               </p>
             )}
