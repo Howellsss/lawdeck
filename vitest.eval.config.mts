@@ -13,7 +13,7 @@ export default defineConfig({
   test: {
     include: ["tests/eval/**/*.eval.ts"],
     environment: "node",
-    testTimeout: 20 * 60_000,
+    testTimeout: 55 * 60_000, // Voyage free tier: about 10,000 tokens a minute, so a full run can take most of an hour.
     fileParallelism: false,
   },
 });

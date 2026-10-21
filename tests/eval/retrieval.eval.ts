@@ -7,7 +7,7 @@ import { createAdminClient } from "@/server/db/admin";
 import { fuseRankings, rankByMeaning } from "@/server/retrieval/fuse";
 import { passageSearchText } from "@/server/retrieval/indexJob";
 import { EMBEDDING_MODELS, type EmbeddingModel } from "@/server/retrieval/settings";
-import { EMBED_BATCH, embedTexts } from "@/server/retrieval/voyage";
+import { EMBED_BATCH, embedTexts, fitTokenBudget } from "@/server/retrieval/voyage";
 
 const TOP = 5;
 const TARGET = 25;
@@ -31,12 +31,24 @@ type Passage = { id: string; itemTitle: string; heading: string | null; text: st
 
 const normalise = (text: string) => text.toLowerCase().replace(/\s+/g, " ").trim();
 
+// Same pacing as the indexing job: batches that fit Voyage's per-minute limit, and when Voyage
+// asks us to slow down, wait and try again (a few times) instead of failing the run.
 async function embedAll(texts: string[], inputType: "document" | "query", model: EmbeddingModel) {
   const vectors: number[][] = [];
-  for (let i = 0; i < texts.length; i += EMBED_BATCH) {
-    const result = await embedTexts(texts.slice(i, i + EMBED_BATCH), inputType, model, "eval");
+  let busyInARow = 0;
+  for (let i = 0; i < texts.length; ) {
+    const window = texts.slice(i, i + EMBED_BATCH);
+    const batch = window.slice(0, fitTokenBudget(window));
+    const result = await embedTexts(batch, inputType, model, "eval");
+    if (!result.ok && result.reason === "busy" && busyInARow < 10) {
+      busyInARow++;
+      await new Promise((resolve) => setTimeout(resolve, result.retryAfterMs ?? 20_000));
+      continue;
+    }
     if (!result.ok) throw new Error(`Voyage (${model}) failed: ${result.reason}`);
+    busyInARow = 0;
     vectors.push(...result.vectors);
+    i += batch.length;
   }
   return vectors;
 }

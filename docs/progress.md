@@ -65,7 +65,8 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ 2c. Founder reads one scanned file on the live site; check the transcription and the cost per page
 ✅ 2d. Search by meaning (Voyage AI) and exact words in one database function: approved material only, filtered by course, at most 8 passages; test page for reviewers; 15 new permission checks and 12 logic tests pass
 ✅ 2d. Migration 7 applied in Supabase; service-role key added in Vercel (founder, 2026-10-21); search merged and live
-⬜ 2d. Test the two Voyage models on 30 Civil Litigation questions and record the choice (needs 2g material and the 30 questions)
+✅ 2d. 30 test questions written from Sarumi's Civil Litigation notes (founder asked the AI to write them; a legal reviewer should check them)
+⬜ 2d. Run the retrieval test (Actions → "Retrieval test") and record the model choice
 ✅ Extra (founder request). Import library files from Google Drive: pick several files, details suggested from file names
 ✅ Extra. Google Cloud set-up for the Drive import (founder); Drive import works on the live site
 ✅ 2e. Reviewer console: approve, correct, reject, withdraw; "law current as of" date; approval rules and audit record enforced by the database; 16 new permission checks and 10 logic tests
@@ -119,3 +120,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Founder indexed the Civil Litigation notes (165 of 165 passages). Step 2e: reviewer console, approval rules and audit record.
 - 2026-10-21: Migration 8 applied; step 2e merged. Step 2f: law changes and the "Needs re-check" warning.
 - 2026-10-21: Migration 9 applied; step 2f merged. Founder approved the Civil Litigation material as interim reviewer (2g); a legal reviewer will recheck it before launch.
+- 2026-10-21: 30 retrieval test questions written from Sarumi's Civil Litigation notes. The retrieval test now paces itself to Voyage's free-tier limit.
