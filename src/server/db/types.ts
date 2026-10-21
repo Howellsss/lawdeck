@@ -39,8 +39,9 @@ export type Database = {
       };
       topics: {
         Row: { id: string; course_id: string; slug: string; name: string; position: number; created_at: string };
-        Insert: never;
-        Update: never;
+        // Admins only (migration 13). The slug never changes once made.
+        Insert: { course_id: string; slug: string; name: string; position?: number };
+        Update: { name?: string; position?: number };
         Relationships: [];
       };
       projects: {
@@ -57,8 +58,15 @@ export type Database = {
           title: string;
           mode: "learn" | "draft";
           course_id: string | null;
+          auto_routed: boolean;
         };
-        Insert: { project_id?: string | null; title?: string; mode?: "learn" | "draft"; course_id?: string | null };
+        Insert: {
+          project_id?: string | null;
+          title?: string;
+          mode?: "learn" | "draft";
+          course_id?: string | null;
+          auto_routed?: boolean;
+        };
         Update: { project_id?: string | null; title?: string; course_id?: string | null };
         Relationships: [];
       };
