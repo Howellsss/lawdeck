@@ -9,7 +9,7 @@ import type { FieldErrors } from "@/lib/fieldErrors";
 import { kindFromFileName, LIBRARY_ACCEPT, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
 import { KB_ITEM_TYPES } from "@/lib/libraryLabels";
 import { finishLibraryUpload, startLibraryUpload, type UploadDetails } from "@/server/library/actions";
-import { progressText, readUntilDone } from "./readItem";
+import { readAndIndex } from "./readItem";
 import { SelectField } from "./SelectField";
 import { uploadFile } from "./uploadFile";
 
@@ -70,13 +70,14 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
     // Read the file into passages straight away.
     const title = details.title.trim();
     setReading("Reading…");
-    const read = await readUntilDone(finished.id, true, (step) => setReading(progressText(step)));
+    const read = await readAndIndex(finished.id, true, setReading);
     setReading(null);
     router.refresh();
     if (!read.ok) {
+      const stage = read.stage === "index" ? "it was read, but indexing for search stopped" : "reading it stopped";
       return setStatus({
         tone: "warning",
-        message: `“${title}” was added, but reading it stopped: ${read.message} You can try again from the list below.`,
+        message: `“${title}” was added, but ${stage}: ${read.message} You can try again from the list below.`,
       });
     }
     setStatus({
@@ -129,7 +130,7 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
       />
       {reading !== null && (
         <p role="status" className="text-sm text-muted">
-          {reading}. Keep this page open.
+          {reading} Keep this page open.
         </p>
       )}
       {progress !== null && (
