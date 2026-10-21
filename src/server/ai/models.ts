@@ -6,6 +6,8 @@ export const MODELS = {
   healthCheck: "claude-haiku-5-5",
   routing: "claude-haiku-5-5",
   smallJobs: "claude-haiku-5-5",
+  // Reading scanned pages and photos into text (step 2c). Switch to Sonnet if a sample scan shows mistakes.
+  transcribe: "claude-haiku-5-5",
   explain: "claude-sonnet-5-5",
   marking: "claude-sonnet-5-5",
   documents: "claude-opus-5-5",
