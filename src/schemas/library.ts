@@ -62,3 +62,11 @@ export const librarySearchSchema = z.object({
   courseId: z.uuid({ error: "Choose a course." }),
   includePending: z.boolean(),
 });
+
+// One file picked in Google's file picker, with its details (Drive import).
+export const driveImportSchema = z.object({
+  // Short-lived Google access token from the picker (never stored or logged).
+  accessToken: z.string().min(20).max(4096),
+  fileId: z.string().regex(/^[A-Za-z0-9_-]{10,200}$/, { error: "That Google Drive file is not recognised." }),
+  details: libraryDetailsSchema,
+});

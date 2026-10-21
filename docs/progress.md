@@ -64,8 +64,10 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2c. Migration 6 applied in Supabase (founder, 2026-10-21); code merged and live
 ⬜ 2c. Founder reads one scanned file on the live site; check the transcription and the cost per page
 ✅ 2d. Search by meaning (Voyage AI) and exact words in one database function: approved material only, filtered by course, at most 8 passages; test page for reviewers; 15 new permission checks and 12 logic tests pass
-⬜ 2d. Migration 7 applied in Supabase; service-role key added in Vercel (founder)
+✅ 2d. Migration 7 applied in Supabase; service-role key added in Vercel (founder, 2026-10-21); search merged and live
 ⬜ 2d. Test the two Voyage models on 30 Civil Litigation questions and record the choice (needs 2g material and the 30 questions)
+✅ Extra (founder request). Import library files from Google Drive: pick several files, details suggested from file names
+⬜ Extra. Google Cloud set-up for the Drive import (founder)
 ⬜ 2e. Reviewer console: approve, correct, reject, withdraw; reviewer and date recorded
 ⬜ 2f. Out-of-date warning for material older than a later change in the law
 ⬜ 2g. Civil Litigation material loaded and approved
@@ -109,3 +111,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
 - 2026-10-21: Founder confirmed a test upload on the live Library page (step 2b).
 - 2026-10-21: Step 2d: hybrid library search (Voyage AI + exact words), indexing admin job, reviewer test page and retrieval test.
+- 2026-10-21: Migration 7 applied and service-role key added (founder); step 2d merged.
+- 2026-10-21: Google Drive import for library files (founder request): pick several files, details suggested from file names, same checks as uploads.

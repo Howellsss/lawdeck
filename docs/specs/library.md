@@ -84,3 +84,22 @@ Tests: `tests/permissions/sql/40_library_search_test.sql` (15 checks), `tests/un
 2. In Vercel: add `SUPABASE_SERVICE_ROLE_KEY` (Supabase > Project Settings > API keys > the secret or "service_role" key) for Production and Preview, marked Sensitive. `VOYAGE_API_KEY` is already there.
 3. For the retrieval test on GitHub: add `SUPABASE_SERVICE_ROLE_KEY` and `VOYAGE_API_KEY` as repository secrets (Settings > Secrets and variables > Actions).
 
+## Drive import (founder request, 2026-10-21)
+
+- Admins see "Import from Google Drive" on the Library page once Google is set up. Google's own file picker opens; the admin chooses several files (PDF, Word, PNG, JPEG), checks the suggested details for each and clicks Import.
+- Suggestions come from the file name (`src/lib/driveGuess.ts`): the course whose distinctive word is in the name (one spelling slip allowed, e.g. "Cooporate"), the year, and a tidy title. Type starts as "Course material". Nothing is imported until the admin confirms.
+- Access: only Google's `drive.file` permission (the files picked, nothing else), for about an hour. The short-lived token goes to Lawdeck's server for that import only and is never stored or logged.
+- The server fetches each file (`src/server/library/drive.ts`), with the same checks as an upload: admin role, details, real file type, 25 MB limit (the download stops as soon as it passes 25 MB). Google Docs/Sheets/Slides are refused. A file already in the course (same name and size) is skipped. It is stored in the private library store, recorded "awaiting review", then read and indexed like an upload.
+- Google's scripts (`accounts.google.com/gsi/client`, `apis.google.com/js/api.js`) load only when an admin clicks the button (approved by the founder, 2026-10-21).
+
+Tests: `tests/unit/driveImport.test.ts` (10 checks).
+
+### Founder steps for the Drive import (Google Cloud, same project as Google sign-in)
+
+1. APIs & Services > Library: enable **Google Picker API** and **Google Drive API**.
+2. APIs & Services > Credentials > Create credentials > API key. Restrict it: Websites `https://lawdeck.vercel.app/*`; APIs: Google Picker API. Copy it.
+3. Credentials > the OAuth "Web client" used for sign-in: add `https://lawdeck.vercel.app` under Authorised JavaScript origins. Copy its Client ID.
+4. OAuth consent screen (Google Auth Platform) > Data access > Add scopes: `.../auth/drive.file`.
+5. Dashboard > Project info: copy the Project number.
+6. Vercel > Environment Variables (Production and Preview): `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_GOOGLE_PICKER_API_KEY`, `NEXT_PUBLIC_GOOGLE_APP_ID`. Then redeploy.
+

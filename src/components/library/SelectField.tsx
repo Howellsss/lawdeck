@@ -8,11 +8,14 @@ export function SelectField({
   name,
   options,
   error,
+  defaultValue = "",
 }: {
   label: string;
   name: string;
   options: [string, string][];
   error?: string;
+  // A suggested choice; empty means "Choose…".
+  defaultValue?: string;
 }) {
   const id = useId();
   return (
@@ -23,7 +26,7 @@ export function SelectField({
       <select
         id={id}
         name={name}
-        defaultValue=""
+        defaultValue={defaultValue}
         required
         aria-invalid={error ? true : undefined}
         aria-describedby={error ? `${id}-error` : undefined}
