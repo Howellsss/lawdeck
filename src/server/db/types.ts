@@ -6,6 +6,8 @@ type Timestamps = { created_at: string; updated_at: string };
 
 type KbItemType = "course_material" | "note" | "draft" | "textbook" | "statute" | "rule_of_court" | "case";
 type ReviewStatus = "pending" | "approved" | "rejected" | "withdrawn";
+type ReadingStatus = "waiting" | "reading" | "done" | "failed";
+type ReadingMethod = "text" | "scan" | "mixed";
 
 export type Database = {
   public: {
@@ -121,6 +123,12 @@ export type Database = {
           review_note: string | null;
           law_current_as_of: string | null;
           created_by: string | null;
+          reading_status: ReadingStatus;
+          reading_method: ReadingMethod | null;
+          reading_quality: number | null;
+          page_count: number | null;
+          read_at: string | null;
+          reading_error: string | null;
         };
         Insert: {
           title: string;
@@ -145,8 +153,25 @@ export type Database = {
           campus?: string | null;
           year?: number | null;
           source?: string | null;
+          reading_status?: ReadingStatus;
+          page_count?: number | null;
+          reading_error?: string | null;
         };
         Relationships: [];
+      };
+      kb_item_pages: {
+        Row: { item_id: string; page: number; text: string; method: "text" | "scan"; created_at: string };
+        Insert: { item_id: string; page: number; text: string; method: "text" | "scan" };
+        Update: never;
+        Relationships: [
+          {
+            foreignKeyName: "kb_item_pages_item_id_fkey";
+            columns: ["item_id"];
+            isOneToOne: false;
+            referencedRelation: "kb_items";
+            referencedColumns: ["id"];
+          },
+        ];
       };
       kb_passages: {
         Row: Timestamps & {
@@ -169,13 +194,25 @@ export type Database = {
           page_to?: number | null;
         };
         Update: { heading?: string | null; text?: string };
-        Relationships: [];
+        Relationships: [
+          {
+            foreignKeyName: "kb_passages_item_id_fkey";
+            columns: ["item_id"];
+            isOneToOne: false;
+            referencedRelation: "kb_items";
+            referencedColumns: ["id"];
+          },
+        ];
       };
     };
     Views: { [_ in never]: never };
     Functions: {
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };
+      replace_kb_passages: {
+        Args: { target_item: string; passages: Json; method: ReadingMethod; quality: number; pages: number };
+        Returns: number;
+      };
     };
     Enums: {
       app_role: "student" | "reviewer" | "admin";
@@ -183,6 +220,8 @@ export type Database = {
       message_role: "user" | "assistant";
       kb_item_type: KbItemType;
       review_status: ReviewStatus;
+      reading_status: ReadingStatus;
+      reading_method: ReadingMethod;
     };
     CompositeTypes: { [_ in never]: never };
   };

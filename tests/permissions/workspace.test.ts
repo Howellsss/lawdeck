@@ -161,6 +161,20 @@ describe("the library", () => {
     expect(file.error).not.toBeNull();
   });
 
+  it("students cannot read page text or replace passages", async () => {
+    const pages = await b.client.from("kb_item_pages").select("item_id").limit(1);
+    expect(pages.error !== null || pages.data?.length === 0).toBe(true);
+    const item = await b.client.from("kb_items").select("id").limit(1).maybeSingle();
+    const replaced = await b.client.rpc("replace_kb_passages", {
+      target_item: item.data?.id ?? "00000000-0000-0000-0000-000000000000",
+      passages: [{ text: "fake" }],
+      method: "text",
+      quality: 1,
+      pages: 1,
+    });
+    expect(replaced.error).not.toBeNull();
+  });
+
   it("students are neither reviewers nor admins", async () => {
     expect((await b.client.rpc("is_reviewer")).data).toBe(false);
     expect((await b.client.rpc("is_admin")).data).toBe(false);
