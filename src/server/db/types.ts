@@ -4,6 +4,9 @@ type Json = string | number | boolean | null | { [key: string]: Json | undefined
 
 type Timestamps = { created_at: string; updated_at: string };
 
+type KbItemType = "course_material" | "note" | "draft" | "textbook" | "statute" | "rule_of_court" | "case";
+type ReviewStatus = "pending" | "approved" | "rejected" | "withdrawn";
+
 export type Database = {
   public: {
     Tables: {
@@ -98,13 +101,88 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      kb_items: {
+        Row: Timestamps & {
+          id: string;
+          title: string;
+          type: KbItemType;
+          course_id: string;
+          topic_ids: string[];
+          campus: string | null;
+          year: number | null;
+          source: string | null;
+          storage_path: string | null;
+          file_name: string | null;
+          mime_type: string | null;
+          size_bytes: number | null;
+          review_status: ReviewStatus;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+          review_note: string | null;
+          law_current_as_of: string | null;
+          created_by: string | null;
+        };
+        Insert: {
+          title: string;
+          type: KbItemType;
+          course_id: string;
+          topic_ids?: string[];
+          campus?: string | null;
+          year?: number | null;
+          source?: string | null;
+          storage_path?: string | null;
+          file_name?: string | null;
+          mime_type?: string | null;
+          size_bytes?: number | null;
+        };
+        Update: {
+          review_status?: ReviewStatus;
+          review_note?: string | null;
+          law_current_as_of?: string | null;
+          title?: string;
+          type?: KbItemType;
+          topic_ids?: string[];
+          campus?: string | null;
+          year?: number | null;
+          source?: string | null;
+        };
+        Relationships: [];
+      };
+      kb_passages: {
+        Row: Timestamps & {
+          id: string;
+          item_id: string;
+          position: number;
+          heading: string | null;
+          text: string;
+          page_from: number | null;
+          page_to: number | null;
+          embedding: string | null;
+          embedding_model: string | null;
+        };
+        Insert: {
+          item_id: string;
+          position: number;
+          heading?: string | null;
+          text: string;
+          page_from?: number | null;
+          page_to?: number | null;
+        };
+        Update: { heading?: string | null; text?: string };
+        Relationships: [];
+      };
     };
     Views: { [_ in never]: never };
-    Functions: { [_ in never]: never };
+    Functions: {
+      is_admin: { Args: Record<string, never>; Returns: boolean };
+      is_reviewer: { Args: Record<string, never>; Returns: boolean };
+    };
     Enums: {
       app_role: "student" | "reviewer" | "admin";
       conversation_mode: "learn" | "draft";
       message_role: "user" | "assistant";
+      kb_item_type: KbItemType;
+      review_status: ReviewStatus;
     };
     CompositeTypes: { [_ in never]: never };
   };

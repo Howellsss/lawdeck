@@ -5,7 +5,7 @@ Proof that one student can never touch another student's data (rules E-06, O-02)
 ## 1. Database rules on a local PostgreSQL (no Supabase needed)
 
 `npm run test:db` loads the migrations into a throwaway local database (with a small
-stand-in for Supabase's sign-in tables) and runs `sql/rls_test.sql`. Needs PostgreSQL 15+
+stand-in for Supabase's sign-in and storage tables) and runs every `sql/*_test.sql` file. Needs PostgreSQL 15+
 running locally; set `PGHOST`, `PGPORT` and `PGUSER` if it is not the default.
 
 ## 2. The real Supabase project

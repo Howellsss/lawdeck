@@ -14,4 +14,5 @@ trap 'psql -q -d postgres -c "drop database if exists $DB"' EXIT
 run() { psql -q -X -v ON_ERROR_STOP=1 -o /dev/null -d "$DB" -f "$1" 2>&1 | sed -e "s/^psql:[^ ]* NOTICE:  //" -e "/does not exist, skipping/d"; return "${PIPESTATUS[0]}"; }
 run tests/permissions/sql/supabase_stub.sql
 for file in supabase/migrations/*.sql; do run "$file"; done
-run tests/permissions/sql/rls_test.sql
+run tests/permissions/sql/helpers.sql
+for file in tests/permissions/sql/*_test.sql; do run "$file"; done
