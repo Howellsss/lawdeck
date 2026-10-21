@@ -27,7 +27,10 @@ const questionsSchema = z.object({
     .min(1),
 });
 
-type Passage = { id: string; itemTitle: string; heading: string | null; text: string };
+type Passage = { id: string; itemId: string; position: number; itemTitle: string; heading: string | null; text: string };
+
+// The real search hands the top 8 passages to the AI (SEARCH_RESULTS); the target is set on the top 5.
+const AI_RECEIVES = 8;
 
 const normalise = (text: string) => text.toLowerCase().replace(/\s+/g, " ").trim();
 
@@ -74,12 +77,21 @@ describe("retrieval test", () => {
     for (let from = 0; ; from += 1000) {
       const page = await db
         .from("kb_passages")
-        .select("id, item_id, heading, text")
+        .select("id, item_id, position, heading, text")
         .in("item_id", [...titles.keys()])
         .order("id")
         .range(from, from + 999);
       if (page.error) throw new Error(`Passages could not be loaded (${page.error.code})`);
-      passages.push(...page.data.map((p) => ({ id: p.id, itemTitle: titles.get(p.item_id) ?? "", heading: p.heading, text: p.text })));
+      passages.push(
+        ...page.data.map((p) => ({
+          id: p.id,
+          itemId: p.item_id,
+          position: p.position,
+          itemTitle: titles.get(p.item_id) ?? "",
+          heading: p.heading,
+          text: p.text,
+        })),
+      );
       if (page.data.length < 1000) break;
     }
     expect(passages.length, "The course has no passages to search").toBeGreaterThan(0);
@@ -97,15 +109,28 @@ describe("retrieval test", () => {
       byWords.set(String(q.id), data.map((row) => row.passage_id));
     }
 
-    const isHit = (q: (typeof questions)[number], ids: string[]) =>
-      ids.some((id) => {
-        const p = byId.get(id);
-        return (
-          p !== undefined &&
-          normalise(passageSearchText(p.heading, p.text)).includes(normalise(q.expectContains)) &&
-          (!q.itemTitle || normalise(p.itemTitle) === normalise(q.itemTitle))
-        );
-      });
+    const answers = (q: (typeof questions)[number], p: Passage | undefined) =>
+      p !== undefined &&
+      normalise(passageSearchText(p.heading, p.text)).includes(normalise(q.expectContains)) &&
+      (!q.itemTitle || normalise(p.itemTitle) === normalise(q.itemTitle));
+    const isHit = (q: (typeof questions)[number], ids: string[]) => ids.some((id) => answers(q, byId.get(id)));
+    // Place (1 = first) of the first passage that answers the question, or "-" when not ranked.
+    const placeOf = (q: (typeof questions)[number], ids: string[]) => {
+      const index = ids.findIndex((id) => answers(q, byId.get(id)));
+      return index < 0 ? "-" : String(index + 1);
+    };
+    // Why a miss might be the test's fault: how many passages contain the answer phrase, and
+    // whether it only appears when neighbouring passages are joined (split across a boundary).
+    const phraseCheck = (q: (typeof questions)[number]) => {
+      const inPassages = passages.filter((p) => answers(q, p)).length;
+      if (inPassages > 0) return `answer phrase in ${inPassages} passage(s)`;
+      const items = new Map<string, Passage[]>();
+      passages.forEach((p) => items.set(p.itemId, [...(items.get(p.itemId) ?? []), p]));
+      const split = [...items.values()].some((list) =>
+        normalise(list.sort((a, b) => a.position - b.position).map((p) => p.text).join(" ")).includes(normalise(q.expectContains)),
+      );
+      return split ? "answer phrase split across two passages" : "answer phrase not found in the library text";
+    };
 
     const lines = [`Retrieval test: ${questions.length} questions, ${passages.length} passages, top ${TOP}`, ""];
     const scores: Record<string, number> = {};
@@ -115,17 +140,28 @@ describe("retrieval test", () => {
       const queryVectors = await embedAll(questions.map((q) => q.question), "query", model);
       const indexed = passages.map((p, i) => ({ id: p.id, vector: docVectors[i] }));
       let hybrid = 0;
+      let hybridAi = 0;
       let meaningOnly = 0;
       const misses: string[] = [];
+      const details: string[] = [];
       questions.forEach((q, i) => {
         const meaning = rankByMeaning(queryVectors[i], indexed);
+        const words = byWords.get(String(q.id)) ?? [];
+        const combined = fuseRankings(meaning, words, passages.length);
         if (isHit(q, meaning.slice(0, TOP))) meaningOnly++;
-        if (isHit(q, fuseRankings(meaning, byWords.get(String(q.id)) ?? [], TOP))) hybrid++;
-        else misses.push(String(q.id));
+        if (isHit(q, combined.slice(0, AI_RECEIVES))) hybridAi++;
+        if (isHit(q, combined.slice(0, TOP))) hybrid++;
+        else {
+          misses.push(String(q.id));
+          details.push(
+            `  Q${q.id}: right passage at combined #${placeOf(q, combined)}, meaning #${placeOf(q, meaning)}, words #${placeOf(q, words)}; ${phraseCheck(q)}`,
+          );
+        }
       });
       scores[model] = hybrid;
       lines.push(
-        `${EMBEDDING_MODELS[model].label}: hybrid ${hybrid}/${questions.length}, meaning only ${meaningOnly}/${questions.length}; missed: ${misses.join(", ") || "none"}`,
+        `${EMBEDDING_MODELS[model].label}: hybrid ${hybrid}/${questions.length} (top ${AI_RECEIVES}: ${hybridAi}/${questions.length}), meaning only ${meaningOnly}/${questions.length}; missed: ${misses.join(", ") || "none"}`,
+        ...details,
       );
     }
     lines.push(`Exact words only: ${wordsOnly}/${questions.length}`);
