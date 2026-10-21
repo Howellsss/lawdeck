@@ -92,10 +92,11 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3b. Sources: list under each answer and [S1] buttons open the passage in the right panel (only while approved and up to date)
 ✅ 3b. Citation check and 50-word quote limit on every sentence before it is shown
 ✅ 3b. "Not enough in the Lawdeck library" answer when the passages cannot support one
-⬜ 3a/3b. Migration 12 applied in Supabase (founder)
+✅ 3a/3b. Migration 12 applied in Supabase (founder, 2026-10-21); merged and live
 ⬜ 3a/3b. Founder asks a few Civil Litigation questions on the live site
-⬜ 3c. Simple and Exam-ready levels; course hubs listing topics
-⬜ 3c. Auto mode routing with Haiku and the "Treated as" chip
+✅ 3c. Simple and Exam-ready levels on every answer; course hubs list topics and start explanations; admin topics editor
+✅ 3c. Auto mode routing with Haiku and the "Treated as" chip; 100-request routing test ready
+⬜ 3c. Migration 13 applied; topics added; routing test run and at least 90/100 (founder: GitHub secret ANTHROPIC_API_KEY)
 ⬜ 3d. Usage logging per call, and per-student limits checked before each call
 ⚠️ 3e. Evaluation set v1: 40+ Civil Litigation questions plus pushback cases, reviewed by a legal reviewer — founder and reviewer
 ⬜ 3e. Model quality test: Haiku, Sonnet and Opus for explanations; choose by quality and cost
@@ -147,3 +148,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Migration 10 applied; re-ranker and search limit merged. Live retrieval test: 35/35 in the top 8 and top 5.
 - 2026-10-21: Out-of-date material leaves student search until re-checked (founder's question); archive of original library files (Q-03). Migration 11.
 - 2026-10-21: Phase 3 started. Steps 3a and 3b: streamed, sourced answers with citation check, quote limit and "not enough" answer; migration 12 (answer sources).
+- 2026-10-21: Migration 12 applied (founder); steps 3a and 3b merged.
+- 2026-10-21: Step 3c: answer levels, course hubs with admin topics editor, Auto routing with Haiku and the "Treated as" chip; migration 13.
