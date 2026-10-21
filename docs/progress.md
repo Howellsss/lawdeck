@@ -43,7 +43,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⚠️ 1b. First real sign-up test on lawdeck.vercel.app — founder to try it with their own email
 ✅ 1c. Database tables written as migrations: profiles, plans, courses, topics, projects, conversations, messages, usage_events, audit_log — row-level security on every table
 ✅ 1c. Permission tests pass on a local copy (29 checks; deliberately broken rules are caught)
-⬜ 1c. Founder applies the three migrations in the Supabase SQL Editor
+✅ 1c. The three migrations applied in Supabase (2026-10-21)
 ⚠️ 1c. Permission tests on the real project — need network access to Supabase for the build workspace and two test accounts (founder)
 ⬜ 1d. Projects and chats saved per student
 ⬜ 1e. Automatic checks on every pull request; Google sign-in
@@ -59,3 +59,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Supabase sign-in settings set (addresses, password length). Clearer message when an email link is opened in a different browser.
 - 2026-10-21: Phase 1 step 1c: database migrations with row-level security, local permission tests (29 passing), real-project permission tests ready.
 - 2026-10-21: Working rule: the AI coding tool merges its own pull requests after all checks pass, and gives direct links for manual steps.
+- 2026-10-21: The three database migrations were applied in Supabase by the founder.
