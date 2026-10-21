@@ -4,6 +4,7 @@ import { AccountSlot } from "@/components/shell/AccountSlot";
 import { AppShell } from "@/components/shell/AppShell";
 import { RecentsPlaceholder } from "@/components/shell/RecentsList";
 import { RecentsSlot } from "@/components/shell/RecentsSlot";
+import { StaffNavSlot } from "@/components/shell/StaffNavSlot";
 
 export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
   return (
@@ -12,6 +13,11 @@ export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
       account={
         <Suspense fallback={<AccountButtonPlaceholder />}>
           <AccountSlot />
+        </Suspense>
+      }
+      staffNav={
+        <Suspense fallback={null}>
+          <StaffNavSlot />
         </Suspense>
       }
       recents={

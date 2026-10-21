@@ -28,3 +28,12 @@ Tests: `tests/permissions/sql/20_library_test.sql` (26 checks) and the "library"
    where id = (select id from auth.users where email = 'YOUR-EMAIL@example.com');
    ```
    Expected: "Success. 1 row affected". Reviewers are made the same way with `'reviewer'`.
+
+## Step 2b: admin upload screen (`/admin/library`)
+
+- Reached from "Library" in the left menu, shown only to reviewers and admins. The page checks the role on the server; anyone else sees "Page not found" and no library content.
+- Admins upload one file with its details: title, type, course, year, campus, source. Reviewers see the list but cannot upload or remove.
+- How a file travels: the server checks the details and the role, then gives the browser a one-time link; the file goes straight into the private `library` store (Vercel cannot carry 25 MB). The server then reads the file's first bytes to check its real type (`src/lib/libraryFiles.ts`), and only then records the item as "awaiting review". A mismatched file is deleted with a clear message.
+- Files from interrupted uploads (no item, older than an hour) are removed the next time anyone uploads to that course.
+- Removing an item deletes its passages (database) and its file (store), after a confirmation.
+- Not yet: reading the file's text (2c); an audit-log entry per upload (2e).

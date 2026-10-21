@@ -57,8 +57,9 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ## Phase 2. Library and search
 
 ✅ 2a. Library database written: items, passages, review status, private file store, reviewer/admin roles; 26 new permission checks pass locally
-⬜ 2a. Founder applies migrations 4 and 5 in Supabase and makes their account admin
-⬜ 2b. Admin upload screen (file plus its details)
+✅ 2a. Migrations 4 and 5 applied in Supabase; founder account is admin
+✅ 2b. Admin upload screen: file plus details, real file type checked, straight to the private store; list and remove
+⬜ 2b. Founder uploads one small test file on the live site
 ⬜ 2c. Reading files: text from PDF and Word, scans and photos, split into passages with headings and pages
 ⬜ 2d. Search by meaning (Voyage AI) and exact words; test two Voyage models on 30 Civil Litigation questions and record the choice
 ⬜ 2e. Reviewer console: approve, correct, reject, withdraw; reviewer and date recorded
@@ -98,3 +99,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Phase 1 complete: founder confirmed sign out, password reset, Google sign-in and projects on the live site.
 
 - 2026-10-21: Phase 2 started. Step 2a: library database and file store with permission tests.
+- 2026-10-21: Step 2b: admin Library page with upload, real file-type check, list and remove.
