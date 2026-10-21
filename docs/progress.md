@@ -44,13 +44,13 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1c. Database tables written as migrations: profiles, plans, courses, topics, projects, conversations, messages, usage_events, audit_log — row-level security on every table
 ✅ 1c. Permission tests pass on a local copy (29 checks; deliberately broken rules are caught)
 ✅ 1c. The three migrations applied in Supabase (2026-10-21)
-⬜ 1c. Permission tests on the real project — moved to step 1e (run on GitHub with its private settings)
+✅ 1c. Permission tests on the real project — run on GitHub (step 1e)
 ✅ 1d. Projects: create, rename, delete (with confirmation); project page lists its chats
 ✅ 1d. Recents in the left menu shows the student's latest chats; read-only chat page
 ✅ 1d. Courses page reads the five courses from the database
 ⬜ 1d. Founder tries projects on the live site (signed-in journeys are not yet browser-tested automatically; that needs the test accounts in step 1e)
 ✅ 1e. Automatic checks on every pull request (GitHub Actions): lint, types, unit tests, build, browser tests, database permission rules, library security check
-⚠️ 1e. Real-project permission tests on GitHub — need two test accounts in Supabase and 6 repository secrets in GitHub (founder)
+✅ 1e. Real-project permission tests run on GitHub on every pull request (test accounts and secrets added by the founder)
 ✅ 1e. Google sign-in built ("Continue with Google"), hidden until switched on
 ⚠️ 1e. Google sign-in switched on — needs a Google Cloud sign-in client, the Supabase Google setting and GOOGLE_SIGN_IN_ENABLED=true in Vercel (founder; steps in docs/specs/sign-in.md)
 
@@ -69,3 +69,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Phase 1 step 1d: projects, Recents and courses from the database. 36 logic tests and 32 browser tests passing.
 - 2026-10-21: Phase 1 step 1e: automatic checks on every pull request (GitHub Actions).
 - 2026-10-21: Google sign-in built; it appears once set up in Google Cloud, Supabase and Vercel.
+- 2026-10-21: Real-project permission tests added to the automatic checks.
