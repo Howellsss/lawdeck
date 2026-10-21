@@ -3,11 +3,13 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { LibraryList } from "@/components/library/LibraryList";
+import { DriveImport } from "@/components/library/DriveImport";
 import { UploadForm } from "@/components/library/UploadForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { getStaffRole } from "@/server/auth/roles";
 import { getSupabaseConfig } from "@/server/auth/config";
 import { listLibraryItems } from "@/server/db/library";
+import { getDrivePickerConfig } from "@/server/library/driveConfig";
 import { listCourses } from "@/server/db/workspace";
 import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
 
@@ -31,6 +33,7 @@ async function Library() {
   if (!role) notFound();
   const [items, courses] = await Promise.all([listLibraryItems(), listCourses()]);
   const apiKey = getSupabaseConfig()?.key ?? "";
+  const drive = role === "admin" ? getDrivePickerConfig() : null;
 
   return (
     <>
@@ -45,6 +48,7 @@ async function Library() {
           </Link>
         </p>
       </div>
+      {drive && courses.status === "ok" && <DriveImport config={drive} courses={courses.data} />}
       {role === "admin" && courses.status === "ok" && <UploadForm courses={courses.data} apiKey={apiKey} />}
       <section aria-labelledby="library-items" className="flex flex-col gap-3">
         <h2 id="library-items" className="text-lg font-medium">
