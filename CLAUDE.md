@@ -55,6 +55,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - Black and white, calm, input-first. Tokens live in `src/app/globals.css`.
 - Dark mode is the default (paper #1A1A19, sidebar #141413, surface #262624, line #3A3936, ink #ECEAE4, muted #A3A09A). Light mode (ink #141414, muted #6B6B6B, line #E7E5E0, paper #FAF9F7, white surfaces) is a switch in the sidebar; the choice is saved in the browser as `lawdeck-theme`. Every screen must work in both.
 - Colour only for meaning: green `success` for verified or correct, amber `warning` for warnings or low scores. Never decorative.
+- One exception: the official multicolour Google "G" on "Continue with Google", because Google's branding rules require it (founder's decision, 2026-10-21).
 - Fonts: Newsreader (greeting and headings), Inter (everything else), Outfit bold (the "Lawdeck" wordmark only).
 - Text links are underlined. Buttons look like buttons (black filled, or outlined).
 - Placeholders for missing facts in documents: bold, grey box, dashed black underline (`.placeholder`).
