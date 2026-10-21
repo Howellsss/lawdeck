@@ -59,7 +59,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2a. Library database written: items, passages, review status, private file store, reviewer/admin roles; 26 new permission checks pass locally
 ✅ 2a. Migrations 4 and 5 applied in Supabase; founder account is admin
 ✅ 2b. Admin upload screen: file plus details, real file type checked, straight to the private store; list and remove
-⬜ 2b. Founder uploads one small test file on the live site
+✅ 2b. Founder uploaded a test file on the live site (2026-10-21)
 ✅ 2c. Reading files: text from PDF and Word (new libraries unpdf and mammoth, approved), scans and photos read by Claude Haiku 5.5, split into 300–800-word passages with headings and pages; 17 new permission checks and 20 logic tests pass
 ✅ 2c. Migration 6 applied in Supabase (founder, 2026-10-21); code merged and live
 ⬜ 2c. Founder reads one scanned file on the live site; check the transcription and the cost per page
@@ -105,3 +105,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Step 2c: reading library files into passages (PDF, Word, scans and photos). Libraries unpdf and mammoth approved; scans read by Claude Haiku 5.5.
 - 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
 - 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
+- 2026-10-21: Founder confirmed a test upload on the live Library page (step 2b).
