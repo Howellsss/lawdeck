@@ -28,7 +28,8 @@ export type SearchResult =
 // the search still works (exact words, or the combined order without re-ranking) and says so.
 export async function searchLibrary(input: {
   question: string;
-  courseId: string;
+  // null searches every course ("All courses").
+  courseId: string | null;
   includePending: boolean;
 }): Promise<SearchResult> {
   const embedded = await embedTexts([input.question], "query", EMBEDDING_MODEL, "search");

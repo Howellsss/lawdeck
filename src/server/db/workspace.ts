@@ -1,4 +1,5 @@
 import "server-only";
+import { pagesLabel } from "@/lib/pages";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { projectIdSchema } from "@/schemas/projects";
@@ -87,9 +88,16 @@ export async function listCourses(): Promise<Loaded<CourseSummary[]>> {
   return { status: "ok", data };
 }
 
-export type ChatMessage = { id: string; role: "user" | "assistant"; text: string; createdAt: string };
+export type ChatSource = { id: string; label: number; itemTitle: string; heading: string | null; pages: string | null };
+export type ChatMessage = {
+  id: string;
+  role: "user" | "assistant";
+  text: string;
+  createdAt: string;
+  sources: ChatSource[];
+};
 
-// The text part of a stored message. Other structured parts are added in Phase 3.
+// The text part of a stored message.
 function messageText(content: unknown): string {
   if (content && typeof content === "object" && "text" in content) {
     const text = (content as { text: unknown }).text;
@@ -100,32 +108,55 @@ function messageText(content: unknown): string {
 
 export async function getChat(
   id: string,
-): Promise<Loaded<{ chat: ChatSummary; messages: ChatMessage[] } | null>> {
+): Promise<Loaded<{ chat: ChatSummary & { courseName: string | null }; messages: ChatMessage[] } | null>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   if (!projectIdSchema.safeParse(id).success) return { status: "ok", data: null };
   const supabase = await createSupabaseServerClient();
 
-  const chat = await supabase.from("conversations").select("id, title, updated_at").eq("id", id).maybeSingle();
+  const chat = await supabase.from("conversations").select("id, title, updated_at, course_id").eq("id", id).maybeSingle();
   if (chat.error) failed("chat", chat.error.code);
   if (!chat.data) return { status: "ok", data: null };
 
-  const messages = await supabase
-    .from("messages")
-    .select("id, role, content, created_at")
-    .eq("conversation_id", id)
-    .order("created_at")
-    .limit(500);
+  const [messages, course] = await Promise.all([
+    supabase.from("messages").select("id, role, content, created_at").eq("conversation_id", id).order("created_at").limit(500),
+    chat.data.course_id
+      ? supabase.from("courses").select("name").eq("id", chat.data.course_id).maybeSingle()
+      : Promise.resolve({ data: null, error: null }),
+  ]);
   if (messages.error) failed("chat messages", messages.error.code);
+
+  // The sources of the answers (Phase 3): the student's own rows only (row-level security).
+  const answerIds = messages.data.filter((m) => m.role === "assistant").map((m) => m.id);
+  const sources = answerIds.length
+    ? await supabase
+        .from("message_sources")
+        .select("id, message_id, label, item_title, heading, page_from, page_to")
+        .in("message_id", answerIds)
+        .order("label")
+    : { data: [], error: null };
+  if (sources.error) failed("chat sources", sources.error.code);
+  const byMessage = new Map<string, ChatSource[]>();
+  for (const row of sources.data ?? []) {
+    const list = byMessage.get(row.message_id) ?? [];
+    list.push({ id: row.id, label: row.label, itemTitle: row.item_title, heading: row.heading, pages: pagesLabel(row.page_from, row.page_to) });
+    byMessage.set(row.message_id, list);
+  }
 
   return {
     status: "ok",
     data: {
-      chat: { id: chat.data.id, title: chat.data.title, updatedAt: chat.data.updated_at },
+      chat: {
+        id: chat.data.id,
+        title: chat.data.title,
+        updatedAt: chat.data.updated_at,
+        courseName: course.data?.name ?? null,
+      },
       messages: messages.data.map((m) => ({
         id: m.id,
         role: m.role,
         text: messageText(m.content),
         createdAt: m.created_at,
+        sources: byMessage.get(m.id) ?? [],
       })),
     },
   };
