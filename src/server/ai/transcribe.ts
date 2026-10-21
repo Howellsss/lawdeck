@@ -1,7 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { TRANSCRIBE_PROMPT_VERSION, TRANSCRIBE_SYSTEM, transcribeRequest } from "@/prompts/transcribe";
-import { getClaude } from "./client";
+import { failureDetails, getClaude } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
 
@@ -72,8 +72,7 @@ export async function transcribePages(
     pages.delete(Math.max(...pages.keys()));
     return pages.size > 0 ? { ok: true, pages, complete: false } : { ok: false, reason: "unreadable" };
   } catch (error) {
-    const status = error instanceof Anthropic.APIError ? error.status : undefined;
-    console.error("ai call failed", { job: "transcribe", userId, name: (error as Error)?.name, status, ms: Date.now() - started });
+    console.error("ai call failed", { job: "transcribe", userId, ...failureDetails(error), ms: Date.now() - started });
     if (error instanceof Anthropic.BadRequestError) return { ok: false, reason: "unreadable" };
     return { ok: false, reason: "unavailable" };
   }
