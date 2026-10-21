@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ChatThread } from "@/components/learn/ChatThread";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
-import { formatWat } from "@/lib/dates";
 import { getChat } from "@/server/db/workspace";
 
 export const metadata: Metadata = { title: "Chat · Lawdeck" };
 
-// Read-only view of a saved chat. Asking and answering arrive in Phase 3.
+// A Learn chat: its messages, sourced answers and the next-question box (Phase 3).
 export default function ChatPage({ params }: PageProps<"/chats/[id]">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
@@ -28,25 +28,11 @@ async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
 
   return (
     <>
-      <h1 className="break-words font-serif text-3xl font-normal text-greeting">{chat.title}</h1>
-      {messages.length === 0 ? (
-        <p className="text-muted">This chat has no messages yet.</p>
-      ) : (
-        <ol className="flex flex-col gap-4">
-          {messages.map((message) => (
-            <li
-              key={message.id}
-              className={`rounded-2xl px-4 py-3 text-[15px] leading-relaxed ${
-                message.role === "user" ? "self-end bg-pill" : "border border-line"
-              }`}
-            >
-              <span className="sr-only">{message.role === "user" ? "You" : "Lawdeck"}: </span>
-              <span className="whitespace-pre-wrap break-words">{message.text}</span>
-              <span className="mt-1 block text-xs text-muted">{formatWat(message.createdAt)}</span>
-            </li>
-          ))}
-        </ol>
-      )}
+      <div className="flex flex-col gap-1">
+        <h1 className="break-words font-serif text-3xl font-normal text-greeting">{chat.title}</h1>
+        <p className="text-sm text-muted">{chat.courseName ?? "All courses"}</p>
+      </div>
+      <ChatThread chatId={chat.id} initialMessages={messages} />
     </>
   );
 }
