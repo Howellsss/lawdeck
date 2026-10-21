@@ -29,8 +29,30 @@ PRD LN-01 to LN-04, WS-04; Engineering Rules G-01 to G-10; System Design §2 and
 
 Tests: `tests/permissions/sql/90_answers_test.sql` (15 checks), `tests/unit/answerFilter.test.ts` (16), `tests/unit/askStream.test.ts` (6), `tests/e2e/learn.spec.ts` (4, phone and desktop), and the "B cannot reach A's work" part of `tests/permissions/workspace.test.ts`.
 
-Not yet: Simple and Exam-ready levels, course hubs, Auto routing (3c); per-student limits before each call (3d; until then only the founder and test accounts should use it); the evaluation set and model test (3e).
+Not yet: per-student limits before each call (3d; until then only the founder and test accounts should use it); the evaluation set and model test (3e).
 
 ### Founder step for 3a/3b
 
 Paste `supabase/migrations/20261021001200_answers_and_sources.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it. Expected: "Success. No rows returned". Do this before the code goes live.
+
+## Step 3c: levels, course hubs and Auto mode
+
+- **Levels** (LN-02). Every answer is Simple or Exam-ready; Exam-ready is the default. Each answer shows its level and a button for the other ("Explain more simply" / "Make it exam-ready"), which asks the same question again at that level, below. The follow-up box has a Simple / Exam-ready switch. The level instruction (`LEVEL_INSTRUCTIONS` in `src/prompts/explain.ts`, now `explain-v2`) goes with each question, so the fixed instructions stay cached. The level is saved with the question and the answer.
+- **Course hubs** (LN-05). Courses → a course lists its topics in teaching order; "Explain" starts a Learn chat in that course ("Explain <topic>"). Practice sessions from a topic arrive in Phase 4.
+- **Topics editor** (admins only, on the course page): add, rename, move up or down, remove (after a confirmation; chats already started are kept). A topic's web address part is made from its name and never changes. Topics are curriculum structure only (rule H-01). Students and reviewers can only read them (migration 13).
+- **Auto mode** (WS-03). In Auto, Claude Haiku (`MODELS.routing`, `src/prompts/route.ts`, `route-v1`) reads the request (personal data removed) and replies "learn" or "draft". Learn starts the chat as usual and the chat shows "Treated as: Learn" with "Switch to Draft". Draft shows "Treated as: Draft" with "Treat as Learn instead" until drafting arrives (Phase 5). If Haiku cannot be reached within 8 seconds, or replies oddly, the request is treated as Learn. Each routing call logs model, tokens, cost and time, never the request.
+- **Routing test**: `tests/eval/routing/requests.json` (100 requests: 60 Learn, 40 Draft, including "how do I draft…" questions, which are Learn). Target at least 90 correct. Run from GitHub: Actions → "Routing test" → Run workflow (needs the `ANTHROPIC_API_KEY` repository secret), or `npm run eval:routing` locally.
+
+| Part | Students | Reviewers | Admins |
+| --- | --- | --- | --- |
+| `topics` | Read | Read | Add, rename, reorder, remove |
+| `conversations.auto_routed` | Set on their own new chats | — | — |
+
+Tests: `tests/permissions/sql/95_topics_test.sql` (10 checks), `tests/unit/learnLevelsRouting.test.ts` (6), browser tests for the course hub and its editor being hidden from visitors.
+
+### Founder steps for 3c
+
+1. Paste `supabase/migrations/20261021001300_topics_and_routing.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it ("Success. No rows returned"). Before the code goes live.
+2. Add each course's topics: Courses → a course → Manage topics.
+3. For the routing test: add `ANTHROPIC_API_KEY` as a GitHub repository secret (Settings → Secrets and variables → Actions), then run Actions → "Routing test".
+

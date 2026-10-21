@@ -5,8 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { COURSES } from "@/lib/courses";
-import { startChat } from "@/server/learn/actions";
-import { savePendingQuestion } from "./askStream";
+import { openNewChat } from "./openNewChat";
 
 const MODES = ["Auto", "Learn", "Draft"] as const;
 type Mode = (typeof MODES)[number];
@@ -30,28 +29,24 @@ export function Composer() {
   const [course, setCourse] = useState("all");
   const [notice, setNotice] = useState<string | null>(null);
   const [needsSignIn, setNeedsSignIn] = useState(false);
+  const [routedToDraft, setRoutedToDraft] = useState(false);
   const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  async function submit(event: FormEvent) {
+  async function submit(event: FormEvent, asMode: Mode = mode) {
     event.preventDefault();
     const question = text.trim();
     if (!question || busy) return;
-    if (mode === "Draft") return setNotice("Drafting documents arrives in a later build (Phase 5). Use Learn or Auto to ask a question.");
+    setRoutedToDraft(false);
+    if (asMode === "Draft") return setNotice("Drafting documents arrives in a later build (Phase 5). Use Learn or Auto to ask a question.");
     setBusy(true);
     setNotice(null);
-    const started = await startChat({ question, course }).catch(() => ({
-      ok: false as const,
-      message: "Lawdeck could not be reached. Check your connection and try again.",
-      signIn: false,
-    }));
-    if (!started.ok) {
-      setBusy(false);
-      setNeedsSignIn(Boolean(started.signIn));
-      return setNotice(started.message);
-    }
-    savePendingQuestion(started.id, question);
-    router.push(`/chats/${started.id}`);
+    const problem = await openNewChat(router, { question, course, mode: asMode === "Auto" ? "auto" : "learn" });
+    if (!problem) return;
+    setBusy(false);
+    setNeedsSignIn(Boolean(problem.signIn));
+    setRoutedToDraft(Boolean(problem.routedToDraft));
+    setNotice(problem.message);
   }
 
   function applyShortcut(shortcut: (typeof SHORTCUTS)[number]) {
@@ -121,6 +116,18 @@ export function Composer() {
             </>
           )}
         </p>
+      )}
+      {routedToDraft && (
+        <div className="flex flex-wrap items-center gap-2 text-sm">
+          <span className="rounded-full border border-line px-3 py-1 text-muted">Treated as: Draft</span>
+          <button
+            type="button"
+            onClick={(event) => void submit(event, "Learn")}
+            className="text-ink underline underline-offset-2"
+          >
+            Treat as Learn instead
+          </button>
+        </div>
       )}
 
       <div className="hidden flex-wrap justify-center gap-2 lg:flex">

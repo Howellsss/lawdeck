@@ -1,3 +1,4 @@
+import type { AnswerLevel } from "@/prompts/explain";
 import type { AnswerEvent } from "@/server/learn/ask";
 
 // Sends a question to the answer route and reads the answer as it streams
@@ -5,6 +6,7 @@ import type { AnswerEvent } from "@/server/learn/ask";
 export async function askQuestion(
   chatId: string,
   question: string,
+  level: AnswerLevel,
   onEvent: (event: AnswerEvent) => void,
   signal?: AbortSignal,
 ): Promise<void> {
@@ -13,7 +15,7 @@ export async function askQuestion(
     response = await fetch(`/api/chats/${chatId}/answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question }),
+      body: JSON.stringify({ question, level }),
       signal,
     });
   } catch {

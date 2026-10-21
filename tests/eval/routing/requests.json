@@ -1,0 +1,405 @@
+{
+  "description": "Auto mode routing test (PRD WS-03): 100 student requests and the mode each should go to. Target: at least 90 correct.",
+  "requests": [
+    {
+      "request": "Brief the case on the rule in Foss v Harbottle",
+      "expect": "learn"
+    },
+    {
+      "request": "Can you explain what a motion on notice is used for?",
+      "expect": "learn"
+    },
+    {
+      "request": "Compare summary judgment and default judgment",
+      "expect": "learn"
+    },
+    {
+      "request": "Draft a charge for armed robbery",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a charge for theft",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a contract of sale of land",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a deed of gift",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a deed of mortgage",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a lease agreement for office space",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a letter of offer for a property",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a motion ex parte for leave to serve out of jurisdiction",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a motion on notice for an interlocutory injunction",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a notice of appeal against the judgment",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a notice to quit for a yearly tenant",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a petition for winding up a company",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a power of attorney for a property sale",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a statement of defence denying liability",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a summons for directions",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft a writ of summons for a debt recovery claim",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft an engagement letter for a new client",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft an originating summons to interpret a will",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft board resolutions approving a loan",
+      "expect": "draft"
+    },
+    {
+      "request": "Draft special resolutions to change a company name",
+      "expect": "draft"
+    },
+    {
+      "request": "Exam tips for drafting questions in property law",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain appeals from the Magistrate Court",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain how a civil action is commenced in the High Court",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain joinder of parties",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain plea bargaining",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain pre-action protocol in simple terms",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain stamp duties on property transactions",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain the doctrine of lis pendens",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain the duties of directors",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain the order of distribution on intestacy",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain the remedies of a mortgagee",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain the rules of professional conduct on advertising",
+      "expect": "learn"
+    },
+    {
+      "request": "Explain the rules on hearsay evidence",
+      "expect": "learn"
+    },
+    {
+      "request": "Give me five practice questions on bail",
+      "expect": "learn"
+    },
+    {
+      "request": "Help me understand consent to assignment of a right of occupancy",
+      "expect": "learn"
+    },
+    {
+      "request": "How do I draft a writ of summons? What must it contain?",
+      "expect": "learn"
+    },
+    {
+      "request": "How do I prepare for the drafting paper in the Bar exam?",
+      "expect": "learn"
+    },
+    {
+      "request": "How does bail pending trial differ from bail pending appeal?",
+      "expect": "learn"
+    },
+    {
+      "request": "How does service out of jurisdiction work?",
+      "expect": "learn"
+    },
+    {
+      "request": "How does the Land Use Act affect a right of occupancy?",
+      "expect": "learn"
+    },
+    {
+      "request": "How is a company wound up?",
+      "expect": "learn"
+    },
+    {
+      "request": "How is a no-case submission made?",
+      "expect": "learn"
+    },
+    {
+      "request": "How should a lawyer handle client money?",
+      "expect": "learn"
+    },
+    {
+      "request": "I keep confusing ex parte and on notice motions, help",
+      "expect": "learn"
+    },
+    {
+      "request": "Is a letter of offer the same as a contract of sale?",
+      "expect": "learn"
+    },
+    {
+      "request": "Mark my answer: a plaintiff may amend pleadings at any time without leave",
+      "expect": "learn"
+    },
+    {
+      "request": "Practice question on counsel's duty to the court",
+      "expect": "learn"
+    },
+    {
+      "request": "Prepare a bail application for my client",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a consent judgment for the parties",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a deed of assignment of a plot of land",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a share transfer form",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a statement of claim for breach of contract",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a statutory declaration of age",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a tenancy agreement for a flat",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare a will for my client",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare an information for trial in the High Court",
+      "expect": "draft"
+    },
+    {
+      "request": "Prepare minutes of an annual general meeting",
+      "expect": "draft"
+    },
+    {
+      "request": "Quiz me on interlocutory injunctions",
+      "expect": "learn"
+    },
+    {
+      "request": "Revise with me: interpleader",
+      "expect": "learn"
+    },
+    {
+      "request": "Simple explanation of a charge and an information",
+      "expect": "learn"
+    },
+    {
+      "request": "Summarise the stages of a criminal trial",
+      "expect": "learn"
+    },
+    {
+      "request": "Test me on company meetings",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the grounds for setting aside a default judgment?",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the requirements for a valid will?",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the rights of an arrested person?",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the rules on conflict of interest for lawyers?",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the steps in incorporating a private company?",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the time limits for filing an appeal?",
+      "expect": "learn"
+    },
+    {
+      "request": "What are the types of mortgages?",
+      "expect": "learn"
+    },
+    {
+      "request": "What does a company secretary do?",
+      "expect": "learn"
+    },
+    {
+      "request": "What happens if a defendant fails to file a defence?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is a deed of assignment used for?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is a third party notice?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is professional misconduct for a legal practitioner?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the difference between a writ of summons and an originating summons?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the difference between arraignment and plea?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the difference between shares and debentures?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the purpose of a statement of claim?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the quorum for a board meeting?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the role of the Attorney-General in prosecutions?",
+      "expect": "learn"
+    },
+    {
+      "request": "What is the standard of proof in criminal cases?",
+      "expect": "learn"
+    },
+    {
+      "request": "What makes a charge defective?",
+      "expect": "learn"
+    },
+    {
+      "request": "What must an affidavit contain to be valid?",
+      "expect": "learn"
+    },
+    {
+      "request": "What should a power of attorney contain?",
+      "expect": "learn"
+    },
+    {
+      "request": "What should I remember about legal fees and billing?",
+      "expect": "learn"
+    },
+    {
+      "request": "When can a court grant a Mareva injunction?",
+      "expect": "learn"
+    },
+    {
+      "request": "Why is a statement of defence important?",
+      "expect": "learn"
+    },
+    {
+      "request": "Write a counter-affidavit opposing the motion",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a legal opinion letter for a client on a land purchase",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a letter of demand to a tenant owing rent",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a memorandum of association for a private company",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a pre-action notice to a government agency",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a reply to the statement of defence",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a terms of settlement agreement",
+      "expect": "draft"
+    },
+    {
+      "request": "Write a written address in support of a preliminary objection",
+      "expect": "draft"
+    },
+    {
+      "request": "Write an affidavit in support of a motion for extension of time",
+      "expect": "draft"
+    },
+    {
+      "request": "Write the particulars of claim for a small claims matter",
+      "expect": "draft"
+    }
+  ]
+}

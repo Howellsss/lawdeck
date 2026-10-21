@@ -88,14 +88,44 @@ export async function listCourses(): Promise<Loaded<CourseSummary[]>> {
   return { status: "ok", data };
 }
 
+export type TopicSummary = { id: string; slug: string; name: string; position: number };
+
+// One course and its topics in teaching order, for the course hub (PRD LN-05).
+export async function getCourseHub(
+  slug: string,
+): Promise<Loaded<{ course: CourseSummary; topics: TopicSummary[] } | null>> {
+  if (!(await getCurrentAccount())) return { status: "signed-out" };
+  if (!/^[a-z0-9-]{1,60}$/.test(slug)) return { status: "ok", data: null };
+  const supabase = await createSupabaseServerClient();
+  const course = await supabase.from("courses").select("id, slug, name").eq("slug", slug).maybeSingle();
+  if (course.error) failed("course", course.error.code);
+  if (!course.data) return { status: "ok", data: null };
+  const topics = await supabase
+    .from("topics")
+    .select("id, slug, name, position")
+    .eq("course_id", course.data.id)
+    .order("position")
+    .order("name")
+    .limit(500);
+  if (topics.error) failed("topics", topics.error.code);
+  return { status: "ok", data: { course: course.data, topics: topics.data } };
+}
+
 export type ChatSource = { id: string; label: number; itemTitle: string; heading: string | null; pages: string | null };
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
+  // Simple or Exam-ready (PRD LN-02); older messages have none.
+  level: "simple" | "exam" | null;
   createdAt: string;
   sources: ChatSource[];
 };
+
+function messageLevel(content: unknown): "simple" | "exam" | null {
+  const level = content && typeof content === "object" && "level" in content ? content.level : null;
+  return level === "simple" || level === "exam" ? level : null;
+}
 
 // The text part of a stored message.
 function messageText(content: unknown): string {
@@ -108,12 +138,12 @@ function messageText(content: unknown): string {
 
 export async function getChat(
   id: string,
-): Promise<Loaded<{ chat: ChatSummary & { courseName: string | null }; messages: ChatMessage[] } | null>> {
+): Promise<Loaded<{ chat: ChatSummary & { courseName: string | null; autoRouted: boolean }; messages: ChatMessage[] } | null>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   if (!projectIdSchema.safeParse(id).success) return { status: "ok", data: null };
   const supabase = await createSupabaseServerClient();
 
-  const chat = await supabase.from("conversations").select("id, title, updated_at, course_id").eq("id", id).maybeSingle();
+  const chat = await supabase.from("conversations").select("id, title, updated_at, course_id, auto_routed").eq("id", id).maybeSingle();
   if (chat.error) failed("chat", chat.error.code);
   if (!chat.data) return { status: "ok", data: null };
 
@@ -150,11 +180,13 @@ export async function getChat(
         title: chat.data.title,
         updatedAt: chat.data.updated_at,
         courseName: course.data?.name ?? null,
+        autoRouted: chat.data.auto_routed,
       },
       messages: messages.data.map((m) => ({
         id: m.id,
         role: m.role,
         text: messageText(m.content),
+        level: messageLevel(m.content),
         createdAt: m.created_at,
         sources: byMessage.get(m.id) ?? [],
       })),

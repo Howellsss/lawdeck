@@ -37,3 +37,10 @@ test("Draft mode says drafting comes later", async ({ page }) => {
   await page.getByRole("button", { name: "Send" }).click();
   await expect(page.getByText(/Drafting documents arrives in a later build/)).toBeVisible();
 });
+
+test("course hubs never show topics or the topics editor to visitors", async ({ page }) => {
+  await page.goto("/courses/civil-litigation");
+  await expect(page.getByRole("heading", { name: "Manage topics" })).toHaveCount(0);
+  await expect(page.getByRole("button", { name: /^Explain/ })).toHaveCount(0);
+});
+

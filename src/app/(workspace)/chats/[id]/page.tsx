@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChatThread } from "@/components/learn/ChatThread";
+import { RoutedChip } from "@/components/learn/RoutedChip";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { getChat } from "@/server/db/workspace";
@@ -31,6 +32,7 @@ async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
       <div className="flex flex-col gap-1">
         <h1 className="break-words font-serif text-3xl font-normal text-greeting">{chat.title}</h1>
         <p className="text-sm text-muted">{chat.courseName ?? "All courses"}</p>
+        {chat.autoRouted && <RoutedChip />}
       </div>
       <ChatThread chatId={chat.id} initialMessages={messages} />
     </>

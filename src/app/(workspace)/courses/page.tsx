@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { LoadingRows } from "@/components/ui/LoadingRows";
@@ -13,7 +14,7 @@ export default function CoursesPage() {
       <div className="flex flex-col gap-2">
         <h1 className="font-serif text-3xl font-normal text-greeting">Courses</h1>
         <p className="text-muted">
-          The five Bar Part II courses. Topics and study material arrive once the library is loaded (Phase 2).
+          The five Bar Part II courses. Open one to see its topics and ask Lawdeck to explain any of them.
         </p>
       </div>
       <Suspense fallback={<LoadingRows label="Loading courses" rows={5} />}>
@@ -31,9 +32,14 @@ async function Courses() {
   return (
     <ul className="grid gap-3 sm:grid-cols-2">
       {result.data.map((course) => (
-        <li key={course.id} className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-4">
-          <Icon name="book" className="text-muted" />
-          <span className="text-[15px] font-medium">{course.name}</span>
+        <li key={course.id}>
+          <Link
+            href={`/courses/${course.slug}`}
+            className="flex items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-4 hover:bg-pill"
+          >
+            <Icon name="book" className="text-muted" />
+            <span className="text-[15px] font-medium underline underline-offset-2">{course.name}</span>
+          </Link>
         </li>
       ))}
     </ul>

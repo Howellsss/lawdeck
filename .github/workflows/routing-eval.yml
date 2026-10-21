@@ -1,0 +1,25 @@
+# The Auto mode routing test (step 3c): 100 requests, at least 90 must go to the right mode.
+# Run by hand from Actions → "Routing test" → Run workflow. It costs a fraction of a cent.
+name: Routing test
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  routing:
+    name: Routing test (Claude Haiku)
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    env:
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run eval:routing

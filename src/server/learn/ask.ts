@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { questionMessage, type ExplainPassage } from "@/prompts/explain";
+import { questionMessage, type AnswerLevel, type ExplainPassage } from "@/prompts/explain";
 import { streamExplanation, type ExplainTurn } from "@/server/ai/explain";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
@@ -20,7 +20,7 @@ export type SourceSummary = ChatSource;
 // One line of the answer stream (newline-delimited JSON).
 export type AnswerEvent =
   | { type: "text"; text: string }
-  | { type: "done"; messageId: string; text: string; sources: SourceSummary[]; notEnough: boolean }
+  | { type: "done"; messageId: string; text: string; sources: SourceSummary[]; notEnough: boolean; level: AnswerLevel }
   | { type: "error"; message: string };
 
 export const NO_MATERIAL_TEXT = `${NOT_ENOUGH_HEADING}
@@ -42,6 +42,7 @@ export async function answerQuestion(input: {
   userId: string;
   chatId: string;
   question: string;
+  level: AnswerLevel;
   send: (event: AnswerEvent) => void;
   signal?: AbortSignal;
 }): Promise<void> {
@@ -60,7 +61,7 @@ export async function answerQuestion(input: {
   const asked = await db.from("messages").insert({
     conversation_id: input.chatId,
     role: "user",
-    content: { text: input.question },
+    content: { text: input.question, level: input.level },
   });
   if (asked.error) return send({ type: "error", message: "Your question was not saved. Please try again." });
   if (chat.data.title === "New chat") {
@@ -72,9 +73,9 @@ export async function answerQuestion(input: {
   const found = await searchLibrary({ question, courseId: chat.data.course_id, includePending: false });
   if (!found.ok) return send({ type: "error", message: found.message });
   if (found.hits.length === 0) {
-    const saved = await saveAnswer(db, input.chatId, NO_MATERIAL_TEXT, null, []);
+    const saved = await saveAnswer(db, input.chatId, NO_MATERIAL_TEXT, input.level, null, []);
     if (!saved) return send({ type: "error", message: "The answer was not saved. Please try again." });
-    return send({ type: "done", messageId: saved, text: NO_MATERIAL_TEXT, sources: [], notEnough: true });
+    return send({ type: "done", messageId: saved, text: NO_MATERIAL_TEXT, sources: [], notEnough: true, level: input.level });
   }
 
   const hits = found.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
@@ -95,7 +96,7 @@ export async function answerQuestion(input: {
   }));
   const turns: ExplainTurn[] = [
     ...historyTurns(earlier.data),
-    { role: "user", text: questionMessage(passages, question) },
+    { role: "user", text: questionMessage(passages, question, input.level) },
   ];
 
   let shown = "";
@@ -117,10 +118,10 @@ export async function answerQuestion(input: {
   // Sources are the passages the checked answer actually cites (none for "not enough").
   const cited = filter.notEnough ? [] : citedLabels(shown).map((label) => hits.find((hit) => hit.label === label));
   const used = cited.filter((hit): hit is SearchHit & { label: number } => hit !== undefined);
-  const messageId = await saveAnswer(db, input.chatId, shown, result, used);
+  const messageId = await saveAnswer(db, input.chatId, shown, input.level, result, used);
   if (!messageId) return send({ type: "error", message: "The answer was not saved. Please try again." });
   const sources = await saveSources(db, messageId, used);
-  send({ type: "done", messageId, text: shown, sources, notEnough: filter.notEnough });
+  send({ type: "done", messageId, text: shown, sources, notEnough: filter.notEnough, level: input.level });
 }
 
 export function titleFrom(question: string): string {
@@ -172,6 +173,7 @@ async function saveAnswer(
   db: Db,
   chatId: string,
   text: string,
+  level: AnswerLevel,
   usage: { model: string; tokensIn: number; tokensOut: number; costUsd: number | null } | null,
   used: { label: number }[],
 ): Promise<string | null> {
@@ -180,7 +182,7 @@ async function saveAnswer(
     .insert({
       conversation_id: chatId,
       role: "assistant",
-      content: { text, sources: used.map((hit) => hit.label) },
+      content: { text, level, sources: used.map((hit) => hit.label) },
       model: usage?.model ?? null,
       tokens_in: usage?.tokensIn ?? null,
       tokens_out: usage?.tokensOut ?? null,
