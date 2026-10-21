@@ -7,8 +7,29 @@ import { EMBEDDING_DIMENSIONS, EMBEDDING_MODELS, type EmbeddingModel } from "./s
 const ENDPOINT = "https://api.voyageai.com/v1/embeddings";
 // Rule G-10: no call waits longer than 60 seconds.
 const TIMEOUT_MS = 60_000;
-// Voyage takes up to 1,000 texts per call; batches stay well below its token limit too.
+// At most this many passages per call...
 export const EMBED_BATCH = 32;
+// ...and at most about this many tokens, so one call fits inside Voyage's smallest limit
+// (accounts without a payment method: about 10,000 tokens a minute).
+export const EMBED_TOKEN_BUDGET = 8_000;
+
+// A cautious token estimate (Voyage counts roughly one token per 3–4 characters of English).
+export function estimateTokens(text: string): number {
+  return Math.ceil(text.length / 3);
+}
+
+// The longest run of texts, from the start, that fits the token budget (always at least one).
+export function fitTokenBudget(texts: string[], budget = EMBED_TOKEN_BUDGET): number {
+  let used = 0;
+  let count = 0;
+  for (const text of texts) {
+    const tokens = estimateTokens(text);
+    if (count > 0 && used + tokens > budget) break;
+    used += tokens;
+    count += 1;
+  }
+  return count;
+}
 
 const responseSchema = z.object({
   data: z.array(z.object({ index: z.number().int(), embedding: z.array(z.number()).length(EMBEDDING_DIMENSIONS) })),
@@ -17,7 +38,7 @@ const responseSchema = z.object({
 
 export type EmbedResult =
   | { ok: true; vectors: number[][] }
-  | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable" };
+  | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable"; retryAfterMs?: number };
 
 // "document" for library passages, "query" for a question being searched.
 export async function embedTexts(
@@ -46,7 +67,12 @@ export async function embedTexts(
     });
     if (!response.ok) {
       console.error("embedding call failed", { job, model, status: response.status, ms: Date.now() - started });
-      if (response.status === 429 || response.status >= 500) return { ok: false, reason: "busy" };
+      if (response.status === 429 || response.status >= 500) {
+        // Voyage may say how long to wait; otherwise wait 20 seconds (its slowest limit is 3 calls a minute).
+        const seconds = Number(response.headers.get("retry-after"));
+        const retryAfterMs = Number.isFinite(seconds) && seconds > 0 ? Math.min(seconds, 60) * 1000 : 20_000;
+        return { ok: false, reason: "busy", retryAfterMs };
+      }
       return { ok: false, reason: "refused" };
     }
     const parsed = responseSchema.safeParse(await response.json());

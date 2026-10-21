@@ -83,8 +83,11 @@ describe("Voyage AI", () => {
 
   it("reports busy, refused and unusable replies plainly", async () => {
     vi.stubEnv("VOYAGE_API_KEY", "test-key");
+    // "Busy" also says how long to wait: Voyage's own figure, or 20 seconds.
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 429 })));
-    expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "busy" });
+    expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "busy", retryAfterMs: 20_000 });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 429, headers: { "retry-after": "7" } })));
+    expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "busy", retryAfterMs: 7_000 });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("", { status: 401 })));
     expect(await embedTexts(["a"], "query", "voyage-4", "test")).toEqual({ ok: false, reason: "refused" });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response(JSON.stringify({ data: [{ index: 0, embedding: [1, 2] }] }))));

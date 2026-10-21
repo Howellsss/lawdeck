@@ -38,7 +38,8 @@ export function LibraryList({
   return (
     <ul aria-label="Library items" className="flex flex-col divide-y divide-line rounded-2xl border border-line bg-surface">
       {items.map((item) => (
-        <li key={item.id} className="flex flex-col gap-2 px-4 py-4 sm:flex-row sm:items-start sm:justify-between">
+        // Details first, then the actions underneath, so long messages never squeeze the title.
+        <li key={item.id} className="flex flex-col gap-3 px-4 py-4">
           <div className="min-w-0">
             <p className="break-words text-[15px] font-medium">{item.title}</p>
             <p className="text-sm text-muted">
@@ -58,7 +59,7 @@ export function LibraryList({
             </p>
           </div>
           {isAdmin && (
-            <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
+            <div className="flex flex-wrap items-start gap-3 border-t border-line pt-3">
               <ReadItemButton id={item.id} title={item.title} status={item.reading.status} />
               {needsIndexing(item, currentModel) && <IndexItemButton id={item.id} title={item.title} />}
               <RemoveItemButton id={item.id} title={item.title} />
