@@ -36,4 +36,29 @@ Tests: `tests/permissions/sql/20_library_test.sql` (26 checks) and the "library"
 - How a file travels: the server checks the details and the role, then gives the browser a one-time link; the file goes straight into the private `library` store (Vercel cannot carry 25 MB). The server then reads the file's first bytes to check its real type (`src/lib/libraryFiles.ts`), and only then records the item as "awaiting review". A mismatched file is deleted with a clear message.
 - Files from interrupted uploads (no item, older than an hour) are removed the next time anyone uploads to that course.
 - Removing an item deletes its passages (database) and its file (store), after a confirmation.
-- Not yet: reading the file's text (2c); an audit-log entry per upload (2e).
+- Not yet: an audit-log entry per upload (2e).
+
+## Step 2c: reading files into passages
+
+- After an upload, the page reads the file straight away. Admins can also "Read file", "Continue reading", "Try again" or "Read again" from the list.
+- How each file is read (`src/server/library/extract.ts`, `src/server/ai/transcribe.ts`):
+  - PDF with text: page by page with the `unpdf` library. A page with fewer than 40 letters or digits is treated as a scan.
+  - Scanned PDF pages and photos: Claude (`MODELS.transcribe`, Haiku 5.5) copies the text, three pages per call, under the versioned instructions in `src/prompts/transcribe.ts`. Headings are marked "# ", and anything unreadable is marked `[unreadable]`. The file is marked for caching so later batches cost less. Each call's model, tokens, cost and time are logged, never the text.
+  - Word (DOCX): the `mammoth` library, which keeps the real heading styles. Word files have no fixed pages, so the page is left blank.
+- Long scans are read in steps of up to about 2½ minutes (the page allows 5). Page text is kept in `kb_item_pages`, so reading can carry on after a break and reviewers can compare passages with the page.
+- Splitting (`src/server/library/split.ts`): passages of 300–800 words. A heading always stays with the text after it, and a new heading starts a new passage once the current one is long enough. A long section keeps its heading on each part, and a very long paragraph is broken at sentence ends. Each passage records its first and last page.
+- PDF headings are guessed from the line's shape (short lines in capitals; "Part", "Chapter", "Order", "Rule", "Section", "Article", "Schedule" with a number; short numbered lines). Reviewers can correct them in 2e.
+- The new passages replace the old ones in one database step (`replace_kb_passages`), which also records the method (text, scanned or both), quality (share of pages with at least 20 readable words), page count and time. Search vectors are added in 2d.
+- Limits: a PDF with scanned pages must be under about 22 MB, because Claude accepts at most 32 MB per request. Larger scans must be split into smaller files.
+
+| Part | Students | Reviewers | Admins |
+| --- | --- | --- | --- |
+| `kb_item_pages` (text of each page) | No access | Read | Add, remove |
+| Reading details on `kb_items` | Not shown | See; cannot change | Change |
+| `replace_kb_passages` | Refused | Refused | Allowed |
+
+Tests: `tests/permissions/sql/30_library_reading_test.sql` (17 checks), the "library" part of `tests/permissions/workspace.test.ts`, and `tests/unit/libraryReading.test.ts` (20 checks, using two made-up sample files in `tests/fixtures`).
+
+### Founder step for 2c
+
+Paste `supabase/migrations/20261021000600_library_reading.sql` into the Supabase SQL Editor and run it. Expected: "Success. No rows returned". This must be done before the 2c code goes live, or the Library page will show an error.

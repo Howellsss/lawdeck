@@ -1,6 +1,8 @@
 import { formatWat } from "@/lib/dates";
 import { KB_ITEM_TYPES, REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
 import type { LibraryItemSummary } from "@/server/db/library";
+import { ReadingSummary } from "./ReadingSummary";
+import { ReadItemButton } from "./ReadItemButton";
 import { RemoveItemButton } from "./RemoveItemButton";
 
 const STATUS_TONE = {
@@ -15,7 +17,7 @@ function megabytes(bytes: number | null) {
 }
 
 // Library items, newest first. Cards rather than a wide table, so it works at 360 px.
-export function LibraryList({ items, canRemove }: { items: LibraryItemSummary[]; canRemove: boolean }) {
+export function LibraryList({ items, isAdmin }: { items: LibraryItemSummary[]; isAdmin: boolean }) {
   if (items.length === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-line px-4 py-8 text-center text-muted">
@@ -36,11 +38,15 @@ export function LibraryList({ items, canRemove }: { items: LibraryItemSummary[];
             </p>
             <p className="text-sm">
               <span className={STATUS_TONE[item.reviewStatus]}>{REVIEW_STATUS_LABELS[item.reviewStatus]}</span>
-              <span className="text-muted"> · Added {formatWat(item.createdAt)} · Not yet read (step 2c)</span>
+              <span className="text-muted"> · Added {formatWat(item.createdAt)}</span>
+            </p>
+            <p className="text-sm">
+              <ReadingSummary reading={item.reading} />
             </p>
           </div>
-          {canRemove && (
-            <div className="shrink-0">
+          {isAdmin && (
+            <div className="flex shrink-0 flex-col items-start gap-3 sm:items-end">
+              <ReadItemButton id={item.id} title={item.title} status={item.reading.status} />
               <RemoveItemButton id={item.id} title={item.title} />
             </div>
           )}
