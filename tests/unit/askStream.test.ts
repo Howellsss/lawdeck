@@ -16,7 +16,7 @@ function streamOf(chunks: string[]): ReadableStream<Uint8Array> {
 async function collect(response: Response): Promise<AnswerEvent[]> {
   vi.stubGlobal("fetch", vi.fn().mockResolvedValue(response));
   const events: AnswerEvent[] = [];
-  await askQuestion("3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", "Why?", (event) => events.push(event));
+  await askQuestion("3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", "Why?", "exam", (event) => events.push(event));
   return events;
 }
 
@@ -24,7 +24,7 @@ describe("reading the answer stream", () => {
   afterEach(() => vi.unstubAllGlobals());
 
   it("reads events even when a line arrives in pieces", async () => {
-    const done = { type: "done", messageId: "m1", text: "Hello there.", sources: [], notEnough: false };
+    const done = { type: "done", messageId: "m1", text: "Hello there.", sources: [], notEnough: false, level: "exam" };
     const body = streamOf(['{"type":"text","te', 'xt":"Hello "}\n{"type":"text","text":"there."}\n', `${JSON.stringify(done)}\n`]);
     expect(await collect(new Response(body))).toEqual([
       { type: "text", text: "Hello " },
@@ -46,7 +46,7 @@ describe("reading the answer stream", () => {
   it("copes when the network is down", async () => {
     vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new TypeError("network")));
     const events: AnswerEvent[] = [];
-    await askQuestion("id", "Why?", (event) => events.push(event));
+    await askQuestion("id", "Why?", "simple", (event) => events.push(event));
     expect(events[0]?.type).toBe("error");
   });
 

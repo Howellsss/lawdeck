@@ -2,7 +2,7 @@
 // Versioned: change the version whenever the wording changes, and re-run the evaluation set.
 // No legal content lives here: every legal point comes from the library passages supplied.
 
-export const EXPLAIN_PROMPT_VERSION = "explain-v1";
+export const EXPLAIN_PROMPT_VERSION = "explain-v2";
 
 // The first line Claude writes when the passages cannot support an answer. The server
 // recognises it and shows the "not enough support" response instead (LN-04).
@@ -60,6 +60,19 @@ function escapeAttribute(text: string): string {
   return text.replace(/[<>"&]/g, (c) => ({ "<": "&lt;", ">": "&gt;", '"': "&quot;", "&": "&amp;" })[c] ?? c);
 }
 
-export function questionMessage(passages: ExplainPassage[], question: string): string {
-  return `${passagesBlock(passages)}\n\nThe student's question:\n${question}`;
+// The two answer levels (PRD LN-02). Sent with each question, so the fixed instructions above
+// stay the same (and cached) whichever level the student picks.
+export type AnswerLevel = "simple" | "exam";
+
+export const LEVEL_LABELS: Record<AnswerLevel, string> = { simple: "Simple", exam: "Exam-ready" };
+
+export const LEVEL_INSTRUCTIONS: Record<AnswerLevel, string> = {
+  simple:
+    "Answer level: Simple. Use the same section headings, but keep every section short. Use plain, everyday words and explain any legal term the first time you use it. Give one simple example. Name only the most important authority.",
+  exam:
+    "Answer level: Exam-ready. Use the full structure. Name every relevant authority from the passages, with its section, order or rule where the passage gives it. In the exam tip, say how an examiner would expect the point set out and the mistakes students commonly make.",
+};
+
+export function questionMessage(passages: ExplainPassage[], question: string, level: AnswerLevel = "exam"): string {
+  return `${passagesBlock(passages)}\n\n${LEVEL_INSTRUCTIONS[level]}\n\nThe student's question:\n${question}`;
 }
