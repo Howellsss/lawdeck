@@ -96,4 +96,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Google sign-in works on the live site (founder, 2026-10-21)
 - 2026-10-21: Phase 1 exit checks run; two keyboard fixes.
 - 2026-10-21: Phase 1 complete: founder confirmed sign out, password reset, Google sign-in and projects on the live site.
-\n- 2026-10-21: Phase 2 started. Step 2a: library database and file store with permission tests.\n
+
+- 2026-10-21: Phase 2 started. Step 2a: library database and file store with permission tests.
