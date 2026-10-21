@@ -71,6 +71,13 @@ export async function indexStep(itemId: string): Promise<IndexStepResult> {
     savedThisStep += batch.length;
   }
 
+  return recordIndexState(db, itemId);
+}
+
+type AdminDb = NonNullable<ReturnType<typeof createAdminClient>>;
+
+// Counts an item's indexed passages and records it on the item ("done" when all are indexed).
+async function recordIndexState(db: AdminDb, itemId: string): Promise<IndexStepResult> {
   const [total, indexed] = await Promise.all([
     db.from("kb_passages").select("id", { count: "exact", head: true }).eq("item_id", itemId),
     db
@@ -91,6 +98,27 @@ export async function indexStep(itemId: string): Promise<IndexStepResult> {
     .eq("id", itemId);
   if (updated.error) return failed("record", updated.error.code);
   return { ok: true, done, indexed: indexed.count ?? 0, total: total.count ?? 0 };
+}
+
+// Re-indexes one passage after a reviewer corrects it, then records the item's state.
+export async function reindexPassage(passageId: string): Promise<IndexStepResult> {
+  const db = createAdminClient();
+  if (!db) return { ok: false, message: "Search is not set up yet: the server's admin key is missing." };
+  const passage = await db.from("kb_passages").select("item_id, heading, text").eq("id", passageId).single();
+  if (passage.error) return failed("load", passage.error.code);
+  const result = await embedTexts(
+    [passageSearchText(passage.data.heading, passage.data.text)],
+    "document",
+    EMBEDDING_MODEL,
+    "reindex",
+  );
+  if (!result.ok) return { ok: false, message: MESSAGES[result.reason] };
+  const saved = await db
+    .from("kb_passages")
+    .update({ embedding: toVectorText(result.vectors[0]), embedding_model: EMBEDDING_MODEL })
+    .eq("id", passageId);
+  if (saved.error) return failed("save", saved.error.code);
+  return recordIndexState(db, passage.data.item_id);
 }
 
 // Logs the step and error code only, never passage text (rule I-03).

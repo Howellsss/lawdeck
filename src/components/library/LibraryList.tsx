@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { formatWat } from "@/lib/dates";
 import { KB_ITEM_TYPES, REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
 import type { LibraryItemSummary } from "@/server/db/library";
@@ -41,7 +42,11 @@ export function LibraryList({
         // Details first, then the actions underneath, so long messages never squeeze the title.
         <li key={item.id} className="flex flex-col gap-3 px-4 py-4">
           <div className="min-w-0">
-            <p className="break-words text-[15px] font-medium">{item.title}</p>
+            <p className="break-words text-[15px] font-medium">
+              <Link href={`/admin/library/${item.id}`} className="no-underline hover:underline">
+                {item.title}
+              </Link>
+            </p>
             <p className="text-sm text-muted">
               {[item.courseName, KB_ITEM_TYPES[item.type], item.year, item.fileName, megabytes(item.sizeBytes)]
                 .filter(Boolean)
@@ -58,13 +63,18 @@ export function LibraryList({
               <SearchSummary item={item} currentModel={currentModel} />
             </p>
           </div>
-          {isAdmin && (
-            <div className="flex flex-wrap items-start gap-3 border-t border-line pt-3">
-              <ReadItemButton id={item.id} title={item.title} status={item.reading.status} />
-              {needsIndexing(item, currentModel) && <IndexItemButton id={item.id} title={item.title} />}
-              <RemoveItemButton id={item.id} title={item.title} />
-            </div>
-          )}
+          <div className="flex flex-wrap items-center gap-3 border-t border-line pt-3">
+            <Link href={`/admin/library/${item.id}`} className="text-sm">
+              Review<span className="sr-only"> {item.title}</span>
+            </Link>
+            {isAdmin && (
+              <>
+                <ReadItemButton id={item.id} title={item.title} status={item.reading.status} />
+                {needsIndexing(item, currentModel) && <IndexItemButton id={item.id} title={item.title} />}
+                <RemoveItemButton id={item.id} title={item.title} />
+              </>
+            )}
+          </div>
         </li>
       ))}
     </ul>

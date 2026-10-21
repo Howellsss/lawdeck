@@ -51,3 +51,10 @@ test("visitors do not see the Library link", async ({ page }) => {
   await page.goto("/");
   await expect(page.getByRole("link", { name: "Library" })).toHaveCount(0);
 });
+
+test("library review pages are hidden from visitors", async ({ page }) => {
+  await page.goto("/admin/library/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Decision" })).toHaveCount(0);
+  await expect(page.locator("textarea")).toHaveCount(0);
+});

@@ -68,7 +68,8 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ 2d. Test the two Voyage models on 30 Civil Litigation questions and record the choice (needs 2g material and the 30 questions)
 ✅ Extra (founder request). Import library files from Google Drive: pick several files, details suggested from file names
 ⬜ Extra. Google Cloud set-up for the Drive import (founder)
-⬜ 2e. Reviewer console: approve, correct, reject, withdraw; reviewer and date recorded
+✅ 2e. Reviewer console: approve, correct, reject, withdraw; "law current as of" date; approval rules and audit record enforced by the database; 16 new permission checks and 10 logic tests
+⬜ 2e. Founder applies migration 8 in Supabase
 ⬜ 2f. Out-of-date warning for material older than a later change in the law
 ⬜ 2g. Civil Litigation material loaded and approved
 ✅ Voyage AI key added in Vercel (founder, 2026-10-21)
@@ -114,3 +115,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Migration 7 applied and service-role key added (founder); step 2d merged.
 - 2026-10-21: Google Drive import for library files (founder request): pick several files, details suggested from file names, same checks as uploads.
 - 2026-10-21: Fix: indexing sends batches that fit Voyage AI's per-minute limit and waits and carries on when asked to slow down; Library list layout no longer squeezes long titles.
+- 2026-10-21: Founder indexed the Civil Litigation notes (165 of 165 passages). Step 2e: reviewer console, approval rules and audit record.

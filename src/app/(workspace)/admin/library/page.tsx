@@ -6,6 +6,8 @@ import { LibraryList } from "@/components/library/LibraryList";
 import { DriveImport } from "@/components/library/DriveImport";
 import { UploadForm } from "@/components/library/UploadForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
+import { REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
+import { reviewStatusFilterSchema } from "@/schemas/libraryReview";
 import { getStaffRole } from "@/server/auth/roles";
 import { getSupabaseConfig } from "@/server/auth/config";
 import { listLibraryItems } from "@/server/db/library";
@@ -17,21 +19,22 @@ export const metadata: Metadata = { title: "Library · Lawdeck" };
 // Reading a file is done by server actions on this page, in steps of up to about 3 minutes.
 export const maxDuration = 300;
 
-export default function LibraryAdminPage() {
+export default function LibraryAdminPage({ searchParams }: PageProps<"/admin/library">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
       <Suspense fallback={<LoadingRows label="Loading the library" />}>
-        <Library />
+        <Library searchParams={searchParams} />
       </Suspense>
     </div>
   );
 }
 
 // Only reviewers and admins may see this page; everyone else gets "page not found".
-async function Library() {
+async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "searchParams">) {
   const role = await getStaffRole();
   if (!role) notFound();
-  const [items, courses] = await Promise.all([listLibraryItems(), listCourses()]);
+  const status = reviewStatusFilterSchema.parse((await searchParams).status);
+  const [items, courses] = await Promise.all([listLibraryItems(status), listCourses()]);
   const apiKey = getSupabaseConfig()?.key ?? "";
   const drive = role === "admin" ? getDrivePickerConfig() : null;
 
@@ -52,8 +55,20 @@ async function Library() {
       {role === "admin" && courses.status === "ok" && <UploadForm courses={courses.data} apiKey={apiKey} />}
       <section aria-labelledby="library-items" className="flex flex-col gap-3">
         <h2 id="library-items" className="text-lg font-medium">
-          Items ({items.length})
+          {status ? REVIEW_STATUS_LABELS[status] : "All items"} ({items.length})
         </h2>
+        <nav aria-label="Filter by review status" className="flex flex-wrap gap-2 text-sm">
+          {([undefined, "pending", "approved", "rejected", "withdrawn"] as const).map((value) => (
+            <Link
+              key={value ?? "all"}
+              href={value ? `/admin/library?status=${value}` : "/admin/library"}
+              aria-current={value === status ? "page" : undefined}
+              className={`rounded-full border border-line px-3 py-1.5 no-underline ${value === status ? "bg-pill font-medium" : "hover:bg-pill"}`}
+            >
+              {value ? REVIEW_STATUS_LABELS[value] : "All"}
+            </Link>
+          ))}
+        </nav>
         <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} />
       </section>
     </>

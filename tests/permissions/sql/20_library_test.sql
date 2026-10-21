@@ -22,6 +22,7 @@ insert into public.kb_items (title, type, course_id)
 insert into public.kb_passages (item_id, position, text)
   select id, 0, 'Passage of ' || title from public.kb_items;
 insert into storage.objects (bucket_id, name) values ('library', 'civil-litigation/approved.pdf');
+select test.make_reviewable('%note');
 update public.kb_items set review_status = 'approved' where title = 'Approved note';
 select test.check(
   (select reviewed_by from public.kb_items where title = 'Approved note') = 'eeeeeeee-0000-0000-0000-000000000005'

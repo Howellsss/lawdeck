@@ -37,3 +37,13 @@ end $$;
 
 grant execute on all functions in schema test to anon, authenticated;
 
+
+-- Test set-up only: marks items as read, indexed and dated, so they meet the approval rules
+-- (migration 8). Runs with the test owner's rights; the rules being tested are not touched.
+create function test.make_reviewable(title_pattern text) returns void language sql security definer as $$
+  update public.kb_items
+     set reading_status = 'done', indexed_at = now(),
+         law_current_as_of = coalesce(law_current_as_of, current_date)
+   where title like title_pattern;
+$$;
+grant execute on function test.make_reviewable(text) to authenticated, anon;
