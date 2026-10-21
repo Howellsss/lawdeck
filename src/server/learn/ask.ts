@@ -72,6 +72,8 @@ export async function answerQuestion(input: {
   const question = redactPersonalData(input.question);
   const found = await searchLibrary({ question, courseId: chat.data.course_id, includePending: false });
   if (!found.ok) return send({ type: "error", message: found.message });
+  const unsure = searchUnsure(found);
+  if (unsure) return send({ type: "error", message: unsure });
   if (found.hits.length === 0) {
     const saved = await saveAnswer(db, input.chatId, NO_MATERIAL_TEXT, input.level, null, []);
     if (!saved) return send({ type: "error", message: "The answer was not saved. Please try again." });
@@ -122,6 +124,20 @@ export async function answerQuestion(input: {
   if (!messageId) return send({ type: "error", message: "The answer was not saved. Please try again." });
   const sources = await saveSources(db, messageId, used);
   send({ type: "done", messageId, text: shown, sources, notEnough: filter.notEnough, level: input.level });
+}
+
+export const SEARCH_BUSY =
+  "Lawdeck's library search is busy right now, so it can't check the library properly for this question. Please try again in a minute.";
+
+// Nothing found only means "not in the library" when search by meaning ran. If only the
+// exact-words search ran (Voyage busy or unreachable), saying the library has nothing could be
+// wrong, so the student is asked to try again instead (never invent a result).
+export function searchUnsure(found: { hits: unknown[]; meaningUsed: boolean }): string | null {
+  if (found.hits.length === 0 && !found.meaningUsed) {
+    console.warn("learn answer search unsure", { meaningUsed: false });
+    return SEARCH_BUSY;
+  }
+  return null;
 }
 
 export function titleFrom(question: string): string {
