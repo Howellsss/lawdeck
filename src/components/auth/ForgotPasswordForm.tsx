@@ -4,9 +4,9 @@ import Link from "next/link";
 import { useActionState } from "react";
 import { requestPasswordReset, type AuthFormState } from "@/server/auth/actions";
 import { CheckEmail } from "./CheckEmail";
-import { FormAlert } from "./FormAlert";
-import { TextField } from "./TextField";
-import { primaryButton } from "./buttons";
+import { FormAlert } from "@/components/ui/FormAlert";
+import { TextField } from "@/components/ui/TextField";
+import { primaryButton } from "@/components/ui/buttons";
 
 const initialState: AuthFormState = { status: "idle" };
 

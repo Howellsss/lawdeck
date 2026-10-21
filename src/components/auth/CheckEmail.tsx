@@ -3,8 +3,8 @@
 import Link from "next/link";
 import { useActionState, type ReactNode } from "react";
 import { resendConfirmation, type AuthFormState } from "@/server/auth/actions";
-import { FormAlert } from "./FormAlert";
-import { secondaryButton } from "./buttons";
+import { FormAlert } from "@/components/ui/FormAlert";
+import { secondaryButton } from "@/components/ui/buttons";
 
 // "Check your email" message, with an optional button to send the confirmation link again.
 export function CheckEmail({ email, resend, children }: { email: string; resend?: boolean; children: ReactNode }) {

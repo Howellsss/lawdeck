@@ -12,7 +12,15 @@ const roundButton =
 
 // The three-pane workspace: left menu, middle work area, right panel (closed until needed).
 // Below 1024 px the left menu becomes a drawer opened from the top bar (PRD 4.1).
-export function AppShell({ children, account }: { children: ReactNode; account?: ReactNode }) {
+export function AppShell({
+  children,
+  account,
+  recents,
+}: {
+  children: ReactNode;
+  account?: ReactNode;
+  recents?: ReactNode;
+}) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelContent | null>(null);
@@ -34,6 +42,7 @@ export function AppShell({ children, account }: { children: ReactNode; account?:
               collapsed={collapsed}
               onToggleCollapse={() => setCollapsed((value) => !value)}
               account={account}
+              recents={recents}
             />
           </div>
         </div>
@@ -50,6 +59,7 @@ export function AppShell({ children, account }: { children: ReactNode; account?:
               <Sidebar
                 onNavigate={closeDrawer}
                 account={account}
+                recents={recents}
                 closeButton={
                   <button
                     ref={drawerCloseRef}

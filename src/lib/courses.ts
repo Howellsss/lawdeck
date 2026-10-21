@@ -1,5 +1,6 @@
 // The five Bar Part II courses. Curriculum structure only, not legal content (rule H-01).
-// Moves into the courses table in step 1c.
+// The database (courses table) is the source of truth; this copy only fills the
+// course picker on the home screen until that picker reads the database (Phase 3).
 export const COURSES = [
   { slug: "civil-litigation", name: "Civil Litigation" },
   { slug: "criminal-litigation", name: "Criminal Litigation" },
