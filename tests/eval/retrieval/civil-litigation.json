@@ -150,6 +150,36 @@
       "id": 30,
       "question": "What happens to a relief that was in the writ but left out of the statement of claim?",
       "expectContains": "but not claimed in statement of claim shall be deemed abandoned"
+    },
+    {
+      "id": 31,
+      "question": "What does Order 7 Rule 8 of the Abuja rules say about serving a company?",
+      "expectContains": "delivery at the head office or any other place of business",
+      "kind": "exact"
+    },
+    {
+      "id": 32,
+      "question": "Does S. 308 immunity cover an election petition against a sitting governor?",
+      "expectContains": "immunity does not apply to election petition against a sitting governor",
+      "kind": "exact"
+    },
+    {
+      "id": 33,
+      "question": "What is Form 4A in the Lagos Magistrate Court?",
+      "expectContains": "Form of Admission, Defence and Counter Claim",
+      "kind": "exact"
+    },
+    {
+      "id": 34,
+      "question": "Order 6 Rule 7 Abuja: when will a writ be renewed?",
+      "expectContains": "for good cause and upon prompt application",
+      "kind": "exact"
+    },
+    {
+      "id": 35,
+      "question": "When do I file Form 17 and 18?",
+      "expectContains": "Application for Case Management Conference Notice",
+      "kind": "exact"
     }
   ]
 }
