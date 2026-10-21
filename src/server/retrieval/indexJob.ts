@@ -2,7 +2,7 @@ import "server-only";
 // ADMIN JOB: uses the service-role key (src/server/db/admin.ts) to write search vectors,
 // which no signed-in person may write (System Design §4). Callers check the admin role first.
 import { createAdminClient } from "@/server/db/admin";
-import { EMBED_BATCH, embedTexts, toVectorText } from "./voyage";
+import { EMBED_BATCH, embedTexts, fitTokenBudget, toVectorText } from "./voyage";
 import { EMBEDDING_MODEL } from "./settings";
 
 // Stop starting new batches after this long, so one step ends inside the page's time limit.
@@ -14,7 +14,7 @@ export type IndexStepResult =
 
 const MESSAGES = {
   no_key: "Search is not set up yet: the Voyage AI key is missing on the server.",
-  busy: "Voyage AI is busy. Wait a minute, then use “Index for search” to carry on.",
+  busy: "Voyage AI's speed limit was reached. Progress so far is saved; wait a minute, then use “Index for search” to carry on.",
   refused: "Voyage AI did not accept the request. Check the key and the account's credit.",
   unavailable: "Voyage AI could not be reached. Try again in a few minutes.",
 } as const;
@@ -31,8 +31,9 @@ export async function indexStep(itemId: string): Promise<IndexStepResult> {
   if (!db) return { ok: false, message: "Search is not set up yet: the server's admin key is missing." };
   const started = Date.now();
 
+  let savedThisStep = 0;
   while (Date.now() - started < STEP_BUDGET_MS) {
-    const { data: batch, error } = await db
+    const { data: candidates, error } = await db
       .from("kb_passages")
       .select("id, heading, text")
       .eq("item_id", itemId)
@@ -40,15 +41,23 @@ export async function indexStep(itemId: string): Promise<IndexStepResult> {
       .order("position")
       .limit(EMBED_BATCH);
     if (error) return failed("load", error.code);
-    if (batch.length === 0) break;
+    if (candidates.length === 0) break;
 
-    const result = await embedTexts(
-      batch.map((passage) => passageSearchText(passage.heading, passage.text)),
-      "document",
-      EMBEDDING_MODEL,
-      "index",
-    );
-    if (!result.ok) return { ok: false, message: MESSAGES[result.reason] };
+    // Only as many passages as fit Voyage's per-minute token limit.
+    const texts = candidates.map((passage) => passageSearchText(passage.heading, passage.text));
+    const batch = candidates.slice(0, fitTokenBudget(texts));
+    const result = await embedTexts(texts.slice(0, batch.length), "document", EMBEDDING_MODEL, "index");
+    if (!result.ok) {
+      // Voyage asked us to slow down: wait and carry on, if this step still has time.
+      const wait = result.retryAfterMs ?? 0;
+      if (result.reason === "busy" && Date.now() - started + wait < STEP_BUDGET_MS) {
+        await new Promise((resolve) => setTimeout(resolve, wait));
+        continue;
+      }
+      // Out of time but some passages were saved: report progress so the screen asks again.
+      if (result.reason === "busy" && savedThisStep > 0) break;
+      return { ok: false, message: MESSAGES[result.reason] };
+    }
     const saved = await Promise.all(
       batch.map((passage, index) =>
         db
@@ -59,6 +68,7 @@ export async function indexStep(itemId: string): Promise<IndexStepResult> {
     );
     const failure = saved.find((row) => row.error);
     if (failure?.error) return failed("save", failure.error.code);
+    savedThisStep += batch.length;
   }
 
   const [total, indexed] = await Promise.all([

@@ -113,3 +113,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Step 2d: hybrid library search (Voyage AI + exact words), indexing admin job, reviewer test page and retrieval test.
 - 2026-10-21: Migration 7 applied and service-role key added (founder); step 2d merged.
 - 2026-10-21: Google Drive import for library files (founder request): pick several files, details suggested from file names, same checks as uploads.
+- 2026-10-21: Fix: indexing sends batches that fit Voyage AI's per-minute limit and waits and carries on when asked to slow down; Library list layout no longer squeezes long titles.
