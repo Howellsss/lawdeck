@@ -22,7 +22,10 @@ test("sign in: email first, then password", async ({ page }) => {
 
   await password.fill("a long enough password");
   await page.getByRole("button", { name: "Sign in" }).click();
-  await expect(page.getByText("Sign-in isn’t switched on for this site yet")).toBeVisible();
+  // Fake details never sign in: depending on set-up, Supabase is off, unreachable or says no.
+  await expect(
+    page.getByText(/Sign-in isn’t switched on|Something went wrong while signing in|don’t match/),
+  ).toBeVisible({ timeout: 15_000 });
 
   await page.getByRole("button", { name: "Change" }).click();
   await expect(page.getByLabel("Email address")).toHaveValue("ada@example.com");
@@ -71,6 +74,11 @@ test("a broken email link explains what happened", async ({ page }) => {
   await page.goto("/auth/confirm?token_hash=bad&type=signup");
   await expect(page).toHaveURL(/\/sign-in\?error=link$/);
   await expect(page.getByText("That link has expired or was already used")).toBeVisible();
+});
+
+test("a link opened in another browser gets a clear next step", async ({ page }) => {
+  await page.goto("/sign-in?error=browser");
+  await expect(page.getByText("open the link in the same browser")).toBeVisible();
 });
 
 test("signed-out visitors see Sign in in the menu", async ({ page }, testInfo) => {

@@ -37,7 +37,10 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1b. Sign-in screens: sign in (email first, then password), create account, confirm email, forgot and reset password, sign out
 ✅ 1b. Unit tests (27) and browser tests (18, phone and desktop) passing
 ✅ 1b. Supabase project `lawdeck-dev` created (West EU, Ireland; free plan)
-⚠️ 1b. Live sign-in — needs the Supabase project (URL and publishable key) and its settings from the founder (see docs/specs/sign-in.md)
+✅ 1b. Sign-in code merged and live; Supabase settings added to Vercel
+✅ 1b. Supabase: site address and allowed return addresses set; minimum password length 10
+⚠️ 1b. Email templates — Supabase only allows editing them after a custom email service (SMTP) is connected. Needs a decision from the founder before real students sign up
+⚠️ 1b. First real sign-up test on lawdeck.vercel.app — founder to try it with their own email
 ⬜ 1c. Database tables with row-level security, and permission tests
 ⬜ 1d. Projects and chats saved per student
 ⬜ 1e. Automatic checks on every pull request; Google sign-in
@@ -50,3 +53,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-20: Phase 1 step 1a: dark-default theme with light switch, three-pane shell, home screen, loading/empty/error screens.
 - 2026-10-20: Phase 1 step 1b: sign-in screens and server logic, unit and browser tests. Waiting on Supabase project to switch on.
 - 2026-10-20: Supabase project lawdeck-dev created in West EU (Ireland).
+- 2026-10-21: Supabase sign-in settings set (addresses, password length). Clearer message when an email link is opened in a different browser.

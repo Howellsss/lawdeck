@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { Icon } from "@/components/ui/Icon";
+import { linkErrorMessage } from "@/lib/linkErrors";
 import { safeNextPath } from "@/lib/safeNextPath";
 import { signIn, type AuthFormState } from "@/server/auth/actions";
 import { FormAlert } from "./FormAlert";
@@ -12,7 +13,6 @@ import { primaryButton } from "./buttons";
 // A quick shape check so step one can move on without a server trip. The server checks properly.
 const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const initialState: AuthFormState = { status: "idle" };
-const LINK_FAILED = "That link has expired or was already used. Sign in below, or ask for a new link.";
 
 // The page address (?next=… and ?error=…), read in the browser so the form itself never has to
 // wait for the server or be swapped out while the student is typing.
@@ -28,7 +28,7 @@ export function SignInForm() {
   const query = useQuery();
   // The server checks `next` again; this only decides what goes in the form.
   const next = safeNextPath(query.get("next"));
-  const notice = query.get("error") === "link" ? LINK_FAILED : undefined;
+  const notice = linkErrorMessage(query.get("error"));
   // null until the student acts; then their choice wins. Before that, a server reply with the
   // email filled in means step one is done (this also makes the form work without JavaScript).
   const [step, setStep] = useState<"email" | "password" | null>(null);
