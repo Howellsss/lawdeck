@@ -12,6 +12,15 @@ export type LibraryItemSummary = {
   fileName: string | null;
   sizeBytes: number | null;
   createdAt: string;
+  reading: {
+    status: "waiting" | "reading" | "done" | "failed";
+    method: "text" | "scan" | "mixed" | null;
+    quality: number | null;
+    pageCount: number | null;
+    pagesRead: number;
+    passages: number;
+    error: string | null;
+  };
 };
 
 // The library list for reviewers and admins. Callers check the role first;
@@ -21,7 +30,9 @@ export async function listLibraryItems(): Promise<LibraryItemSummary[]> {
   const [items, courses] = await Promise.all([
     supabase
       .from("kb_items")
-      .select("id, title, type, course_id, year, review_status, file_name, size_bytes, created_at")
+      .select(
+        "id, title, type, course_id, year, review_status, file_name, size_bytes, created_at, reading_status, reading_method, reading_quality, page_count, reading_error, kb_passages(count), kb_item_pages(count)",
+      )
       .order("created_at", { ascending: false })
       .limit(500),
     supabase.from("courses").select("id, name"),
@@ -41,5 +52,14 @@ export async function listLibraryItems(): Promise<LibraryItemSummary[]> {
     fileName: item.file_name,
     sizeBytes: item.size_bytes,
     createdAt: item.created_at,
+    reading: {
+      status: item.reading_status,
+      method: item.reading_method,
+      quality: item.reading_quality === null ? null : Number(item.reading_quality),
+      pageCount: item.page_count,
+      pagesRead: item.kb_item_pages[0]?.count ?? 0,
+      passages: item.kb_passages[0]?.count ?? 0,
+      error: item.reading_error,
+    },
   }));
 }

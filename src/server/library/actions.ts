@@ -5,7 +5,9 @@ import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { detectFileKind, LIBRARY_FILE_TYPES, LIBRARY_MAX_BYTES, type LibraryFileKind } from "@/lib/libraryFiles";
 import { libraryDetailsSchema, libraryFileSchema, libraryItemIdSchema, libraryPathSchema } from "@/schemas/library";
 import { getStaffRole } from "@/server/auth/roles";
+import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { readStep, restartReading, type ReadStepResult } from "./reading";
 
 const BUCKET = "library";
 // Files uploaded but never finished are removed after this long.
@@ -27,7 +29,8 @@ export type StartUploadResult =
   | { ok: true; path: string; signedUrl: string }
   | { ok: false; message?: string; fieldErrors?: FieldErrors };
 
-export type FinishUploadResult = { ok: true } | { ok: false; message: string };
+export type FinishUploadResult = { ok: true; id: string } | { ok: false; message: string };
+export type RemoveResult = { ok: true } | { ok: false; message: string };
 
 const NOT_ALLOWED = "Only admins can add to the library.";
 
@@ -96,7 +99,7 @@ export async function finishLibraryUpload(input: UploadDetails & { path: string 
     };
   }
 
-  const { error } = await supabase.from("kb_items").insert({
+  const { data: added, error } = await supabase.from("kb_items").insert({
     title: parsed.details.title,
     type: parsed.details.type,
     course_id: parsed.details.courseId,
@@ -107,18 +110,40 @@ export async function finishLibraryUpload(input: UploadDetails & { path: string 
     file_name: parsed.file.fileName,
     mime_type: LIBRARY_FILE_TYPES[realKind].mime,
     size_bytes: bytes.length,
-  });
+  }).select("id").single();
   if (error) {
     logFailure("finishLibraryUpload.insert", error.code);
     await supabase.storage.from(BUCKET).remove([path.data]);
     return { ok: false, message: "The item was not saved. Please try again." };
   }
   refresh();
-  return { ok: true };
+  return { ok: true, id: added.id };
+}
+
+// Reads an item's file into passages, one step at a time (see src/server/library/reading.ts).
+// "start" begins again from the first page; otherwise reading carries on where it stopped.
+export async function readLibraryItem(id: string, start: boolean): Promise<ReadStepResult> {
+  const parsedId = libraryItemIdSchema.safeParse(id);
+  if (!parsedId.success || typeof start !== "boolean") return { ok: false, message: "That item could not be found." };
+  const account = await getCurrentAccount();
+  if (!account || (await getStaffRole()) !== "admin") return { ok: false, message: "Only admins can read library files." };
+
+  const supabase = await createSupabaseServerClient();
+  if (start) {
+    try {
+      await restartReading(supabase, parsedId.data);
+    } catch {
+      logFailure("readLibraryItem.start", "restart");
+      return { ok: false, message: "Reading could not start. Please try again." };
+    }
+  }
+  const result = await readStep(supabase, parsedId.data, account.id);
+  if (!result.ok || result.done) refresh();
+  return result;
 }
 
 // Remove an item, its passages (by the database) and its file.
-export async function removeLibraryItem(id: string): Promise<FinishUploadResult> {
+export async function removeLibraryItem(id: string): Promise<RemoveResult> {
   const parsedId = libraryItemIdSchema.safeParse(id);
   if (!parsedId.success) return { ok: false, message: "That item could not be found." };
   if ((await getStaffRole()) !== "admin") return { ok: false, message: "Only admins can remove library items." };

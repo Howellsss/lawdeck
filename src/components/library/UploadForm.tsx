@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useRef, useState } from "react";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { TextField } from "@/components/ui/TextField";
@@ -8,6 +9,7 @@ import type { FieldErrors } from "@/lib/fieldErrors";
 import { kindFromFileName, LIBRARY_ACCEPT, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
 import { KB_ITEM_TYPES } from "@/lib/libraryLabels";
 import { finishLibraryUpload, startLibraryUpload, type UploadDetails } from "@/server/library/actions";
+import { progressText, readUntilDone } from "./readItem";
 import { SelectField } from "./SelectField";
 import { uploadFile } from "./uploadFile";
 
@@ -15,10 +17,12 @@ type Status = { tone: "warning" | "success"; message: string } | null;
 
 // Admin form: one library file plus its details. The file goes straight to private storage.
 export function UploadForm({ courses, apiKey }: { courses: { id: string; name: string }[]; apiKey: string }) {
+  const router = useRouter();
   const formRef = useRef<HTMLFormElement>(null);
   const [errors, setErrors] = useState<FieldErrors>({});
   const [status, setStatus] = useState<Status>(null);
   const [progress, setProgress] = useState<number | null>(null);
+  const [reading, setReading] = useState<string | null>(null);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,10 +66,26 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
     setProgress(null);
     if (!finished.ok) return setStatus({ tone: "warning", message: finished.message });
     formRef.current?.reset();
-    setStatus({ tone: "success", message: `“${details.title.trim()}” was added. It is awaiting review.` });
+
+    // Read the file into passages straight away.
+    const title = details.title.trim();
+    setReading("Reading…");
+    const read = await readUntilDone(finished.id, true, (step) => setReading(progressText(step)));
+    setReading(null);
+    router.refresh();
+    if (!read.ok) {
+      return setStatus({
+        tone: "warning",
+        message: `“${title}” was added, but reading it stopped: ${read.message} You can try again from the list below.`,
+      });
+    }
+    setStatus({
+      tone: "success",
+      message: `“${title}” was added and read into ${read.passages ?? 0} passages. It is awaiting review.`,
+    });
   }
 
-  const busy = progress !== null;
+  const busy = progress !== null || reading !== null;
   return (
     <form ref={formRef} onSubmit={submit} noValidate className="flex flex-col gap-4 rounded-3xl border border-line bg-surface p-5">
       <h2 className="text-lg font-medium">Add to the library</h2>
@@ -107,7 +127,12 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
         hint="Where it came from, e.g. a lecturer's handout or a law report."
         error={errors.source}
       />
-      {busy && (
+      {reading !== null && (
+        <p role="status" className="text-sm text-muted">
+          {reading}. Keep this page open.
+        </p>
+      )}
+      {progress !== null && (
         <div role="status" className="flex items-center gap-3 text-sm text-muted">
           <progress value={progress} max={100} className="h-2 flex-1 accent-ink" aria-label="Upload progress" />
           {progress}%
@@ -115,7 +140,7 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
       )}
       <div>
         <button type="submit" disabled={busy} className={compactPrimaryButton}>
-          {busy ? "Uploading…" : "Upload"}
+          {progress !== null ? "Uploading…" : reading !== null ? "Reading…" : "Upload"}
         </button>
       </div>
     </form>

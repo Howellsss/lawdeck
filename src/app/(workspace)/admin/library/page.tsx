@@ -10,6 +10,8 @@ import { listLibraryItems } from "@/server/db/library";
 import { listCourses } from "@/server/db/workspace";
 
 export const metadata: Metadata = { title: "Library · Lawdeck" };
+// Reading a file is done by server actions on this page, in steps of up to about 3 minutes.
+export const maxDuration = 300;
 
 export default function LibraryAdminPage() {
   return (
@@ -41,7 +43,7 @@ async function Library() {
         <h2 id="library-items" className="text-lg font-medium">
           Items ({items.length})
         </h2>
-        <LibraryList items={items} canRemove={role === "admin"} />
+        <LibraryList items={items} isAdmin={role === "admin"} />
       </section>
     </>
   );
