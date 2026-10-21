@@ -7,9 +7,9 @@ import { libraryDetailsSchema, libraryFileSchema, libraryItemIdSchema, libraryPa
 import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { LIBRARY_BUCKET as BUCKET, recordLibraryItem } from "./items";
 import { readStep, restartReading, type ReadStepResult } from "./reading";
 
-const BUCKET = "library";
 // Files uploaded but never finished are removed after this long.
 const LEFTOVER_AFTER_MS = 60 * 60 * 1000;
 
@@ -99,21 +99,14 @@ export async function finishLibraryUpload(input: UploadDetails & { path: string 
     };
   }
 
-  const { data: added, error } = await supabase.from("kb_items").insert({
-    title: parsed.details.title,
-    type: parsed.details.type,
-    course_id: parsed.details.courseId,
-    campus: parsed.details.campus,
-    year: parsed.details.year,
-    source: parsed.details.source,
-    storage_path: path.data,
-    file_name: parsed.file.fileName,
-    mime_type: LIBRARY_FILE_TYPES[realKind].mime,
-    size_bytes: bytes.length,
-  }).select("id").single();
-  if (error) {
-    logFailure("finishLibraryUpload.insert", error.code);
-    await supabase.storage.from(BUCKET).remove([path.data]);
+  const added = await recordLibraryItem(supabase, parsed.details, {
+    path: path.data,
+    fileName: parsed.file.fileName,
+    kind: realKind,
+    size: bytes.length,
+  });
+  if (!added.ok) {
+    logFailure("finishLibraryUpload.insert", added.code);
     return { ok: false, message: "The item was not saved. Please try again." };
   }
   refresh();
