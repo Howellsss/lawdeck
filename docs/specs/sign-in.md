@@ -13,7 +13,7 @@ Rules: Engineering Rules C-01 to C-04; PRD AC-01; System Design §2 (Supabase Au
 | New password | `/reset-password` | Only works after opening a valid reset link. |
 | Sign out | Sidebar, bottom | Ends the session on Supabase's server, not only in the browser. |
 
-Google sign-in is step 1e.
+| Continue with Google | `/sign-in`, `/sign-up` | Shown only when `GOOGLE_SIGN_IN_ENABLED=true`. Google returns the student to `/auth/callback`, which signs them in; a cancelled or failed attempt returns to sign-in with a clear message. |
 
 ## How it is built
 
@@ -32,6 +32,13 @@ Google sign-in is step 1e.
    - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/`
    - Reset password: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
 4. **Vercel**: add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`.
+
+## Google sign-in set-up (founder, once)
+
+1. Google Cloud: create an OAuth client of type "Web application". Authorised redirect URI:
+   `https://vvidwaslcbmzbrcqvdyz.supabase.co/auth/v1/callback`. Keep the client secret private.
+2. Supabase → Authentication → Sign In / Providers → Google: switch on, paste the client ID and secret there (never in chat or code).
+3. Vercel: add `GOOGLE_SIGN_IN_ENABLED=true` (Config) and redeploy. The button appears.
 
 ## Known limits (tracked)
 

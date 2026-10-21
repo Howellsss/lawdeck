@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useActionState, useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useActionState, useEffect, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { linkErrorMessage } from "@/lib/linkErrors";
 import { safeNextPath } from "@/lib/safeNextPath";
@@ -9,18 +9,11 @@ import { signIn, type AuthFormState } from "@/server/auth/actions";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { TextField } from "@/components/ui/TextField";
 import { primaryButton } from "@/components/ui/buttons";
+import { useQuery } from "./useQuery";
 
 // A quick shape check so step one can move on without a server trip. The server checks properly.
 const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 const initialState: AuthFormState = { status: "idle" };
-
-// The page address (?next=… and ?error=…), read in the browser so the form itself never has to
-// wait for the server or be swapped out while the student is typing.
-const noSubscribe = () => () => {};
-function useQuery() {
-  const search = useSyncExternalStore(noSubscribe, () => window.location.search, () => "");
-  return new URLSearchParams(search);
-}
 
 // Email first, then password (design board M1). Without JavaScript both steps still work.
 export function SignInForm() {

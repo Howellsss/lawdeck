@@ -10,6 +10,10 @@ describe("email link error messages", () => {
     expect(linkErrorMessage("browser")).toMatch(/same browser/);
   });
 
+  it("explains an unfinished Google sign-in", () => {
+    expect(linkErrorMessage("google")).toMatch(/Google sign-in didn’t finish/);
+  });
+
   it("shows nothing for missing or unknown codes", () => {
     expect(linkErrorMessage(null)).toBeUndefined();
     expect(linkErrorMessage("anything")).toBeUndefined();

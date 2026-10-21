@@ -19,3 +19,9 @@ export function getSupabaseConfig(): SupabaseConfig | null {
   });
   return parsed.success ? parsed.data : null;
 }
+
+// Google sign-in is switched on per deployment once it is set up in Google and Supabase.
+// Screens only show the button when this is "true".
+export function isGoogleSignInEnabled(): boolean {
+  return process.env.GOOGLE_SIGN_IN_ENABLED === "true" && getSupabaseConfig() !== null;
+}
