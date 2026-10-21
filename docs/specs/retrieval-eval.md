@@ -17,3 +17,15 @@ Diagnosis runs, 2026-10-21 ([miss report](https://github.com/Howellsss/lawdeck/a
 - 5 exact-term questions added (rule numbers, forms; `"kind": "exact"`). With 35 questions, voyage-4 scores 32/35 in the top 5 and 34/35 in the top 8. Q32 is at 11th.
 - Exact-words weight 1, 0.5 and 0.25 give the same totals; 0 is worse, especially for exact-term questions (top 8: 3/5). The live setting (1) stays.
 - Weak spot: the exact-words search requires every word of the question (`websearch_to_tsquery`), so whole-sentence questions rarely match (6/35 alone).
+
+Re-ranking experiment, 2026-10-21 ([run](https://github.com/Howellsss/lawdeck/actions/runs/39631528055)), voyage-4, 35 questions, re-ranker reads the top 30:
+
+| Setup | Top 5 | Top 8 | Exact-term (top 8) |
+| --- | --- | --- | --- |
+| Live (all words) | 32/35 | 34/35 | 4/5 |
+| Most words | 25/35 | 29/35 | 2/5 |
+| All words + rerank-2.5 | 35/35 | 35/35 | 5/5 |
+| Most words + rerank-2.5 | 35/35 | 35/35 | 5/5 |
+| Most words + rerank-2.5-lite | 35/35 | 35/35 | 5/5 |
+
+Recommendation: keep the exact-words search as it is ("most words" alone is worse) and add rerank-2.5 over the top 30 to the live search. Cost about $0.001 per question (first 200M tokens free). Caveat: 35 questions from one document, written by the AI; a legal reviewer's questions and other courses are needed before calling this proven.
