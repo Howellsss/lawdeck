@@ -25,12 +25,17 @@ export function AppShell({
   const [drawerOpen, setDrawerOpen] = useState(false);
   const [panel, setPanel] = useState<PanelContent | null>(null);
   const drawerCloseRef = useRef<HTMLButtonElement>(null);
+  const menuButtonRef = useRef<HTMLButtonElement>(null);
+  const drawerWasOpen = useRef(false);
 
   const closeDrawer = useCallback(() => setDrawerOpen(false), []);
   const panelControls = useMemo(() => ({ open: setPanel, close: () => setPanel(null) }), []);
 
   useEffect(() => {
+    // Opening moves focus into the menu; closing returns it to the menu button (WCAG 2.4.3).
     if (drawerOpen) drawerCloseRef.current?.focus();
+    else if (drawerWasOpen.current) menuButtonRef.current?.focus();
+    drawerWasOpen.current = drawerOpen;
   }, [drawerOpen]);
 
   return (
@@ -79,7 +84,7 @@ export function AppShell({
 
         <div className="flex min-w-0 flex-1 flex-col">
           <header className="flex items-center justify-between px-4 pt-4 lg:hidden">
-            <button type="button" aria-label="Open menu" onClick={() => setDrawerOpen(true)} className={roundButton}>
+            <button ref={menuButtonRef} type="button" aria-label="Open menu" onClick={() => setDrawerOpen(true)} className={roundButton}>
               <Icon name="menu" />
             </button>
             <Link href="/" aria-label="New task" className={`${roundButton} no-underline`}>
