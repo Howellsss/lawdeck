@@ -103,3 +103,15 @@ Tests: `tests/unit/driveImport.test.ts` (10 checks).
 5. Dashboard > Project info: copy the Project number.
 6. Vercel > Environment Variables (Production and Preview): `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_GOOGLE_PICKER_API_KEY`, `NEXT_PUBLIC_GOOGLE_APP_ID`. Then redeploy.
 
+
+## Step 2e: reviewer console (`/admin/library/[id]`)
+
+- Every item in the Library list has **Review**. The list can be filtered: All, Awaiting review, Approved, Rejected, Withdrawn.
+- The review page shows the item's details, reading and search state, a **Decision** panel and its passages, 20 per page with page numbers.
+- **Decision:** Approve, Reject, Withdraw, or back to Awaiting review; a "law current as of" date (required to approve, not in the future; rule KB-02) and an optional note.
+- **Approval rules, enforced by the database (migration 8):** the file must be read, every passage indexed for search, and the date given. The screen explains what is missing; the database refuses anything that breaks the rules anyway.
+- **Correct a passage:** reviewers fix a heading or wording in place. The database clears the passage's old search vector and marks the item as not fully indexed; Lawdeck re-indexes the passage straight away (marked admin job). If Voyage AI is busy, the correction is still saved and an admin finishes it with "Index for search".
+- **Audit record (audit_log), written by the database:** item added, item removed, each decision (from, to, date, whether the note changed), each correction (which passage). Never document text. Nobody can read or write it from the app.
+- Reviewers still cannot upload, remove, read files or change an item's details.
+
+Tests: `tests/permissions/sql/50_library_review_test.sql` (16 checks); approvals in earlier test files now prepare items to meet the rules first (`test.make_reviewable`).

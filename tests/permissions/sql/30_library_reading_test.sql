@@ -16,10 +16,11 @@ update public.profiles set role = 'admin' where id = 'eeeeeeee-0000-0000-0000-00
 select test.as_user('eeeeeeee-0000-0000-0000-000000000015');
 insert into public.kb_items (title, type, course_id)
   select 'Read note', 'note', id from public.courses where slug = 'civil-litigation';
-update public.kb_items set review_status = 'approved' where title = 'Read note';
 select test.check(
   (select reading_status from public.kb_items where title = 'Read note') = 'waiting',
   'a new item is waiting to be read');
+select test.make_reviewable('Read note');
+update public.kb_items set review_status = 'approved' where title = 'Read note';
 insert into public.kb_item_pages (item_id, page, text, method)
   select id, 1, 'Page one text', 'text' from public.kb_items where title = 'Read note';
 insert into public.kb_passages (item_id, position, text)
