@@ -33,6 +33,8 @@ npm run typecheck
 npm test            # unit tests (logic)
 npm run build
 npm run test:e2e    # browser tests of the main journeys (needs the build)
+npm run test:db     # database permission rules on a local PostgreSQL
+npm run test:permissions  # the same rules on the real Supabase project (needs test accounts)
 ```
 
 The first time, browser tests need Chromium: `npx playwright install chromium`.
