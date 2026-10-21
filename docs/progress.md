@@ -58,3 +58,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-20: Supabase project lawdeck-dev created in West EU (Ireland).
 - 2026-10-21: Supabase sign-in settings set (addresses, password length). Clearer message when an email link is opened in a different browser.
 - 2026-10-21: Phase 1 step 1c: database migrations with row-level security, local permission tests (29 passing), real-project permission tests ready.
+- 2026-10-21: Working rule: the AI coding tool merges its own pull requests after all checks pass, and gives direct links for manual steps.
