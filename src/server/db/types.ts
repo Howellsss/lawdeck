@@ -132,6 +132,7 @@ export type Database = {
           indexed_passages: number;
           index_model: string | null;
           indexed_at: string | null;
+          archive_path: string | null;
         };
         Insert: {
           title: string;
@@ -163,6 +164,8 @@ export type Database = {
           indexed_passages?: number;
           index_model?: string | null;
           indexed_at?: string | null;
+          // The archived original (Q-03): written once by the reading step (admins); never changed.
+          archive_path?: string;
         };
         Relationships: [];
       };

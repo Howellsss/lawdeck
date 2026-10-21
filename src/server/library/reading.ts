@@ -4,6 +4,7 @@ import { detectFileKind } from "@/lib/libraryFiles";
 import { transcribePages, type ScanSource } from "@/server/ai/transcribe";
 import type { Database } from "@/server/db/types";
 import { pdfPageToBlocks, scanPageToBlocks, type Block } from "./blocks";
+import { archiveOriginal } from "./archive";
 import { needsScan, readDocxBlocks, readPdfText } from "./extract";
 import { readingQuality, splitIntoPassages } from "./split";
 
@@ -52,7 +53,11 @@ export async function restartReading(db: Db, itemId: string): Promise<void> {
 export async function readStep(db: Db, itemId: string, userId: string): Promise<ReadStepResult> {
   const started = Date.now();
   try {
-    const item = await db.from("kb_items").select("storage_path, page_count").eq("id", itemId).maybeSingle();
+    const item = await db
+      .from("kb_items")
+      .select("storage_path, page_count, course_id, archive_path")
+      .eq("id", itemId)
+      .maybeSingle();
     if (item.error) throw new ReadingError("The item could not be loaded. Please try again.", item.error.code);
     if (!item.data) return { ok: false, message: "That item no longer exists." };
     if (!item.data.storage_path) throw new ReadingError("This item has no file to read.", "no_file");
@@ -62,6 +67,10 @@ export async function readStep(db: Db, itemId: string, userId: string): Promise<
     const bytes = new Uint8Array(await download.data.arrayBuffer());
     const kind = detectFileKind(bytes);
     if (!kind) throw new ReadingError("The file is not a PDF, Word, PNG or JPEG file.", "kind");
+    // Rule Q-03: keep the original in the archive before reading it (once per item).
+    if (!item.data.archive_path && !(await archiveOriginal(db, { id: itemId, courseId: item.data.course_id }, bytes, kind))) {
+      throw new ReadingError("A safe copy of the file could not be stored. Please try again.", "archive");
+    }
 
     if (kind === "docx") {
       const blocks = await readDocxBlocks(bytes);

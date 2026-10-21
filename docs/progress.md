@@ -77,6 +77,9 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2f. Out-of-date warning: law changes recorded by reviewers; items checked before a change are marked "Needs re-check" (worked out live by the database); 13 new permission checks and 4 logic tests
 ✅ 2f. Migration 9 applied in Supabase (founder, 2026-10-21); merged and live
 ✅ 2g. Civil Litigation material loaded and approved (founder approved as interim reviewer, 2026-10-21)
+✅ 2f. Out-of-date material ("Needs re-check") is hidden from student search until re-checked
+✅ Q-03. Archive of original library files that nobody can overwrite or delete; originals archived when read
+⬜ Q-03. Founder applies migration 11; archive job run for files read earlier
 ⬜ 2g. A qualified legal reviewer rechecks the founder-approved material before launch
 ✅ Voyage AI key added in Vercel (founder, 2026-10-21)
 ✅ Civil Litigation material (founder, 2026-10-21)
@@ -127,3 +130,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Retrieval test: voyage-4 28/30, voyage-law-2 28/30, exact words only 3/30. Kept voyage-4. Retrieval exit target met.
 - 2026-10-21: Re-ranking (Voyage rerank-2.5) added to the live search after the test found 35/35; searches return up to 30 candidates to the server, with a student search limit. Migration 10.
 - 2026-10-21: Migration 10 applied; re-ranker and search limit merged. Live retrieval test: 35/35 in the top 8 and top 5.
+- 2026-10-21: Out-of-date material leaves student search until re-checked (founder's question); archive of original library files (Q-03). Migration 11.

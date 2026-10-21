@@ -12,7 +12,8 @@
     "test:e2e": "playwright test",
     "test:db": "scripts/test-db-local.sh",
     "test:permissions": "vitest run --config vitest.permissions.config.mts",
-    "eval:retrieval": "vitest run --config vitest.eval.config.mts"
+    "eval:retrieval": "vitest run --config vitest.eval.config.mts",
+    "job:archive": "vitest run --config vitest.jobs.config.mts jobs/archive-originals.job.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",

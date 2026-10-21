@@ -36,7 +36,7 @@ async function LawChanges() {
         <h1 className="font-serif text-3xl font-normal text-greeting">Law changes</h1>
         <p className="text-muted">
           When the law changes, record it here. Library material checked only up to an earlier date, in the same course,
-          is marked “Needs re-check” until a reviewer checks it again.
+          is marked “Needs re-check”, and students cannot find it in search until a reviewer checks it again.
         </p>
       </div>
       {courses.status === "ok" && <LawChangeForm courses={courses.data} />}
