@@ -40,7 +40,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1b. Sign-in code merged and live; Supabase settings added to Vercel
 ✅ 1b. Supabase: site address and allowed return addresses set; minimum password length 10
 ⚠️ 1b. Email templates — Supabase only allows editing them after a custom email service (SMTP) is connected. Needs a decision from the founder before real students sign up
-⚠️ 1b. Live sign-in — needs the Supabase project (URL and publishable key) and its settings from the founder (see docs/specs/sign-in.md)
+⚠️ 1b. First real sign-up test on lawdeck.vercel.app — founder to try it with their own email
 ⬜ 1c. Database tables with row-level security, and permission tests
 ⬜ 1d. Projects and chats saved per student
 ⬜ 1e. Automatic checks on every pull request; Google sign-in
