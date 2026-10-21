@@ -50,8 +50,9 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1d. Courses page reads the five courses from the database
 ⬜ 1d. Founder tries projects on the live site (signed-in journeys are not yet browser-tested automatically; that needs the test accounts in step 1e)
 ✅ 1e. Automatic checks on every pull request (GitHub Actions): lint, types, unit tests, build, browser tests, database permission rules, library security check
-⬜ 1e. Real-project permission tests on GitHub — need 4 private settings in GitHub (founder)
-⬜ 1e. Google sign-in
+⚠️ 1e. Real-project permission tests on GitHub — need two test accounts in Supabase and 6 repository secrets in GitHub (founder)
+✅ 1e. Google sign-in built ("Continue with Google"), hidden until switched on
+⚠️ 1e. Google sign-in switched on — needs a Google Cloud sign-in client, the Supabase Google setting and GOOGLE_SIGN_IN_ENABLED=true in Vercel (founder; steps in docs/specs/sign-in.md)
 
 ## Change log
 
@@ -67,3 +68,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: The three database migrations were applied in Supabase by the founder.
 - 2026-10-21: Phase 1 step 1d: projects, Recents and courses from the database. 36 logic tests and 32 browser tests passing.
 - 2026-10-21: Phase 1 step 1e: automatic checks on every pull request (GitHub Actions).
+- 2026-10-21: Google sign-in built; it appears once set up in Google Cloud, Supabase and Vercel.
