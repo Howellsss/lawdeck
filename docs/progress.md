@@ -22,7 +22,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Single AI module (`src/server/ai`) and the protected `/health` connection check
 ✅ Secret scanning (Secret Protection) and push protection switched on in GitHub
 ✅ Vercel connected; app live at lawdeck.vercel.app (framework preset set to Next.js)
-⬜ Supabase development project created (EU region, pgvector on) — moved to the start of Phase 1, where it is first used
+✅ Supabase development project created (EU region) in Phase 1
 ✅ Anthropic account with $10 credit; key added to Vercel as a secret (⬜ confirm the $20 monthly limit is set)
 ⬜ Voyage AI account and key — moved to Phase 2, where it is first used
 ✅ Health check shows Claude's "OK" on the live site (claude-haiku-5-5, about 1.1 s)
@@ -39,8 +39,8 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1b. Supabase project `lawdeck-dev` created (West EU, Ireland; free plan)
 ✅ 1b. Sign-in code merged and live; Supabase settings added to Vercel
 ✅ 1b. Supabase: site address and allowed return addresses set; minimum password length 10
-⚠️ 1b. Email templates — Supabase only allows editing them after a custom email service (SMTP) is connected. Needs a decision from the founder before real students sign up
-⚠️ 1b. First real sign-up test on lawdeck.vercel.app — founder to try it with their own email
+⬜ Before launch: connect an email service (SMTP) so sign-in emails can be edited and work across devices — founder decision on a domain name
+✅ 1b. First real sign-up test on lawdeck.vercel.app (founder)
 ✅ 1c. Database tables written as migrations: profiles, plans, courses, topics, projects, conversations, messages, usage_events, audit_log — row-level security on every table
 ✅ 1c. Permission tests pass on a local copy (29 checks; deliberately broken rules are caught)
 ✅ 1c. The three migrations applied in Supabase (2026-10-21)
