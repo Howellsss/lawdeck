@@ -7,7 +7,8 @@ import { DriveImport } from "@/components/library/DriveImport";
 import { UploadForm } from "@/components/library/UploadForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
-import { reviewStatusFilterSchema } from "@/schemas/libraryReview";
+import { libraryFilterSchema } from "@/schemas/libraryReview";
+import { getRecheckReasons } from "@/server/db/lawChanges";
 import { getStaffRole } from "@/server/auth/roles";
 import { getSupabaseConfig } from "@/server/auth/config";
 import { listLibraryItems } from "@/server/db/library";
@@ -33,8 +34,10 @@ export default function LibraryAdminPage({ searchParams }: PageProps<"/admin/lib
 async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "searchParams">) {
   const role = await getStaffRole();
   if (!role) notFound();
-  const status = reviewStatusFilterSchema.parse((await searchParams).status);
-  const [items, courses] = await Promise.all([listLibraryItems(status), listCourses()]);
+  const filter = libraryFilterSchema.parse((await searchParams).status);
+  const status = filter === "recheck" ? undefined : filter;
+  const [allItems, courses, recheck] = await Promise.all([listLibraryItems(status), listCourses(), getRecheckReasons()]);
+  const items = filter === "recheck" ? allItems.filter((item) => recheck.has(item.id)) : allItems;
   const apiKey = getSupabaseConfig()?.key ?? "";
   const drive = role === "admin" ? getDrivePickerConfig() : null;
 
@@ -49,27 +52,31 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
           <Link href="/admin/library/search" className="underline underline-offset-2">
             Test the search
           </Link>
+          {" · "}
+          <Link href="/admin/library/law-changes" className="underline underline-offset-2">
+            Law changes
+          </Link>
         </p>
       </div>
       {drive && courses.status === "ok" && <DriveImport config={drive} courses={courses.data} />}
       {role === "admin" && courses.status === "ok" && <UploadForm courses={courses.data} apiKey={apiKey} />}
       <section aria-labelledby="library-items" className="flex flex-col gap-3">
         <h2 id="library-items" className="text-lg font-medium">
-          {status ? REVIEW_STATUS_LABELS[status] : "All items"} ({items.length})
+          {filter === "recheck" ? "Needs re-check" : status ? REVIEW_STATUS_LABELS[status] : "All items"} ({items.length})
         </h2>
         <nav aria-label="Filter by review status" className="flex flex-wrap gap-2 text-sm">
-          {([undefined, "pending", "approved", "rejected", "withdrawn"] as const).map((value) => (
+          {([undefined, "pending", "approved", "rejected", "withdrawn", "recheck"] as const).map((value) => (
             <Link
               key={value ?? "all"}
               href={value ? `/admin/library?status=${value}` : "/admin/library"}
-              aria-current={value === status ? "page" : undefined}
-              className={`rounded-full border border-line px-3 py-1.5 no-underline ${value === status ? "bg-pill font-medium" : "hover:bg-pill"}`}
+              aria-current={value === filter ? "page" : undefined}
+              className={`rounded-full border border-line px-3 py-1.5 no-underline ${value === filter ? "bg-pill font-medium" : "hover:bg-pill"}`}
             >
-              {value ? REVIEW_STATUS_LABELS[value] : "All"}
+              {value === "recheck" ? `Needs re-check (${recheck.size})` : value ? REVIEW_STATUS_LABELS[value] : "All"}
             </Link>
           ))}
         </nav>
-        <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} />
+        <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} recheck={recheck} />
       </section>
     </>
   );

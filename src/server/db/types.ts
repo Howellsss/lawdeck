@@ -212,8 +212,28 @@ export type Database = {
           },
         ];
       };
+      law_changes: {
+        Row: {
+          id: string;
+          course_id: string;
+          title: string;
+          effective_on: string;
+          note: string | null;
+          source: string | null;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: { course_id: string; title: string; effective_on: string; note?: string | null; source?: string | null };
+        Update: { title?: string; effective_on?: string; note?: string | null; source?: string | null };
+        Relationships: [];
+      };
     };
-    Views: { [_ in never]: never };
+    Views: {
+      kb_items_needing_recheck: {
+        Row: { item_id: string; change_id: string; change_title: string; effective_on: string };
+        Relationships: [];
+      };
+    };
     Functions: {
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };

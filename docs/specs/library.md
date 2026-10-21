@@ -115,3 +115,13 @@ Tests: `tests/unit/driveImport.test.ts` (10 checks).
 - Reviewers still cannot upload, remove, read files or change an item's details.
 
 Tests: `tests/permissions/sql/50_library_review_test.sql` (16 checks); approvals in earlier test files now prepare items to meet the rules first (`test.make_reviewable`).
+
+## Step 2f: out-of-date warning (`/admin/library/law-changes`)
+
+- Reviewers and admins record **changes in the law**: what changed, the course, the date it took effect, and an optional source and note. They can remove a record; all of this goes into the audit record.
+- An item **needs re-checking** when a recorded change in its course took effect after the item's "law current as of" date. The database works this out live (view `kb_items_needing_recheck`, migration 9), so it is never stale.
+- The Library list shows "Needs re-check: …" on such items and has a **Needs re-check** filter with a count. The review page lists the changes that triggered it and what to do.
+- Saving a newer "law current as of" date clears the warning. Nothing is withdrawn automatically: a reviewer decides.
+- Students and visitors cannot see law changes or the warnings.
+
+Tests: `tests/permissions/sql/60_law_changes_test.sql` (13 checks).
