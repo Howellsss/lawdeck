@@ -69,3 +69,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Phase 1 step 1d: projects, Recents and courses from the database. 36 logic tests and 32 browser tests passing.
 - 2026-10-21: Phase 1 step 1e: automatic checks on every pull request (GitHub Actions).
 - 2026-10-21: Google sign-in built; it appears once set up in Google Cloud, Supabase and Vercel.
+- 2026-10-21: "Continue with Google" uses Google's official multicolour logo (founder's request; Google branding rules).
