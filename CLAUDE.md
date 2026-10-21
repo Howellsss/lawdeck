@@ -69,6 +69,8 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 
 ## Git
 One feature per branch, never commit to main, small commits saying what and why, merge via pull request after running the app and tests.
+- The AI coding tool merges its own pull requests once lint, typecheck, build and all tests pass (founder's decision, 2026-10-21). It never merges with a failing or skipped check.
+- When the founder must do something by hand (for example paste a migration into Supabase), give a direct link to the exact file and the shortest possible steps.
 
 ## Done means
 PRD acceptance criteria met · works at 360 px and desktop · input validated · permissions + RLS + tests · all states handled · no secrets · no unapproved libraries · tests (and eval if relevant) pass · spec and this file updated if needed.
