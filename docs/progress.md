@@ -61,7 +61,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2b. Admin upload screen: file plus details, real file type checked, straight to the private store; list and remove
 ⬜ 2b. Founder uploads one small test file on the live site
 ✅ 2c. Reading files: text from PDF and Word (new libraries unpdf and mammoth, approved), scans and photos read by Claude Haiku 5.5, split into 300–800-word passages with headings and pages; 17 new permission checks and 20 logic tests pass
-⬜ 2c. Migration 6 applied in Supabase (founder)
+✅ 2c. Migration 6 applied in Supabase (founder, 2026-10-21); code merged and live
 ⬜ 2c. Founder reads one scanned file on the live site; check the transcription and the cost per page
 ⬜ 2d. Search by meaning (Voyage AI) and exact words; test two Voyage models on 30 Civil Litigation questions and record the choice
 ⬜ 2e. Reviewer console: approve, correct, reject, withdraw; reviewer and date recorded
@@ -103,3 +103,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Phase 2 started. Step 2a: library database and file store with permission tests.
 - 2026-10-21: Step 2b: admin Library page with upload, real file-type check, list and remove.
 - 2026-10-21: Step 2c: reading library files into passages (PDF, Word, scans and photos). Libraries unpdf and mammoth approved; scans read by Claude Haiku 5.5.
+- 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
+- 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
