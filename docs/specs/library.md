@@ -62,3 +62,25 @@ Tests: `tests/permissions/sql/30_library_reading_test.sql` (17 checks), the "lib
 ### Founder step for 2c
 
 Paste `supabase/migrations/20261021000600_library_reading.sql` into the Supabase SQL Editor and run it. Expected: "Success. No rows returned". This must be done before the 2c code goes live, or the Library page will show an error.
+
+## Step 2d: search
+
+- **Search vectors** come from Voyage AI (`src/server/retrieval/voyage.ts`; model setting in `src/server/retrieval/settings.ts`, currently `voyage-4` until the test picks one). Each passage is indexed as its heading plus its wording, and the model name is stored with every vector.
+- **Indexing** is a marked admin job (`src/server/retrieval/indexJob.ts`) using the service-role key, because nobody signed in may write search vectors. It runs straight after a file is read; admins can also click "Index for search" on an item. Like reading, it works in steps and can carry on after a break. The list shows "Indexed for search: all N passages" or what is missing. Reading a file again clears its index count, because the new passages have no vectors yet.
+- **Searching** goes through one database function, `search_library` (migration 7). It filters first (chosen course; approved items only, or also items awaiting review for reviewers and admin jobs), then ranks two ways: by meaning (only vectors from the same model are compared) and by exact words (English word stems, so section numbers and case names count). The two rankings are combined by reciprocal rank fusion (k = 60, top 40 each), and at most 8 passages are returned. If Voyage cannot be reached, the search still works on exact words and says so.
+- **Test page** `/admin/library/search` (reviewers and admins): ask a question, choose a course, see the passages with their item, pages and how each was found. Students will search only through answers in Phase 3.
+- **Retrieval test** (`tests/eval/retrieval`): compares the two models on the 30 Civil Litigation questions. Results are recorded in `docs/specs/retrieval-eval.md`.
+
+| Part | Students | Reviewers | Admins | Admin jobs (service key) |
+| --- | --- | --- | --- | --- |
+| `search_library` | Approved passages of one course, at most 8 | Also material awaiting review | Same as reviewers | Same as reviewers |
+| Search vectors and index details | No | No | No | Write |
+
+Tests: `tests/permissions/sql/40_library_search_test.sql` (15 checks), `tests/unit/retrieval.test.ts` (12 checks), and the browser test that the test page is hidden from visitors.
+
+### Founder steps for 2d
+
+1. Paste `supabase/migrations/20261021000700_library_search.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it. Expected: "Success. No rows returned". Do this before the 2d code goes live.
+2. In Vercel: add `SUPABASE_SERVICE_ROLE_KEY` (Supabase > Project Settings > API keys > the secret or "service_role" key) for Production and Preview, marked Sensitive. `VOYAGE_API_KEY` is already there.
+3. For the retrieval test on GitHub: add `SUPABASE_SERVICE_ROLE_KEY` and `VOYAGE_API_KEY` as repository secrets (Settings > Secrets and variables > Actions).
+

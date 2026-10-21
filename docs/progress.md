@@ -24,7 +24,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Vercel connected; app live at lawdeck.vercel.app (framework preset set to Next.js)
 ✅ Supabase development project created (EU region) in Phase 1
 ✅ Anthropic account with $10 credit; key added to Vercel as a secret (⬜ confirm the $20 monthly limit is set)
-⬜ Voyage AI account and key — moved to Phase 2, where it is first used
+✅ Voyage AI account and key (added in Phase 2)
 ✅ Health check shows Claude's "OK" on the live site (claude-haiku-5-5, about 1.1 s)
 
 ## Phase 1. Shell, accounts and data ✅ (complete 2026-10-21)
@@ -63,11 +63,13 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2c. Reading files: text from PDF and Word (new libraries unpdf and mammoth, approved), scans and photos read by Claude Haiku 5.5, split into 300–800-word passages with headings and pages; 17 new permission checks and 20 logic tests pass
 ✅ 2c. Migration 6 applied in Supabase (founder, 2026-10-21); code merged and live
 ⬜ 2c. Founder reads one scanned file on the live site; check the transcription and the cost per page
-⬜ 2d. Search by meaning (Voyage AI) and exact words; test two Voyage models on 30 Civil Litigation questions and record the choice
+✅ 2d. Search by meaning (Voyage AI) and exact words in one database function: approved material only, filtered by course, at most 8 passages; test page for reviewers; 15 new permission checks and 12 logic tests pass
+⬜ 2d. Migration 7 applied in Supabase; service-role key added in Vercel (founder)
+⬜ 2d. Test the two Voyage models on 30 Civil Litigation questions and record the choice (needs 2g material and the 30 questions)
 ⬜ 2e. Reviewer console: approve, correct, reject, withdraw; reviewer and date recorded
 ⬜ 2f. Out-of-date warning for material older than a later change in the law
 ⬜ 2g. Civil Litigation material loaded and approved
-⚠️ Voyage AI account and key — founder, by 2d
+✅ Voyage AI key added in Vercel (founder, 2026-10-21)
 ⚠️ Civil Litigation material — founder, by 2g
 ⚠️ Legal reviewer and 30 test questions — founder, by 2e
 
@@ -106,3 +108,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
 - 2026-10-21: Migration 6 applied in Supabase (lawdeck-dev); step 2c merged.
 - 2026-10-21: Founder confirmed a test upload on the live Library page (step 2b).
+- 2026-10-21: Step 2d: hybrid library search (Voyage AI + exact words), indexing admin job, reviewer test page and retrieval test.

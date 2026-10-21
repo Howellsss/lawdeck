@@ -1,0 +1,11 @@
+{
+  "course": "civil-litigation",
+  "questions": [
+    {
+      "id": 1,
+      "question": "A question written the way a student would ask it",
+      "expectContains": "a short exact phrase (5 to 15 words) from the passage that should come up",
+      "itemTitle": "Optional: the title of the library item it is in"
+    }
+  ]
+}
