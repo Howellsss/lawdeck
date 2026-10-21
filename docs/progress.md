@@ -69,7 +69,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 2d. Retrieval test run: 28/30 with both models (target 25); library keeps voyage-4
 ✅ 2d. Misses diagnosed (test sound; 34/35 in the top 8) and fixed with Voyage re-ranking: 35/35 in the test
 ✅ 2d. Re-ranker in the live search, with a student search limit (40 an hour, 200 a day); 12 new permission checks
-⬜ 2d. Founder applies migration 10 in Supabase
+✅ 2d. Migration 10 applied in Supabase (founder, 2026-10-21); re-ranker live; live search 35/35 in the top 8 and top 5
 ✅ Extra (founder request). Import library files from Google Drive: pick several files, details suggested from file names
 ✅ Extra. Google Cloud set-up for the Drive import (founder); Drive import works on the live site
 ✅ 2e. Reviewer console: approve, correct, reject, withdraw; "law current as of" date; approval rules and audit record enforced by the database; 16 new permission checks and 10 logic tests
@@ -126,3 +126,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: 30 retrieval test questions written from Sarumi's Civil Litigation notes. The retrieval test now paces itself to Voyage's free-tier limit.
 - 2026-10-21: Retrieval test: voyage-4 28/30, voyage-law-2 28/30, exact words only 3/30. Kept voyage-4. Retrieval exit target met.
 - 2026-10-21: Re-ranking (Voyage rerank-2.5) added to the live search after the test found 35/35; searches return up to 30 candidates to the server, with a student search limit. Migration 10.
+- 2026-10-21: Migration 10 applied; re-ranker and search limit merged. Live retrieval test: 35/35 in the top 8 and top 5.

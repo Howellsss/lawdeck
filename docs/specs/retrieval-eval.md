@@ -29,3 +29,5 @@ Re-ranking experiment, 2026-10-21 ([run](https://github.com/Howellsss/lawdeck/ac
 | Most words + rerank-2.5-lite | 35/35 | 35/35 | 5/5 |
 
 Recommendation: keep the exact-words search as it is ("most words" alone is worse) and add rerank-2.5 over the top 30 to the live search. Cost about $0.001 per question (first 200M tokens free). Caveat: 35 questions from one document, written by the AI; a legal reviewer's questions and other courses are needed before calling this proven.
+
+Live search check, 2026-10-21, after migration 10 ([run](https://github.com/Howellsss/lawdeck/actions/runs/39659858919)): voyage-4, top 30, then rerank-2.5. **35/35 in the top 8 and 35/35 in the top 5; exact-term questions 5/5.** Without the re-ranker (the fallback if Voyage is down) the same questions score 33/35 in the top 8 (words ranking now read 30 deep, as the database does), so the fallback is weaker and the test page warns when it is used.
