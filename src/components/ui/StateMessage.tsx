@@ -7,17 +7,21 @@ export function StateMessage({
   children,
   action,
   tone = "neutral",
+  level = 1,
 }: {
   title: string;
   children?: ReactNode;
   action?: { label: string; href: string } | ReactNode;
   tone?: "neutral" | "warning";
+  // 2 when the page already has its own main heading.
+  level?: 1 | 2;
 }) {
+  const Heading = level === 1 ? "h1" : "h2";
   return (
     <div className="mx-auto flex w-full max-w-md flex-col items-center gap-3 px-4 py-16 text-center">
-      <h1 className={`font-serif text-3xl font-normal ${tone === "warning" ? "text-warning" : "text-greeting"}`}>
+      <Heading className={`font-serif text-3xl font-normal ${tone === "warning" ? "text-warning" : "text-greeting"}`}>
         {title}
-      </h1>
+      </Heading>
       {children && <div className="text-base leading-relaxed text-muted">{children}</div>}
       {action && isLinkAction(action) ? (
         <Link href={action.href} className="mt-2">

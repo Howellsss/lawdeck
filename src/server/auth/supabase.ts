@@ -1,6 +1,7 @@
 import "server-only";
 import { createServerClient } from "@supabase/ssr";
 import { cookies } from "next/headers";
+import type { Database } from "@/server/db/types";
 import { getSupabaseConfig } from "./config";
 
 export class AuthNotConfiguredError extends Error {
@@ -17,7 +18,7 @@ export async function createSupabaseServerClient() {
   if (!config) throw new AuthNotConfiguredError();
   const cookieStore = await cookies();
 
-  return createServerClient(config.url, config.key, {
+  return createServerClient<Database>(config.url, config.key, {
     cookies: {
       getAll() {
         return cookieStore.getAll();

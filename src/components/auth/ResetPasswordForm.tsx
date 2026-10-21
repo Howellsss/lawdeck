@@ -3,9 +3,9 @@
 import { useActionState } from "react";
 import { PASSWORD_MIN } from "@/lib/passwordRules";
 import { updatePassword, type AuthFormState } from "@/server/auth/actions";
-import { FormAlert } from "./FormAlert";
-import { TextField } from "./TextField";
-import { primaryButton } from "./buttons";
+import { FormAlert } from "@/components/ui/FormAlert";
+import { TextField } from "@/components/ui/TextField";
+import { primaryButton } from "@/components/ui/buttons";
 
 const initialState: AuthFormState = { status: "idle" };
 

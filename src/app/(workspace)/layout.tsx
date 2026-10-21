@@ -2,14 +2,21 @@ import { Suspense } from "react";
 import { AccountButtonPlaceholder } from "@/components/shell/AccountButton";
 import { AccountSlot } from "@/components/shell/AccountSlot";
 import { AppShell } from "@/components/shell/AppShell";
+import { RecentsPlaceholder } from "@/components/shell/RecentsList";
+import { RecentsSlot } from "@/components/shell/RecentsSlot";
 
 export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
   return (
     <AppShell
+      // Both read the sign-in cookie, so they stream in without holding up the page.
       account={
-        // The sign-in check reads cookies, so it streams in without holding up the page.
         <Suspense fallback={<AccountButtonPlaceholder />}>
           <AccountSlot />
+        </Suspense>
+      }
+      recents={
+        <Suspense fallback={<RecentsPlaceholder />}>
+          <RecentsSlot />
         </Suspense>
       }
     >

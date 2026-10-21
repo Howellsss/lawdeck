@@ -6,9 +6,9 @@ import { Icon } from "@/components/ui/Icon";
 import { linkErrorMessage } from "@/lib/linkErrors";
 import { safeNextPath } from "@/lib/safeNextPath";
 import { signIn, type AuthFormState } from "@/server/auth/actions";
-import { FormAlert } from "./FormAlert";
-import { TextField } from "./TextField";
-import { primaryButton } from "./buttons";
+import { FormAlert } from "@/components/ui/FormAlert";
+import { TextField } from "@/components/ui/TextField";
+import { primaryButton } from "@/components/ui/buttons";
 
 // A quick shape check so step one can move on without a server trip. The server checks properly.
 const LOOKS_LIKE_EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
