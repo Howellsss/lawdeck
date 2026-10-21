@@ -1,21 +1,30 @@
 "use server";
 
 import { pagesLabel } from "@/lib/pages";
-import { sourceIdSchema, startChatSchema } from "@/schemas/learn";
+import { DRAFT_LATER, sourceIdSchema, startChatSchema } from "@/schemas/learn";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { routeRequest } from "@/server/ai/route";
 import { titleFrom } from "./ask";
+import { redactPersonalData } from "./redact";
 
 export type StartChatResult =
   | { ok: true; id: string }
-  | { ok: false; message: string; signIn?: boolean };
+  | { ok: false; message: string; signIn?: boolean; routedToDraft?: boolean };
 
-// Starts a Learn chat from the home composer. The question itself is then asked from the
-// chat page, which streams the answer.
-export async function startChat(input: { question: string; course: string }): Promise<StartChatResult> {
+// Starts a Learn chat from the home composer or a course hub. In Auto mode the router decides
+// first (Learn or Draft); if it cannot be reached, the request is treated as Learn. The question
+// itself is then asked from the chat page, which streams the answer.
+export async function startChat(input: { question: string; course: string; mode?: string }): Promise<StartChatResult> {
   const parsed = startChatSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Type a question." };
-  if (!(await getCurrentAccount())) return { ok: false, signIn: true, message: "Sign in to ask Lawdeck a question." };
+  const account = await getCurrentAccount();
+  if (!account) return { ok: false, signIn: true, message: "Sign in to ask Lawdeck a question." };
+
+  const auto = parsed.data.mode === "auto";
+  if (auto && (await routeRequest(redactPersonalData(parsed.data.question), account.id)) === "draft") {
+    return { ok: false, routedToDraft: true, message: DRAFT_LATER };
+  }
 
   const supabase = await createSupabaseServerClient();
   let courseId: string | null = null;
@@ -26,7 +35,7 @@ export async function startChat(input: { question: string; course: string }): Pr
   }
   const { data, error } = await supabase
     .from("conversations")
-    .insert({ title: titleFrom(parsed.data.question), mode: "learn", course_id: courseId })
+    .insert({ title: titleFrom(parsed.data.question), mode: "learn", course_id: courseId, auto_routed: auto })
     .select("id")
     .single();
   if (error) {

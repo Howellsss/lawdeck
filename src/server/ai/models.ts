@@ -4,6 +4,7 @@ import "server-only";
 // Phase 3 tests which model each Learn and Practice job really needs.
 export const MODELS = {
   healthCheck: "claude-haiku-5-5",
+  // Auto mode: Learn or Draft (step 3c).
   routing: "claude-haiku-5-5",
   smallJobs: "claude-haiku-5-5",
   // Reading scanned pages and photos into text (step 2c). Switch to Sonnet if a sample scan shows mistakes.
