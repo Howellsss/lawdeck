@@ -16,10 +16,12 @@ export function AppShell({
   children,
   account,
   recents,
+  staffNav,
 }: {
   children: ReactNode;
   account?: ReactNode;
   recents?: ReactNode;
+  staffNav?: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -48,6 +50,7 @@ export function AppShell({
               onToggleCollapse={() => setCollapsed((value) => !value)}
               account={account}
               recents={recents}
+              staffNav={staffNav}
             />
           </div>
         </div>
@@ -65,6 +68,7 @@ export function AppShell({
                 onNavigate={closeDrawer}
                 account={account}
                 recents={recents}
+                staffNav={staffNav}
                 closeButton={
                   <button
                     ref={drawerCloseRef}

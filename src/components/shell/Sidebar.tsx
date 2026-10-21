@@ -23,9 +23,11 @@ type SidebarProps = {
   account?: React.ReactNode;
   // The student's latest chats, read on the server (see RecentsSlot).
   recents?: React.ReactNode;
+  // The Library link for reviewers and admins (see StaffNavSlot).
+  staffNav?: React.ReactNode;
 };
 
-export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents }: SidebarProps) {
+export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav }: SidebarProps) {
   const itemClass = (active: boolean) =>
     `flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
       active ? "bg-pill font-medium" : ""
@@ -73,6 +75,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
               {label(link.label)}
             </NavLink>
           ))}
+          {staffNav}
         </div>
 
         {recents}

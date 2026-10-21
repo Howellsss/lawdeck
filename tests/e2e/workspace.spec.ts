@@ -29,3 +29,18 @@ test("the menu marks the current section", async ({ page }, testInfo) => {
   const projects = page.getByRole("link", { name: "Projects", exact: true }).filter({ visible: true });
   await expect(projects).toHaveAttribute("aria-current", "page");
 });
+
+test("the Library page is hidden from visitors", async ({ page }) => {
+  // The role is checked after the page starts streaming, so the content (not the status code)
+  // says "not found". What matters: no library content or upload form is ever shown.
+  await page.goto("/admin/library");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Library", exact: true })).toHaveCount(0);
+  await expect(page.getByText("Add to the library")).toHaveCount(0);
+  await expect(page.locator('input[type="file"]')).toHaveCount(0);
+});
+
+test("visitors do not see the Library link", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByRole("link", { name: "Library" })).toHaveCount(0);
+});
