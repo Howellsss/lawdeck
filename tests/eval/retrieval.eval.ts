@@ -10,7 +10,10 @@ import { EMBEDDING_MODELS, type EmbeddingModel } from "@/server/retrieval/settin
 import { EMBED_BATCH, embedTexts, fitTokenBudget } from "@/server/retrieval/voyage";
 
 const TOP = 5;
-const TARGET = 25;
+// Build Phases target: 25 of 30 in the top 5, i.e. five in six, whatever the number of questions.
+const targetFor = (count: number) => Math.ceil((count * 25) / 30);
+// Weights for the exact-words ranking to compare (1 = the live setting, see fuse.ts).
+const WORDS_WEIGHTS = [1, 0.5, 0.25, 0];
 const FILE = process.env.EVAL_QUESTIONS ?? "tests/eval/retrieval/civil-litigation.json";
 
 const questionsSchema = z.object({
@@ -22,6 +25,8 @@ const questionsSchema = z.object({
         question: z.string().min(3).max(1000),
         expectContains: z.string().min(5),
         itemTitle: z.string().optional(),
+        // "exact": the question uses an exact term from the notes (a rule number, a form).
+        kind: z.enum(["meaning", "exact"]).optional(),
       }),
     )
     .min(1),
@@ -57,7 +62,7 @@ async function embedAll(texts: string[], inputType: "document" | "query", model:
 }
 
 describe("retrieval test", () => {
-  it(`finds the right passage in the top ${TOP} for at least ${TARGET} of 30 questions`, async () => {
+  it(`finds the right passage in the top ${TOP} for at least five in six questions`, async () => {
     if (!existsSync(FILE)) throw new Error(`Questions file not found: ${FILE}. See tests/eval/retrieval/README.md.`);
     const { course: slug, questions } = questionsSchema.parse(JSON.parse(readFileSync(FILE, "utf8")));
     const db = createAdminClient();
@@ -163,15 +168,34 @@ describe("retrieval test", () => {
         `${EMBEDDING_MODELS[model].label}: hybrid ${hybrid}/${questions.length} (top ${AI_RECEIVES}: ${hybridAi}/${questions.length}), meaning only ${meaningOnly}/${questions.length}; missed: ${misses.join(", ") || "none"}`,
         ...details,
       );
+      // Same model, different trust in exact words: top 5 and top 8, overall and for exact-term questions.
+      const exact = questions.filter((q) => q.kind === "exact");
+      for (const weight of WORDS_WEIGHTS) {
+        const counts = { top: 0, ai: 0, exactTop: 0, exactAi: 0 };
+        questions.forEach((q, i) => {
+          const combined = fuseRankings(rankByMeaning(queryVectors[i], indexed), byWords.get(String(q.id)) ?? [], AI_RECEIVES, weight);
+          const top = isHit(q, combined.slice(0, TOP));
+          const ai = isHit(q, combined);
+          counts.top += Number(top);
+          counts.ai += Number(ai);
+          if (q.kind === "exact") {
+            counts.exactTop += Number(top);
+            counts.exactAi += Number(ai);
+          }
+        });
+        lines.push(
+          `  words weight ${weight}: top ${TOP} ${counts.top}/${questions.length}, top ${AI_RECEIVES} ${counts.ai}/${questions.length}; exact-term questions top ${TOP} ${counts.exactTop}/${exact.length}, top ${AI_RECEIVES} ${counts.exactAi}/${exact.length}`,
+        );
+      }
     }
     lines.push(`Exact words only: ${wordsOnly}/${questions.length}`);
     const best = Math.max(...Object.values(scores));
-    lines.push("", `Best: ${best}/${questions.length} (target ${TARGET})`);
+    lines.push("", `Best (live setting): ${best}/${questions.length} (target ${targetFor(questions.length)})`);
     console.info(lines.join("\n"));
     if (process.env.GITHUB_STEP_SUMMARY) {
       const { appendFileSync } = await import("node:fs");
       appendFileSync(process.env.GITHUB_STEP_SUMMARY, lines.map((line) => (line ? `- ${line}` : "")).join("\n") + "\n");
     }
-    expect(best).toBeGreaterThanOrEqual(Math.min(TARGET, questions.length));
+    expect(best).toBeGreaterThanOrEqual(targetFor(questions.length));
   });
 });

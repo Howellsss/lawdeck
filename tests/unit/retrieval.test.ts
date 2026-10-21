@@ -20,6 +20,11 @@ describe("combining the two rankings", () => {
     const deep = Array.from({ length: 50 }, (_, i) => `m${i}`);
     expect(fuseRankings(deep, [], 50)).toHaveLength(40);
   });
+
+  it("trusts meaning more when exact words are given less weight", () => {
+    expect(fuseRankings(["a", "b", "c"], ["c"], 3)[0]).toBe("c");
+    expect(fuseRankings(["a", "b", "c"], ["c"], 3, 0)[0]).toBe("a");
+  });
 });
 
 describe("ranking by meaning", () => {

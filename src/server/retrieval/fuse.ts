@@ -2,12 +2,15 @@ import { FUSION_DEPTH, FUSION_K } from "./settings";
 
 // Reciprocal rank fusion: the same way search_library (migration 7) combines the ranking by
 // meaning with the ranking by exact words. Used by the retrieval test to try models side by side.
-export function fuseRankings(byMeaning: string[], byWords: string[], limit: number): string[] {
+// wordsWeight 1 counts both rankings equally (the live setting); lower values trust meaning more.
+export function fuseRankings(byMeaning: string[], byWords: string[], limit: number, wordsWeight = 1): string[] {
   const scores = new Map<string, number>();
-  const add = (ids: string[]) =>
-    ids.slice(0, FUSION_DEPTH).forEach((id, index) => scores.set(id, (scores.get(id) ?? 0) + 1 / (FUSION_K + index + 1)));
-  add(byMeaning);
-  add(byWords);
+  const add = (ids: string[], weight: number) =>
+    ids
+      .slice(0, FUSION_DEPTH)
+      .forEach((id, index) => scores.set(id, (scores.get(id) ?? 0) + weight / (FUSION_K + index + 1)));
+  add(byMeaning, 1);
+  add(byWords, wordsWeight);
   return [...scores.entries()]
     .sort((a, b) => b[1] - a[1] || (a[0] < b[0] ? -1 : 1))
     .slice(0, limit)
