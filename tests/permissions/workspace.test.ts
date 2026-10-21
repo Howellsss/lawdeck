@@ -138,3 +138,31 @@ describe("visitors who are not signed in", () => {
     }
   });
 });
+
+describe("the library", () => {
+  it("students cannot read library passages, even approved ones", async () => {
+    const { data, error } = await b.client.from("kb_passages").select("id").limit(1);
+    expect(error !== null || data?.length === 0).toBe(true);
+  });
+
+  it("students only ever see approved library items", async () => {
+    const { data, error } = await b.client.from("kb_items").select("review_status");
+    expect(error).toBeNull();
+    expect((data ?? []).every((item) => item.review_status === "approved")).toBe(true);
+  });
+
+  it("students cannot add library items or files", async () => {
+    const course = await b.client.from("courses").select("id").limit(1).single();
+    const item = await b.client.from("kb_items").insert({ title: "fake", type: "note", course_id: course.data?.id });
+    expect(item.error).not.toBeNull();
+    const file = await b.client.storage.from("library").upload(`fake-${marker}.pdf`, new Blob(["x"]), {
+      contentType: "application/pdf",
+    });
+    expect(file.error).not.toBeNull();
+  });
+
+  it("students are neither reviewers nor admins", async () => {
+    expect((await b.client.rpc("is_reviewer")).data).toBe(false);
+    expect((await b.client.rpc("is_admin")).data).toBe(false);
+  });
+});

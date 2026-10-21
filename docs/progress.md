@@ -54,6 +54,20 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1e. Google sign-in built ("Continue with Google"), hidden until switched on
 ✅ 1e. Google sign-in switched on and working
 
+## Phase 2. Library and search
+
+✅ 2a. Library database written: items, passages, review status, private file store, reviewer/admin roles; 26 new permission checks pass locally
+⬜ 2a. Founder applies migrations 4 and 5 in Supabase and makes their account admin
+⬜ 2b. Admin upload screen (file plus its details)
+⬜ 2c. Reading files: text from PDF and Word, scans and photos, split into passages with headings and pages
+⬜ 2d. Search by meaning (Voyage AI) and exact words; test two Voyage models on 30 Civil Litigation questions and record the choice
+⬜ 2e. Reviewer console: approve, correct, reject, withdraw; reviewer and date recorded
+⬜ 2f. Out-of-date warning for material older than a later change in the law
+⬜ 2g. Civil Litigation material loaded and approved
+⚠️ Voyage AI account and key — founder, by 2d
+⚠️ Civil Litigation material — founder, by 2g
+⚠️ Legal reviewer and 30 test questions — founder, by 2e
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
@@ -82,3 +96,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Google sign-in works on the live site (founder, 2026-10-21)
 - 2026-10-21: Phase 1 exit checks run; two keyboard fixes.
 - 2026-10-21: Phase 1 complete: founder confirmed sign out, password reset, Google sign-in and projects on the live site.
+
+- 2026-10-21: Phase 2 started. Step 2a: library database and file store with permission tests.
