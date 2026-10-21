@@ -19,16 +19,19 @@ export async function GET(request: NextRequest) {
   const code = params.get("code");
 
   let ok = false;
+  let reason = "link";
   if (tokenHash && type.success) {
     const { error } = await supabase.auth.verifyOtp({ token_hash: tokenHash, type: type.data });
     ok = !error;
     if (error) console.warn("auth link failed", { kind: "token_hash", code: error.code ?? "unknown" });
   } else if (code) {
-    // Older link style; only works in the same browser that asked for the email.
+    // Link style used by Supabase's standard emails; only works in the same browser that asked for the email.
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     ok = !error;
+    reason = "browser";
     if (error) console.warn("auth link failed", { kind: "code", code: error.code ?? "unknown" });
   }
 
-  return NextResponse.redirect(ok ? new URL(next, request.url) : failed);
+  if (ok) return NextResponse.redirect(new URL(next, request.url));
+  return NextResponse.redirect(new URL(`/sign-in?error=${reason}`, request.url));
 }

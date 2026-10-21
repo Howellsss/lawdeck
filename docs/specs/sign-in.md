@@ -28,12 +28,14 @@ Google sign-in is step 1e.
 
 1. **URL settings**: Site URL = the live address (e.g. `https://lawdeck.vercel.app`). Add `http://localhost:3000/**` and the Vercel preview addresses to the allowed redirect list.
 2. **Email sign-in**: on, with "confirm email" on. Minimum password length 10.
-3. **Email templates** (Confirm signup, Reset password): point the link at Lawdeck's confirm page so it works on any device:
+3. **Email templates** (Confirm signup, Reset password). Supabase only allows editing these once a custom email service (SMTP) is connected, so this waits for that. When possible, point the link at Lawdeck's confirm page so it works on any device:
    - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/`
    - Reset password: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=recovery&next=/reset-password`
 4. **Vercel**: add `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY` and `SITE_URL`.
 
 ## Known limits (tracked)
+
+- Until the templates can be edited, Supabase's standard email links only finish signing in when opened in the same browser that asked for them. Otherwise Lawdeck explains what to do (`?error=browser`): an email confirmation has usually worked, so the student signs in; a reset link must be reopened in the right browser or requested again.
 
 - Supabase's built-in email sender allows only a few emails an hour and is for testing. Before real students arrive, connect a proper email service (custom SMTP). Needs a decision and an account.
 - Sign-in attempt limits use Supabase's built-in protection for now. The extra per-address check (rule C-04/K-02) needs the database tables from step 1c.
