@@ -52,3 +52,13 @@ export const libraryItemIdSchema = z.uuid({ error: "That item could not be found
 export const libraryPathSchema = z
   .string()
   .regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|docx|png|jpeg)$/, { error: "Upload not recognised." });
+
+// A reviewer's test search on the Library search page.
+export const librarySearchSchema = z.object({
+  question: z
+    .string({ error: "Type a question." })
+    .transform((value) => value.replace(/\s+/g, " ").trim())
+    .pipe(z.string().min(3, { error: "Type a question." }).max(1000, { error: "Use 1,000 characters or fewer." })),
+  courseId: z.uuid({ error: "Choose a course." }),
+  includePending: z.boolean(),
+});
