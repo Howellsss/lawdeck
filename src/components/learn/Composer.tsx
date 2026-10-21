@@ -41,7 +41,8 @@ export function Composer() {
     <div className="flex w-full max-w-[760px] flex-col gap-4">
       <form
         onSubmit={submit}
-        className="flex flex-col gap-3 rounded-3xl border border-line bg-surface px-3 pb-3 pt-4 shadow-[0_8px_28px_rgba(0,0,0,0.12)]"
+        // The box outlines itself while the student types (visible keyboard focus, WCAG 2.4.7).
+        className="flex flex-col gap-3 rounded-3xl border border-line bg-surface px-3 pb-3 pt-4 shadow-[0_8px_28px_rgba(0,0,0,0.12)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
       >
         <label htmlFor="composer" className="sr-only">
           What are we working on?

@@ -71,3 +71,13 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Google sign-in built; it appears once set up in Google Cloud, Supabase and Vercel.
 - 2026-10-21: "Continue with Google" uses Google's official multicolour logo (founder's request; Google branding rules).
 - 2026-10-21: Real-project permission tests added to the automatic checks.
+
+### Phase 1 exit checklist (details: docs/specs/phase-1-exit.md)
+
+✅ Workspace works at 360, 768, 1024 px and desktop with no sideways scrolling
+✅ Keyboard-only use works (two fixes made: message box focus outline; phone menu returns focus)
+✅ Every table has row-level security; permission tests pass (local and real project)
+✅ Home page fully loaded in about 2.1 s on simulated slow 4G (budget 3 s); 155 KB of code (budget 1.5 MB)
+⬜ Sign out and reset password tried on the live site (founder)
+⬜ Google sign-in tried on the live site (founder, after adding the Client Secret in Supabase)
+- 2026-10-21: Phase 1 exit checks run; two keyboard fixes.
