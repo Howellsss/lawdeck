@@ -129,6 +129,9 @@ export type Database = {
           page_count: number | null;
           read_at: string | null;
           reading_error: string | null;
+          indexed_passages: number;
+          index_model: string | null;
+          indexed_at: string | null;
         };
         Insert: {
           title: string;
@@ -156,6 +159,10 @@ export type Database = {
           reading_status?: ReadingStatus;
           page_count?: number | null;
           reading_error?: string | null;
+          // Search index details: written by the marked admin job only (src/server/retrieval/indexJob.ts).
+          indexed_passages?: number;
+          index_model?: string | null;
+          indexed_at?: string | null;
         };
         Relationships: [];
       };
@@ -193,7 +200,8 @@ export type Database = {
           page_from?: number | null;
           page_to?: number | null;
         };
-        Update: { heading?: string | null; text?: string };
+        // embedding and embedding_model: the marked admin job only (src/server/retrieval/indexJob.ts).
+        Update: { heading?: string | null; text?: string; embedding?: string; embedding_model?: string };
         Relationships: [
           {
             foreignKeyName: "kb_passages_item_id_fkey";
@@ -209,6 +217,28 @@ export type Database = {
     Functions: {
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };
+      search_library: {
+        Args: {
+          query_text: string;
+          course: string;
+          query_embedding?: string | null;
+          model?: string | null;
+          match_count?: number;
+          include_pending?: boolean;
+        };
+        Returns: {
+          passage_id: string;
+          item_id: string;
+          item_title: string;
+          heading: string | null;
+          text: string;
+          page_from: number | null;
+          page_to: number | null;
+          score: number;
+          meaning_rank: number | null;
+          words_rank: number | null;
+        }[];
+      };
       replace_kb_passages: {
         Args: { target_item: string; passages: Json; method: ReadingMethod; quality: number; pages: number };
         Returns: number;
