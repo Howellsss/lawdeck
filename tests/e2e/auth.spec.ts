@@ -81,6 +81,18 @@ test("a link opened in another browser gets a clear next step", async ({ page })
   await expect(page.getByText("open the link in the same browser")).toBeVisible();
 });
 
+test("an unfinished Google sign-in returns to sign-in with a clear message", async ({ page }) => {
+  await page.goto("/auth/callback?error=access_denied");
+  await expect(page).toHaveURL(/\/sign-in\?error=google$/);
+  await expect(page.getByText("Google sign-in didn’t finish")).toBeVisible();
+});
+
+test("the Google button only appears when Google sign-in is switched on", async ({ page }) => {
+  await page.goto("/sign-in");
+  const google = page.getByRole("button", { name: "Continue with Google" });
+  await expect(google).toHaveCount(process.env.GOOGLE_SIGN_IN_ENABLED === "true" ? 1 : 0);
+});
+
 test("signed-out visitors see Sign in in the menu", async ({ page }, testInfo) => {
   await page.goto("/");
   if (testInfo.project.name === "phone-360") await page.getByRole("button", { name: /menu/i }).first().click();

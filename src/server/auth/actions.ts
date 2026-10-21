@@ -4,7 +4,7 @@ import { redirect } from "next/navigation";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { safeNextPath } from "@/lib/safeNextPath";
 import { emailOnlySchema, resetPasswordSchema, signInSchema, signUpSchema } from "@/schemas/auth";
-import { getSupabaseConfig } from "./config";
+import { getSupabaseConfig, isGoogleSignInEnabled } from "./config";
 import { GENERIC_AUTH_ERROR, NOT_CONFIGURED_ERROR, messageForAuthError } from "./errors";
 import { siteOrigin } from "./origin";
 import { getCurrentAccount } from "./session";
@@ -129,4 +129,20 @@ export async function signOut(): Promise<void> {
     if (error) logAuthFailure("signOut", error.code);
   }
   redirect("/");
+}
+
+// Sends the student to Google, which returns them to /auth/callback.
+export async function signInWithGoogle(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
+  if (!isGoogleSignInEnabled()) return { status: "error", message: "Google sign-in isn’t switched on yet." };
+  const next = safeNextPath(formData.get("next"));
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.auth.signInWithOAuth({
+    provider: "google",
+    options: { redirectTo: `${await siteOrigin()}/auth/callback?next=${encodeURIComponent(next)}` },
+  });
+  if (error || !data.url) {
+    logAuthFailure("signInWithGoogle", error?.code);
+    return { status: "error", message: GENERIC_AUTH_ERROR };
+  }
+  redirect(data.url);
 }
