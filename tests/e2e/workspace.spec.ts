@@ -58,3 +58,9 @@ test("library review pages are hidden from visitors", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Decision" })).toHaveCount(0);
   await expect(page.locator("textarea")).toHaveCount(0);
 });
+
+test("the law changes page is hidden from visitors", async ({ page }) => {
+  await page.goto("/admin/library/law-changes");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Law changes" })).toHaveCount(0);
+});

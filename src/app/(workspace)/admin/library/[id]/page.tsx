@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { Pager } from "@/components/library/Pager";
 import { PassageCard } from "@/components/library/PassageCard";
 import { ReadingSummary } from "@/components/library/ReadingSummary";
+import { RecheckNotice } from "@/components/library/RecheckNotice";
 import { ReviewPanel } from "@/components/library/ReviewPanel";
 import { SearchSummary } from "@/components/library/SearchSummary";
 import { LoadingRows } from "@/components/ui/LoadingRows";
@@ -14,6 +15,7 @@ import { approvalBlockers, todayInLagos } from "@/lib/reviewRules";
 import { libraryItemIdSchema } from "@/schemas/library";
 import { reviewPageSchema } from "@/schemas/libraryReview";
 import { getStaffRole } from "@/server/auth/roles";
+import { getRecheckReasons } from "@/server/db/lawChanges";
 import { getLibraryItem, getReviewPassages, PASSAGES_PER_PAGE } from "@/server/db/library";
 import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
 
@@ -45,7 +47,10 @@ async function ReviewItem({ params, searchParams }: PageProps<"/admin/library/[i
 
   const query = await searchParams;
   const page = reviewPageSchema.parse(query.page);
-  const { passages, total } = await getReviewPassages(id, page, EMBEDDING_MODEL);
+  const [{ passages, total }, recheck] = await Promise.all([
+    getReviewPassages(id, page, EMBEDDING_MODEL),
+    getRecheckReasons([id]),
+  ]);
   const pages = Math.max(1, Math.ceil(total / PASSAGES_PER_PAGE));
   const blockers = approvalBlockers(
     {
@@ -76,6 +81,8 @@ async function ReviewItem({ params, searchParams }: PageProps<"/admin/library/[i
           <SearchSummary item={item} currentModel={EMBEDDING_MODEL} />
         </p>
       </div>
+
+      <RecheckNotice reasons={recheck.get(id) ?? []} />
 
       <ReviewPanel
         id={item.id}

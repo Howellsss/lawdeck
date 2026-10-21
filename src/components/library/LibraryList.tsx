@@ -2,6 +2,7 @@ import Link from "next/link";
 import { formatWat } from "@/lib/dates";
 import { KB_ITEM_TYPES, REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
 import type { LibraryItemSummary } from "@/server/db/library";
+import type { RecheckReason } from "@/server/db/lawChanges";
 import { ReadingSummary } from "./ReadingSummary";
 import { IndexItemButton } from "./IndexItemButton";
 import { ReadItemButton } from "./ReadItemButton";
@@ -24,10 +25,12 @@ export function LibraryList({
   items,
   isAdmin,
   currentModel,
+  recheck,
 }: {
   items: LibraryItemSummary[];
   isAdmin: boolean;
   currentModel: string;
+  recheck: Map<string, RecheckReason[]>;
 }) {
   if (items.length === 0) {
     return (
@@ -56,6 +59,12 @@ export function LibraryList({
               <span className={STATUS_TONE[item.reviewStatus]}>{REVIEW_STATUS_LABELS[item.reviewStatus]}</span>
               <span className="text-muted"> · Added {formatWat(item.createdAt)}</span>
             </p>
+            {recheck.has(item.id) && (
+              <p className="text-sm text-warning">
+                Needs re-check: {recheck.get(item.id)?.[0]?.changeTitle}
+                {(recheck.get(item.id)?.length ?? 0) > 1 ? ` and ${(recheck.get(item.id)?.length ?? 1) - 1} more` : ""}
+              </p>
+            )}
             <p className="text-sm">
               <ReadingSummary reading={item.reading} />
             </p>

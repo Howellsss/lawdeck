@@ -69,8 +69,9 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Extra (founder request). Import library files from Google Drive: pick several files, details suggested from file names
 ⬜ Extra. Google Cloud set-up for the Drive import (founder)
 ✅ 2e. Reviewer console: approve, correct, reject, withdraw; "law current as of" date; approval rules and audit record enforced by the database; 16 new permission checks and 10 logic tests
-⬜ 2e. Founder applies migration 8 in Supabase
-⬜ 2f. Out-of-date warning for material older than a later change in the law
+✅ 2e. Migration 8 applied in Supabase (founder); reviewer console merged and live
+✅ 2f. Out-of-date warning: law changes recorded by reviewers; items checked before a change are marked "Needs re-check" (worked out live by the database); 13 new permission checks and 4 logic tests
+⬜ 2f. Founder applies migration 9 in Supabase
 ⬜ 2g. Civil Litigation material loaded and approved
 ✅ Voyage AI key added in Vercel (founder, 2026-10-21)
 ⚠️ Civil Litigation material — founder, by 2g
@@ -116,3 +117,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Google Drive import for library files (founder request): pick several files, details suggested from file names, same checks as uploads.
 - 2026-10-21: Fix: indexing sends batches that fit Voyage AI's per-minute limit and waits and carries on when asked to slow down; Library list layout no longer squeezes long titles.
 - 2026-10-21: Founder indexed the Civil Litigation notes (165 of 165 passages). Step 2e: reviewer console, approval rules and audit record.
+- 2026-10-21: Migration 8 applied; step 2e merged. Step 2f: law changes and the "Needs re-check" warning.

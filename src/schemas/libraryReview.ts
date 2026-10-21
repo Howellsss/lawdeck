@@ -44,3 +44,6 @@ export const passageCorrectionSchema = z.object({
 
 export const reviewPageSchema = z.coerce.number().int().min(1).max(1000).catch(1);
 export const reviewStatusFilterSchema = z.enum(REVIEW_STATUSES).optional().catch(undefined);
+
+// The Library list's filter: a review status, or items that need re-checking after a law change.
+export const libraryFilterSchema = z.enum([...REVIEW_STATUSES, "recheck"]).optional().catch(undefined);
