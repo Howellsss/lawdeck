@@ -25,3 +25,15 @@ export const SEARCH_RESULTS = 8;
 // fusion with k = 60. The same numbers are in search_library (migration 7).
 export const FUSION_K = 60;
 export const FUSION_DEPTH = 40;
+
+// Re-rankers tried in the retrieval test (not used by the live search yet). US dollars per
+// million tokens, from Voyage's price list; check voyageai.com/pricing before relying on it.
+export const RERANK_MODELS = {
+  "rerank-2.5": { label: "rerank-2.5", pricePerMillion: 0.05 },
+  "rerank-2.5-lite": { label: "rerank-2.5-lite", pricePerMillion: 0.02 },
+} as const;
+
+export type RerankModel = keyof typeof RERANK_MODELS;
+
+// How many combined results the re-ranker reads before picking the best.
+export const RERANK_CANDIDATES = 30;

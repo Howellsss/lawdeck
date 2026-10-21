@@ -6,14 +6,14 @@ import { z } from "zod";
 import { createAdminClient } from "@/server/db/admin";
 import { fuseRankings, rankByMeaning } from "@/server/retrieval/fuse";
 import { passageSearchText } from "@/server/retrieval/indexJob";
-import { EMBEDDING_MODELS, type EmbeddingModel } from "@/server/retrieval/settings";
+import { EMBEDDING_MODEL, EMBEDDING_MODELS, type EmbeddingModel } from "@/server/retrieval/settings";
+import { anyWordsQuery } from "@/lib/wordsQuery";
+import { compareSetups } from "./retrieval/compare";
 import { EMBED_BATCH, embedTexts, fitTokenBudget } from "@/server/retrieval/voyage";
 
 const TOP = 5;
 // Build Phases target: 25 of 30 in the top 5, i.e. five in six, whatever the number of questions.
 const targetFor = (count: number) => Math.ceil((count * 25) / 30);
-// Weights for the exact-words ranking to compare (1 = the live setting, see fuse.ts).
-const WORDS_WEIGHTS = [1, 0.5, 0.25, 0];
 const FILE = process.env.EVAL_QUESTIONS ?? "tests/eval/retrieval/civil-litigation.json";
 
 const questionsSchema = z.object({
@@ -113,6 +113,17 @@ describe("retrieval test", () => {
       if (error) throw new Error(`search_library failed (${error.code})`);
       byWords.set(String(q.id), data.map((row) => row.passage_id));
     }
+    // The same, matching passages that contain most of the words (src/lib/wordsQuery.ts).
+    const byMostWords = new Map<string, string[]>();
+    for (const q of questions) {
+      const { data, error } = await db.rpc("search_library", {
+        query_text: anyWordsQuery(q.question),
+        course: course.data.id,
+        include_pending: true,
+      });
+      if (error) throw new Error(`search_library failed (${error.code})`);
+      byMostWords.set(String(q.id), data.map((row) => row.passage_id));
+    }
 
     const answers = (q: (typeof questions)[number], p: Passage | undefined) =>
       p !== undefined &&
@@ -168,23 +179,24 @@ describe("retrieval test", () => {
         `${EMBEDDING_MODELS[model].label}: hybrid ${hybrid}/${questions.length} (top ${AI_RECEIVES}: ${hybridAi}/${questions.length}), meaning only ${meaningOnly}/${questions.length}; missed: ${misses.join(", ") || "none"}`,
         ...details,
       );
-      // Same model, different trust in exact words: top 5 and top 8, overall and for exact-term questions.
-      const exact = questions.filter((q) => q.kind === "exact");
-      for (const weight of WORDS_WEIGHTS) {
-        const counts = { top: 0, ai: 0, exactTop: 0, exactAi: 0 };
-        questions.forEach((q, i) => {
-          const combined = fuseRankings(rankByMeaning(queryVectors[i], indexed), byWords.get(String(q.id)) ?? [], AI_RECEIVES, weight);
-          const top = isHit(q, combined.slice(0, TOP));
-          const ai = isHit(q, combined);
-          counts.top += Number(top);
-          counts.ai += Number(ai);
-          if (q.kind === "exact") {
-            counts.exactTop += Number(top);
-            counts.exactAi += Number(ai);
-          }
-        });
+      // The live model only: try "most words" and the re-ranker (tests/eval/retrieval/compare.ts).
+      if (model === EMBEDDING_MODEL) {
+        const meanings = queryVectors.map((vector) => rankByMeaning(vector, indexed));
         lines.push(
-          `  words weight ${weight}: top ${TOP} ${counts.top}/${questions.length}, top ${AI_RECEIVES} ${counts.ai}/${questions.length}; exact-term questions top ${TOP} ${counts.exactTop}/${exact.length}, top ${AI_RECEIVES} ${counts.exactAi}/${exact.length}`,
+          `Setups compared with ${EMBEDDING_MODELS[model].label}:`,
+          ...(await compareSetups({
+            questions,
+            meaningOf: (index) => meanings[index],
+            wordsOf: (q, words) => (words === "all" ? byWords : byMostWords).get(String(q.id)) ?? [],
+            textOf: (id) => {
+              const p = byId.get(id);
+              return p ? passageSearchText(p.heading, p.text) : "";
+            },
+            isHit: (q, ids) => isHit(q as (typeof questions)[number], ids),
+            placeOf: (q, ids) => placeOf(q as (typeof questions)[number], ids),
+            top: TOP,
+            ai: AI_RECEIVES,
+          })),
         );
       }
     }
