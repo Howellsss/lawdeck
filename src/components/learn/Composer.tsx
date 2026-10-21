@@ -1,8 +1,12 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { COURSES } from "@/lib/courses";
+import { startChat } from "@/server/learn/actions";
+import { savePendingQuestion } from "./askStream";
 
 const MODES = ["Auto", "Learn", "Draft"] as const;
 type Mode = (typeof MODES)[number];
@@ -17,18 +21,37 @@ const SHORTCUTS: { label: string; icon: IconName; mode: Mode; starter: string }[
 const selectClass =
   "h-11 appearance-none rounded-full border-0 bg-pill pl-4 pr-9 text-[15px] text-ink outline-offset-2 cursor-pointer";
 
-// The input-first composer (PRD 4.3). Answers are switched on in Phase 3; for now it explains that plainly.
+// The input-first composer (PRD 4.3). A Learn question starts a chat and opens it; the chat
+// page asks the question and streams the answer. Drafting arrives in Phase 5.
 export function Composer() {
+  const router = useRouter();
   const [text, setText] = useState("");
   const [mode, setMode] = useState<Mode>("Auto");
   const [course, setCourse] = useState("all");
   const [notice, setNotice] = useState<string | null>(null);
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  const [busy, setBusy] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
-  function submit(event: FormEvent) {
+  async function submit(event: FormEvent) {
     event.preventDefault();
-    if (!text.trim()) return;
-    setNotice("Lawdeck can’t answer yet. Answers are switched on in a later build (Phase 3).");
+    const question = text.trim();
+    if (!question || busy) return;
+    if (mode === "Draft") return setNotice("Drafting documents arrives in a later build (Phase 5). Use Learn or Auto to ask a question.");
+    setBusy(true);
+    setNotice(null);
+    const started = await startChat({ question, course }).catch(() => ({
+      ok: false as const,
+      message: "Lawdeck could not be reached. Check your connection and try again.",
+      signIn: false,
+    }));
+    if (!started.ok) {
+      setBusy(false);
+      setNeedsSignIn(Boolean(started.signIn));
+      return setNotice(started.message);
+    }
+    savePendingQuestion(started.id, question);
+    router.push(`/chats/${started.id}`);
   }
 
   function applyShortcut(shortcut: (typeof SHORTCUTS)[number]) {
@@ -40,7 +63,7 @@ export function Composer() {
   return (
     <div className="flex w-full max-w-[760px] flex-col gap-4">
       <form
-        onSubmit={submit}
+        onSubmit={(event) => void submit(event)}
         // The box outlines itself while the student types (visible keyboard focus, WCAG 2.4.7).
         className="flex flex-col gap-3 rounded-3xl border border-line bg-surface px-3 pb-3 pt-4 shadow-[0_8px_28px_rgba(0,0,0,0.12)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
       >
@@ -54,7 +77,7 @@ export function Composer() {
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) submit(event);
+            if (event.key === "Enter" && !event.shiftKey) void submit(event);
           }}
           placeholder="What are we working on?"
           className="resize-none bg-transparent px-2 text-[17px] leading-relaxed text-ink outline-none placeholder:text-muted"
@@ -78,7 +101,7 @@ export function Composer() {
           <button
             type="submit"
             aria-label="Send"
-            disabled={!text.trim()}
+            disabled={!text.trim() || busy}
             className="ml-auto flex size-11 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
           >
             <Icon name="arrowUp" size={18} />
@@ -89,6 +112,14 @@ export function Composer() {
       {notice && (
         <p role="status" className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
           {notice}
+          {needsSignIn && (
+            <>
+              {" "}
+              <Link href="/sign-in" className="text-ink underline underline-offset-2">
+                Sign in
+              </Link>
+            </>
+          )}
         </p>
       )}
 

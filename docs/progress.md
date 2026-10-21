@@ -85,6 +85,21 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Civil Litigation material (founder, 2026-10-21)
 ⚠️ Legal reviewer and 30 test questions — founder, needed for 2d and the recheck
 
+## Phase 3. Learn: ask and explain
+
+✅ 3a. Explanation prompt (answer structure; correct, hold position, accept a valid correction), versioned in `src/prompts/explain.ts`
+✅ 3a. Explain flow: search the library (one course or all), stream the answer, save the message and its sources; personal data removed first
+✅ 3b. Sources: list under each answer and [S1] buttons open the passage in the right panel (only while approved and up to date)
+✅ 3b. Citation check and 50-word quote limit on every sentence before it is shown
+✅ 3b. "Not enough in the Lawdeck library" answer when the passages cannot support one
+⬜ 3a/3b. Migration 12 applied in Supabase (founder)
+⬜ 3a/3b. Founder asks a few Civil Litigation questions on the live site
+⬜ 3c. Simple and Exam-ready levels; course hubs listing topics
+⬜ 3c. Auto mode routing with Haiku and the "Treated as" chip
+⬜ 3d. Usage logging per call, and per-student limits checked before each call
+⚠️ 3e. Evaluation set v1: 40+ Civil Litigation questions plus pushback cases, reviewed by a legal reviewer — founder and reviewer
+⬜ 3e. Model quality test: Haiku, Sonnet and Opus for explanations; choose by quality and cost
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
@@ -131,3 +146,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-21: Re-ranking (Voyage rerank-2.5) added to the live search after the test found 35/35; searches return up to 30 candidates to the server, with a student search limit. Migration 10.
 - 2026-10-21: Migration 10 applied; re-ranker and search limit merged. Live retrieval test: 35/35 in the top 8 and top 5.
 - 2026-10-21: Out-of-date material leaves student search until re-checked (founder's question); archive of original library files (Q-03). Migration 11.
+- 2026-10-21: Phase 3 started. Steps 3a and 3b: streamed, sourced answers with citation check, quote limit and "not enough" answer; migration 12 (answer sources).

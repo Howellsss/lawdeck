@@ -103,6 +103,21 @@ describe("student B cannot reach A's work", () => {
     expect(message.error).not.toBeNull();
   });
 
+  it("cannot see or open anyone else's answer sources", async () => {
+    const sources = await b.client.from("message_sources").select("id, owner_id");
+    expect(sources.error !== null || (sources.data ?? []).every((row) => row.owner_id === b.id)).toBe(true);
+    const opened = await b.client.rpc("source_passage", { source: "00000000-0000-0000-0000-000000000000" });
+    expect(opened.error !== null || opened.data?.length === 0).toBe(true);
+  });
+
+  it("cannot add a source to A's chat", async () => {
+    const message = await a.client.from("messages").select("id").eq("conversation_id", conversationId).single();
+    const source = await b.client
+      .from("message_sources")
+      .insert({ message_id: message.data?.id ?? "", label: 1, item_title: "fake" });
+    expect(source.error).not.toBeNull();
+  });
+
   it("cannot create a project in A's name", async () => {
     const { error } = await b.client.from("projects").insert({ name: "fake", owner_id: a.id });
     expect(error).not.toBeNull();

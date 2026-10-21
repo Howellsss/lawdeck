@@ -87,6 +87,31 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      message_sources: {
+        Row: {
+          id: string;
+          message_id: string;
+          owner_id: string;
+          label: number;
+          kb_passage_id: string | null;
+          item_title: string;
+          heading: string | null;
+          page_from: number | null;
+          page_to: number | null;
+          created_at: string;
+        };
+        Insert: {
+          message_id: string;
+          label: number;
+          kb_passage_id?: string | null;
+          item_title: string;
+          heading?: string | null;
+          page_from?: number | null;
+          page_to?: number | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
       usage_events: {
         Row: {
           id: string;
@@ -246,10 +271,22 @@ export type Database = {
     Functions: {
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };
+      source_passage: {
+        Args: { source: string };
+        Returns: {
+          item_title: string;
+          heading: string | null;
+          text: string | null;
+          page_from: number | null;
+          page_to: number | null;
+          available: boolean;
+        }[];
+      };
       search_library: {
         Args: {
           query_text: string;
-          course: string;
+          // null searches every course ("All courses", migration 12).
+          course: string | null;
           query_embedding?: string | null;
           model?: string | null;
           match_count?: number;
