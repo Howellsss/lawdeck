@@ -27,7 +27,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ Voyage AI account and key — moved to Phase 2, where it is first used
 ✅ Health check shows Claude's "OK" on the live site (claude-haiku-5-5, about 1.1 s)
 
-## Phase 1. Shell, accounts and data
+## Phase 1. Shell, accounts and data ✅ (complete 2026-10-21)
 
 ✅ 1a. Dark mode by default with a light switch (choice remembered, no flash on load)
 ✅ 1a. Three-pane workspace: left navigation (collapsible on desktop, drawer on mobile), middle work area, right panel closed until needed
@@ -48,11 +48,11 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1d. Projects: create, rename, delete (with confirmation); project page lists its chats
 ✅ 1d. Recents in the left menu shows the student's latest chats; read-only chat page
 ✅ 1d. Courses page reads the five courses from the database
-⬜ 1d. Founder tries projects on the live site (signed-in journeys are not yet browser-tested automatically; that needs the test accounts in step 1e)
+✅ 1d. Founder tried projects on the live site
 ✅ 1e. Automatic checks on every pull request (GitHub Actions): lint, types, unit tests, build, browser tests, database permission rules, library security check
 ✅ 1e. Real-project permission tests run on GitHub on every pull request (test accounts and secrets added by the founder)
 ✅ 1e. Google sign-in built ("Continue with Google"), hidden until switched on
-⚠️ 1e. Google sign-in switched on — needs a Google Cloud sign-in client, the Supabase Google setting and GOOGLE_SIGN_IN_ENABLED=true in Vercel (founder; steps in docs/specs/sign-in.md)
+✅ 1e. Google sign-in switched on and working
 
 ## Change log
 
@@ -78,6 +78,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ Keyboard-only use works (two fixes made: message box focus outline; phone menu returns focus)
 ✅ Every table has row-level security; permission tests pass (local and real project)
 ✅ Home page fully loaded in about 2.1 s on simulated slow 4G (budget 3 s); 155 KB of code (budget 1.5 MB)
-⬜ Sign out and reset password tried on the live site (founder)
-⬜ Google sign-in tried on the live site (founder, after adding the Client Secret in Supabase)
+✅ Sign out and reset password work on the live site (founder, 2026-10-21)
+✅ Google sign-in works on the live site (founder, 2026-10-21)
 - 2026-10-21: Phase 1 exit checks run; two keyboard fixes.
+- 2026-10-21: Phase 1 complete: founder confirmed sign out, password reset, Google sign-in and projects on the live site.
