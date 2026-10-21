@@ -1,7 +1,7 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { EXPLAIN_PROMPT_VERSION, EXPLAIN_SYSTEM } from "@/prompts/explain";
-import { getClaude, MissingKeyError } from "./client";
+import { failureDetails, getClaude, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
 
@@ -72,8 +72,7 @@ export async function streamExplanation(input: {
       stop: message.stop_reason,
     };
   } catch (error) {
-    const status = error instanceof Anthropic.APIError ? error.status : undefined;
-    console.error("ai call failed", { job: "explain", userId: input.userId, name: (error as Error)?.name, status, ms: Date.now() - started });
+    console.error("ai call failed", { job: "explain", userId: input.userId, ...failureDetails(error), ms: Date.now() - started });
     if (error instanceof MissingKeyError) return { ok: false, reason: "no_key" };
     if (error instanceof Anthropic.APIUserAbortError) return { ok: false, reason: "cancelled" };
     if (error instanceof Anthropic.RateLimitError || error instanceof Anthropic.InternalServerError) {

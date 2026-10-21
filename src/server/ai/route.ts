@@ -1,7 +1,6 @@
 import "server-only";
-import Anthropic from "@anthropic-ai/sdk";
 import { parseRoute, ROUTE_PROMPT_VERSION, ROUTE_SYSTEM, type Route } from "@/prompts/route";
-import { getClaude } from "./client";
+import { failureDetails, getClaude } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
 
@@ -39,8 +38,7 @@ export async function routeRequest(request: string, userId: string): Promise<Rou
     });
     return route;
   } catch (error) {
-    const status = error instanceof Anthropic.APIError ? error.status : undefined;
-    console.error("ai call failed", { job: "route", userId, name: (error as Error)?.name, status, ms: Date.now() - started });
+    console.error("ai call failed", { job: "route", userId, ...failureDetails(error), ms: Date.now() - started });
     return null;
   }
 }

@@ -21,3 +21,14 @@ export class MissingKeyError extends Error {
     this.name = "MissingKeyError";
   }
 }
+
+// What went wrong on a failed call, for the server log (rule G-08): the status, the error
+// type, Claude's short reason (for example "credit balance is too low") and the request id
+// Anthropic support asks for. Never the question, the answer or the key.
+export function failureDetails(error: unknown): Record<string, string | number | null> {
+  const name = error instanceof Error ? error.constructor.name : "unknown";
+  if (!(error instanceof Anthropic.APIError)) return { name };
+  const body = error.error as { error?: { message?: unknown } } | undefined;
+  const reason = typeof body?.error?.message === "string" ? body.error.message.slice(0, 160) : null;
+  return { name, status: error.status ?? null, type: error.type ?? null, reason, requestId: error.requestID ?? null };
+}
