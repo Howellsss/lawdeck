@@ -12,6 +12,8 @@ export const MODELS = {
   explain: "claude-sonnet-5-5",
   // Practice questions (step 4b): the model chosen for explanations in step 3e.
   practice: "claude-sonnet-5-5",
+  // Case and statute briefs (step 4f): legal judgement, so the explanations model.
+  brief: "claude-sonnet-5-5",
   // Flashcards (step 4c): short facts from the notes; System Design §5.3 names Haiku for them.
   flashcards: "claude-haiku-5-5",
   marking: "claude-sonnet-5-5",

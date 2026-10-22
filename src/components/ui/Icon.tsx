@@ -7,6 +7,7 @@ const PATHS = {
   document: "M5 2.5h7l3 3v12H5zM12 2.5v3h3M8 10h5M8 13h5",
   pen: "M13.5 3.5l3 3L7 16H4v-3z",
   cards: "M3.5 6.5h10v10h-10zM6.5 3.5h10v10",
+  bookmark: "M5.5 3h9v14l-4.5-3.5L5.5 17z",
   check: "M3.5 3.5h13v13h-13zM7 10l2 2 4-4",
   scale: "M10 3v14M5 17h10M4 7h12M4 7l-2 5h4zM16 7l-2 5h4z",
   menu: "M3 5.5h14M3 10h10M3 14.5h7",
