@@ -10,6 +10,8 @@ export const MODELS = {
   // Reading scanned pages and photos into text (step 2c). Switch to Sonnet if a sample scan shows mistakes.
   transcribe: "claude-haiku-5-5",
   explain: "claude-sonnet-5-5",
+  // Practice questions (step 4b): the model chosen for explanations in step 3e.
+  practice: "claude-sonnet-5-5",
   marking: "claude-sonnet-5-5",
   documents: "claude-opus-5-5",
 } as const;
