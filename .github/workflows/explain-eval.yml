@@ -30,6 +30,8 @@ jobs:
       SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
       VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
       ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      # The "Lawdeck API" workspace (not secret); needed because the key is a personal sk-ant-usr key.
+      ANTHROPIC_WORKSPACE_ID: wrkspc_0128BwXP23kGYCu9QkS6AJ1H
       EVAL_MODELS: ${{ inputs.models }}
       EVAL_CASES: ${{ inputs.cases }}
     steps:
