@@ -97,7 +97,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3c. Simple and Exam-ready levels on every answer; course hubs list topics and start explanations; admin topics editor
 ✅ 3c. Auto mode routing with Haiku and the "Treated as" chip; 100-request routing test ready
 ✅ 3c. Migration 13 applied (founder, 2026-10-21); merged and live
-⬜ 3c. Topics added; routing test run and at least 90/100 (founder: GitHub secret ANTHROPIC_API_KEY)
+✅ 3c. Routing test: 100/100 on Haiku (2026-10-22). Civil Litigation topics added; other four courses when their outlines are uploaded
 ✅ 3d. Every AI call recorded (model, tokens, cost, time; never the text); monthly question limit checked before each answer; "X of 30 questions left this month" note
 ✅ 3d. Migration 14 applied (founder, 2026-10-22); merged and live
 ✅ 3d. Google sign-in works on the live site (founder, 2026-10-22); the failure reason stays logged
@@ -106,7 +106,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3e. Citation check asks the whole library before removing an authority (migration 16, applied 2026-10-22)
 ✅ 3e. Answer test: every case through the real answer pipeline on Haiku, Sonnet and Opus, graded automatically and saved privately for the reviewer (migration 15, /admin/eval)
 ✅ 3e. Migration 15 applied, GitHub keys fixed (founder, 2026-10-22); full run: 156/156 answered, $6.91
-⬜ 3e. Model choice: Sonnet leads (97% points, 11/12 pushback, 1.0 s); Opus too slow (5.5 s). Waiting on the reviewer's ratings and a re-check run after the citation fix (about $2, when the founder tops up)
+✅ 3e. Model choice: Sonnet 5.5 for explanations (founder's decision, 2026-10-22). Measured: 97% of points covered, 11/12 pushback, first words in 1.0 s, about $0.031 per answer. Opus too slow (5.5 s); Haiku cheaper but weaker. Reviewer ratings still to come
 
 ## Change log
 
@@ -166,3 +166,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Answer test trial: migration 15 needed a schema reload; GitHub's Voyage key replaced (founder). Claude keys starting sk-ant-usr now work when ANTHROPIC_WORKSPACE_ID is set (the answer and routing tests send the Lawdeck API workspace).
 - 2026-10-22: Full answer test: 156/156 answered, $6.91. Sonnet strongest (97% points, 11/12 pushback, 1.0 s, $0.031/answer); Opus too slow (5.5 s); Haiku cheapest ($0.0013) but weaker. 107 authorities removed, nearly all real court-rule names the notes contain but the answer's passages did not.
 - 2026-10-22: Fix: the citation check now asks the whole approved library before removing a case or statute (migration 16); test answers keep their wording before the check, so later check changes can be tried free; answer-test page marks cases with removals. No AI calls (founder: no spending for now).
+- 2026-10-22: Re-check after the citation fix: 10 Sonnet answers, 4 authorities removed (first run: about 6 per 10), $0.41. Routing test 100/100. Founder chose Sonnet 5.5 for explanations (already the setting in `src/server/ai/models.ts`).
