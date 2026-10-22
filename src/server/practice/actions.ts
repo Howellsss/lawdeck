@@ -1,7 +1,7 @@
 "use server";
 
 import { parseChoices, parsePracticeSources, type PracticeReveal } from "@/lib/practice";
-import { mcqAnswerSchema, newPracticeSetSchema, practiceSetIdSchema } from "@/schemas/practice";
+import { flashcardMarkSchema, mcqAnswerSchema, newPracticeSetSchema, practiceSetIdSchema } from "@/schemas/practice";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { createPracticeSet } from "./create";
@@ -11,7 +11,7 @@ import { createPracticeSet } from "./create";
 
 export type CreatePracticeActionResult = { ok: true; id: string } | { ok: false; message: string; signIn?: boolean };
 
-export async function startPracticeSet(input: { topicId: string; kind: string; count: number | string }): Promise<CreatePracticeActionResult> {
+export async function startPracticeSet(input: { topicId: string; kind: string; count?: number | string }): Promise<CreatePracticeActionResult> {
   const parsed = newPracticeSetSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Choose a topic and a type." };
   const account = await getCurrentAccount();
@@ -54,6 +54,21 @@ export async function revealModelAnswer(itemId: string): Promise<RevealResult> {
   const item = await supabase.from("practice_items").select("answer, correct_choice, sources").eq("id", itemId).maybeSingle();
   if (item.error || !item.data) return { ok: false, message: NOT_FOUND };
   return { ok: true, correct: null, answer: item.data.answer, correctChoice: item.data.correct_choice, sources: parsePracticeSources(item.data.sources) };
+}
+
+// A flashcard marked "know it" (true) or "not yet" (false); null clears the mark. Row-level
+// security lets a student change only this mark, and only on their own cards (migration 17).
+export async function markFlashcard(input: { itemId: string; known: boolean | null }): Promise<{ ok: boolean; message?: string }> {
+  const parsed = flashcardMarkSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "That card could not be found." };
+  if (!(await getCurrentAccount())) return { ok: false, message: "Sign in to practise." };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from("practice_items").update({ known: parsed.data.known }).eq("id", parsed.data.itemId).select("id");
+  if (error || !data?.length) {
+    if (error) console.error("practice action failed", { action: "markFlashcard", code: error.code });
+    return { ok: false, message: "That card was not saved. Please try again." };
+  }
+  return { ok: true };
 }
 
 export async function deletePracticeSet(id: string): Promise<{ ok: boolean; message?: string }> {

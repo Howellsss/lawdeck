@@ -30,7 +30,7 @@ export async function cleanPracticeItems(
     const shapeOk =
       kind === "mcq"
         ? raw.choices.length >= 2 && raw.choices.length <= 6 && raw.correctChoice >= 0 && raw.correctChoice < raw.choices.length
-        : raw.choices.length === 0;
+        : raw.choices.length === 0; // scenarios and flashcards have no options
     if (sources.length === 0 || !shapeOk) {
       dropped++;
       continue;

@@ -1,23 +1,46 @@
 import { z } from "zod";
 
-// Practice set requests (Phase 4, step 4b; PRD LN-06). Founder's decision: default 5, at most 10.
+// Practice set requests (Phase 4; PRD LN-06, LN-07). Founder's decisions: questions default 5,
+// at most 10; flashcards default 10, at most 20.
 export const PRACTICE_DEFAULT_COUNT = 5;
 export const PRACTICE_MIN_COUNT = 3;
 export const PRACTICE_MAX_COUNT = 10;
+export const FLASHCARD_DEFAULT_COUNT = 10;
+export const FLASHCARD_MIN_COUNT = 5;
+export const FLASHCARD_MAX_COUNT = 20;
 
-export const newPracticeSetSchema = z.object({
-  topicId: z.uuid({ error: "Choose a topic." }),
-  kind: z.enum(["mcq", "scenario"], { error: "Choose multiple choice or scenario." }),
-  count: z.coerce
-    .number({ error: "Choose how many questions." })
-    .int({ error: "Choose how many questions." })
-    .min(PRACTICE_MIN_COUNT, { error: `Choose at least ${PRACTICE_MIN_COUNT} questions.` })
-    .max(PRACTICE_MAX_COUNT, { error: `Choose at most ${PRACTICE_MAX_COUNT} questions.` })
-    .default(PRACTICE_DEFAULT_COUNT),
-});
+export type PracticeKind = "mcq" | "scenario" | "flashcards";
+
+export function countLimits(kind: PracticeKind): { min: number; max: number; default: number } {
+  return kind === "flashcards"
+    ? { min: FLASHCARD_MIN_COUNT, max: FLASHCARD_MAX_COUNT, default: FLASHCARD_DEFAULT_COUNT }
+    : { min: PRACTICE_MIN_COUNT, max: PRACTICE_MAX_COUNT, default: PRACTICE_DEFAULT_COUNT };
+}
+
+export const newPracticeSetSchema = z
+  .object({
+    topicId: z.uuid({ error: "Choose a topic." }),
+    kind: z.enum(["mcq", "scenario", "flashcards"], { error: "Choose multiple choice, scenario or flashcards." }),
+    count: z.union([z.literal(""), z.coerce.number({ error: "Choose how many." }).int({ error: "Choose how many." })]).optional(),
+  })
+  .transform((value, ctx) => {
+    const limits = countLimits(value.kind);
+    const count = value.count === undefined || value.count === "" ? limits.default : value.count;
+    const noun = value.kind === "flashcards" ? "cards" : "questions";
+    if (count < limits.min || count > limits.max) {
+      ctx.addIssue({ code: "custom", message: `Choose between ${limits.min} and ${limits.max} ${noun}.`, path: ["count"] });
+      return z.NEVER;
+    }
+    return { topicId: value.topicId, kind: value.kind, count };
+  });
 export type NewPracticeSet = z.infer<typeof newPracticeSetSchema>;
 
 export const practiceSetIdSchema = z.uuid({ error: "That practice set could not be found." });
+
+export const flashcardMarkSchema = z.object({
+  itemId: z.uuid({ error: "That card could not be found." }),
+  known: z.boolean().nullable(),
+});
 
 export const mcqAnswerSchema = z.object({
   itemId: z.uuid({ error: "That question could not be found." }),

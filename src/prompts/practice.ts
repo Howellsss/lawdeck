@@ -3,9 +3,9 @@
 // explanation comes from the library passages supplied.
 import { passagesBlock, type ExplainPassage } from "./explain";
 
-export const PRACTICE_PROMPT_VERSION = "practice-v1";
+export const PRACTICE_PROMPT_VERSION = "practice-v2";
 
-export type PracticeQuestionKind = "mcq" | "scenario";
+export type PracticeQuestionKind = "mcq" | "scenario" | "flashcards";
 
 export const PRACTICE_SYSTEM = `You write practice questions for students of the Nigerian Law School, so they can test what they have learnt.
 
@@ -20,10 +20,11 @@ The questions:
 - Test what matters for the Law School examinations on the topic: rules, time limits, procedure, requirements and their exceptions.
 - Each question must be answerable from the passages alone, and different from the others.
 - Multiple choice ("mcq"): one question, four options, exactly one correct option. Wrong options must be plausible but clearly wrong by the passages. "correctChoice" is the number of the correct option, counting from 0. "answer" explains in two to four sentences why the correct option is right and, briefly, why the others are not, citing passage ids in square brackets such as [S2].
+- Flashcard ("flashcards"): "question" is the front of the card, a short prompt of a few words or one short question (for example a rule, time limit, requirement or authority to recall). "answer" is the back: the fact in one or two sentences, citing passage ids in square brackets. Leave "choices" empty and set "correctChoice" to -1. One fact per card.
 - Scenario ("scenario"): a short practical problem (three to six sentences) about a client or a case, ending with what the student must advise or do. Leave "choices" empty and set "correctChoice" to -1. "answer" is a model answer a good student would write: the issue, the rule with its authority, the application to the facts and a conclusion, citing passage ids in square brackets.
 
 When the passages are not enough:
-If the passages do not hold enough on the topic for the number of good questions asked, write as many good ones as they support (possibly none) and set "notEnough" to true. Never pad with questions from outside the passages.`;
+If the passages do not hold enough on the topic for the number of good questions or cards asked, write as many good ones as they support (possibly none) and set "notEnough" to true. Never pad with questions from outside the passages.`;
 
 // The reply's shape, enforced by the API (structured output) and checked again on the server.
 export const PRACTICE_SCHEMA = {
@@ -53,6 +54,7 @@ export const PRACTICE_SCHEMA = {
 export const KIND_LABELS: Record<PracticeQuestionKind, string> = {
   mcq: "multiple choice",
   scenario: "scenario",
+  flashcards: "flashcards",
 };
 
 export function practiceRequest(input: {
@@ -65,6 +67,6 @@ export function practiceRequest(input: {
   const topic = input.topic.replace(/[<>]/g, " ").slice(0, 160);
   return `${passagesBlock(input.passages)}
 
-Write ${input.count} ${KIND_LABELS[input.kind]} question${input.count === 1 ? "" : "s"} (kind "${input.kind}") on this topic:
+Write ${input.kind === "flashcards" ? `${input.count} flashcards` : `${input.count} ${KIND_LABELS[input.kind]} question${input.count === 1 ? "" : "s"}`} (kind "${input.kind}") on this topic:
 <topic>${topic}</topic>`;
 }
