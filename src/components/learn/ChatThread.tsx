@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useRightPanel } from "@/components/shell/panelContext";
 import { formatWat } from "@/lib/dates";
@@ -21,6 +22,7 @@ export function ChatThread({ chatId, initialMessages }: { chatId: string; initia
   const [level, setLevel] = useState<AnswerLevel>("exam");
   const started = useRef(false);
   const panel = useRightPanel();
+  const router = useRouter();
 
   function openSource(source: ChatSource) {
     panel.open({ title: `Source S${source.label}`, body: <SourcePassage key={source.id} id={source.id} /> });
@@ -42,6 +44,7 @@ export function ChatThread({ chatId, initialMessages }: { chatId: string; initia
           { id: event.messageId, role: "assistant", text: event.text, level: event.level, createdAt: now, sources: event.sources },
         ]);
         setLive(null);
+        router.refresh(); // Updates "questions left this month".
       }
     });
     setBusy(false);

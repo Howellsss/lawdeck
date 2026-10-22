@@ -5,6 +5,8 @@ import { DRAFT_LATER, sourceIdSchema, startChatSchema } from "@/schemas/learn";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { routeRequest } from "@/server/ai/route";
+import { limitReachedMessage } from "@/lib/allowance";
+import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "./allowance";
 import { titleFrom } from "./ask";
 import { redactPersonalData } from "./redact";
 
@@ -21,12 +23,17 @@ export async function startChat(input: { question: string; course: string; mode?
   const account = await getCurrentAccount();
   if (!account) return { ok: false, signIn: true, message: "Sign in to ask Lawdeck a question." };
 
+  // Rule K-01: no new chat, and no routing call, once this month's questions are used up.
+  const supabase = await createSupabaseServerClient();
+  const allowance = await getAllowance(supabase);
+  if (!allowance) return { ok: false, message: ALLOWANCE_UNAVAILABLE };
+  if (!hasQuestionsLeft(allowance)) return { ok: false, message: limitReachedMessage(allowance) };
+
   const auto = parsed.data.mode === "auto";
   if (auto && (await routeRequest(redactPersonalData(parsed.data.question), account.id)) === "draft") {
     return { ok: false, routedToDraft: true, message: DRAFT_LATER };
   }
 
-  const supabase = await createSupabaseServerClient();
   let courseId: string | null = null;
   if (parsed.data.course !== "all") {
     const course = await supabase.from("courses").select("id").eq("slug", parsed.data.course).maybeSingle();
