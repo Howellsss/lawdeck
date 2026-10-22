@@ -25,6 +25,11 @@ A set can only name a topic from its own course; an item or attempt can only bel
 - The name must be found in the approved library first; if not, the student is told and nothing is written. A section the passages do not cover says so instead of being filled from memory. The citation check applies.
 - Briefs are saved (table `briefs`, owner only, never edited, deleted by the owner) and count as one question in the monthly allowance. Sonnet writes them (about 3 to 4 US cents each).
 
+## Marking guides (step 4d, migration 19)
+- One guide = one exam-style question with its marking points, each worth 1 to 20 marks (founder, 2026-10-22). At most 30 points.
+- Reviewers and admins write them on **/admin/rubrics** ("Marking guides" in the staff menu): save as draft, approve, withdraw, back to draft; admins can delete. Students never see them directly.
+- Only approved guides are used for marking (step 4e). The database will not approve a guide without its question and points, and puts an approved guide back to draft if its wording or points change. It records who approved and when. A reviewer may approve their own guide for now (founder, 2026-10-22); a second approver can be required later.
+
 ## Steps
 - 4a: tables, rules and permission tests (this file, migration 17).
 - 4b: making questions (Sonnet, structured output checked before use, rule F-03), screens.

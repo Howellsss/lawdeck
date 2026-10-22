@@ -113,7 +113,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 4a. Migration 17: practice_sets, practice_items, attempts, rubrics, with two-student permission tests (applied by founder 2026-10-22; merged)
 ✅ 4b. Practice questions (multiple choice and scenario) by course and topic, from library passages only (LN-06); live trial still to run
 ✅ 4c. Flashcards with known and not-yet tracking (LN-07); Haiku; live trial still to run
-⬜ 4d. Rubrics written and approved for Civil Litigation topics — legal reviewer
+⬜ 4d. Rubrics written and approved for Civil Litigation topics — editor built (Marking guides, migration 19); writing and approving the guides needs the legal reviewer
 ⬜ 4e. Mark my answer: typed or uploaded, structured feedback in the right panel (LN-08)
 ✅ 4f. Case and statute briefs (LN-09): migration 18 applied by founder 2026-10-22; Sonnet; live trial still to run
 ⬜ 4g. Marking agreement test: 50 answers marked by Lawdeck and by the reviewer (at least 80% agreement) — legal reviewer
@@ -182,3 +182,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Step 4c built: flashcards (Haiku, founder approved; default 10 cards, at most 20), one card at a time with Show answer, Know it / Not yet saved per card, and Review "not yet" cards. Prompt practice-v2. No migration needed. No live AI test yet.
 - 2026-10-22: Step 4f planned and approved: saved case and statute briefs on their own page, Sonnet, counting as one question. First part: migration 18 (briefs table) with permission tests.
 - 2026-10-22: Step 4f part 2 built: Briefs page (name a case or statute, choose a course), brief written by Sonnet from library passages only after checking the name is in the library; fixed sections (case: facts, issues, decision, ratio, relevance; statute: purpose, key sections, relevance); sections the library does not cover say so; saved briefs list and delete. Prompt brief-v1. No live AI test yet.
+- 2026-10-22: Step 4d editor built: Marking guides page for reviewers (exam-style question, marking points with marks, draft / approve / withdraw; admins delete). Migration 19 adds the question; editing an approved guide puts it back to draft. No AI, no cost.
