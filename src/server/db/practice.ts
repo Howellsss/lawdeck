@@ -115,3 +115,19 @@ export async function getPracticeSet(id: string): Promise<Loaded<PracticeSetView
     },
   };
 }
+
+export type PracticeTopic = { id: string; name: string; courseName: string; courseSlug: string };
+
+// The topic a new practice set is about, with its course (for the "new practice set" screen).
+export async function getPracticeTopic(topicId: string | undefined): Promise<Loaded<PracticeTopic | null>> {
+  if (!(await getCurrentAccount())) return { status: "signed-out" };
+  if (!topicId || !practiceSetIdSchema.safeParse(topicId).success) return { status: "ok", data: null };
+  const supabase = await createSupabaseServerClient();
+  const topic = await supabase.from("topics").select("id, name, course_id").eq("id", topicId).maybeSingle();
+  if (topic.error) failed("topic", topic.error.code);
+  if (!topic.data) return { status: "ok", data: null };
+  const course = await supabase.from("courses").select("name, slug").eq("id", topic.data.course_id).maybeSingle();
+  if (course.error) failed("course", course.error.code);
+  if (!course.data) return { status: "ok", data: null };
+  return { status: "ok", data: { id: topic.data.id, name: topic.data.name, courseName: course.data.name, courseSlug: course.data.slug } };
+}
