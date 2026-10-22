@@ -8,6 +8,7 @@ type KbItemType = "course_material" | "note" | "draft" | "textbook" | "statute" 
 type ReviewStatus = "pending" | "approved" | "rejected" | "withdrawn";
 type ReadingStatus = "waiting" | "reading" | "done" | "failed";
 type ReadingMethod = "text" | "scan" | "mixed";
+type PracticeKind = "mcq" | "scenario" | "flashcards";
 
 export type Database = {
   public: {
@@ -263,6 +264,89 @@ export type Database = {
         Update: { title?: string; effective_on?: string; note?: string | null; source?: string | null };
         Relationships: [];
       };
+      // Practice (migration 17). Owners only; rubrics are for reviewers and admins.
+      practice_sets: {
+        Row: {
+          id: string;
+          owner_id: string;
+          course_id: string;
+          topic_id: string | null;
+          kind: PracticeKind;
+          title: string;
+          model: string | null;
+          created_at: string;
+        };
+        Insert: { course_id: string; topic_id?: string | null; kind: PracticeKind; title: string; model?: string | null };
+        Update: never;
+        Relationships: [];
+      };
+      practice_items: {
+        Row: {
+          id: string;
+          set_id: string;
+          owner_id: string;
+          position: number;
+          question: string;
+          choices: Json | null;
+          correct_choice: number | null;
+          answer: string;
+          sources: Json;
+          known: boolean | null;
+          created_at: string;
+        };
+        Insert: {
+          set_id: string;
+          position: number;
+          question: string;
+          choices?: Json | null;
+          correct_choice?: number | null;
+          answer: string;
+          sources?: Json;
+        };
+        Update: { known?: boolean | null };
+        Relationships: [];
+      };
+      attempts: {
+        Row: {
+          id: string;
+          owner_id: string;
+          item_id: string;
+          rubric_id: string | null;
+          choice: number | null;
+          answer_text: string | null;
+          score: number | null;
+          feedback: Json | null;
+          model: string | null;
+          created_at: string;
+        };
+        Insert: {
+          item_id: string;
+          rubric_id?: string | null;
+          choice?: number | null;
+          answer_text?: string | null;
+          score?: number | null;
+          feedback?: Json | null;
+          model?: string | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      rubrics: {
+        Row: Timestamps & {
+          id: string;
+          course_id: string;
+          topic_id: string | null;
+          title: string;
+          criteria: Json;
+          status: ReviewStatus;
+          created_by: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+        };
+        Insert: { course_id: string; topic_id?: string | null; title: string; criteria?: Json };
+        Update: { title?: string; topic_id?: string | null; criteria?: Json; status?: ReviewStatus };
+        Relationships: [];
+      };
       eval_runs: {
         Row: {
           id: string;
@@ -413,6 +497,7 @@ export type Database = {
       conversation_mode: "learn" | "draft";
       message_role: "user" | "assistant";
       kb_item_type: KbItemType;
+      practice_kind: PracticeKind;
       review_status: ReviewStatus;
       reading_status: ReadingStatus;
       reading_method: ReadingMethod;
