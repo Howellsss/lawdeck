@@ -1,11 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { openNewChat } from "@/components/learn/openNewChat";
 import type { TopicSummary } from "@/server/db/workspace";
 
-// A course's topics. Choosing one starts a Learn chat in that course: "Explain <topic>".
+// A course's topics. "Explain" starts a Learn chat in that course ("Explain <topic>"); "Practise"
+// makes practice questions on the topic (Phase 4).
 export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: TopicSummary[] }) {
   const router = useRouter();
   const [busy, setBusy] = useState<string | null>(null);
@@ -46,15 +48,23 @@ export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: 
               <span className="mr-2 text-muted">{index + 1}.</span>
               {topic.name}
             </span>
-            <button
-              type="button"
-              disabled={busy !== null}
-              onClick={() => void explain(topic)}
-              className="shrink-0 rounded-full border border-line px-4 py-2 text-sm font-medium hover:bg-pill disabled:opacity-60"
-            >
-              {busy === topic.id ? "Opening…" : "Explain"}
-              <span className="sr-only"> {topic.name}</span>
-            </button>
+            <span className="flex shrink-0 flex-wrap justify-end gap-2">
+              <button
+                type="button"
+                disabled={busy !== null}
+                onClick={() => void explain(topic)}
+                className="rounded-full border border-line px-4 py-2 text-sm font-medium hover:bg-pill disabled:opacity-60"
+              >
+                {busy === topic.id ? "Opening…" : "Explain"}
+                <span className="sr-only"> {topic.name}</span>
+              </button>
+              <Link
+                href={`/practice/new?topic=${topic.id}`}
+                className="rounded-full border border-line px-4 py-2 text-sm font-medium no-underline hover:bg-pill"
+              >
+                Practise<span className="sr-only"> {topic.name}</span>
+              </Link>
+            </span>
           </li>
         ))}
       </ol>

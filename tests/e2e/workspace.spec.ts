@@ -9,6 +9,9 @@ for (const [path, heading] of [
   [`/chats/${someId}`, "Sign in to see your chats"],
   ["/courses", "Sign in to see your courses"],
   ["/courses/civil-litigation", "Sign in to see your courses"],
+  ["/practice", "Sign in to see your practice sets"],
+  ["/practice/new", "Sign in to see your practice sets"],
+  [`/practice/${someId}`, "Sign in to see your practice sets"],
 ] as const) {
   test(`${path} asks visitors to sign in`, async ({ page }) => {
     await page.goto(path);

@@ -40,7 +40,7 @@ async function Hub({ params }: Pick<PageProps<"/courses/[slug]">, "params">) {
           </Link>
         </p>
         <h1 className="font-serif text-3xl font-normal text-greeting">{course.name}</h1>
-        <p className="text-muted">Choose a topic and Lawdeck explains it from approved course material.</p>
+        <p className="text-muted">Choose a topic: Lawdeck explains it, or makes practice questions on it, from approved course material.</p>
       </div>
       <TopicList courseSlug={course.slug} topics={topics} />
       {isAdmin && <TopicsEditor courseId={course.id} topics={topics} />}

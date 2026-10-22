@@ -9,7 +9,8 @@ import type { ChatSource } from "@/server/db/workspace";
 import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
 import { limitReachedMessage } from "@/lib/allowance";
 import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "./allowance";
-import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING, REMOVED_AUTHORITY, type LibraryLookup } from "./answerFilter";
+import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING, REMOVED_AUTHORITY } from "./answerFilter";
+import { filterContextFor } from "./filterContext";
 import { redactPersonalData } from "./redact";
 
 type Db = SupabaseClient<Database>;
@@ -139,14 +140,7 @@ export async function composeAnswer(input: {
   model?: ExplainModel;
 }): Promise<ComposedAnswer> {
   const hits = input.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
-  const [types, recognised] = await Promise.all([itemTypes(input.db, hits), recognisedTitles(input.db, input.courseId)]);
-  const filter = new AnswerFilter({
-    labels: new Set(hits.map((hit) => hit.label)),
-    passageTexts: hits.map((hit) => `${hit.heading ?? ""} ${hit.text}`),
-    statuteTexts: hits.filter((hit) => types.get(hit.itemId)).map((hit) => hit.text),
-    recognisedTitles: recognised,
-    lookup: libraryLookup(input.db, input.courseId),
-  });
+  const filter = new AnswerFilter(await filterContextFor(input.db, hits, input.courseId));
   const passages: ExplainPassage[] = hits.map((hit) => ({
     label: hit.label,
     itemTitle: hit.itemTitle,
@@ -185,19 +179,6 @@ export async function composeAnswer(input: {
   const used = cited.filter((hit): hit is SearchHit & { label: number } => hit !== undefined);
   const removedAuthorities = shown.split(REMOVED_AUTHORITY).length - 1;
   return { ok: true, shown, notEnough: filter.notEnough, used, removedAuthorities, raw, result };
-}
-
-// Asks the whole approved library (in this course, or all courses) which names it mentions.
-// Row-level rules apply as for search; only the names found come back, never library text.
-function libraryLookup(db: Db, courseId: string | null): LibraryLookup {
-  return async ({ statutes, cases }) => {
-    const { data, error } = await db.rpc("library_mentions", { statutes, cases, course: courseId ?? undefined });
-    if (error) {
-      console.warn("citation check lookup failed", { code: error.code });
-      return new Set();
-    }
-    return new Set(data.map((row) => row.phrase));
-  };
 }
 
 export const SEARCH_BUSY =
@@ -242,21 +223,6 @@ export function historyTurns(rows: { role: "user" | "assistant"; content: unknow
   }
   if (alternating.at(-1)?.role === "user") alternating.pop();
   return alternating;
-}
-
-// Which items are statutes or rules of court (their quotations may be longer).
-async function itemTypes(db: Db, hits: SearchHit[]): Promise<Map<string, boolean>> {
-  const ids = [...new Set(hits.map((hit) => hit.itemId))];
-  const { data } = await db.from("kb_items").select("id, type").in("id", ids);
-  return new Map((data ?? []).map((item) => [item.id, item.type === "statute" || item.type === "rule_of_court"]));
-}
-
-// Approved statutes and rules of court in the library: the "recognised statutes".
-async function recognisedTitles(db: Db, courseId: string | null): Promise<string[]> {
-  let query = db.from("kb_items").select("title").in("type", ["statute", "rule_of_court"]).limit(500);
-  if (courseId) query = query.eq("course_id", courseId);
-  const { data } = await query;
-  return (data ?? []).map((item) => item.title);
 }
 
 async function saveAnswer(
