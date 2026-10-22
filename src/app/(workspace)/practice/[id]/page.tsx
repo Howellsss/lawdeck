@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DeleteSetButton } from "@/components/practice/DeleteSetButton";
+import { MarkedItem } from "@/components/marking/MarkedItem";
 import { FlashcardDeck } from "@/components/practice/FlashcardDeck";
 import { McqItem } from "@/components/practice/McqItem";
 import { ScenarioItem } from "@/components/practice/ScenarioItem";
@@ -16,6 +17,7 @@ export const metadata: Metadata = { title: "Practice set · Lawdeck" };
 // One practice set: multiple-choice questions to answer, scenarios with model answers, or flashcards.
 export default function PracticeSetPage({
   params,
+  searchParams,
 }: PageProps<"/practice/[id]">) {
   return (
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
@@ -23,7 +25,7 @@ export default function PracticeSetPage({
         All practice
       </Link>
       <Suspense fallback={<LoadingRows label="Loading the questions" />}>
-        <SetView params={params} />
+        <SetView params={params} searchParams={searchParams} />
       </Suspense>
     </div>
   );
@@ -31,8 +33,10 @@ export default function PracticeSetPage({
 
 async function SetView({
   params,
-}: Pick<PageProps<"/practice/[id]">, "params">) {
+  searchParams,
+}: Pick<PageProps<"/practice/[id]">, "params" | "searchParams">) {
   const { id } = await params;
+  const justMarked = (await searchParams).marked === "1";
   const result = await getPracticeSet(id);
   if (result.status === "signed-out")
     return (
@@ -66,7 +70,15 @@ async function SetView({
       ) : (
         <ol className="flex flex-col gap-4">
           {set.items.map((item, index) =>
-            item.choices ? (
+            item.marked ? (
+              <MarkedItem
+                key={item.id}
+                question={item.question}
+                answerText={item.marked.answerText}
+                feedback={item.marked.feedback}
+                openNow={justMarked}
+              />
+            ) : item.choices ? (
               <McqItem
                 key={item.id}
                 number={index + 1}

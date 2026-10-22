@@ -1,7 +1,7 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 
-export type UsageKind = "explain" | "route" | "transcribe" | "practice" | "brief";
+export type UsageKind = "explain" | "route" | "transcribe" | "practice" | "brief" | "marking";
 
 // Saves one AI call to usage_events for the signed-in person (rules G-08, K-01): model, tokens,
 // cost and time, never the question or the answer. The database takes the owner from the
