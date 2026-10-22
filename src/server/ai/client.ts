@@ -11,8 +11,22 @@ export function getClaude(): Anthropic {
   client ??= new Anthropic({
     timeout: 60_000, // rule G-10: no request waits longer than 60 seconds
     maxRetries: 2, // busy or rate-limited replies are retried automatically
+    defaultHeaders: workspaceHeaders(process.env.ANTHROPIC_WORKSPACE_ID),
   });
   return client;
+}
+
+// A key that belongs to a person (sk-ant-usr...) rather than a workspace must say which
+// workspace to use, or Claude refuses every call. The workspace ID is not secret. Anything that
+// doesn't look like a workspace ID is ignored, so it can never change other headers.
+export function workspaceHeaders(id: string | undefined): Record<string, string> {
+  const trimmed = id?.trim();
+  if (!trimmed) return {};
+  if (!/^wrkspc_[A-Za-z0-9]{10,60}$/.test(trimmed)) {
+    console.warn("ANTHROPIC_WORKSPACE_ID ignored: it does not look like a workspace ID");
+    return {};
+  }
+  return { "anthropic-workspace-id": trimmed };
 }
 
 export class MissingKeyError extends Error {
