@@ -15,3 +15,18 @@ export const MODELS = {
 } as const;
 
 export type AiJob = keyof typeof MODELS;
+
+// The models step 3e compares for explanations, with the lowest-thinking setting each accepts,
+// so the first words appear quickly (budget L-02: 3 seconds). Each model takes a different
+// setting: Sonnet 5.5 rejects "disabled" thinking, and Opus 5.5 cannot turn thinking off at all.
+export const EXPLAIN_MODELS = ["claude-haiku-5-5", "claude-sonnet-5-5", "claude-opus-5-5"] as const;
+export type ExplainModel = (typeof EXPLAIN_MODELS)[number];
+
+export const EXPLAIN_SETTINGS: Record<
+  ExplainModel,
+  { thinking?: { type: "disabled" } | { type: "between_tools" }; effort?: "low" | "medium" | "high" }
+> = {
+  "claude-haiku-5-5": { thinking: { type: "disabled" } },
+  "claude-sonnet-5-5": { thinking: { type: "between_tools" } },
+  "claude-opus-5-5": { effort: "low" },
+};

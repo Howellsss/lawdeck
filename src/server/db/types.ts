@@ -263,6 +263,80 @@ export type Database = {
         Update: { title?: string; effective_on?: string; note?: string | null; source?: string | null };
         Relationships: [];
       };
+      eval_runs: {
+        Row: {
+          id: string;
+          prompt_version: string;
+          models: string[];
+          case_count: number;
+          status: "running" | "done" | "failed";
+          started_at: string;
+          finished_at: string | null;
+        };
+        // Written by the marked admin job only (jobs/explain-eval.job.ts).
+        Insert: { prompt_version: string; models: string[]; case_count: number; status?: "running" | "done" | "failed" };
+        Update: { status?: "running" | "done" | "failed"; finished_at?: string | null };
+        Relationships: [];
+      };
+      eval_answers: {
+        Row: {
+          id: string;
+          run_id: string;
+          case_id: string;
+          case_kind: "question" | "pushback";
+          pushback_type: "wrong_statement" | "holds_position" | "fake_authority" | "valid_correction" | null;
+          topic: string | null;
+          level: "simple" | "exam" | null;
+          turns: Json;
+          question: string;
+          must_include: Json;
+          expect: string | null;
+          model: string;
+          answer: string | null;
+          not_enough: boolean | null;
+          removed_authorities: number | null;
+          sources: Json;
+          grade: Json | null;
+          first_text_ms: number | null;
+          total_ms: number | null;
+          tokens_in: number | null;
+          tokens_out: number | null;
+          cost_usd: number | null;
+          error: string | null;
+          created_at: string;
+          rating: "approved" | "needs_fix" | null;
+          review_note: string | null;
+          reviewed_by: string | null;
+          reviewed_at: string | null;
+        };
+        // Written by the marked admin job only; reviewers update rating and review_note.
+        Insert: {
+          run_id: string;
+          case_id: string;
+          case_kind: "question" | "pushback";
+          pushback_type?: "wrong_statement" | "holds_position" | "fake_authority" | "valid_correction" | null;
+          topic?: string | null;
+          level?: "simple" | "exam" | null;
+          turns?: Json;
+          question: string;
+          must_include?: Json;
+          expect?: string | null;
+          model: string;
+          answer?: string | null;
+          not_enough?: boolean | null;
+          removed_authorities?: number | null;
+          sources?: Json;
+          grade?: Json | null;
+          first_text_ms?: number | null;
+          total_ms?: number | null;
+          tokens_in?: number | null;
+          tokens_out?: number | null;
+          cost_usd?: number | null;
+          error?: string | null;
+        };
+        Update: { rating?: "approved" | "needs_fix" | null; review_note?: string | null };
+        Relationships: [];
+      };
       search_events: {
         Row: { id: number; owner_id: string; created_at: string };
         Insert: never;

@@ -1,14 +1,15 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { questionMessage, type AnswerLevel, type ExplainPassage } from "@/prompts/explain";
-import { streamExplanation, type ExplainTurn } from "@/server/ai/explain";
+import { streamExplanation, type ExplainResult, type ExplainTurn } from "@/server/ai/explain";
+import type { ExplainModel } from "@/server/ai/models";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
 import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
 import { limitReachedMessage } from "@/lib/allowance";
 import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "./allowance";
-import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING } from "./answerFilter";
+import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING, REMOVED_AUTHORITY } from "./answerFilter";
 import { redactPersonalData } from "./redact";
 
 type Db = SupabaseClient<Database>;
@@ -87,15 +88,62 @@ export async function answerQuestion(input: {
     return send({ type: "done", messageId: saved, text: NO_MATERIAL_TEXT, sources: [], notEnough: true, level: input.level });
   }
 
-  const hits = found.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
-  const [types, recognised] = await Promise.all([itemTypes(db, hits), recognisedTitles(db, chat.data.course_id)]);
+  const composed = await composeAnswer({
+    db,
+    hits: found.hits,
+    question,
+    level: input.level,
+    history: historyTurns(earlier.data),
+    courseId: chat.data.course_id,
+    userId: input.userId,
+    onText: (text) => send({ type: "text", text }),
+    signal: input.signal,
+  });
+  if (!composed.ok) return send({ type: "error", message: FAILURES[composed.reason] });
+  const { shown, notEnough, used, result } = composed;
+
+  const messageId = await saveAnswer(db, input.chatId, shown, input.level, result, used);
+  if (!messageId) return send({ type: "error", message: "The answer was not saved. Please try again." });
+  const sources = await saveSources(db, messageId, used);
+  send({ type: "done", messageId, text: shown, sources, notEnough, level: input.level });
+}
+
+export type ComposedAnswer =
+  | {
+      ok: true;
+      shown: string;
+      notEnough: boolean;
+      // The passages the checked answer cites (none for "not enough").
+      used: (SearchHit & { label: number })[];
+      // How many authorities the citation check removed (step 3e counts these: must be zero).
+      removedAuthorities: number;
+      result: Extract<ExplainResult, { ok: true }>;
+    }
+  | { ok: false; reason: keyof typeof FAILURES };
+
+// The heart of an answer, shared by the app and the model test (step 3e): label the passages,
+// stream Claude's explanation through the citation and quotation check, and work out which
+// passages the checked answer cites. Saving is left to the caller.
+export async function composeAnswer(input: {
+  db: Db;
+  hits: SearchHit[];
+  question: string;
+  level: AnswerLevel;
+  history: ExplainTurn[];
+  courseId: string | null;
+  userId: string;
+  onText: (text: string) => void;
+  signal?: AbortSignal;
+  model?: ExplainModel;
+}): Promise<ComposedAnswer> {
+  const hits = input.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
+  const [types, recognised] = await Promise.all([itemTypes(input.db, hits), recognisedTitles(input.db, input.courseId)]);
   const filter = new AnswerFilter({
     labels: new Set(hits.map((hit) => hit.label)),
     passageTexts: hits.map((hit) => `${hit.heading ?? ""} ${hit.text}`),
     statuteTexts: hits.filter((hit) => types.get(hit.itemId)).map((hit) => hit.text),
     recognisedTitles: recognised,
   });
-
   const passages: ExplainPassage[] = hits.map((hit) => ({
     label: hit.label,
     itemTitle: hit.itemTitle,
@@ -103,34 +151,29 @@ export async function answerQuestion(input: {
     pages: pagesLabel(hit.pageFrom, hit.pageTo),
     text: hit.text,
   }));
-  const turns: ExplainTurn[] = [
-    ...historyTurns(earlier.data),
-    { role: "user", text: questionMessage(passages, question, input.level) },
-  ];
+  const turns: ExplainTurn[] = [...input.history, { role: "user", text: questionMessage(passages, input.question, input.level) }];
 
   let shown = "";
   const show = (text: string) => {
     if (!text) return;
     shown += text;
-    send({ type: "text", text });
+    input.onText(text);
   };
   const result = await streamExplanation({
     turns,
     userId: input.userId,
     onText: (text) => show(filter.push(text)),
     signal: input.signal,
+    model: input.model,
   });
-  if (!result.ok) return send({ type: "error", message: FAILURES[result.reason] });
+  if (!result.ok) return { ok: false, reason: result.reason };
   show(filter.end());
-  if (!shown.trim()) return send({ type: "error", message: FAILURES.unavailable });
+  if (!shown.trim()) return { ok: false, reason: "unavailable" };
 
-  // Sources are the passages the checked answer actually cites (none for "not enough").
   const cited = filter.notEnough ? [] : citedLabels(shown).map((label) => hits.find((hit) => hit.label === label));
   const used = cited.filter((hit): hit is SearchHit & { label: number } => hit !== undefined);
-  const messageId = await saveAnswer(db, input.chatId, shown, input.level, result, used);
-  if (!messageId) return send({ type: "error", message: "The answer was not saved. Please try again." });
-  const sources = await saveSources(db, messageId, used);
-  send({ type: "done", messageId, text: shown, sources, notEnough: filter.notEnough, level: input.level });
+  const removedAuthorities = shown.split(REMOVED_AUTHORITY).length - 1;
+  return { ok: true, shown, notEnough: filter.notEnough, used, removedAuthorities, result };
 }
 
 export const SEARCH_BUSY =
@@ -157,7 +200,7 @@ function textOf(content: unknown): string {
 }
 
 // Earlier messages, oldest first. Old citation numbers refer to old passages, so they are dropped.
-function historyTurns(rows: { role: "user" | "assistant"; content: unknown }[]): ExplainTurn[] {
+export function historyTurns(rows: { role: "user" | "assistant"; content: unknown }[]): ExplainTurn[] {
   const turns = rows
     .slice()
     .reverse()

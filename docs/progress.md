@@ -101,7 +101,10 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3d. Every AI call recorded (model, tokens, cost, time; never the text); monthly question limit checked before each answer; "X of 30 questions left this month" note
 ⬜ 3d. Founder applies migration 14 in Supabase
 ⬜ 3d. Google sign-in failing on the live site: reason now logged; founder to try once and send the log line
-⚠️ 3e. Evaluation set v1: 40+ Civil Litigation questions plus pushback cases, reviewed by a legal reviewer — founder and reviewer
+✅ 3e. Evaluation set v1 drafted from Sarumi's notes: 40 questions and 12 pushback cases (3 each: wrong statement, holds position, made-up authority, valid correction); `tests/eval/explain/civil-litigation.json`
+⚠️ 3e. Legal reviewer checks the 52 test cases, then rates the answers on /admin/eval — founder and reviewer
+✅ 3e. Answer test: every case through the real answer pipeline on Haiku, Sonnet and Opus, graded automatically and saved privately for the reviewer (migration 15, /admin/eval)
+⬜ 3e. Founder applies migration 15 and adds the GitHub secret ANTHROPIC_API_KEY (workspace key); first test run
 ⬜ 3e. Model quality test: Haiku, Sonnet and Opus for explanations; choose by quality and cost
 
 ## Change log
@@ -158,3 +161,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Founder added a Voyage payment method; Anthropic key added in Vercel. 18 Civil Litigation topics added from the 2023/24 course outline (founder pasted the SQL). Other four courses: when their outlines are uploaded.
 - 2026-10-22: Live answers fail: Claude returns 400 on every call and Voyage returns 401 (key). Failed AI calls now log Claude's error type, short reason and request id (never the question or key) so the cause can be read in Vercel.
 - 2026-10-22: Step 3d: AI usage recorded per call; Free plan of 30 questions a month (founder can change it in the database), checked before each answer and before Auto routing. Migration 14. Claude key changed to a workspace key (founder); answers work on the live site.
+- 2026-10-22: Step 3e: test set of 52 cases, answer test on three models with automatic grading, private results and a reviewer page. Repository found to be public: test answers are kept in the database, never in GitHub logs.

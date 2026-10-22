@@ -1,5 +1,7 @@
 import "server-only";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import type { Database } from "@/server/db/types";
 import { passageSearchText } from "./indexJob";
 import { rerankTexts } from "./rerank";
 import { embedTexts, toVectorText } from "./voyage";
@@ -31,10 +33,12 @@ export async function searchLibrary(input: {
   // null searches every course ("All courses").
   courseId: string | null;
   includePending: boolean;
+  // Only the answer test (a marked admin job) passes its own client; the app searches as the student.
+  db?: SupabaseClient<Database>;
 }): Promise<SearchResult> {
   const embedded = await embedTexts([input.question], "query", EMBEDDING_MODEL, "search");
   const vector = embedded.ok ? embedded.vectors[0] : null;
-  const supabase = await createSupabaseServerClient();
+  const supabase = input.db ?? (await createSupabaseServerClient());
   const { data, error } = await supabase.rpc("search_library", {
     query_text: input.question,
     course: input.courseId,
