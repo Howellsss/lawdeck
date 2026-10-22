@@ -115,7 +115,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 4c. Flashcards with known and not-yet tracking (LN-07); Haiku; live trial still to run
 ⬜ 4d. Rubrics written and approved for Civil Litigation topics — legal reviewer
 ⬜ 4e. Mark my answer: typed or uploaded, structured feedback in the right panel (LN-08)
-⬜ 4f. Case and statute briefs (LN-09)
+✅ 4f. Case and statute briefs (LN-09): migration 18 applied by founder 2026-10-22; Sonnet; live trial still to run
 ⬜ 4g. Marking agreement test: 50 answers marked by Lawdeck and by the reviewer (at least 80% agreement) — legal reviewer
 
 ## Change log
@@ -181,3 +181,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Step 4b built: Practise button on each course topic, /practice list, new-set form (multiple choice or scenario, 3–10 questions), set page with server-checked answers, explanations and sources. Questions come only from library passages; items that cite nothing or name an authority not in the library are dropped. No live AI test yet (founder: no spending; one trial about 5 cents when approved).
 - 2026-10-22: Step 4c built: flashcards (Haiku, founder approved; default 10 cards, at most 20), one card at a time with Show answer, Know it / Not yet saved per card, and Review "not yet" cards. Prompt practice-v2. No migration needed. No live AI test yet.
 - 2026-10-22: Step 4f planned and approved: saved case and statute briefs on their own page, Sonnet, counting as one question. First part: migration 18 (briefs table) with permission tests.
+- 2026-10-22: Step 4f part 2 built: Briefs page (name a case or statute, choose a course), brief written by Sonnet from library passages only after checking the name is in the library; fixed sections (case: facts, issues, decision, ratio, relevance; statute: purpose, key sections, relevance); sections the library does not cover say so; saved briefs list and delete. Prompt brief-v1. No live AI test yet.
