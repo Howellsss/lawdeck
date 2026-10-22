@@ -14,7 +14,21 @@ export async function GET(request: NextRequest) {
     const supabase = await createSupabaseServerClient();
     const { error } = await supabase.auth.exchangeCodeForSession(code);
     if (!error) return NextResponse.redirect(new URL(next, request.url));
-    console.warn("google sign-in failed", { code: error.code ?? "unknown" });
+    // For example "flow_state_not_found" when sign-in started on a different web address.
+    console.warn("google sign-in failed", { step: "exchange", code: error.code ?? "unknown", reason: short(error.message) });
+  } else {
+    // Google or Supabase sent the student back with an error instead of a code. Their reason
+    // says why (for example a wrong Google client secret). It never contains a password or key.
+    console.warn("google sign-in failed", {
+      step: code ? "not_configured" : "returned_error",
+      error: short(params.get("error")),
+      code: short(params.get("error_code")),
+      reason: short(params.get("error_description")),
+    });
   }
   return NextResponse.redirect(new URL("/sign-in?error=google", request.url));
+}
+
+function short(value: string | null | undefined): string | null {
+  return value ? value.slice(0, 160) : null;
 }
