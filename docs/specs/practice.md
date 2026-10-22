@@ -20,6 +20,11 @@ PRD LN-06 to LN-09; System Design §3 (practice_sets, practice_items, rubrics, a
 
 A set can only name a topic from its own course; an item or attempt can only belong to the student's own set or item (database rules, tested in `tests/permissions/sql/9a_practice_test.sql`).
 
+## Briefs (step 4f, migration 18; PRD LN-09)
+- **Briefs** in the sidebar: the student names a case or a statute (or rules of court) and Lawdeck writes a brief from approved library passages. Case: facts, issues, decision, ratio, relevance. Statute: purpose, key sections or orders, relevance.
+- The name must be found in the approved library first; if not, the student is told and nothing is written. A section the passages do not cover says so instead of being filled from memory. The citation check applies.
+- Briefs are saved (table `briefs`, owner only, never edited, deleted by the owner) and count as one question in the monthly allowance. Sonnet writes them (about 3 to 4 US cents each).
+
 ## Steps
 - 4a: tables, rules and permission tests (this file, migration 17).
 - 4b: making questions (Sonnet, structured output checked before use, rule F-03), screens.
