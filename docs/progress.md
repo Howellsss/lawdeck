@@ -108,6 +108,16 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3e. Migration 15 applied, GitHub keys fixed (founder, 2026-10-22); full run: 156/156 answered, $6.91
 ✅ 3e. Model choice: Sonnet 5.5 for explanations (founder's decision, 2026-10-22). Measured: 97% of points covered, 11/12 pushback, first words in 1.0 s, about $0.031 per answer. Opus too slow (5.5 s); Haiku cheaper but weaker. Reviewer ratings still to come
 
+## Phase 4. Practice
+
+⬜ 4a. Migration 17: practice_sets, practice_items, attempts, rubrics, with two-student permission tests (founder applies the migration)
+⬜ 4b. Practice questions (multiple choice and scenario) by course and topic, from library passages only (LN-06)
+⬜ 4c. Flashcards with known and not-yet tracking (LN-07)
+⬜ 4d. Rubrics written and approved for Civil Litigation topics — legal reviewer
+⬜ 4e. Mark my answer: typed or uploaded, structured feedback in the right panel (LN-08)
+⬜ 4f. Case and statute briefs (LN-09)
+⬜ 4g. Marking agreement test: 50 answers marked by Lawdeck and by the reviewer (at least 80% agreement) — legal reviewer
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
@@ -167,3 +177,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Full answer test: 156/156 answered, $6.91. Sonnet strongest (97% points, 11/12 pushback, 1.0 s, $0.031/answer); Opus too slow (5.5 s); Haiku cheapest ($0.0013) but weaker. 107 authorities removed, nearly all real court-rule names the notes contain but the answer's passages did not.
 - 2026-10-22: Fix: the citation check now asks the whole approved library before removing a case or statute (migration 16); test answers keep their wording before the check, so later check changes can be tried free; answer-test page marks cases with removals. No AI calls (founder: no spending for now).
 - 2026-10-22: Re-check after the citation fix: 10 Sonnet answers, 4 authorities removed (first run: about 6 per 10), $0.41. Routing test 100/100. Founder chose Sonnet 5.5 for explanations (already the setting in `src/server/ai/models.ts`).
+- 2026-10-22: Phase 4 (Practice) started. Plan approved: practice set counts as 1 question; default 5 questions, maximum 10. Step 4a: migration 17 (practice_sets, practice_items, attempts, rubrics) with two-student permission tests. Spec: docs/specs/practice.md.
