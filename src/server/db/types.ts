@@ -354,14 +354,16 @@ export type Database = {
           course_id: string;
           topic_id: string | null;
           title: string;
+          // The exam-style question the guide marks (migration 19).
+          question: string | null;
           criteria: Json;
           status: ReviewStatus;
           created_by: string | null;
           reviewed_by: string | null;
           reviewed_at: string | null;
         };
-        Insert: { course_id: string; topic_id?: string | null; title: string; criteria?: Json };
-        Update: { title?: string; topic_id?: string | null; criteria?: Json; status?: ReviewStatus };
+        Insert: { course_id: string; topic_id?: string | null; title: string; question?: string | null; criteria?: Json };
+        Update: { title?: string; topic_id?: string | null; question?: string | null; criteria?: Json; status?: ReviewStatus };
         Relationships: [];
       };
       eval_runs: {

@@ -84,8 +84,8 @@ end $$;
 
 -- Reviewers write and approve rubrics; the database records who approved -----------------
 select test.as_user('dddddddd-0000-0000-0000-000000000173');
-insert into public.rubrics (course_id, topic_id, title, criteria)
-  select civil, civil_topic, 'Quokka writ answer', '[{"point": "Six months", "marks": 2}]' from test.practice;
+insert into public.rubrics (course_id, topic_id, title, question, criteria)
+  select civil, civil_topic, 'Quokka writ answer', 'How long does a quokka writ last?', '[{"point": "Six months", "marks": 2}]' from test.practice;
 update public.rubrics set status = 'approved' where title = 'Quokka writ answer';
 select test.check((select reviewed_by from public.rubrics where title = 'Quokka writ answer') = 'dddddddd-0000-0000-0000-000000000173',
   'approving a rubric records the reviewer');
@@ -115,4 +115,21 @@ select test.as_user('cccccccc-0000-0000-0000-000000000171');
 delete from public.practice_sets;
 select test.check((select count(*) from public.practice_items) + (select count(*) from public.attempts) = 0,
   'deleting a set removes its questions and answers');
+reset role;
+
+-- Marking guides with their question (migration 19) -----------------------------------------
+select test.as_user('dddddddd-0000-0000-0000-000000000173');
+insert into public.rubrics (course_id, title, question, criteria)
+  select civil, 'Quokka renewal', 'Your client''s quokka writ has expired. Advise.', '[{"point": "Writ expired", "marks": 2}]' from test.practice;
+update public.rubrics set status = 'approved' where title = 'Quokka renewal';
+select test.check((select status from public.rubrics where title = 'Quokka renewal') = 'approved', 'a reviewer approves a complete guide');
+update public.rubrics set criteria = '[{"point": "Writ expired", "marks": 3}]' where title = 'Quokka renewal';
+select test.check((select status = 'pending' and reviewed_by is null from public.rubrics where title = 'Quokka renewal'),
+  'changing an approved guide puts it back to draft');
+insert into public.rubrics (course_id, title) select civil, 'Quokka empty' from test.practice;
+select test.refused($$update public.rubrics set status = 'approved' where title = 'Quokka empty'$$,
+  'a guide without its question and points cannot be approved');
+reset role;
+select test.as_user('cccccccc-0000-0000-0000-000000000171');
+select test.check((select count(*) from public.rubrics) = 0, 'students still cannot see marking guides');
 reset role;
