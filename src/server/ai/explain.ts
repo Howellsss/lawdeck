@@ -3,7 +3,7 @@ import Anthropic from "@anthropic-ai/sdk";
 import { EXPLAIN_PROMPT_VERSION, EXPLAIN_SYSTEM } from "@/prompts/explain";
 import { failureDetails, getClaude, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
-import { MODELS } from "./models";
+import { EXPLAIN_SETTINGS, MODELS, type ExplainModel } from "./models";
 import { recordUsage } from "./usage";
 
 export type ExplainTurn = { role: "user" | "assistant"; text: string };
@@ -16,6 +16,8 @@ export type ExplainResult =
       tokensOut: number;
       costUsd: number | null;
       stop: string | null;
+      // Time until the first words of the answer arrived (budget L-02: 3 seconds).
+      firstTextMs: number | null;
     }
   | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable" | "cancelled" };
 
@@ -27,15 +29,21 @@ export async function streamExplanation(input: {
   userId: string;
   onText: (text: string) => void;
   signal?: AbortSignal;
+  // Only the model test (step 3e) chooses another model; the app uses MODELS.explain.
+  model?: ExplainModel;
 }): Promise<ExplainResult> {
   const started = Date.now();
+  const model = input.model ?? MODELS.explain;
+  const settings = EXPLAIN_SETTINGS[model];
+  let firstTextMs: number | null = null;
   try {
     const stream = getClaude().messages.stream(
       {
-        model: MODELS.explain,
+        model,
         max_tokens: 4_000,
         // No long thinking before answering, so the first words appear quickly (budget: 3 s).
-        thinking: { type: "between_tools" },
+        ...(settings.thinking ? { thinking: settings.thinking } : {}),
+        ...(settings.effort ? { output_config: { effort: settings.effort } } : {}),
         // The fixed instructions are cached, so repeat questions cost less.
         system: [{ type: "text", text: EXPLAIN_SYSTEM, cache_control: { type: "ephemeral" } }],
         messages: input.turns.map((turn) => ({ role: turn.role, content: turn.text })),
@@ -43,7 +51,10 @@ export async function streamExplanation(input: {
       { signal: input.signal },
     );
     for await (const event of stream) {
-      if (event.type === "content_block_delta" && event.delta.type === "text_delta") input.onText(event.delta.text);
+      if (event.type === "content_block_delta" && event.delta.type === "text_delta") {
+        firstTextMs ??= Date.now() - started;
+        input.onText(event.delta.text);
+      }
     }
     const message = await stream.finalMessage();
     const cost = costUsd(message.model, message.usage);
@@ -85,6 +96,7 @@ export async function streamExplanation(input: {
       tokensOut: message.usage.output_tokens,
       costUsd: cost,
       stop: message.stop_reason,
+      firstTextMs,
     };
   } catch (error) {
     console.error("ai call failed", { job: "explain", userId: input.userId, ...failureDetails(error), ms: Date.now() - started });

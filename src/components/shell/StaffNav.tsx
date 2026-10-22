@@ -11,9 +11,15 @@ export function StaffNav() {
       active ? "bg-pill font-medium" : ""
     } ${collapsed ? "justify-center" : ""}`;
   return (
-    <NavLink href="/admin/library" onNavigate={onNavigate} className={itemClass} match="prefix">
-      <Icon name="scale" />
-      <span className={collapsed ? "sr-only" : ""}>Library</span>
-    </NavLink>
+    <>
+      <NavLink href="/admin/library" onNavigate={onNavigate} className={itemClass} match="prefix">
+        <Icon name="scale" />
+        <span className={collapsed ? "sr-only" : ""}>Library</span>
+      </NavLink>
+      <NavLink href="/admin/eval" onNavigate={onNavigate} className={itemClass} match="prefix">
+        <Icon name="check" />
+        <span className={collapsed ? "sr-only" : ""}>Answer tests</span>
+      </NavLink>
+    </>
   );
 }

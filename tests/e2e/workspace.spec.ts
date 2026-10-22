@@ -65,3 +65,12 @@ test("the law changes page is hidden from visitors", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Law changes" })).toHaveCount(0);
 });
+
+test("the answer test pages are hidden from visitors", async ({ page }) => {
+  for (const path of ["/admin/eval", "/admin/eval/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    await expect(page.getByRole("heading", { name: "Answer tests" })).toHaveCount(0);
+    await expect(page.getByRole("radio")).toHaveCount(0);
+  }
+});

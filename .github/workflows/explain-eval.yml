@@ -1,0 +1,42 @@
+# The answer quality test (step 3e): every test case on each model, graded and saved privately
+# for the legal reviewer (/admin/eval). Run by hand: Actions -> "Answer test" -> Run workflow.
+# A full run costs a few US dollars on the Anthropic account. The repository is public, so the
+# job prints counts and costs only, never questions, answers or library text.
+name: Answer test
+
+on:
+  workflow_dispatch:
+    inputs:
+      models:
+        description: "Models (comma-separated). Empty = Haiku, Sonnet and Opus."
+        required: false
+        default: ""
+      cases:
+        description: "Case ids for a trial run, e.g. Q01,P01. Empty = all cases."
+        required: false
+        default: ""
+
+permissions:
+  contents: read
+
+jobs:
+  answer-test:
+    name: Answer test (real Supabase project, Voyage AI and Claude)
+    runs-on: ubuntu-latest
+    timeout-minutes: 120
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+      VOYAGE_API_KEY: ${{ secrets.VOYAGE_API_KEY }}
+      ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+      EVAL_MODELS: ${{ inputs.models }}
+      EVAL_CASES: ${{ inputs.cases }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run eval:explain

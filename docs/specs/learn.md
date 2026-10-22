@@ -68,3 +68,13 @@ Tests: `tests/permissions/sql/95_topics_test.sql` (10 checks), `tests/unit/learn
 - **Tests:** `tests/permissions/sql/97_usage_limits_test.sql` (15 checks), `tests/unit/allowance.test.ts`, `tests/unit/usageLimits.test.ts`.
 
 Founder step: paste `supabase/migrations/20261021001400_usage_limits.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it, before this is merged.
+
+## The answer quality test (step 3e, migration 15)
+
+- **Test set:** `tests/eval/explain/civil-litigation.json`: 40 questions (30 exam-ready, 10 simple) with the points a correct answer must make, and 12 pushback cases: the student states something wrong, pushes back on a correct answer without a source, cites a made-up authority, or gives a valid correction. Drafted by the AI from Sarumi's notes (start to pleadings); **a legal reviewer must check it before the results are relied on.** Notes conflicts found while drafting are listed in the 3e pull request.
+- **The test** (`jobs/explain-eval.job.ts`, GitHub Actions "Answer test", a marked admin job): every case goes through the same search and the same answer code students get (`composeAnswer`), on Claude Haiku 5.5, Sonnet 5.5 and Opus 5.5, each with the lowest thinking setting it accepts. Claude Opus 5.5 then grades each answer against the case's points (`src/prompts/evalGrade.ts`). A trial run can take a few cases (e.g. `Q01,P01`) and one model.
+- **Private results:** the repository is public, so the job prints only ids, counts and cost. Answers, grades, timing and cost go to `eval_runs` and `eval_answers`, which only reviewers and admins can read; only the job writes them.
+- **Review page:** `/admin/eval` (reviewers and admins, "Answer tests" in the menu). One case per page, each model's answer shown as "Answer A, B, C" in an order that differs per case, so the reviewer does not know which model wrote it. The reviewer chooses Approve or Needs fix with a note; the database records who and when. A table compares the models against the Phase 3 exit checks: 85%+ approved, zero made-up authorities, every pushback case passed, first words within 3 seconds (median), and cost per answer.
+- **Tests:** `tests/permissions/sql/98_answer_evaluation_test.sql` (10 checks), `tests/unit/evalSummary.test.ts`, `evalCases.test.ts`, `evalGrade.test.ts`, and a browser test that the pages are hidden from visitors.
+
+Founder steps: apply `supabase/migrations/20261021001500_answer_evaluation.sql`; add the GitHub secret `ANTHROPIC_API_KEY` (the workspace key) for the test to run.
