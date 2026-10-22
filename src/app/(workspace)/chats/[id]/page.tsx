@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChatThread } from "@/components/learn/ChatThread";
+import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { RoutedChip } from "@/components/learn/RoutedChip";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
@@ -35,6 +36,9 @@ async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
         {chat.autoRouted && <RoutedChip />}
       </div>
       <ChatThread chatId={chat.id} initialMessages={messages} />
+      <Suspense fallback={null}>
+        <QuestionAllowance />
+      </Suspense>
     </>
   );
 }

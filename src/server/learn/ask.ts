@@ -6,6 +6,8 @@ import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
 import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
+import { limitReachedMessage } from "@/lib/allowance";
+import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "./allowance";
 import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING } from "./answerFilter";
 import { redactPersonalData } from "./redact";
 
@@ -49,6 +51,11 @@ export async function answerQuestion(input: {
   const { db, send } = input;
   const chat = await db.from("conversations").select("id, title, course_id").eq("id", input.chatId).maybeSingle();
   if (chat.error || !chat.data) return send({ type: "error", message: "That chat could not be found." });
+
+  // Rule K-01: the monthly limit is checked before anything is saved or any AI is called.
+  const allowance = await getAllowance(db);
+  if (!allowance) return send({ type: "error", message: ALLOWANCE_UNAVAILABLE });
+  if (!hasQuestionsLeft(allowance)) return send({ type: "error", message: limitReachedMessage(allowance) });
 
   const earlier = await db
     .from("messages")

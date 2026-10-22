@@ -1,5 +1,7 @@
+import { Suspense } from "react";
 import { Composer } from "@/components/learn/Composer";
 import { Greeting } from "@/components/learn/Greeting";
+import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { BrandMark } from "@/components/ui/BrandMark";
 
 // Home: calm and input-first (PRD 4.2). On phones the composer sits at the bottom, as in the M2 design.
@@ -12,8 +14,11 @@ export default function HomePage() {
           <Greeting />
         </h1>
       </div>
-      <div className="flex justify-center">
+      <div className="flex flex-col items-center gap-3">
         <Composer />
+        <Suspense fallback={null}>
+          <QuestionAllowance />
+        </Suspense>
       </div>
     </div>
   );

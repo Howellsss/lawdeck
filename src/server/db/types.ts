@@ -277,6 +277,14 @@ export type Database = {
       };
     };
     Functions: {
+      record_ai_usage: {
+        Args: { kind: string; model: string; tokens_in: number; tokens_out: number; cost_usd: number; duration_ms: number };
+        Returns: undefined;
+      };
+      question_allowance: {
+        Args: Record<string, never>;
+        Returns: { used: number; monthly_limit: number; unlimited: boolean }[];
+      };
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };
       source_passage: {

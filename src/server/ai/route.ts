@@ -3,6 +3,7 @@ import { parseRoute, ROUTE_PROMPT_VERSION, ROUTE_SYSTEM, type Route } from "@/pr
 import { failureDetails, getClaude } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
+import { recordUsage } from "./usage";
 
 // Routing must feel instant; if it takes longer, the request is treated as Learn.
 const ROUTE_TIMEOUT_MS = 8_000;
@@ -35,6 +36,14 @@ export async function routeRequest(request: string, userId: string): Promise<Rou
       costUsd: costUsd(response.model, response.usage),
       ms: Date.now() - started,
       route: route ?? "unknown",
+    });
+    await recordUsage({
+      kind: "route",
+      model: response.model,
+      tokensIn: response.usage.input_tokens,
+      tokensOut: response.usage.output_tokens,
+      costUsd: costUsd(response.model, response.usage),
+      ms: Date.now() - started,
     });
     return route;
   } catch (error) {

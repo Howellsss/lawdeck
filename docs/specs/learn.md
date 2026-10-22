@@ -56,3 +56,15 @@ Tests: `tests/permissions/sql/95_topics_test.sql` (10 checks), `tests/unit/learn
 2. Add each course's topics: Courses → a course → Manage topics.
 3. For the routing test: add `ANTHROPIC_API_KEY` as a GitHub repository secret (Settings → Secrets and variables → Actions), then run Actions → "Routing test".
 
+
+## Usage records and the monthly limit (step 3d, migration 14)
+
+- **Every AI call is recorded** in `usage_events` through `record_ai_usage` (answers, Auto routing, reading scans): model, tokens, cost in US dollars and time. Never the question or the answer. The owner always comes from the sign-in; students cannot write, change or delete these rows directly, or see anyone else's.
+- **A question counts** when its answer has been written by the AI. Failed answers, refused answers and "nothing in the library" replies are free. Routing calls are recorded for cost but do not count as questions.
+- **The limit:** the Free plan allows **30 questions a month** (the founder's default, 2026-10-22). The month runs from the 1st in Lagos time. Reviewers and admins are not limited. A plan with an empty limit has no limit (for paid plans later).
+- **Checked before anything happens:** before the question is saved, before search and before any AI call, in the answer route and before Auto routing when a chat starts. If the count cannot be read, Lawdeck does not call the AI and asks the student to try again.
+- **On screen:** "18 of 30 questions left this month" under the question box on the home page and in chats; at the limit, "You’ve used all 30 questions for this month. You can ask again from 1 November."
+- **Changing the limit** needs no code. In the Supabase SQL Editor: `update public.plans set monthly_message_limit = 50 where name = 'Free';`
+- **Tests:** `tests/permissions/sql/97_usage_limits_test.sql` (15 checks), `tests/unit/allowance.test.ts`, `tests/unit/usageLimits.test.ts`.
+
+Founder step: paste `supabase/migrations/20261021001400_usage_limits.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it, before this is merged.

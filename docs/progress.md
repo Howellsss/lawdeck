@@ -98,7 +98,9 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3c. Auto mode routing with Haiku and the "Treated as" chip; 100-request routing test ready
 ✅ 3c. Migration 13 applied (founder, 2026-10-21); merged and live
 ⬜ 3c. Topics added; routing test run and at least 90/100 (founder: GitHub secret ANTHROPIC_API_KEY)
-⬜ 3d. Usage logging per call, and per-student limits checked before each call
+✅ 3d. Every AI call recorded (model, tokens, cost, time; never the text); monthly question limit checked before each answer; "X of 30 questions left this month" note
+⬜ 3d. Founder applies migration 14 in Supabase
+⬜ 3d. Google sign-in failing on the live site: reason now logged; founder to try once and send the log line
 ⚠️ 3e. Evaluation set v1: 40+ Civil Litigation questions plus pushback cases, reviewed by a legal reviewer — founder and reviewer
 ⬜ 3e. Model quality test: Haiku, Sonnet and Opus for explanations; choose by quality and cost
 
@@ -155,3 +157,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Fix: when search by meaning is unavailable and nothing is found, answers ask the student to try again instead of saying the library has nothing (found on the live site).
 - 2026-10-22: Founder added a Voyage payment method; Anthropic key added in Vercel. 18 Civil Litigation topics added from the 2023/24 course outline (founder pasted the SQL). Other four courses: when their outlines are uploaded.
 - 2026-10-22: Live answers fail: Claude returns 400 on every call and Voyage returns 401 (key). Failed AI calls now log Claude's error type, short reason and request id (never the question or key) so the cause can be read in Vercel.
+- 2026-10-22: Step 3d: AI usage recorded per call; Free plan of 30 questions a month (founder can change it in the database), checked before each answer and before Auto routing. Migration 14. Claude key changed to a workspace key (founder); answers work on the live site.

@@ -4,6 +4,7 @@ import { EXPLAIN_PROMPT_VERSION, EXPLAIN_SYSTEM } from "@/prompts/explain";
 import { failureDetails, getClaude, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
+import { recordUsage } from "./usage";
 
 export type ExplainTurn = { role: "user" | "assistant"; text: string };
 
@@ -59,6 +60,20 @@ export async function streamExplanation(input: {
       ms: Date.now() - started,
       stop: message.stop_reason,
     });
+    // A refused answer is not a question answered, so it does not count against the limit.
+    if (message.stop_reason !== "refusal") {
+      await recordUsage({
+        kind: "explain",
+        model: message.model,
+        tokensIn:
+          message.usage.input_tokens +
+          (message.usage.cache_creation_input_tokens ?? 0) +
+          (message.usage.cache_read_input_tokens ?? 0),
+        tokensOut: message.usage.output_tokens,
+        costUsd: cost,
+        ms: Date.now() - started,
+      });
+    }
     if (message.stop_reason === "refusal") return { ok: false, reason: "refused" };
     return {
       ok: true,

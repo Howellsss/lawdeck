@@ -4,6 +4,7 @@ import { TRANSCRIBE_PROMPT_VERSION, TRANSCRIBE_SYSTEM, transcribeRequest } from 
 import { failureDetails, getClaude } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
+import { recordUsage } from "./usage";
 
 // Claude's request limit is 32 MB; base64 makes a file a third bigger.
 export const SCAN_MAX_BASE64_CHARS = 30_000_000;
@@ -63,6 +64,14 @@ export async function transcribePages(
       costUsd: costUsd(response.model, response.usage),
       ms: Date.now() - started,
       stop: response.stop_reason,
+    });
+    await recordUsage({
+      kind: "transcribe",
+      model: response.model,
+      tokensIn: response.usage.input_tokens + (response.usage.cache_creation_input_tokens ?? 0) + (response.usage.cache_read_input_tokens ?? 0),
+      tokensOut: response.usage.output_tokens,
+      costUsd: costUsd(response.model, response.usage),
+      ms: Date.now() - started,
     });
     if (response.stop_reason === "refusal") return { ok: false, reason: "refused" };
     const text = response.content.map((block) => (block.type === "text" ? block.text : "")).join("");
