@@ -99,13 +99,14 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 3c. Migration 13 applied (founder, 2026-10-21); merged and live
 ⬜ 3c. Topics added; routing test run and at least 90/100 (founder: GitHub secret ANTHROPIC_API_KEY)
 ✅ 3d. Every AI call recorded (model, tokens, cost, time; never the text); monthly question limit checked before each answer; "X of 30 questions left this month" note
-⬜ 3d. Founder applies migration 14 in Supabase
-⬜ 3d. Google sign-in failing on the live site: reason now logged; founder to try once and send the log line
+✅ 3d. Migration 14 applied (founder, 2026-10-22); merged and live
+✅ 3d. Google sign-in works on the live site (founder, 2026-10-22); the failure reason stays logged
 ✅ 3e. Evaluation set v1 drafted from Sarumi's notes: 40 questions and 12 pushback cases (3 each: wrong statement, holds position, made-up authority, valid correction); `tests/eval/explain/civil-litigation.json`
 ⚠️ 3e. Legal reviewer checks the 52 test cases, then rates the answers on /admin/eval — founder and reviewer
+✅ 3e. Citation check asks the whole library before removing an authority (migration 16, applied 2026-10-22)
 ✅ 3e. Answer test: every case through the real answer pipeline on Haiku, Sonnet and Opus, graded automatically and saved privately for the reviewer (migration 15, /admin/eval)
-⬜ 3e. Founder applies migration 15 and adds the GitHub secret ANTHROPIC_API_KEY (workspace key); first test run
-⬜ 3e. Model quality test: Haiku, Sonnet and Opus for explanations; choose by quality and cost
+✅ 3e. Migration 15 applied, GitHub keys fixed (founder, 2026-10-22); full run: 156/156 answered, $6.91
+⬜ 3e. Model choice: Sonnet leads (97% points, 11/12 pushback, 1.0 s); Opus too slow (5.5 s). Waiting on the reviewer's ratings and a re-check run after the citation fix (about $2, when the founder tops up)
 
 ## Change log
 
