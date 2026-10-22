@@ -13,7 +13,7 @@ PRD LN-01 to LN-04, WS-04; Engineering Rules G-01 to G-10; System Design §2 and
   5. Otherwise Claude (`MODELS.explain`, Sonnet 5.5 until the 3e model test) gets the versioned instructions (`src/prompts/explain.ts`), the last few messages and the passages, marked as material with numbers S1, S2 … It answers in the set structure (short answer, rule, authority, application, exam tip) and cites passages as [S1].
   6. Every sentence is checked before the student sees it (`src/server/learn/answerFilter.ts`):
      - citations to passages that were not supplied are removed;
-     - a case ("A v B") or statute ("… Act / Law / Rules") found in no supplied passage, and not among the approved statutes and rules of court in the library, is replaced with "[authority removed: not found in the Lawdeck library]";
+     - a case ("A v B") or statute ("… Act / Law / Rules") found in no supplied passage, not among the approved statutes and rules of court in the library, and not found anywhere else in the approved library (whole-library lookup, migration 16; if the lookup fails, the name is removed) is replaced with "[authority removed: not found in the Lawdeck library]";
      - a quotation over 50 words is cut, unless it comes from a statute or rule of court;
      - if Claude says the passages are not enough, the answer starts "Not enough in the Lawdeck library", says what is missing and suggests a narrower question (LN-04).
   7. The checked answer is saved with its model, tokens and cost, and the passages it cites are saved as its sources.

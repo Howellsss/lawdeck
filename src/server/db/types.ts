@@ -293,6 +293,8 @@ export type Database = {
           expect: string | null;
           model: string;
           answer: string | null;
+          // Claude's wording before the citation check (migration 16).
+          raw_answer: string | null;
           not_enough: boolean | null;
           removed_authorities: number | null;
           sources: Json;
@@ -323,6 +325,7 @@ export type Database = {
           expect?: string | null;
           model: string;
           answer?: string | null;
+          raw_answer?: string | null;
           not_enough?: boolean | null;
           removed_authorities?: number | null;
           sources?: Json;
@@ -394,6 +397,11 @@ export type Database = {
           meaning_rank: number | null;
           words_rank: number | null;
         }[];
+      };
+      // Which case and statute names appear in approved library material (migration 16).
+      library_mentions: {
+        Args: { statutes: string[]; cases: string[]; course?: string };
+        Returns: { kind: "statute" | "case"; phrase: string }[];
       };
       replace_kb_passages: {
         Args: { target_item: string; passages: Json; method: ReadingMethod; quality: number; pages: number };

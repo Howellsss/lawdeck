@@ -42,6 +42,9 @@ async function Run({ params, searchParams }: PageProps<"/admin/eval/[id]">) {
   const index = caseIds.indexOf(current);
   const caseAnswers = blindOrder(current ?? "", answers.filter((a) => a.caseId === current));
   const rated = (caseId: string) => answers.filter((a) => a.caseId === caseId && !a.error).every((a) => a.rating);
+  // Authorities the citation check removed from this case's answers, so the reviewer can go to them.
+  const removed = (caseId: string) =>
+    answers.filter((a) => a.caseId === caseId).reduce((sum, a) => sum + (a.removedAuthorities ?? 0), 0);
 
   return (
     <>
@@ -71,6 +74,12 @@ async function Run({ params, searchParams }: PageProps<"/admin/eval/[id]">) {
               >
                 {caseId}
                 {rated(caseId) && <span className="sr-only"> (rated)</span>}
+                {removed(caseId) > 0 && (
+                  <span className="ml-1 text-warning">
+                    · {removed(caseId)}
+                    <span className="sr-only"> authorities removed</span>
+                  </span>
+                )}
               </Link>
             ))}
           </nav>
