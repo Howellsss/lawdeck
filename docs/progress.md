@@ -115,7 +115,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 4c. Flashcards with known and not-yet tracking (LN-07); Haiku; live trial still to run
 ⬜ 4d. Rubrics written and approved for Civil Litigation topics — legal reviewer
 ⬜ 4e. Mark my answer: typed or uploaded, structured feedback in the right panel (LN-08)
-⬜ 4f. Case and statute briefs (LN-09)
+✅ 4f. Case and statute briefs (LN-09): migration 18 applied by founder 2026-10-22; Sonnet; live trial still to run
 ⬜ 4g. Marking agreement test: 50 answers marked by Lawdeck and by the reviewer (at least 80% agreement) — legal reviewer
 
 ## Change log
