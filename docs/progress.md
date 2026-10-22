@@ -110,8 +110,8 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 
 ## Phase 4. Practice
 
-⬜ 4a. Migration 17: practice_sets, practice_items, attempts, rubrics, with two-student permission tests (founder applies the migration)
-⬜ 4b. Practice questions (multiple choice and scenario) by course and topic, from library passages only (LN-06)
+✅ 4a. Migration 17: practice_sets, practice_items, attempts, rubrics, with two-student permission tests (applied by founder 2026-10-22; merged)
+✅ 4b. Practice questions (multiple choice and scenario) by course and topic, from library passages only (LN-06); live trial still to run
 ⬜ 4c. Flashcards with known and not-yet tracking (LN-07)
 ⬜ 4d. Rubrics written and approved for Civil Litigation topics — legal reviewer
 ⬜ 4e. Mark my answer: typed or uploaded, structured feedback in the right panel (LN-08)
