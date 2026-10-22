@@ -264,6 +264,23 @@ export type Database = {
         Update: { title?: string; effective_on?: string; note?: string | null; source?: string | null };
         Relationships: [];
       };
+      // Case and statute briefs (migration 18). Owners only; never edited.
+      briefs: {
+        Row: {
+          id: string;
+          owner_id: string;
+          course_id: string | null;
+          kind: "case" | "statute";
+          name: string;
+          sections: Json;
+          sources: Json;
+          model: string | null;
+          created_at: string;
+        };
+        Insert: { course_id?: string | null; kind: "case" | "statute"; name: string; sections: Json; sources?: Json; model?: string | null };
+        Update: never;
+        Relationships: [];
+      };
       // Practice (migration 17). Owners only; rubrics are for reviewers and admins.
       practice_sets: {
         Row: {
@@ -498,6 +515,7 @@ export type Database = {
       message_role: "user" | "assistant";
       kb_item_type: KbItemType;
       practice_kind: PracticeKind;
+      brief_kind: "case" | "statute";
       review_status: ReviewStatus;
       reading_status: ReadingStatus;
       reading_method: ReadingMethod;
