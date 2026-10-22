@@ -9,7 +9,7 @@ import type { ChatSource } from "@/server/db/workspace";
 import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
 import { limitReachedMessage } from "@/lib/allowance";
 import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "./allowance";
-import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING, REMOVED_AUTHORITY } from "./answerFilter";
+import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING, REMOVED_AUTHORITY, type LibraryLookup } from "./answerFilter";
 import { redactPersonalData } from "./redact";
 
 type Db = SupabaseClient<Database>;
@@ -117,6 +117,8 @@ export type ComposedAnswer =
       used: (SearchHit & { label: number })[];
       // How many authorities the citation check removed (step 3e counts these: must be zero).
       removedAuthorities: number;
+      // Claude's wording before the check (the answer test saves it privately; the app does not).
+      raw: string;
       result: Extract<ExplainResult, { ok: true }>;
     }
   | { ok: false; reason: keyof typeof FAILURES };
@@ -143,6 +145,7 @@ export async function composeAnswer(input: {
     passageTexts: hits.map((hit) => `${hit.heading ?? ""} ${hit.text}`),
     statuteTexts: hits.filter((hit) => types.get(hit.itemId)).map((hit) => hit.text),
     recognisedTitles: recognised,
+    lookup: libraryLookup(input.db, input.courseId),
   });
   const passages: ExplainPassage[] = hits.map((hit) => ({
     label: hit.label,
@@ -154,26 +157,47 @@ export async function composeAnswer(input: {
   const turns: ExplainTurn[] = [...input.history, { role: "user", text: questionMessage(passages, input.question, input.level) }];
 
   let shown = "";
+  let raw = "";
   const show = (text: string) => {
     if (!text) return;
     shown += text;
     input.onText(text);
   };
+  // The check may ask the library before letting a sentence through, so pieces are checked one
+  // after another, in order.
+  let checking: Promise<void> = Promise.resolve();
   const result = await streamExplanation({
     turns,
     userId: input.userId,
-    onText: (text) => show(filter.push(text)),
+    onText: (text) => {
+      raw += text;
+      checking = checking.then(async () => show(await filter.push(text)));
+    },
     signal: input.signal,
     model: input.model,
   });
+  await checking;
   if (!result.ok) return { ok: false, reason: result.reason };
-  show(filter.end());
+  show(await filter.end());
   if (!shown.trim()) return { ok: false, reason: "unavailable" };
 
   const cited = filter.notEnough ? [] : citedLabels(shown).map((label) => hits.find((hit) => hit.label === label));
   const used = cited.filter((hit): hit is SearchHit & { label: number } => hit !== undefined);
   const removedAuthorities = shown.split(REMOVED_AUTHORITY).length - 1;
-  return { ok: true, shown, notEnough: filter.notEnough, used, removedAuthorities, result };
+  return { ok: true, shown, notEnough: filter.notEnough, used, removedAuthorities, raw, result };
+}
+
+// Asks the whole approved library (in this course, or all courses) which names it mentions.
+// Row-level rules apply as for search; only the names found come back, never library text.
+function libraryLookup(db: Db, courseId: string | null): LibraryLookup {
+  return async ({ statutes, cases }) => {
+    const { data, error } = await db.rpc("library_mentions", { statutes, cases, course: courseId ?? undefined });
+    if (error) {
+      console.warn("citation check lookup failed", { code: error.code });
+      return new Set();
+    }
+    return new Set(data.map((row) => row.phrase));
+  };
 }
 
 export const SEARCH_BUSY =

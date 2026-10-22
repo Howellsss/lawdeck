@@ -144,6 +144,7 @@ it("runs the answer quality test and saves it for the legal reviewer", { timeout
       expect: c.expect,
       model,
       answer: ok?.shown ?? null,
+      raw_answer: ok?.raw ?? null,
       not_enough: ok?.notEnough ?? null,
       removed_authorities: ok?.removedAuthorities ?? null,
       sources: ok ? ok.used.map((hit) => ({ label: hit.label, title: hit.itemTitle })) : [],

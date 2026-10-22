@@ -1,12 +1,14 @@
-import { describe, expect, it } from "vitest";
+import { describe, expect, it, vi } from "vitest";
 import { NOT_ENOUGH_MARKER, passagesBlock, questionMessage } from "@/prompts/explain";
 import {
   AnswerFilter,
   checkText,
+  checkWithLibrary,
   citedLabels,
   NOT_ENOUGH_HEADING,
   REMOVED_AUTHORITY,
   safeBoundary,
+  unmatchedAuthorities,
   type FilterContext,
 } from "@/server/learn/answerFilter";
 import { redactPersonalData } from "@/server/learn/redact";
@@ -68,38 +70,97 @@ describe("quote limit", () => {
 });
 
 describe("checking while streaming", () => {
-  it("only lets complete sentences through, and checks them", () => {
+  it("only lets complete sentences through, and checks them", async () => {
     const filter = new AnswerFilter(context);
-    expect(filter.push("## Short answer\nIn Okafor v. Nwo")).toBe("## Short answer\n");
-    expect(filter.push("su the court held. More")).toBe(`In ${REMOVED_AUTHORITY} the court held.`);
-    expect(filter.end()).toBe(" More");
+    expect(await filter.push("## Short answer\nIn Okafor v. Nwo")).toBe("## Short answer\n");
+    expect(await filter.push("su the court held. More")).toBe(`In ${REMOVED_AUTHORITY} the court held.`);
+    expect(await filter.end()).toBe(" More");
   });
 
   it("does not split a case name at 'v.'", () => {
     expect(safeBoundary("In Adeyemi v. Bello the")).toBe(0);
   });
 
-  it("holds an open quotation until it closes", () => {
+  it("holds an open quotation until it closes", async () => {
     const filter = new AnswerFilter(context);
-    expect(filter.push(`He said “${words(55)}. More words`)).toBe("");
-    expect(filter.push(`” there. Next`)).toBe(`He said “${words(50)} …” there.`);
+    expect(await filter.push(`He said “${words(55)}. More words`)).toBe("");
+    expect(await filter.push(`” there. Next`)).toBe(`He said “${words(50)} …” there.`);
   });
 
-  it("turns the not-enough marker into a clear heading", () => {
+  it("turns the not-enough marker into a clear heading", async () => {
     const filter = new AnswerFilter(context);
-    expect(filter.push("NOT_ENO")).toBe("");
-    const shown = filter.push("UGH_SUPPORT\nThe library has nothing on this.\n") + filter.end();
+    expect(await filter.push("NOT_ENO")).toBe("");
+    const shown = (await filter.push("UGH_SUPPORT\nThe library has nothing on this.\n")) + (await filter.end());
     expect(filter.notEnough).toBe(true);
     expect(shown).toBe(`${NOT_ENOUGH_HEADING}\nThe library has nothing on this.\n`);
     expect(shown).not.toContain(NOT_ENOUGH_MARKER);
   });
 
-  it("passes ordinary answers through unchanged", () => {
+  it("passes ordinary answers through unchanged", async () => {
     const filter = new AnswerFilter(context);
     const text = "## Short answer\nA form is filed [S2].\n## Exam tip\nRemember Adeyemi v Bello [S1].\n";
-    const shown = text.split("").map((c) => filter.push(c)).join("") + filter.end();
+    let shown = "";
+    for (const c of text.split("")) shown += await filter.push(c);
+    shown += await filter.end();
     expect(shown).toBe(text);
     expect(filter.notEnough).toBe(false);
+  });
+});
+
+// The answer test (step 3e) found real court rules removed because the few passages behind an
+// answer did not name them, though the library did. Made-up names, same shapes as those answers.
+describe("asking the whole library", () => {
+  const sentence =
+    "Under Order 5, Rule 1(2) of the High Court of Imaginary State (Civil Procedure) Rules, 2019, the claimant must file the writ with a statement of claim [S1].";
+  const inLibrary = (found: string[]) => vi.fn(async () => new Set(found));
+
+  it("names what the passages do not account for, once each", () => {
+    const keys = unmatchedAuthorities(`${sentence} Okafor v. Nwosu and Okafor v Nwosu. Adeyemi v Bello.`, context);
+    expect(keys.statutes).toEqual(["high court of imaginary state civil procedure rules"]);
+    expect(keys.cases).toEqual(["okafor v nwosu"]);
+  });
+
+  it("keeps a real authority the library names elsewhere", async () => {
+    const lookup = inLibrary(["high court of imaginary state civil procedure rules"]);
+    expect(await checkWithLibrary(sentence, { ...context, lookup })).toBe(sentence);
+    expect(lookup).toHaveBeenCalledWith({ statutes: ["high court of imaginary state civil procedure rules"], cases: [] });
+  });
+
+  it("still removes an authority the library does not have anywhere", async () => {
+    const text = "In Okafor v Nwosu the court held so. The Invented Evidence Act 2011 says so.";
+    const checked = await checkWithLibrary(text, { ...context, lookup: inLibrary([]) });
+    expect(checked).toBe(`In ${REMOVED_AUTHORITY} the court held so. The ${REMOVED_AUTHORITY} says so.`);
+  });
+
+  it("keeps only the names the library found", async () => {
+    const text = "See Okafor v Nwosu, and see Eze v Obi.";
+    const checked = await checkWithLibrary(text, { ...context, lookup: inLibrary(["eze v obi"]) });
+    expect(checked).toBe(`See ${REMOVED_AUTHORITY}, and see Eze v Obi.`);
+  });
+
+  it("removes, as before, when the library cannot be asked", async () => {
+    const warn = vi.spyOn(console, "warn").mockImplementation(() => {});
+    const lookup = vi.fn(async (): Promise<Set<string>> => {
+      throw new Error("offline");
+    });
+    expect(await checkWithLibrary("In Okafor v Nwosu it was held.", { ...context, lookup })).toBe(
+      `In ${REMOVED_AUTHORITY} it was held.`,
+    );
+    warn.mockRestore();
+  });
+
+  it("does not ask the library when the passages already account for every name", async () => {
+    const lookup = inLibrary([]);
+    expect(await checkWithLibrary("See Adeyemi v Bello [S1].", { ...context, lookup })).toBe("See Adeyemi v Bello [S1].");
+    expect(lookup).not.toHaveBeenCalled();
+  });
+
+  it("asks the library while streaming, and keeps the order of the answer", async () => {
+    const filter = new AnswerFilter({ ...context, lookup: inLibrary(["high court of imaginary state civil procedure rules"]) });
+    let shown = "";
+    for (const piece of ["## The rule\n", sentence.slice(0, 40), sentence.slice(40), " Next point."]) shown += await filter.push(piece);
+    shown += await filter.end();
+    expect(shown).toBe(`## The rule\n${sentence} Next point.`);
   });
 });
 
