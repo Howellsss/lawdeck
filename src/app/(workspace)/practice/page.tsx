@@ -40,7 +40,7 @@ async function Sets() {
                 {set.title}
               </Link>
               <span className="text-sm text-muted">
-                {formatWat(set.createdAt)} · {set.answered} of {set.questions} answered
+                {formatWat(set.createdAt)} · {set.answered} of {set.questions} {set.kind === "flashcards" ? "known" : "answered"}
               </span>
             </li>
           ))}

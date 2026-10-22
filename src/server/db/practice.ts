@@ -14,6 +14,7 @@ export type PracticeSetSummary = {
   kind: "mcq" | "scenario" | "flashcards";
   createdAt: string;
   questions: number;
+  // Questions answered, or for flashcards, cards marked "know it".
   answered: number;
 };
 
@@ -23,7 +24,10 @@ export type PracticeItemView = {
   choices: string[] | null;
   // Multiple choice already answered: the option picked and what it revealed.
   chosen: number | null;
+  // Flashcards always carry their back (the student flips the card themselves).
   reveal: PracticeReveal | null;
+  // Flashcards: "know it" (true), "not yet" (false), or not marked yet (null).
+  known: boolean | null;
 };
 
 export type PracticeSetView = {
@@ -46,7 +50,7 @@ export async function listPracticeSets(): Promise<Loaded<PracticeSetSummary[]>> 
   const sets = await supabase.from("practice_sets").select("id, title, kind, created_at").order("created_at", { ascending: false }).limit(100);
   if (sets.error) failed("practice sets", sets.error.code);
   const ids = sets.data.map((s) => s.id);
-  const items = ids.length ? await supabase.from("practice_items").select("id, set_id").in("set_id", ids) : { data: [], error: null };
+  const items = ids.length ? await supabase.from("practice_items").select("id, set_id, known").in("set_id", ids) : { data: [], error: null };
   if (items.error) failed("practice items", items.error.code);
   const itemIds = items.data.map((i) => i.id);
   const attempts = itemIds.length ? await supabase.from("attempts").select("item_id").in("item_id", itemIds) : { data: [], error: null };
@@ -62,14 +66,14 @@ export async function listPracticeSets(): Promise<Loaded<PracticeSetSummary[]>> 
         kind: s.kind,
         createdAt: s.created_at,
         questions: own.length,
-        answered: own.filter((i) => answered.has(i.id)).length,
+        answered: s.kind === "flashcards" ? own.filter((i) => i.known === true).length : own.filter((i) => answered.has(i.id)).length,
       };
     }),
   };
 }
 
 // One set with its questions. Answers stay on the server until the student answers a multiple
-// choice question or asks to see a model answer.
+// choice question or asks to see a model answer; flashcards come with their backs.
 export async function getPracticeSet(id: string): Promise<Loaded<PracticeSetView | null>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   if (!practiceSetIdSchema.safeParse(id).success) return { status: "ok", data: null };
@@ -77,9 +81,10 @@ export async function getPracticeSet(id: string): Promise<Loaded<PracticeSetView
   const set = await supabase.from("practice_sets").select("id, title, kind, course_id, created_at").eq("id", id).maybeSingle();
   if (set.error) failed("practice set", set.error.code);
   if (!set.data) return { status: "ok", data: null };
+  const isFlashcards = set.data.kind === "flashcards";
   const items = await supabase
     .from("practice_items")
-    .select("id, position, question, choices, correct_choice, answer, sources")
+    .select("id, position, question, choices, correct_choice, answer, sources, known")
     .eq("set_id", id)
     .order("position");
   if (items.error) failed("practice items", items.error.code);
@@ -101,15 +106,14 @@ export async function getPracticeSet(id: string): Promise<Loaded<PracticeSetView
         const latest = attempts.data.find((a) => a.item_id === item.id && a.choice !== null);
         const choices = parseChoices(item.choices);
         const chosen = choices && latest ? latest.choice : null;
+        const showBack = chosen !== null || isFlashcards;
         return {
           id: item.id,
           question: item.question,
           choices,
           chosen,
-          reveal:
-            chosen !== null
-              ? { answer: item.answer, correctChoice: item.correct_choice, sources: parsePracticeSources(item.sources) }
-              : null,
+          reveal: showBack ? { answer: item.answer, correctChoice: item.correct_choice, sources: parsePracticeSources(item.sources) } : null,
+          known: item.known,
         };
       }),
     },

@@ -42,9 +42,14 @@ async function callOnce(
   try {
     const stream = getClaude().messages.stream(
       {
-        model: MODELS.practice,
+        model: input.kind === "flashcards" ? MODELS.flashcards : MODELS.practice,
         max_tokens: 16_000,
-        output_config: { effort: "medium", format: { type: "json_schema", schema: PRACTICE_SCHEMA } },
+        // Flashcards are short facts: Haiku with no long thinking. Questions get Sonnet at medium effort.
+        ...(input.kind === "flashcards" ? { thinking: { type: "disabled" as const } } : {}),
+        output_config: {
+          effort: input.kind === "flashcards" ? "low" : "medium",
+          format: { type: "json_schema", schema: PRACTICE_SCHEMA },
+        },
         system: [{ type: "text", text: PRACTICE_SYSTEM, cache_control: { type: "ephemeral" } }],
         messages: [{ role: "user", content: practiceRequest(input) }],
       },
