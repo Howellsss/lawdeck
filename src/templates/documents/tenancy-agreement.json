@@ -1,0 +1,224 @@
+{
+  "slug": "tenancy-agreement",
+  "title": "Tenancy agreement",
+  "course": "property-law-practice",
+  "forums": [],
+  "ruleSource": "Formal parts of a lease and covenants in leases, as set out in the Property Law Practice Handbook 2025 and S.A Badmus' Property Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including against the Tenancy Law of Lagos State 2011.",
+  "spec": {
+    "parts": [
+      {
+        "id": "commencement",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THIS TENANCY AGREEMENT is made this ............ day of ............ 20.....\nBETWEEN {{landlord}} of {{landlordAddress}} (\"the Landlord\") of the one part\nAND\n{{tenant}} of {{tenantAddress}} (\"the Tenant\") of the other part.",
+        "required": true,
+        "why": "Commencement, date and parties with their full names and addresses. A tenancy of three years or less may be made by agreement under hand; longer needs a deed of lease. Source: Property Law Practice Handbook 2025 (formal parts of a lease); S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "operative",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "IT IS AGREED AS FOLLOWS:\n1. The Landlord lets to the Tenant ALL THAT {{premises}} situate at {{premisesAddress}} (\"the Premises\") TO HOLD unto the Tenant for a term of {{termLength}} commencing on {{startDate}} and ending on {{endDate}}.\n2. YIELDING AND PAYING the {{rentPeriod}} rent of {{rent}} clear of all deductions, payable in advance.",
+        "required": true,
+        "why": "The operative words and parcels, the habendum (certain commencement and end dates, without which a lease fails for uncertainty) and the reddendum (the rent, which must be certain and is not implied, so it is stated). Source: Property Law Practice Handbook 2025; S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "tenantCovenants",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THE TENANT COVENANTS with the Landlord as follows:\n(a) to pay the rent on the days and in the manner stated in this agreement;\n(b) not to assign, sublet, charge or otherwise part with possession of the Premises or any part of them without the written consent of the Landlord first obtained, such consent not to be unreasonably withheld;\n(c) not to make any alteration to the Premises without the written consent of the Landlord, and to restore the Premises to their original state at the end of the tenancy;\n(d) to keep the Premises in a good state of repair, fair wear and tear excepted;\n(e) to use the Premises for {{use}} purposes only;\n(f) to deliver up possession of the Premises at the end of the tenancy.",
+        "required": true,
+        "why": "The tenant's express covenants: rent, no assignment or subletting without consent, no alterations, repair, permitted use and yielding up. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base) (lease covenants); Property Law Practice Handbook 2025 (covenants in leases)."
+      },
+      {
+        "id": "landlordCovenants",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THE LANDLORD COVENANTS with the Tenant that the Tenant, paying the rent and performing the covenants in this agreement, shall have quiet possession of the Premises without disturbance by the Landlord or the Landlord's agents.",
+        "required": true,
+        "why": "The landlord's covenant for quiet enjoyment. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base); Property Law Practice Handbook 2025."
+      },
+      {
+        "id": "otherTermsText",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "If the facts include other agreed terms (for example a service charge, caution deposit or option to renew), set each out as a clause under the heading's numbering (g), (h)…, using only the facts given. If no other terms are given, return an empty text.",
+        "maxWords": 300,
+        "required": false,
+        "why": "Any further terms the parties agreed, drafted as express covenants. Source: Property Law Practice Handbook 2025 (express covenants).",
+        "heading": "OTHER TERMS"
+      },
+      {
+        "id": "proviso",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "PROVIDED ALWAYS that if the rent or any part of it is unpaid for twenty-eight days after becoming payable, or if the Tenant commits a breach of any covenant in this agreement, the Landlord may determine this tenancy and recover possession of the Premises in accordance with the law.",
+        "required": true,
+        "why": "The proviso on the tenant's default. In Lagos, recovering possession still requires the statutory notices and a court order: a landlord may not simply re-enter. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base) (proviso for re-entry, adapted). Reviewer: confirm against the Tenancy Law of Lagos State 2011."
+      },
+      {
+        "id": "execution",
+        "kind": "fixed",
+        "align": "left",
+        "text": "IN WITNESS OF WHICH the parties have signed this agreement the day and year first above written.\n\nSIGNED by the Landlord\n........................................\n{{landlord}}\nIN THE PRESENCE OF:\nName: ....................\nAddress: ....................\nOccupation: ....................\nSignature: ....................\n\nSIGNED by the Tenant\n........................................\n{{tenant}}\nIN THE PRESENCE OF:\nName: ....................\nAddress: ....................\nOccupation: ....................\nSignature: ....................",
+        "required": true,
+        "why": "Testimonium, execution and attestation. A tenancy agreement is signed under hand, not sealed as a deed. Source: Property Law Practice Handbook 2025; S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "preparedBy",
+        "kind": "fixed",
+        "align": "left",
+        "text": "PREPARED BY:\n{{preparerName}}\n{{preparerAddress}}",
+        "required": false,
+        "why": "Franking: the legal practitioner who prepared the agreement. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "landlord",
+        "label": "Landlord",
+        "type": "party",
+        "required": true,
+        "question": "Who is letting the premises? Full name, or the company's registered name.",
+        "placeholder": "LANDLORD",
+        "repeatable": false
+      },
+      {
+        "id": "landlordAddress",
+        "label": "Landlord's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the landlord live or have its registered office?",
+        "placeholder": "LANDLORD’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "tenant",
+        "label": "Tenant",
+        "type": "party",
+        "required": true,
+        "question": "Who is taking the premises?",
+        "placeholder": "TENANT",
+        "repeatable": false
+      },
+      {
+        "id": "tenantAddress",
+        "label": "Tenant's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the tenant live now?",
+        "placeholder": "TENANT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "premises",
+        "label": "The premises",
+        "type": "text",
+        "required": true,
+        "question": "What is being let? For example: two-bedroom flat on the first floor.",
+        "placeholder": "DESCRIPTION OF THE PREMISES",
+        "repeatable": false
+      },
+      {
+        "id": "premisesAddress",
+        "label": "Where the premises are",
+        "type": "address",
+        "required": true,
+        "question": "Where are the premises situate?",
+        "placeholder": "ADDRESS OF THE PREMISES",
+        "repeatable": false
+      },
+      {
+        "id": "termLength",
+        "label": "Length of the tenancy",
+        "type": "text",
+        "required": true,
+        "question": "How long is the tenancy? A tenancy agreement is for three years or less; longer needs a deed of lease. For example: two years.",
+        "placeholder": "TERM",
+        "repeatable": false
+      },
+      {
+        "id": "startDate",
+        "label": "Start date",
+        "type": "date",
+        "required": true,
+        "question": "When does the tenancy start?",
+        "placeholder": "START DATE",
+        "repeatable": false
+      },
+      {
+        "id": "endDate",
+        "label": "End date",
+        "type": "date",
+        "required": true,
+        "question": "When does it end?",
+        "placeholder": "END DATE",
+        "repeatable": false
+      },
+      {
+        "id": "rentPeriod",
+        "label": "How often rent is paid",
+        "type": "text",
+        "required": true,
+        "question": "Is rent yearly, half-yearly or monthly?",
+        "placeholder": "RENT PERIOD",
+        "repeatable": false
+      },
+      {
+        "id": "rent",
+        "label": "Rent",
+        "type": "money",
+        "required": true,
+        "question": "What is the rent, in figures and words? For example: N1,500,000.00 (One Million Five Hundred Thousand Naira).",
+        "placeholder": "RENT",
+        "repeatable": false
+      },
+      {
+        "id": "use",
+        "label": "Permitted use",
+        "type": "text",
+        "required": true,
+        "question": "What may the premises be used for? For example: residential.",
+        "placeholder": "PERMITTED USE",
+        "repeatable": false
+      },
+      {
+        "id": "otherTerms",
+        "label": "Other agreed terms",
+        "type": "longText",
+        "required": false,
+        "question": "Anything else the parties agreed, such as a service charge, caution deposit or renewal option.",
+        "placeholder": "OTHER TERMS",
+        "repeatable": false
+      },
+      {
+        "id": "preparerName",
+        "label": "Prepared by",
+        "type": "party",
+        "required": false,
+        "question": "Which legal practitioner prepared the agreement?",
+        "placeholder": "SOLICITOR’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "preparerAddress",
+        "label": "Solicitor's address and contacts",
+        "type": "address",
+        "required": false,
+        "question": "The solicitor's address, email and phone number.",
+        "placeholder": "SOLICITOR’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [
+      "the Premises"
+    ],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5g)."
+      }
+    ]
+  }
+}

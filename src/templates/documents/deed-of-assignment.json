@@ -1,0 +1,207 @@
+{
+  "slug": "deed-of-assignment",
+  "title": "Deed of assignment (statutory right of occupancy)",
+  "course": "property-law-practice",
+  "forums": [
+    "lagos-lands-registry"
+  ],
+  "ruleSource": "Parts of a deed and the deed of assignment as set out in S.A Badmus' Property Law drafts (Lawdeck knowledge base) and the Property Law Practice Handbook 2025 (Land Use Act consent requirement). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "commencement",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THIS DEED OF ASSIGNMENT is made this ............ day of ............ 20.....\nBETWEEN {{assignor}} of {{assignorAddress}} (\"the Assignor\") of the one part\nAND\n{{assignee}} of {{assigneeAddress}} (\"the Assignee\") of the other part.",
+        "required": true,
+        "why": "The introductory part: commencement, date and the parties with their status. Two parties are 'of the one part' and 'of the other part' (not 'first part'). The date is the date of execution. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base); Property Law Practice Handbook 2025."
+      },
+      {
+        "id": "recitals",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THIS DEED RECITES AS FOLLOWS:\n1. The Assignor is the holder of the Statutory Right of Occupancy over the property described in this deed by virtue of {{titleDocument}}.\n2. The Assignor has agreed to assign to the Assignee the unexpired residue of the term granted by the Right of Occupancy for the consideration stated in this deed.",
+        "required": true,
+        "why": "Short recitals: the root of title, in whom it is vested, and the agreement to assign. Recitals should be limited to what explains the operative part. Source: Property Law Practice Handbook 2025 (recitals); S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "operative",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THIS DEED WITNESSES AS FOLLOWS:\nIn consideration of the sum of {{consideration}} paid by the Assignee to the Assignor (the receipt of which the Assignor acknowledges), the Assignor as BENEFICIAL OWNER assigns to the Assignee ALL THAT {{propertyDescription}} situate at {{propertyAddress}}, covered by {{titleDocument}}, and more particularly described in the Schedule to this deed, together with all rights, easements and things appurtenant to it, TO HOLD UNTO the Assignee for the residue of the term unexpired on the Right of Occupancy, free from all encumbrances and subject to the provisions of the Land Use Act.",
+        "required": true,
+        "why": "The operative part: testatum (without 'now'), consideration and receipt clauses, the capacity in which the assignor conveys (beneficial owner), the words of grant, the ALL THAT and parcels clauses, and the habendum. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base) (deed of assignment); Property Law Practice Handbook 2025."
+      },
+      {
+        "id": "covenants",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "THE ASSIGNEE COVENANTS with the Assignor to keep the Assignor indemnified against all proceedings, costs, claims and expenses on account of any omission to pay rent or to observe and perform any of the covenants and conditions contained in the Certificate of Occupancy.\nTHE ASSIGNOR ACKNOWLEDGES the right of the Assignee to the production of the documents of title and undertakes with the Assignee for their safe custody.",
+        "required": true,
+        "why": "The miscellaneous part: the indemnity covenant and the acknowledgement for production and undertaking for safe custody of title documents. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "testimonium",
+        "kind": "fixed",
+        "align": "left",
+        "text": "IN WITNESS OF WHICH the parties have executed this deed in the manner below the day and year first above written.",
+        "required": true,
+        "why": "The testimonium connects the parties to the execution. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "schedule",
+        "kind": "fixed",
+        "align": "left",
+        "text": "ALL THAT {{propertyDescription}} situate at {{propertyAddress}}, as shown on Survey Plan No. {{surveyPlan}} prepared by a licensed surveyor and attached to this deed.",
+        "required": true,
+        "why": "Describes the property in detail, with the survey plan prepared by a licensed surveyor. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base); Property Law Practice Handbook 2025.",
+        "heading": "THE SCHEDULE"
+      },
+      {
+        "id": "execution",
+        "kind": "fixed",
+        "align": "left",
+        "text": "SIGNED, SEALED AND DELIVERED by the Assignor\n........................................\n{{assignor}}\nIN THE PRESENCE OF:\nName: ....................\nAddress: ....................\nOccupation: ....................\nSignature: ....................\n\nSIGNED, SEALED AND DELIVERED by the Assignee\n........................................\n{{assignee}}\nIN THE PRESENCE OF:\nName: ....................\nAddress: ....................\nOccupation: ....................\nSignature: ....................",
+        "required": true,
+        "why": "Execution (signed, sealed and delivered, without 'the within named') and attestation. A company, an attorney, a family or an illiterate or blind party executes differently: adjust this part by hand. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base) (execution clauses); Property Law Practice Handbook 2025."
+      },
+      {
+        "id": "consent",
+        "kind": "fixed",
+        "align": "left",
+        "text": "I CONSENT TO THE ABOVE TRANSACTION THIS ............ DAY OF ............ 20.....\n........................................\nGOVERNOR OF LAGOS STATE",
+        "required": true,
+        "why": "The Governor's consent clause: an alienation of a statutory right of occupancy needs the Governor's consent, and leaving out provision for it is a material omission. Source: Property Law Practice Handbook 2025 (Governor's consent); S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "preparedBy",
+        "kind": "fixed",
+        "align": "left",
+        "text": "PREPARED BY:\n{{preparerName}}\n{{preparerFirm}}\n{{preparerAddress}}",
+        "required": true,
+        "why": "Franking: the legal practitioner who prepared the deed. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "assignor",
+        "label": "Assignor",
+        "type": "party",
+        "required": true,
+        "question": "Who is assigning (selling) the property? Full name, or the company's registered name.",
+        "placeholder": "ASSIGNOR",
+        "repeatable": false
+      },
+      {
+        "id": "assignorAddress",
+        "label": "Assignor's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the assignor live or have its registered office?",
+        "placeholder": "ASSIGNOR’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "assignee",
+        "label": "Assignee",
+        "type": "party",
+        "required": true,
+        "question": "Who is taking (buying) the property? Full name, or the company's registered name.",
+        "placeholder": "ASSIGNEE",
+        "repeatable": false
+      },
+      {
+        "id": "assigneeAddress",
+        "label": "Assignee's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the assignee live or have its registered office?",
+        "placeholder": "ASSIGNEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "consideration",
+        "label": "Consideration",
+        "type": "money",
+        "required": true,
+        "question": "What is the price, in figures and words? For example: N25,000,000.00 (Twenty-Five Million Naira).",
+        "placeholder": "CONSIDERATION",
+        "repeatable": false
+      },
+      {
+        "id": "propertyDescription",
+        "label": "The property",
+        "type": "text",
+        "required": true,
+        "question": "What is the property? For example: block of six flats, or parcel of land measuring 600 square metres.",
+        "placeholder": "DESCRIPTION OF THE PROPERTY",
+        "repeatable": false
+      },
+      {
+        "id": "propertyAddress",
+        "label": "Where the property is",
+        "type": "address",
+        "required": true,
+        "question": "Where is the property situate?",
+        "placeholder": "ADDRESS OF THE PROPERTY",
+        "repeatable": false
+      },
+      {
+        "id": "titleDocument",
+        "label": "Title document",
+        "type": "text",
+        "required": true,
+        "question": "What is the assignor's title? For example: Certificate of Occupancy No. ... dated ... registered as No. ... at page ... in volume ... at the Lands Registry, Lagos.",
+        "placeholder": "TITLE DOCUMENT",
+        "repeatable": false
+      },
+      {
+        "id": "surveyPlan",
+        "label": "Survey plan number",
+        "type": "text",
+        "required": false,
+        "question": "What is the number of the survey plan prepared by a licensed surveyor?",
+        "placeholder": "SURVEY PLAN NO.",
+        "repeatable": false
+      },
+      {
+        "id": "preparerName",
+        "label": "Prepared by",
+        "type": "party",
+        "required": true,
+        "question": "Which legal practitioner prepared the deed?",
+        "placeholder": "SOLICITOR’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "preparerFirm",
+        "label": "Solicitor's firm",
+        "type": "party",
+        "required": false,
+        "question": "Which firm is the solicitor in?",
+        "placeholder": "FIRM",
+        "repeatable": false
+      },
+      {
+        "id": "preparerAddress",
+        "label": "Solicitor's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The solicitor's address, email and phone number.",
+        "placeholder": "SOLICITOR’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [
+      "the Assignor",
+      "the Assignee"
+    ],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5g)."
+      }
+    ]
+  }
+}

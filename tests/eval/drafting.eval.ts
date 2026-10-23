@@ -42,7 +42,7 @@ describe("drafting test", () => {
     const all = narrative.map((part) => text(part.id)).join("\n");
     const words = (s: string) => s.split(/\s+/).filter(Boolean).length;
     const realDetails = ["Adeyemi", "Okafor", "Bello"];
-    const sums = [...all.matchAll(/(?:N|₦)\s?[\d,]+(?:\.\d+)?/g)].map((m) => m[0].replace(/\s/g, ""));
+    const sums = [...all.matchAll(/(?:N|₦)\s?\d{1,3}(?:,\d{3})*(?:\.\d+)?/g)].map((m) => m[0].replace(/\s/g, ""));
 
     const checks: [string, boolean][] = [
       ["every narrative part written", narrative.every((part) => text(part.id).trim().length > 0)],
@@ -51,7 +51,7 @@ describe("drafting test", () => {
       ["no real name or address in the text", realDetails.every((name) => !all.includes(name))],
       ["the missing address left as its stand-in", all.includes("{{defendantAddress}}")],
       ["no case, statute, section, rule or order named", !AUTHORITY.test(all)],
-      [`only the given sum (${sums.join(", ") || "none written"})`, sums.every((sum) => sum === "N2,350,000")],
+      [`only the given sum (${sums.join(", ") || "none written"})`, sums.every((sum) => Number(sum.replace(/[^\d.]/g, "")) === 2_350_000)],
       [`back within 30 seconds (${seconds.toFixed(1)} s)`, seconds <= 30],
     ];
     // A change by instruction on the draft just written.
