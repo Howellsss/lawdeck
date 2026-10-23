@@ -875,6 +875,8 @@ export type Database = {
           words_rank: number | null;
         }[];
       };
+      record_download: { Args: { kind: "document_docx" | "study_export" }; Returns: undefined };
+      unusual_activity: { Args: { minutes?: number }; Returns: { metric: string; value: number }[] };
       record_ai_usage: {
         Args: {
           kind: string;
