@@ -8,7 +8,8 @@ import { useSidebar } from "./sidebarContext";
 
 const row = "flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill";
 
-// Bottom of the sidebar: "Sign in" for visitors; the student's email and "Sign out" once signed in.
+// Bottom of the sidebar: "Sign in" for visitors; the student's email (linking to their Account page)
+// and "Sign out" once signed in.
 export function AccountButton({ account }: { account: Account | null }) {
   const { collapsed, onNavigate } = useSidebar();
   const label = (text: string) => <span className={collapsed ? "sr-only" : "truncate"}>{text}</span>;
@@ -24,10 +25,15 @@ export function AccountButton({ account }: { account: Account | null }) {
 
   return (
     <div className={`flex min-w-0 flex-1 items-center gap-1 ${collapsed ? "flex-col" : ""}`}>
-      <p className={`flex min-w-0 flex-1 items-center gap-3 px-2 text-[15px] ${collapsed ? "justify-center" : ""}`}>
+      <Link
+        href="/account"
+        onClick={onNavigate}
+        title="Account"
+        className={`${row} min-w-0 flex-1 px-2 ${collapsed ? "justify-center" : ""}`}
+      >
         <Avatar letter={account.email.charAt(0).toUpperCase() || "L"} />
         {label(account.email)}
-      </p>
+      </Link>
       <form action={signOut}>
         <button
           type="submit"
