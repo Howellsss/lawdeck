@@ -915,6 +915,8 @@ export type Database = {
       redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
       pilot_metrics: { Args: { weeks?: number }; Returns: { week_start: string; metric: string; value: number }[] };
       pilot_summary: { Args: Record<string, never>; Returns: { metric: string; value: number | null }[] };
+      record_download: { Args: { kind: "document_docx" | "study_export" }; Returns: undefined };
+      unusual_activity: { Args: { minutes?: number }; Returns: { metric: string; value: number }[] };
       record_ai_usage: {
         Args: {
           kind: string;

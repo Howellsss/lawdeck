@@ -6,7 +6,16 @@ import { StateMessage } from "@/components/ui/StateMessage";
 // Standard error screen (rule I-01): a plain message and a next step, never a blank page.
 export default function WorkspaceError({ error, retry }: { error: unknown; retry: () => void }) {
   useEffect(() => {
-    console.error("Workspace error", { name: (error as Error)?.name });
+    const err = error as { name?: string; message?: string; digest?: string } | null;
+    console.error("Workspace error", { name: err?.name });
+    // Errors from the server (with a digest) are already reported there; report browser ones (step 7e).
+    if (err?.digest) return;
+    const report = JSON.stringify({ type: err?.name ?? "Error", message: String(err?.message ?? "").slice(0, 1000), path: window.location.pathname });
+    try {
+      navigator.sendBeacon("/api/error-report", new Blob([report], { type: "application/json" }));
+    } catch {
+      // Reporting must never get in the student's way.
+    }
   }, [error]);
 
   return (

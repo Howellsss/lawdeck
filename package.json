@@ -14,6 +14,7 @@
     "test:permissions": "vitest run --config vitest.permissions.config.mts",
     "eval:retrieval": "vitest run --config vitest.eval.config.mts tests/eval/retrieval.eval.ts",
     "job:archive": "vitest run --config vitest.jobs.config.mts jobs/archive-originals.job.ts",
+    "job:unusual-access": "vitest run --config vitest.jobs.config.mts jobs/unusual-access.job.ts",
     "eval:explain": "vitest run --config vitest.jobs.config.mts jobs/explain-eval.job.ts",
     "eval:routing": "vitest run --config vitest.eval.config.mts tests/eval/routing.eval.ts",
     "eval:drafting": "vitest run --config vitest.eval.config.mts tests/eval/drafting.eval.ts",

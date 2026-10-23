@@ -4,9 +4,11 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 const ID = "aaaaaaaa-0000-4000-8000-000000000001";
 const account = vi.fn();
 const loadSheet = vi.fn();
+const recordDownload = vi.fn();
 vi.mock("server-only", () => ({}));
 vi.mock("@/server/auth/session", () => ({ getCurrentAccount: account }));
 vi.mock("@/server/exports/load", () => ({ loadSheet, exportFileName: (t: string) => t }));
+vi.mock("@/server/monitoring/downloads", () => ({ recordDownload }));
 const { GET } = await import("@/app/api/exports/[kind]/[id]/route");
 
 const call = (kind: string, id: string, query = "") =>
@@ -14,6 +16,7 @@ const call = (kind: string, id: string, query = "") =>
 
 beforeEach(() => {
   account.mockReset().mockResolvedValue({ id: "me" });
+  recordDownload.mockReset();
   loadSheet.mockReset().mockResolvedValue({ status: "ok", data: { title: "Notes", subtitle: "s", blocks: [] } });
 });
 
@@ -22,6 +25,7 @@ describe("downloading a study sheet", () => {
     account.mockResolvedValue(null);
     expect((await call("chat", ID)).status).toBe(401);
     expect(loadSheet).not.toHaveBeenCalled();
+    expect(recordDownload).not.toHaveBeenCalled();
   });
 
   it("refuses unknown kinds and malformed ids before reading anything", async () => {
@@ -38,6 +42,8 @@ describe("downloading a study sheet", () => {
   it("sends the student's own work as a private Word file", async () => {
     const response = await call("practice", ID, "?notKnown=1");
     expect(response.status).toBe(200);
+    // Each export is counted for the hourly unusual-access check (step 7e).
+    expect(recordDownload).toHaveBeenCalledWith("study_export");
     expect(loadSheet).toHaveBeenCalledWith({ kind: "practice", id: ID, notKnown: true });
     expect(response.headers.get("Content-Disposition")).toBe('attachment; filename="Notes.docx"');
     expect(response.headers.get("Cache-Control")).toBe("private, no-store");
