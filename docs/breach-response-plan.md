@@ -73,6 +73,7 @@ Answer these questions, in the log:
 - **What data?** Use the table above. Was any of it about third parties, such as names in drafted documents?
 - **How many people?** Count affected accounts from the database: rows by `owner_id` in the affected table, over the affected time.
 - **Since when, until when?** Use Vercel logs, Supabase logs (API, Auth, Storage) and GitHub history.
+- **Was an exposed key used?** Supabase → Logs → API: filter to the time the key was exposed until it was replaced, and look at requests made with that key. Service-role requests show the role `service_role`. Lawdeck's own admin jobs run only from GitHub Actions, so compare their times with GitHub → Actions; anything else is not Lawdeck. Anthropic and Voyage show usage per key in their dashboards.
 - **How?** Which route, setting or person.
 - **Risk to people:** could it lead to harm such as embarrassment, fraud or discrimination? Is the data easy to misuse (emails and names) or hard (search times)?
 
@@ -106,6 +107,7 @@ The answers decide step 3.
   - database rule problems go in `tests/permissions/sql`;
   - server action or route problems go in `tests/unit/serverGuards.test.ts` or the permission tests;
   - leaked keys go to GitHub push protection, which is on.
+- When the cause was a person rather than code (for example a key shown in a screenshot or pasted into a chat), the fix is a written habit added to this plan's "Habits" list, plus a technical guard where one exists.
 - Fix it through the normal pull request with all checks green. Never weaken a test or check to get it out faster.
 
 ### 5. Record (within 2 weeks)
@@ -119,6 +121,12 @@ Write up `docs/incidents/YYYY-MM-DD-short-name.md`. Keep it free of personal dat
 - the decisions taken and by whom;
 - the test added;
 - what to change in this plan.
+
+## Habits that prevent breaches
+
+- Never screenshot, screen-share or paste a settings page that shows a key: Vercel environment variables, Supabase API keys, or the Anthropic and Voyage dashboards. Hide the value first, or crop it out.
+- Keys live only in Vercel and GitHub's encrypted settings, and in a password manager. Never in chats, emails or documents.
+- Use two-step sign-in on Supabase, Vercel, GitHub, Google, Anthropic and Voyage.
 
 ## Incident log template (copy into a private note at once)
 
