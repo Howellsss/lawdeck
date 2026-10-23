@@ -12,7 +12,12 @@ export function resetDay(now: Date = new Date()): string {
   return `1 ${next.toLocaleString("en-GB", { month: "long" })}`;
 }
 
+// The closed pilot (Phase 8): while invite-only is on, students without an invite code have 0 questions.
+export const CLOSED_PILOT_MESSAGE =
+  "Lawdeck is in a closed pilot. If you have an invite code, enter it on your Account page to start.";
+
 export function limitReachedMessage(a: Allowance, now: Date = new Date()): string {
+  if (a.limit === 0) return CLOSED_PILOT_MESSAGE;
   return `You’ve used all ${a.limit} questions for this month. You can ask again from ${resetDay(now)}.`;
 }
 

@@ -151,6 +151,13 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ 7j. Library, rubrics and templates for all five courses loaded and approved: ⚠️ founder and reviewers
 ⬜ 7k. Full evaluation set (150+ questions, 30 drafting requests) passes all launch gates: ⚠️ reviewer, then AI spend approval
 
+### Phase 8. Closed pilot
+⬜ 8.1 Invite 10–20 students, then a wider cohort: invitations built (Admin → Pilot; migration 32 to apply); ⚠️ running the pilot needs AI funding (funding request, 2026-10-23)
+⬜ 8.2 Weekly review of problem reports, evaluation results and costs: Pilot page built; weekly use during the pilot
+⬜ 8.3 Measure weekly active students, messages and cost per student, marking agreement, document use: Pilot page built
+⬜ 8.4 Interview pilot students on value and price: price question built; interview guide written
+⬜ 8.5 Prepare the Council of Legal Education demonstration: demonstration pack written
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
@@ -241,3 +248,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 6f-2 merged; Phase 6 complete (exit checklist met). Phase 7 started; founder: no paid upgrades yet. Step 7c approved and built: 5 wrong passwords for one email in 15 minutes pauses sign-in for 15 minutes; sign-up, reset and resend limited to 5 per email and 20 per internet address an hour. Only scrambled (SHA-256) emails and addresses kept, for a day. Migration 29; 15 database checks. No AI, no cost, no new library.
 - 2026-10-23: Step 7g approved and built: security review (docs/security-review.md). Browser security headers on every page (no framing by other sites, no file-type guessing, secure connections only); content security policy in report-only mode with a report address. Migration 30 (approved): visitors lose read permission on search_events (nothing was exposed). Reviewer status changes now check the role on the server. New automatic checks: every table has row-level security, every owner-rights function fixes its search path, visitors can read no table, and every server action and route checks sign-in and input. No secrets found in the code or its history. No AI, no cost, no new library.
 - 2026-10-23: Step 7g merged (migration 30 applied by founder). Step 7f approved (founder: lead and data protection contact; with a practice drill) and written: docs/breach-response-plan.md (contain, assess, notify the NDPC within 72 hours and students without undue delay, fix with a test, record), with a data map, key-rotation table and incident log template. No code, no cost.
+- 2026-10-23: Funding request written for the founder's finance review: about $390 (₦546,000 at ₦1,400 per $) for the remaining paid work and a two-month pilot, plus the lawyer's fee. Phase 8 pilot tools approved (founder: all six) and built: invite-only mode with invite codes (students without a code have no questions or scans), the admin Pilot page (weekly measures, cost per student in dollars and naira, week-4 retention, price answers, open reports), and a one-time price question for pilot students. Migration 32; 33 database checks. Interview guide, Council demonstration pack and decision template written as documents. No AI, no cost, no new library.

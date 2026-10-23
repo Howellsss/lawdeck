@@ -109,6 +109,41 @@ export type Database = {
         Relationships: [];
       };
       // Report a problem (migration 28). Students see their own; reviewers see all and resolve them.
+      // The closed pilot (migration 32).
+      pilot_settings: {
+        Row: { id: boolean; invite_only: boolean; price_ngn: number | null; price_question_open: boolean; updated_at: string };
+        Insert: never;
+        Update: { invite_only?: boolean; price_ngn?: number | null; price_question_open?: boolean };
+        Relationships: [];
+      };
+      invite_codes: {
+        Row: {
+          id: string;
+          code: string;
+          label: string;
+          max_uses: number;
+          uses: number;
+          expires_at: string | null;
+          disabled: boolean;
+          created_by: string | null;
+          created_at: string;
+        };
+        Insert: { code: string; label: string; max_uses?: number; expires_at?: string | null };
+        Update: { disabled?: boolean };
+        Relationships: [];
+      };
+      invite_redemptions: {
+        Row: { code_id: string; owner_id: string; created_at: string };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      price_answers: {
+        Row: { owner_id: string; price_ngn: number; answer: "yes" | "maybe" | "no"; created_at: string };
+        Insert: { price_ngn: number; answer: "yes" | "maybe" | "no" };
+        Update: never;
+        Relationships: [];
+      };
       problem_reports: {
         Row: {
           id: string;
@@ -171,6 +206,7 @@ export type Database = {
           plan_id: string | null;
           courses: string[];
           upload_notice_accepted_at: string | null;
+          pilot_access_at: string | null;
         };
         Insert: never;
         Update: {
@@ -875,6 +911,10 @@ export type Database = {
           words_rank: number | null;
         }[];
       };
+      has_pilot_access: { Args: Record<string, never>; Returns: boolean };
+      redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
+      pilot_metrics: { Args: { weeks?: number }; Returns: { week_start: string; metric: string; value: number }[] };
+      pilot_summary: { Args: Record<string, never>; Returns: { metric: string; value: number | null }[] };
       record_ai_usage: {
         Args: {
           kind: string;
