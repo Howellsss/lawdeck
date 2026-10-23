@@ -54,3 +54,15 @@ begin
   perform test.check(extra is null, 'visitors can run only the sign-in limits and the takedown form' || coalesce(' (also: ' || extra || ')', ''));
 end;
 $$;
+
+-- 5. Trigger functions cannot be called by anyone; they only run when rows change (migration 33).
+do $$
+declare callable text;
+begin
+  select string_agg(p.proname, ', ' order by p.proname) into callable
+    from pg_proc p join pg_namespace n on n.oid = p.pronamespace
+   where n.nspname = 'public' and p.prorettype = 'trigger'::regtype
+     and (has_function_privilege('anon', p.oid, 'execute') or has_function_privilege('authenticated', p.oid, 'execute'));
+  perform test.check(callable is null, 'trigger functions cannot be called directly' || coalesce(' (callable: ' || callable || ')', ''));
+end;
+$$;

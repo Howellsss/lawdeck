@@ -10,20 +10,22 @@ import { briefSheet, chatSheet, practiceSheet, type StudySheet } from "./sheet";
 // read checks sign-in; row-level security returns the student's own rows only, so anyone else's
 // id is simply "not found".
 export async function loadSheet(request: ExportRequest): Promise<Loaded<StudySheet | null>> {
-  const when = `exported ${formatWat(new Date())}`;
+  // Read the clock only after the sign-in check (the reads below), so Next.js never tries to
+  // pre-build this page with a fixed time.
+  const when = () => `exported ${formatWat(new Date())}`;
   if (request.kind === "chat") {
     const result = await getChat(request.id);
     if (result.status !== "ok") return result;
-    return { status: "ok", data: result.data ? chatSheet(result.data.chat, result.data.messages, when) : null };
+    return { status: "ok", data: result.data ? chatSheet(result.data.chat, result.data.messages, when()) : null };
   }
   if (request.kind === "brief") {
     const result = await getBrief(request.id);
     if (result.status !== "ok") return result;
-    return { status: "ok", data: result.data ? briefSheet(result.data, when) : null };
+    return { status: "ok", data: result.data ? briefSheet(result.data, when()) : null };
   }
   const result = await getPracticeSet(request.id);
   if (result.status !== "ok") return result;
-  return { status: "ok", data: result.data ? practiceSheet(result.data, when, request.notKnown) : null };
+  return { status: "ok", data: result.data ? practiceSheet(result.data, when(), request.notKnown) : null };
 }
 
 // Where each kind lives in the workspace, for "Back" links.
