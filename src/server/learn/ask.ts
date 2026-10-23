@@ -1,15 +1,32 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { questionMessage, type AnswerLevel, type ExplainPassage } from "@/prompts/explain";
-import { streamExplanation, type ExplainResult, type ExplainTurn } from "@/server/ai/explain";
+import {
+  questionMessage,
+  type AnswerLevel,
+  type ExplainPassage,
+} from "@/prompts/explain";
+import {
+  streamExplanation,
+  type ExplainResult,
+  type ExplainTurn,
+} from "@/server/ai/explain";
 import type { ExplainModel } from "@/server/ai/models";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
-import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
+import { searchForAnswer, type SearchHit } from "@/server/retrieval/search";
 import { limitReachedMessage } from "@/lib/allowance";
-import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "./allowance";
-import { AnswerFilter, citedLabels, NOT_ENOUGH_HEADING, REMOVED_AUTHORITY } from "./answerFilter";
+import {
+  ALLOWANCE_UNAVAILABLE,
+  getAllowance,
+  hasQuestionsLeft,
+} from "./allowance";
+import {
+  AnswerFilter,
+  citedLabels,
+  NOT_ENOUGH_HEADING,
+  REMOVED_AUTHORITY,
+} from "./answerFilter";
 import { filterContextFor } from "./filterContext";
 import { redactPersonalData } from "./redact";
 
@@ -24,17 +41,26 @@ export type SourceSummary = ChatSource;
 // One line of the answer stream (newline-delimited JSON).
 export type AnswerEvent =
   | { type: "text"; text: string }
-  | { type: "done"; messageId: string; text: string; sources: SourceSummary[]; notEnough: boolean; level: AnswerLevel }
+  | {
+      type: "done";
+      messageId: string;
+      text: string;
+      sources: SourceSummary[];
+      notEnough: boolean;
+      level: AnswerLevel;
+    }
   | { type: "error"; message: string };
 
 export const NO_MATERIAL_TEXT = `${NOT_ENOUGH_HEADING}
 The library has no approved material that matches this question yet, so Lawdeck won't guess. Try a narrower question, name the topic you mean, or choose the course it belongs to.`;
 
 const FAILURES = {
-  no_key: "Answers are not switched on yet: the Claude key is missing on the server.",
+  no_key:
+    "Answers are not switched on yet: the Claude key is missing on the server.",
   busy: "Lawdeck is busy right now. Please try again in a minute.",
   refused: "Lawdeck can't answer that question. Try asking it a different way.",
-  unavailable: "Lawdeck could not reach the answer service. Please try again in a minute.",
+  unavailable:
+    "Lawdeck could not reach the answer service. Please try again in a minute.",
   cancelled: "The answer was stopped.",
 } as const;
 
@@ -51,13 +77,20 @@ export async function answerQuestion(input: {
   signal?: AbortSignal;
 }): Promise<void> {
   const { db, send } = input;
-  const chat = await db.from("conversations").select("id, title, course_id").eq("id", input.chatId).maybeSingle();
-  if (chat.error || !chat.data) return send({ type: "error", message: "That chat could not be found." });
+  const chat = await db
+    .from("conversations")
+    .select("id, title, course_id, use_uploads")
+    .eq("id", input.chatId)
+    .maybeSingle();
+  if (chat.error || !chat.data)
+    return send({ type: "error", message: "That chat could not be found." });
 
   // Rule K-01: the monthly limit is checked before anything is saved or any AI is called.
   const allowance = await getAllowance(db);
-  if (!allowance) return send({ type: "error", message: ALLOWANCE_UNAVAILABLE });
-  if (!hasQuestionsLeft(allowance)) return send({ type: "error", message: limitReachedMessage(allowance) });
+  if (!allowance)
+    return send({ type: "error", message: ALLOWANCE_UNAVAILABLE });
+  if (!hasQuestionsLeft(allowance))
+    return send({ type: "error", message: limitReachedMessage(allowance) });
 
   const earlier = await db
     .from("messages")
@@ -65,28 +98,63 @@ export async function answerQuestion(input: {
     .eq("conversation_id", input.chatId)
     .order("created_at", { ascending: false })
     .limit(HISTORY_MESSAGES);
-  if (earlier.error) return send({ type: "error", message: "The chat could not be loaded. Please try again." });
+  if (earlier.error)
+    return send({
+      type: "error",
+      message: "The chat could not be loaded. Please try again.",
+    });
 
   const asked = await db.from("messages").insert({
     conversation_id: input.chatId,
     role: "user",
     content: { text: input.question, level: input.level },
   });
-  if (asked.error) return send({ type: "error", message: "Your question was not saved. Please try again." });
+  if (asked.error)
+    return send({
+      type: "error",
+      message: "Your question was not saved. Please try again.",
+    });
   if (chat.data.title === "New chat") {
-    await db.from("conversations").update({ title: titleFrom(input.question) }).eq("id", input.chatId);
+    await db
+      .from("conversations")
+      .update({ title: titleFrom(input.question) })
+      .eq("id", input.chatId);
   }
 
   // Rule G-06: nothing that looks like an email address or phone number leaves Lawdeck.
   const question = redactPersonalData(input.question);
-  const found = await searchLibrary({ question, courseId: chat.data.course_id, includePending: false });
+  // The student's own Ready uploads join the library unless this chat has them turned off (6c).
+  const found = await searchForAnswer({
+    question,
+    courseId: chat.data.course_id,
+    includePending: false,
+    useUploads: chat.data.use_uploads,
+  });
   if (!found.ok) return send({ type: "error", message: found.message });
   const unsure = searchUnsure(found);
   if (unsure) return send({ type: "error", message: unsure });
   if (found.hits.length === 0) {
-    const saved = await saveAnswer(db, input.chatId, NO_MATERIAL_TEXT, input.level, null, []);
-    if (!saved) return send({ type: "error", message: "The answer was not saved. Please try again." });
-    return send({ type: "done", messageId: saved, text: NO_MATERIAL_TEXT, sources: [], notEnough: true, level: input.level });
+    const saved = await saveAnswer(
+      db,
+      input.chatId,
+      NO_MATERIAL_TEXT,
+      input.level,
+      null,
+      [],
+    );
+    if (!saved)
+      return send({
+        type: "error",
+        message: "The answer was not saved. Please try again.",
+      });
+    return send({
+      type: "done",
+      messageId: saved,
+      text: NO_MATERIAL_TEXT,
+      sources: [],
+      notEnough: true,
+      level: input.level,
+    });
   }
 
   const composed = await composeAnswer({
@@ -100,13 +168,32 @@ export async function answerQuestion(input: {
     onText: (text) => send({ type: "text", text }),
     signal: input.signal,
   });
-  if (!composed.ok) return send({ type: "error", message: FAILURES[composed.reason] });
+  if (!composed.ok)
+    return send({ type: "error", message: FAILURES[composed.reason] });
   const { shown, notEnough, used, result } = composed;
 
-  const messageId = await saveAnswer(db, input.chatId, shown, input.level, result, used);
-  if (!messageId) return send({ type: "error", message: "The answer was not saved. Please try again." });
+  const messageId = await saveAnswer(
+    db,
+    input.chatId,
+    shown,
+    input.level,
+    result,
+    used,
+  );
+  if (!messageId)
+    return send({
+      type: "error",
+      message: "The answer was not saved. Please try again.",
+    });
   const sources = await saveSources(db, messageId, used);
-  send({ type: "done", messageId, text: shown, sources, notEnough, level: input.level });
+  send({
+    type: "done",
+    messageId,
+    text: shown,
+    sources,
+    notEnough,
+    level: input.level,
+  });
 }
 
 export type ComposedAnswer =
@@ -140,15 +227,30 @@ export async function composeAnswer(input: {
   model?: ExplainModel;
 }): Promise<ComposedAnswer> {
   const hits = input.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
-  const filter = new AnswerFilter(await filterContextFor(input.db, hits, input.courseId));
+  // The citation check matches authorities against the library only: a case or statute found only
+  // in the student's own notes is still removed (CLAUDE.md). Upload passages can still be cited.
+  const context = await filterContextFor(
+    input.db,
+    hits.filter((hit) => hit.origin !== "upload"),
+    input.courseId,
+  );
+  context.labels = new Set(hits.map((hit) => hit.label));
+  const filter = new AnswerFilter(context);
   const passages: ExplainPassage[] = hits.map((hit) => ({
     label: hit.label,
     itemTitle: hit.itemTitle,
     heading: hit.heading,
     pages: pagesLabel(hit.pageFrom, hit.pageTo),
     text: hit.text,
+    origin: hit.origin ?? "library",
   }));
-  const turns: ExplainTurn[] = [...input.history, { role: "user", text: questionMessage(passages, input.question, input.level) }];
+  const turns: ExplainTurn[] = [
+    ...input.history,
+    {
+      role: "user",
+      text: questionMessage(passages, input.question, input.level),
+    },
+  ];
 
   let shown = "";
   let raw = "";
@@ -175,10 +277,24 @@ export async function composeAnswer(input: {
   show(await filter.end());
   if (!shown.trim()) return { ok: false, reason: "unavailable" };
 
-  const cited = filter.notEnough ? [] : citedLabels(shown).map((label) => hits.find((hit) => hit.label === label));
-  const used = cited.filter((hit): hit is SearchHit & { label: number } => hit !== undefined);
+  const cited = filter.notEnough
+    ? []
+    : citedLabels(shown).map((label) =>
+        hits.find((hit) => hit.label === label),
+      );
+  const used = cited.filter(
+    (hit): hit is SearchHit & { label: number } => hit !== undefined,
+  );
   const removedAuthorities = shown.split(REMOVED_AUTHORITY).length - 1;
-  return { ok: true, shown, notEnough: filter.notEnough, used, removedAuthorities, raw, result };
+  return {
+    ok: true,
+    shown,
+    notEnough: filter.notEnough,
+    used,
+    removedAuthorities,
+    raw,
+    result,
+  };
 }
 
 export const SEARCH_BUSY =
@@ -187,7 +303,10 @@ export const SEARCH_BUSY =
 // Nothing found only means "not in the library" when search by meaning ran. If only the
 // exact-words search ran (Voyage busy or unreachable), saying the library has nothing could be
 // wrong, so the student is asked to try again instead (never invent a result).
-export function searchUnsure(found: { hits: unknown[]; meaningUsed: boolean }): string | null {
+export function searchUnsure(found: {
+  hits: unknown[];
+  meaningUsed: boolean;
+}): string | null {
   if (found.hits.length === 0 && !found.meaningUsed) {
     console.warn("learn answer search unsure", { meaningUsed: false });
     return SEARCH_BUSY;
@@ -197,28 +316,41 @@ export function searchUnsure(found: { hits: unknown[]; meaningUsed: boolean }): 
 
 export function titleFrom(question: string): string {
   const flat = question.replace(/\s+/g, " ").trim();
-  return flat.length > TITLE_CHARS ? `${flat.slice(0, TITLE_CHARS - 1)}…` : flat || "New chat";
+  return flat.length > TITLE_CHARS
+    ? `${flat.slice(0, TITLE_CHARS - 1)}…`
+    : flat || "New chat";
 }
 
 function textOf(content: unknown): string {
-  return content && typeof content === "object" && "text" in content && typeof content.text === "string" ? content.text : "";
+  return content &&
+    typeof content === "object" &&
+    "text" in content &&
+    typeof content.text === "string"
+    ? content.text
+    : "";
 }
 
 // Earlier messages, oldest first. Old citation numbers refer to old passages, so they are dropped.
-export function historyTurns(rows: { role: "user" | "assistant"; content: unknown }[]): ExplainTurn[] {
+export function historyTurns(
+  rows: { role: "user" | "assistant"; content: unknown }[],
+): ExplainTurn[] {
   const turns = rows
     .slice()
     .reverse()
     .map((row) => ({
       role: row.role,
-      text: (row.role === "user" ? redactPersonalData(textOf(row.content)) : textOf(row.content).replace(/\[S\d+\]/g, "")).trim(),
+      text: (row.role === "user"
+        ? redactPersonalData(textOf(row.content))
+        : textOf(row.content).replace(/\[S\d+\]/g, "")
+      ).trim(),
     }))
     .filter((turn) => turn.text);
   // Claude needs the conversation to start with the student and alternate.
   while (turns.length && turns[0].role !== "user") turns.shift();
   const alternating: ExplainTurn[] = [];
   for (const turn of turns) {
-    if (alternating.at(-1)?.role === turn.role) alternating[alternating.length - 1] = turn;
+    if (alternating.at(-1)?.role === turn.role)
+      alternating[alternating.length - 1] = turn;
     else alternating.push(turn);
   }
   if (alternating.at(-1)?.role === "user") alternating.pop();
@@ -230,7 +362,12 @@ async function saveAnswer(
   chatId: string,
   text: string,
   level: AnswerLevel,
-  usage: { model: string; tokensIn: number; tokensOut: number; costUsd: number | null } | null,
+  usage: {
+    model: string;
+    tokensIn: number;
+    tokensOut: number;
+    costUsd: number | null;
+  } | null,
   used: { label: number }[],
 ): Promise<string | null> {
   const { data, error } = await db
@@ -253,7 +390,11 @@ async function saveAnswer(
   return data.id;
 }
 
-async function saveSources(db: Db, messageId: string, used: (SearchHit & { label: number })[]): Promise<SourceSummary[]> {
+async function saveSources(
+  db: Db,
+  messageId: string,
+  used: (SearchHit & { label: number })[],
+): Promise<SourceSummary[]> {
   if (used.length === 0) return [];
   const { data, error } = await db
     .from("message_sources")
@@ -261,14 +402,16 @@ async function saveSources(db: Db, messageId: string, used: (SearchHit & { label
       used.map((hit) => ({
         message_id: messageId,
         label: hit.label,
-        kb_passage_id: hit.passageId,
+        origin: hit.origin ?? "library",
+        kb_passage_id: hit.origin === "upload" ? null : hit.passageId,
+        upload_passage_id: hit.origin === "upload" ? hit.passageId : null,
         item_title: hit.itemTitle.slice(0, 300),
         heading: hit.heading?.slice(0, 500) ?? null,
         page_from: hit.pageFrom,
         page_to: hit.pageTo,
       })),
     )
-    .select("id, label, item_title, heading, page_from, page_to");
+    .select("id, label, item_title, heading, page_from, page_to, origin");
   if (error) {
     console.error("learn answer failed", { step: "sources", code: error.code });
     return [];
@@ -280,6 +423,7 @@ async function saveSources(db: Db, messageId: string, used: (SearchHit & { label
       itemTitle: row.item_title,
       heading: row.heading,
       pages: pagesLabel(row.page_from, row.page_to),
+      origin: row.origin,
     }))
     .sort((a, b) => a.label - b.label);
 }

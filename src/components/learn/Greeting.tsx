@@ -8,7 +8,10 @@ import { greetingFor } from "@/lib/greeting";
 export function Greeting({ name }: { name?: string }) {
   const id = useId();
   const suffix = name ? `, ${name}` : "";
-  const text = typeof window === "undefined" ? `Welcome${suffix}` : `${greetingFor(new Date().getHours())}${suffix}`;
+  const text =
+    typeof window === "undefined"
+      ? `Welcome${suffix}`
+      : `${greetingFor(new Date().getHours())}${suffix}`;
   const script = `(function(){var n=document.getElementById(${JSON.stringify(id)});if(!n)return;var h=new Date().getHours();n.textContent=(h<12?"Good morning":h<17?"Good afternoon":"Good evening")+${JSON.stringify(suffix)}})()`;
 
   return (

@@ -1,4 +1,8 @@
-import { allowanceNote, limitReachedMessage, questionsLeft } from "@/lib/allowance";
+import {
+  allowanceNote,
+  limitReachedMessage,
+  questionsLeft,
+} from "@/lib/allowance";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { getAllowance } from "@/server/learn/allowance";

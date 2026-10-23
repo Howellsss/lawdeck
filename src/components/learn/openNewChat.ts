@@ -11,7 +11,8 @@ export async function openNewChat(
 ): Promise<Extract<StartChatResult, { ok: false }> | null> {
   const started = await startChat(input).catch(() => ({
     ok: false as const,
-    message: "Lawdeck could not be reached. Check your connection and try again.",
+    message:
+      "Lawdeck could not be reached. Check your connection and try again.",
   }));
   if (!started.ok) return started;
   savePendingQuestion(started.id, input.question);

@@ -36,20 +36,33 @@ export function AnswerText({
     const heading = /^#{1,4}\s+(.*)$/.exec(line);
     if (heading) {
       blocks.push(
-        <h3 key={`h-${blocks.length}`} className="pt-2 text-[15px] font-semibold">
+        <h3
+          key={`h-${blocks.length}`}
+          className="pt-2 text-[15px] font-semibold"
+        >
           {inline(heading[1], onCite, citable)}
         </h3>,
       );
     } else {
-      blocks.push(<p key={`p-${blocks.length}`}>{inline(line, onCite, citable)}</p>);
+      blocks.push(
+        <p key={`p-${blocks.length}`}>{inline(line, onCite, citable)}</p>,
+      );
     }
   }
   flushBullets();
-  return <div className="flex flex-col gap-2 break-words text-[15px] leading-relaxed">{blocks}</div>;
+  return (
+    <div className="flex flex-col gap-2 break-words text-[15px] leading-relaxed">
+      {blocks}
+    </div>
+  );
 }
 
 // **bold** and [S1] markers inside one line.
-function inline(text: string, onCite: ((label: number) => void) | undefined, citable: Set<number>): ReactNode[] {
+function inline(
+  text: string,
+  onCite: ((label: number) => void) | undefined,
+  citable: Set<number>,
+): ReactNode[] {
   const parts: ReactNode[] = [];
   const pattern = /\*\*([^*]+)\*\*|\[S(\d+)\]/g;
   let last = 0;
@@ -71,7 +84,10 @@ function inline(text: string, onCite: ((label: number) => void) | undefined, cit
             S{label}
           </button>
         ) : (
-          <span key={match.index} className="mx-0.5 rounded-md border border-line px-1.5 text-xs text-muted">
+          <span
+            key={match.index}
+            className="mx-0.5 rounded-md border border-line px-1.5 text-xs text-muted"
+          >
             S{label}
           </span>
         ),

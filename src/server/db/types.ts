@@ -170,6 +170,7 @@ export type Database = {
           mode: "learn" | "draft";
           course_id: string | null;
           auto_routed: boolean;
+          use_uploads: boolean;
         };
         Insert: {
           project_id?: string | null;
@@ -177,11 +178,13 @@ export type Database = {
           mode?: "learn" | "draft";
           course_id?: string | null;
           auto_routed?: boolean;
+          use_uploads?: boolean;
         };
         Update: {
           project_id?: string | null;
           title?: string;
           course_id?: string | null;
+          use_uploads?: boolean;
         };
         Relationships: [];
       };
@@ -221,12 +224,16 @@ export type Database = {
           heading: string | null;
           page_from: number | null;
           page_to: number | null;
+          origin: "library" | "upload";
+          upload_passage_id: string | null;
           created_at: string;
         };
         Insert: {
           message_id: string;
           label: number;
           kb_passage_id?: string | null;
+          origin?: "library" | "upload";
+          upload_passage_id?: string | null;
           item_title: string;
           heading?: string | null;
           page_from?: number | null;
@@ -762,6 +769,21 @@ export type Database = {
       fail_upload_reading: { Args: { target: string; reason: string }; Returns: undefined };
       scan_pages_left: { Args: Record<string, never>; Returns: number | null };
       record_scan_pages: { Args: { pages: number }; Returns: undefined };
+      search_uploads: {
+        Args: { query_text: string; query_embedding?: string | null; model?: string | null; match_count?: number };
+        Returns: {
+          passage_id: string;
+          upload_id: string;
+          file_name: string;
+          heading: string | null;
+          text: string;
+          page_from: number | null;
+          page_to: number | null;
+          score: number;
+          meaning_rank: number | null;
+          words_rank: number | null;
+        }[];
+      };
       record_ai_usage: {
         Args: {
           kind: string;

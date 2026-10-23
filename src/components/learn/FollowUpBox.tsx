@@ -33,7 +33,9 @@ export function FollowUpBox({
           <label
             key={value}
             className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink ${
-              level === value ? "border-ink bg-ink text-on-ink" : "border-line text-ink"
+              level === value
+                ? "border-ink bg-ink text-on-ink"
+                : "border-line text-ink"
             }`}
           >
             <input

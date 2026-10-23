@@ -37,17 +37,29 @@ export async function listProjects(): Promise<Loaded<ProjectSummary[]>> {
     .order("updated_at", { ascending: false })
     .limit(200);
   if (error) failed("projects", error.code);
-  return { status: "ok", data: data.map((p) => ({ id: p.id, name: p.name, updatedAt: p.updated_at })) };
+  return {
+    status: "ok",
+    data: data.map((p) => ({
+      id: p.id,
+      name: p.name,
+      updatedAt: p.updated_at,
+    })),
+  };
 }
 
 export async function getProject(
   id: string,
 ): Promise<Loaded<{ project: ProjectSummary; chats: ChatSummary[] } | null>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
-  if (!projectIdSchema.safeParse(id).success) return { status: "ok", data: null };
+  if (!projectIdSchema.safeParse(id).success)
+    return { status: "ok", data: null };
   const supabase = await createSupabaseServerClient();
 
-  const project = await supabase.from("projects").select("id, name, updated_at").eq("id", id).maybeSingle();
+  const project = await supabase
+    .from("projects")
+    .select("id, name, updated_at")
+    .eq("id", id)
+    .maybeSingle();
   if (project.error) failed("project", project.error.code);
   if (!project.data) return { status: "ok", data: null };
 
@@ -62,13 +74,23 @@ export async function getProject(
   return {
     status: "ok",
     data: {
-      project: { id: project.data.id, name: project.data.name, updatedAt: project.data.updated_at },
-      chats: chats.data.map((c) => ({ id: c.id, title: c.title, updatedAt: c.updated_at })),
+      project: {
+        id: project.data.id,
+        name: project.data.name,
+        updatedAt: project.data.updated_at,
+      },
+      chats: chats.data.map((c) => ({
+        id: c.id,
+        title: c.title,
+        updatedAt: c.updated_at,
+      })),
     },
   };
 }
 
-export async function listRecentChats(limit = 20): Promise<Loaded<ChatSummary[]>> {
+export async function listRecentChats(
+  limit = 20,
+): Promise<Loaded<ChatSummary[]>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
@@ -77,18 +99,33 @@ export async function listRecentChats(limit = 20): Promise<Loaded<ChatSummary[]>
     .order("updated_at", { ascending: false })
     .limit(limit);
   if (error) failed("recent chats", error.code);
-  return { status: "ok", data: data.map((c) => ({ id: c.id, title: c.title, updatedAt: c.updated_at })) };
+  return {
+    status: "ok",
+    data: data.map((c) => ({
+      id: c.id,
+      title: c.title,
+      updatedAt: c.updated_at,
+    })),
+  };
 }
 
 export async function listCourses(): Promise<Loaded<CourseSummary[]>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.from("courses").select("id, slug, name").order("position");
+  const { data, error } = await supabase
+    .from("courses")
+    .select("id, slug, name")
+    .order("position");
   if (error) failed("courses", error.code);
   return { status: "ok", data };
 }
 
-export type TopicSummary = { id: string; slug: string; name: string; position: number };
+export type TopicSummary = {
+  id: string;
+  slug: string;
+  name: string;
+  position: number;
+};
 
 // One course and its topics in teaching order, for the course hub (PRD LN-05).
 export async function getCourseHub(
@@ -97,7 +134,11 @@ export async function getCourseHub(
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   if (!/^[a-z0-9-]{1,60}$/.test(slug)) return { status: "ok", data: null };
   const supabase = await createSupabaseServerClient();
-  const course = await supabase.from("courses").select("id, slug, name").eq("slug", slug).maybeSingle();
+  const course = await supabase
+    .from("courses")
+    .select("id, slug, name")
+    .eq("slug", slug)
+    .maybeSingle();
   if (course.error) failed("course", course.error.code);
   if (!course.data) return { status: "ok", data: null };
   const topics = await supabase
@@ -111,7 +152,15 @@ export async function getCourseHub(
   return { status: "ok", data: { course: course.data, topics: topics.data } };
 }
 
-export type ChatSource = { id: string; label: number; itemTitle: string; heading: string | null; pages: string | null };
+export type ChatSource = {
+  id: string;
+  label: number;
+  itemTitle: string;
+  heading: string | null;
+  pages: string | null;
+  // The reviewed library or the student's own upload (step 6c); older sources are library.
+  origin: "library" | "upload";
+};
 export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
@@ -123,7 +172,10 @@ export type ChatMessage = {
 };
 
 function messageLevel(content: unknown): "simple" | "exam" | null {
-  const level = content && typeof content === "object" && "level" in content ? content.level : null;
+  const level =
+    content && typeof content === "object" && "level" in content
+      ? content.level
+      : null;
   return level === "simple" || level === "exam" ? level : null;
 }
 
@@ -136,31 +188,62 @@ function messageText(content: unknown): string {
   return "";
 }
 
-export async function getChat(
-  id: string,
-): Promise<Loaded<{ chat: ChatSummary & { courseName: string | null; autoRouted: boolean }; messages: ChatMessage[] } | null>> {
+export async function getChat(id: string): Promise<
+  Loaded<{
+    chat: ChatSummary & {
+      courseName: string | null;
+      autoRouted: boolean;
+      useUploads: boolean;
+      hasReadyUploads: boolean;
+    };
+    messages: ChatMessage[];
+  } | null>
+> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
-  if (!projectIdSchema.safeParse(id).success) return { status: "ok", data: null };
+  if (!projectIdSchema.safeParse(id).success)
+    return { status: "ok", data: null };
   const supabase = await createSupabaseServerClient();
 
-  const chat = await supabase.from("conversations").select("id, title, updated_at, course_id, auto_routed").eq("id", id).maybeSingle();
+  const chat = await supabase
+    .from("conversations")
+    .select("id, title, updated_at, course_id, auto_routed, use_uploads")
+    .eq("id", id)
+    .maybeSingle();
   if (chat.error) failed("chat", chat.error.code);
   if (!chat.data) return { status: "ok", data: null };
 
+  // Only the student's own files are counted (row-level security).
+  const ready = await supabase
+    .from("uploads")
+    .select("id", { count: "exact", head: true })
+    .eq("status", "ready");
   const [messages, course] = await Promise.all([
-    supabase.from("messages").select("id, role, content, created_at").eq("conversation_id", id).order("created_at").limit(500),
+    supabase
+      .from("messages")
+      .select("id, role, content, created_at")
+      .eq("conversation_id", id)
+      .order("created_at")
+      .limit(500),
     chat.data.course_id
-      ? supabase.from("courses").select("name").eq("id", chat.data.course_id).maybeSingle()
+      ? supabase
+          .from("courses")
+          .select("name")
+          .eq("id", chat.data.course_id)
+          .maybeSingle()
       : Promise.resolve({ data: null, error: null }),
   ]);
   if (messages.error) failed("chat messages", messages.error.code);
 
   // The sources of the answers (Phase 3): the student's own rows only (row-level security).
-  const answerIds = messages.data.filter((m) => m.role === "assistant").map((m) => m.id);
+  const answerIds = messages.data
+    .filter((m) => m.role === "assistant")
+    .map((m) => m.id);
   const sources = answerIds.length
     ? await supabase
         .from("message_sources")
-        .select("id, message_id, label, item_title, heading, page_from, page_to")
+        .select(
+          "id, message_id, label, item_title, heading, page_from, page_to, origin",
+        )
         .in("message_id", answerIds)
         .order("label")
     : { data: [], error: null };
@@ -168,7 +251,14 @@ export async function getChat(
   const byMessage = new Map<string, ChatSource[]>();
   for (const row of sources.data ?? []) {
     const list = byMessage.get(row.message_id) ?? [];
-    list.push({ id: row.id, label: row.label, itemTitle: row.item_title, heading: row.heading, pages: pagesLabel(row.page_from, row.page_to) });
+    list.push({
+      id: row.id,
+      label: row.label,
+      itemTitle: row.item_title,
+      heading: row.heading,
+      pages: pagesLabel(row.page_from, row.page_to),
+      origin: row.origin,
+    });
     byMessage.set(row.message_id, list);
   }
 
@@ -181,6 +271,9 @@ export async function getChat(
         updatedAt: chat.data.updated_at,
         courseName: course.data?.name ?? null,
         autoRouted: chat.data.auto_routed,
+        useUploads: chat.data.use_uploads,
+        // If the count fails, the switch is simply not shown.
+        hasReadyUploads: !ready.error && (ready.count ?? 0) > 0,
       },
       messages: messages.data.map((m) => ({
         id: m.id,

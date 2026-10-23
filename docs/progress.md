@@ -133,7 +133,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 
 ✅ 6a. Upload notice, private file store, uploads tables and My uploads page (UP-01, UP-02, UP-03, UP-05, UP-06) (migration 24 applied by founder 2026-10-23)
 ✅ 6b. Reading uploads (text and scans), extraction quality flag, search index tied to the student (UP-01, UP-04); 200 scanned pages a month on Free (migration 25 applied by founder 2026-10-23)
-⬜ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library"
+✅ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library" (migration 26 applied by founder 2026-10-23); answer test to re-run after the prompt change (about $0.40, founder to approve)
 ⬜ 6d. View-only share links, who has access, revoke (EX-04)
 ⬜ 6e. Export notes, briefs and flashcards (EX-03)
 ⬜ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03)
@@ -220,3 +220,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Phase 6 started (founder: "approve"). Step 6a built: upload notice (Appendix C) accepted once, private "uploads" file store with one folder per student, uploads and upload_passages tables (owner only), 50-file Free limit and notice enforced by the database, My uploads page with upload, real file-type check and delete. Migration 24; 30 database permission checks. No AI, no cost, no new library.
 - 2026-10-23: Migration 24 applied (founder). Real-project check added: a second student cannot list, download, delete, overwrite or add to another student's upload.
 - 2026-10-23: Step 6a merged. Step 6b planned and approved (founder: 200 scanned pages per student per month on the Free plan). Built: uploads are read straight after upload by the library's reader (now shared), with scans by Haiku and indexing by Voyage, all with the student's own session; "Ready" only with passages; failures shown with "Try again", which carries on without paying twice; hard-to-read files flagged (UP-04). Migration 25; 30 database permission checks. No live AI test yet.
+- 2026-10-23: Step 6b merged (migration 25 applied). Step 6c approved and built: answers search the library and the student's own Ready uploads together (per-chat "Use my uploads" switch), sources grouped "From the Lawdeck library" / "From your uploads", prompt explain-v3 marks uploads as the student's own notes (library preferred), citation check still library-only. Migration 26; 12 database permission checks. Answer test not yet re-run.
