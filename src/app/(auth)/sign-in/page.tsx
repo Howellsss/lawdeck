@@ -23,6 +23,9 @@ export default function SignInPage() {
       <p className="text-sm text-muted">
         New to Lawdeck? <Link href="/sign-up">Create an account</Link>
       </p>
+      <p className="text-sm text-muted">
+        <Link href="/takedown">Request removal of material</Link>
+      </p>
     </>
   );
 }

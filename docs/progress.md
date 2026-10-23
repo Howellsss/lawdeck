@@ -136,7 +136,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library" (migration 26 applied by founder 2026-10-23); answer test run 2026-10-23: 10/10 answered, $0.43, grades reviewed by founder
 ✅ 6d. View-only share links, who has access, revoke (EX-04) (migration 27 applied by founder 2026-10-23)
 ✅ 6e. Export notes, briefs and flashcards (EX-03)
-⚠️ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03): 6f-1 done (migration 28 applied by founder 2026-10-23); 6f-2 (report a problem, takedown screens) next
+✅ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03) (migration 28 applied by founder 2026-10-23)
 
 ## Change log
 
@@ -224,3 +224,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 6c merged after the answer test (10/10 answered, 6 unmatched authorities removed, $0.43; founder reviewed grades). Step 6d approved (founder: viewers must sign in) and built: view-only links to a document or project (long random token), "who opened it" list for the owner, "Turn off link" stops access at once, read-only pages under /shared/<link> for documents, project lists and chats (source titles only, never passages). Migration 27; 25 database permission checks. No AI, no cost, no new library.
 - 2026-10-23: Step 6d merged (migration 27 applied; live permission check passes). Step 6e approved and built: "Download Word" and "Save as PDF" on chats (as study notes), briefs and practice sets, with "only the cards I don't know yet" for flashcards. One study-sheet model draws both files; answers not yet revealed stay hidden; source titles only, never library passages. No migration, no AI, no cost, no new library.
 - 2026-10-23: Step 6e merged. Step 6f approved (two parts). 6f-1 built: Account page (sidebar email links to it) with "Delete my account" (type DELETE): the student's files are removed first, then the database deletes the account and everything it owns, at once; no service-role key; reviewer and admin accounts are removed by the founder only. Migration 28 also adds the problem_reports and takedown_requests tables used by 6f-2. 30 database permission checks. No AI, no cost, no new library.
+- 2026-10-23: Step 6f-1 merged (migration 28 applied; live check passes). 6f-2 built: "Report a problem" (five categories, optional note) under every answer, document, brief and practice question; reviewer pages Reports (with what was reported, resolve) and Takedowns (due in 7 days, overdue shown, mark done); public /takedown form linked from sign-in, with a hidden spam trap. No migration, no AI, no cost, no new library. Phase 6 tasks complete; exit checklist next.

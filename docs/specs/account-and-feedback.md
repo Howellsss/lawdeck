@@ -11,10 +11,12 @@ Founder approved 2026-10-23. PRD AC-05, FB-01, FB-03. Migration 28.
 - No service-role key is used.
 
 ## Report a problem (FB-01) — step 6f-2
+- Screens: "Report a problem" under every answer, document, brief and practice question (five choices, optional note). Reviewers: Admin → Reports, with what was reported, "Mark resolved" or "Open again".
 - `problem_reports`: answer, document, brief or practice question; category wrong law, outdated, unclear, formatting or other; optional note up to 500 characters.
 - A student can report only their own work (checked by the database), at most 50 reports a day, and sees only their own reports. Reviewers see all reports, with what was reported (`problem_report_context`, cut at 4,000 characters), and mark them resolved; the database records who and when.
 
 ## Takedown requests (FB-03) — step 6f-2
+- Screens: public `/takedown` form (linked from the sign-in page), with a hidden spam trap. Reviewers: Admin → Takedowns, open requests oldest first with their due date (overdue shown), "Mark done" or "Open again".
 - Anyone can submit through `submit_takedown(name, email, material, reason)`: length-limited, real-looking email, at most 30 requests an hour across everyone.
 - Only reviewers can read requests (they hold names and emails) and mark them done; the team acts within 7 days of `created_at`.
 

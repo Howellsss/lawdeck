@@ -152,3 +152,20 @@ test("Account asks visitors to sign in and offers no delete button", async ({ pa
   await expect(page.getByRole("heading", { name: "Sign in to see your account" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Delete my account" })).toHaveCount(0);
 });
+
+test("Anyone can open the takedown form; empty boxes are explained", async ({ page }) => {
+  await page.goto("/sign-in");
+  await page.getByRole("link", { name: "Request removal of material" }).click();
+  await expect(page.getByRole("heading", { name: "Request removal" })).toBeVisible();
+  await page.getByRole("button", { name: "Send request" }).click();
+  await expect(page.getByText("Enter your name.")).toBeVisible();
+  await expect(page.getByText("Enter a real email address.")).toBeVisible();
+});
+
+test("Reports and takedown requests are hidden from visitors", async ({ page }) => {
+  for (const path of ["/admin/reports", "/admin/takedowns"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    await expect(page.getByRole("button", { name: /mark resolved|mark done/i })).toHaveCount(0);
+  }
+});

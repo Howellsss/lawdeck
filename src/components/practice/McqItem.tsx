@@ -1,5 +1,6 @@
 "use client";
 
+import { ReportProblem } from "@/components/feedback/ReportProblem";
 import { useState } from "react";
 import { choiceLetter, type PracticeReveal } from "@/lib/practice";
 import { answerMultipleChoice } from "@/server/practice/actions";
@@ -81,6 +82,7 @@ export function McqItem({
             {right ? "Correct." : `Not quite: the answer is ${choiceLetter(reveal.correctChoice ?? 0)}.`}
           </p>
           <RevealPanel reveal={reveal} heading="Why" />
+          <ReportProblem kind="practice_item" id={id} />
         </>
       )}
     </li>
