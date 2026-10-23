@@ -1,6 +1,6 @@
 # The drafting test (step 5d): one made-up document drafted by Opus with the real prompt, checked
-# for stand-ins, word limits, nothing invented and speed. Run by hand from Actions → "Drafting test"
-# → Run workflow. About 5 cents a run. Prints only results, never the drafted text (public repository).
+# for stand-ins, word limits, nothing invented and speed, then one change by instruction. Run by hand from Actions → "Drafting test"
+# → Run workflow. About 3 cents a run. Prints only results, never the drafted text (public repository).
 name: Drafting test
 
 on:

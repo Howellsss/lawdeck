@@ -6,6 +6,7 @@ import {
   draftingIdSchema,
   forumProfileSchema,
   templateSpecSchema,
+  type ForumProfile,
   type TemplateField,
   type TemplateSpec,
 } from "@/schemas/drafting";
@@ -33,10 +34,23 @@ export type IntakeView = {
   aiParts: number;
 };
 export type DocumentSummary = { id: string; title: string; forumName: string | null; updatedAt: string };
+export type EditablePartView = {
+  id: string;
+  heading: string | null;
+  // The wording shown now, with {{fact}} stand-ins as stored; whether the student rewrote it.
+  text: string;
+  edited: boolean;
+};
+export type VersionSummary = { id: string; number: number; by: "student" | "ai"; createdAt: string; current: boolean };
 export type DocumentView = DocumentSummary & {
   createdAt: string;
   model: DocModel | null;
   issues: CheckIssue[];
+  // For editing (step 5e); empty while the document is being re-checked.
+  fields: TemplateField[];
+  facts: Record<string, string[]>;
+  parts: EditablePartView[];
+  versions: VersionSummary[];
 };
 
 function failed(what: string, code: string | undefined): never {
@@ -138,6 +152,7 @@ export async function getDocument(id: string): Promise<Loaded<DocumentView | nul
   const loaded = await loadDocument(supabase, id);
   if (!loaded) return { status: "ok", data: null };
   const { document, model, spec, content } = loaded;
+  const ready = model && spec && content ? { model, spec, content } : null;
   return {
     status: "ok",
     data: {
@@ -147,9 +162,35 @@ export async function getDocument(id: string): Promise<Loaded<DocumentView | nul
       createdAt: document.created_at,
       updatedAt: document.updated_at,
       model,
-      issues: model && spec && content ? checkDocument(spec, content, model) : [],
+      issues: ready ? checkDocument(ready.spec, ready.content, ready.model) : [],
+      fields: ready ? ready.spec.fields : [],
+      facts: ready
+        ? Object.fromEntries(Object.entries(ready.content.fields).map(([key, value]) => [key, Array.isArray(value) ? value : [value]]))
+        : {},
+      parts: ready
+        ? ready.model.blocks
+            .filter((block) => block.kind !== "signature")
+            .map((block) => {
+              const part = ready.spec.parts.find((p) => p.id === block.partId);
+              const edited = ready.content.edits[block.partId];
+              const original = block.kind === "narrative" ? (ready.content.narrative[block.partId] ?? "") : (part?.text ?? "");
+              return { id: block.partId, heading: block.heading, text: edited ?? original, edited: edited !== undefined };
+            })
+        : [],
+      versions: await listVersions(supabase, document.id, document.current_version_id),
     },
   };
+}
+
+async function listVersions(supabase: Db, id: string, currentId: string | null): Promise<VersionSummary[]> {
+  const { data, error } = await supabase
+    .from("document_versions")
+    .select("id, number, created_by, created_at")
+    .eq("document_id", id)
+    .order("number", { ascending: false })
+    .limit(200);
+  if (error) failed("versions", error.code);
+  return data.map((v) => ({ id: v.id, number: v.number, by: v.created_by, createdAt: v.created_at, current: v.id === currentId }));
 }
 
 // The document model for one of the signed-in student's documents (also used for the Word file).
@@ -182,24 +223,28 @@ export async function loadDocument(supabase: Db, id: string) {
   const spec = template.data?.status === "approved" ? templateSpecSchema.safeParse(template.data.spec) : null;
   const forumUsable = !doc.forum_id || forum.data?.status === "approved";
   const profile = forum.data && forumUsable ? forumProfileSchema.safeParse(forum.data.profile) : null;
-  const model: DocModel | null =
-    content.success && spec?.success && forumUsable && (!doc.forum_id || profile?.success)
-      ? buildDocument({
+  const layout: DocumentLayout | null =
+    spec?.success && forumUsable && (!doc.forum_id || profile?.success)
+      ? {
           title: doc.title,
           spec: spec.data,
           profile: profile?.success ? profile.data : DEFAULT_PROFILE,
           forumSlug: forum.data?.slug ?? null,
-          content: content.data,
-        })
+        }
       : null;
+  const model: DocModel | null = layout && content.success ? buildDocument({ ...layout, content: content.data }) : null;
   return {
     document: doc,
     forumName: forum.data?.name ?? null,
+    // What draws this document (any of its versions); null while it is being re-checked.
+    layout: model ? layout : null,
     model,
     spec: model && spec?.success ? (spec.data as TemplateSpec) : null,
     content: content.success ? content.data : null,
   };
 }
+
+export type DocumentLayout = { title: string; spec: TemplateSpec; profile: ForumProfile; forumSlug: string | null };
 
 async function forumNames(supabase: Db, ids: (string | null)[]): Promise<Map<string, string>> {
   const wanted = [...new Set(ids.filter((id): id is string => id !== null))];

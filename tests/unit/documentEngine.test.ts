@@ -122,7 +122,7 @@ describe("building a document", () => {
     expect(heading.align).toBe("center");
     expect(heading.paragraphs[1].runs).toEqual([
       { text: "BETWEEN Adaeze Okafor AND " },
-      { text: "[DEFENDANT’S NAME]", placeholder: true },
+      { text: "[DEFENDANT’S NAME]", placeholder: true, field: "defendant" },
     ]);
     expect(
       model.blocks.find((b) => b.partId === "facts")?.paragraphs[0].runs[0],

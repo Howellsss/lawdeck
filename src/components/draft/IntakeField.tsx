@@ -8,9 +8,12 @@ const inputClass = "w-full rounded-lg border border-line bg-paper px-3 text-ink"
 
 // One intake question (DR-04). Several answers are allowed where the template says so (for example
 // more than one defendant). Every answer is optional: what is left out stays as a placeholder.
-export function IntakeField({ field }: { field: TemplateField }) {
-  const [entries, setEntries] = useState([0]);
-  const [next, setNext] = useState(1);
+// When editing a document (step 5e) it starts with the saved answers, plus empty extra entries
+// Lawdeck asked for (e.g. a second defendant).
+export function IntakeField({ field, values = [], extra = 0, note }: { field: TemplateField; values?: string[]; extra?: number; note?: string }) {
+  const initial = Math.max(1, values.length + (field.repeatable ? extra : 0));
+  const [entries, setEntries] = useState(() => Array.from({ length: Math.min(initial, MAX_ENTRIES) }, (_, i) => i));
+  const [next, setNext] = useState(initial);
   const hintId = `${field.id}-hint`;
 
   return (
@@ -22,9 +25,20 @@ export function IntakeField({ field }: { field: TemplateField }) {
       <p id={hintId} className="text-sm text-muted">
         {field.question} If you leave it out, the draft shows <span className="placeholder">[{field.placeholder}]</span>.
       </p>
+      {note && (
+        <p role="status" className="text-sm text-warning">
+          {note}
+        </p>
+      )}
       {entries.map((key, index) => (
         <div key={key} className="flex items-start gap-2">
-          <Input field={field} label={entries.length > 1 ? `${field.label} ${index + 1}` : field.label} hintId={hintId} />
+          <Input
+            field={field}
+            id={index === 0 ? `fact-${field.id}` : undefined}
+            label={entries.length > 1 ? `${field.label} ${index + 1}` : field.label}
+            hintId={hintId}
+            defaultValue={values[key]}
+          />
           {entries.length > 1 && (
             <button
               type="button"
@@ -52,8 +66,20 @@ export function IntakeField({ field }: { field: TemplateField }) {
   );
 }
 
-function Input({ field, label, hintId }: { field: TemplateField; label: string; hintId: string }) {
-  const common = { name: field.id, "aria-label": label, "aria-describedby": hintId, autoComplete: "off" };
+function Input({
+  field,
+  id,
+  label,
+  hintId,
+  defaultValue,
+}: {
+  field: TemplateField;
+  id?: string;
+  label: string;
+  hintId: string;
+  defaultValue?: string;
+}) {
+  const common = { id, name: field.id, defaultValue, "aria-label": label, "aria-describedby": hintId, autoComplete: "off" };
   if (field.type === "date") return <input type="date" {...common} className={`${inputClass} h-11 sm:w-56`} />;
   if (field.type === "longText" || field.type === "address")
     return <textarea {...common} rows={field.type === "address" ? 2 : 4} maxLength={2000} className={`${inputClass} py-2`} />;

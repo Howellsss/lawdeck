@@ -2,11 +2,14 @@
 // for what Lawdeck promises (PRD DR-02, DR-04): every narrative part written within its limit;
 // names and addresses only as stand-ins; a missing fact left as its stand-in, never invented; no
 // case or statute named; no sum that was not given; and the draft back within 30 seconds.
-// About 5 cents a run. Needs ANTHROPIC_API_KEY. Only results are printed, never the text.
+// Then one change by instruction (step 5e, DR-05): "add a third defendant" must ask the student for
+// the new name, never write one. About 3 cents a run. Needs ANTHROPIC_API_KEY. Only results are
+// printed, never the text.
 import { appendFileSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
 import { factsFor, templateSpecSchema } from "@/schemas/drafting";
-import { writeDraftParts } from "@/server/ai/draft";
+import { editDraftParts, writeDraftParts } from "@/server/ai/draft";
+import { planInstructionEdit } from "@/server/drafting/edit";
 import { factsForClaude } from "@/server/drafting/standIns";
 
 const caseFile = JSON.parse(readFileSync("tests/eval/drafting/case.json", "utf8")) as {
@@ -51,9 +54,39 @@ describe("drafting test", () => {
       [`only the given sum (${sums.join(", ") || "none written"})`, sums.every((sum) => sum === "N2,350,000")],
       [`back within 30 seconds (${seconds.toFixed(1)} s)`, seconds <= 30],
     ];
+    // A change by instruction on the draft just written.
+    const editable = narrative.map((part) => ({
+      id: part.id,
+      heading: part.heading ?? null,
+      purpose: part.instruction ?? part.why,
+      maxWords: part.maxWords ?? 200,
+      text: text(part.id),
+    }));
+    const editStarted = Date.now();
+    const edit = await editDraftParts({
+      documentTitle: "Statement of claim (test)",
+      forumName: "High Court of Wombat State",
+      parts: editable,
+      facts: factsForClaude(spec, facts.fields).map((fact) => ({ ...fact, several: fact.id === "defendant" })),
+      instruction: "Add a third defendant who also took delivery of the cement.",
+      userId: "drafting-test",
+    });
+    const editSeconds = (Date.now() - editStarted) / 1000;
+    if (!edit.ok) throw new Error(`Claude did not make the change: ${edit.reason}`);
+    const plan = planInstructionEdit(spec, editable, edit.reply);
+    const edited = Object.values(plan.parts).join("\n");
+    checks.push(
+      ["change: asks for the new defendant (one more entry)", plan.askFor.some((a) => a.field === "defendant" && a.addAnother)],
+      ["change: no real name or address in the text", realDetails.every((name) => !edited.includes(name))],
+      ["change: no case, statute, section, rule or order named", !AUTHORITY.test(edited)],
+      [`change: explains what it did (${edit.reply.note.trim() ? "yes" : "no"})`, edit.reply.note.trim().length > 0],
+      [`change: back within 30 seconds (${editSeconds.toFixed(1)} s)`, editSeconds <= 30],
+    );
+    const cost = (result.costUsd ?? 0) + (edit.costUsd ?? 0);
+
     const lines = [
       `Drafting test: ${checks.filter(([, ok]) => ok).length}/${checks.length} checks passed`,
-      `Model ${result.model}, ${result.usage.tokensIn} tokens in, ${result.usage.tokensOut} out, $${(result.costUsd ?? 0).toFixed(4)}`,
+      `Model ${result.model}; draft ${result.usage.tokensIn} tokens in, ${result.usage.tokensOut} out; change ${edit.usage.tokensIn} in, ${edit.usage.tokensOut} out; $${cost.toFixed(4)} in all`,
       ...checks.map(([what, ok]) => `${ok ? "PASS" : "FAIL"}: ${what}`),
     ];
     console.info(lines.join("\n"));
