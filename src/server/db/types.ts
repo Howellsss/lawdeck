@@ -34,6 +34,51 @@ type Reviewed = {
 export type Database = {
   public: {
     Tables: {
+      // Students' private uploads (migration 24). Owners only.
+      uploads: {
+        Row: {
+          id: string;
+          owner_id: string;
+          project_id: string | null;
+          file_name: string;
+          mime_type: string;
+          size_bytes: number;
+          storage_path: string;
+          status: "processing" | "ready" | "failed";
+          ocr_confidence: number | null;
+          page_count: number | null;
+        } & Timestamps;
+        Insert: { project_id?: string | null; file_name: string; mime_type: string; size_bytes: number; storage_path: string };
+        Update: never;
+        Relationships: [];
+      };
+      upload_passages: {
+        Row: {
+          id: string;
+          upload_id: string;
+          owner_id: string;
+          position: number;
+          heading: string | null;
+          text: string;
+          page_from: number | null;
+          page_to: number | null;
+          embedding: string | null;
+          embedding_model: string | null;
+          created_at: string;
+        };
+        Insert: {
+          upload_id: string;
+          position: number;
+          heading?: string | null;
+          text: string;
+          page_from?: number | null;
+          page_to?: number | null;
+          embedding?: string | null;
+          embedding_model?: string | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
       plans: {
         Row: {
           id: string;
@@ -55,6 +100,7 @@ export type Database = {
           role: "student" | "reviewer" | "admin";
           plan_id: string | null;
           courses: string[];
+          upload_notice_accepted_at: string | null;
         };
         Insert: never;
         Update: {
@@ -693,6 +739,8 @@ export type Database = {
       };
     };
     Functions: {
+      accept_upload_notice: { Args: Record<string, never>; Returns: string };
+      upload_notice_accepted: { Args: Record<string, never>; Returns: boolean };
       record_ai_usage: {
         Args: {
           kind: string;
@@ -790,6 +838,7 @@ export type Database = {
       message_role: "user" | "assistant";
       kb_item_type: KbItemType;
       practice_kind: PracticeKind;
+      upload_status: "processing" | "ready" | "failed";
       forum_kind: ForumKind;
       version_author: VersionAuthor;
       brief_kind: "case" | "statute";

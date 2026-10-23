@@ -5,6 +5,7 @@ const PATHS = {
   book: "M3 4.5h5a2 2 0 012 2V16a1.5 1.5 0 00-1.5-1.5H3zM17 4.5h-5a2 2 0 00-2 2V16a1.5 1.5 0 011.5-1.5H17z",
   folder: "M2.5 5h6l1.5 2h7.5v9h-15z",
   document: "M5 2.5h7l3 3v12H5zM12 2.5v3h3M8 10h5M8 13h5",
+  upload: "M10 13V3.5M6 7.5l4-4 4 4M3.5 12.5v4h13v-4",
   pen: "M13.5 3.5l3 3L7 16H4v-3z",
   cards: "M3.5 6.5h10v10h-10zM6.5 3.5h10v10",
   bookmark: "M5.5 3h9v14l-4.5-3.5L5.5 17z",
