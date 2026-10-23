@@ -1,0 +1,47 @@
+# The export test (step 5h, PRD EX-01 and EX-02): every template's Word file opens in LibreOffice
+# with the same pages as the on-screen pages, and "Save as PDF" prints exactly those pages.
+# Runs when the document engine, the preview or the templates change, and by hand.
+name: Export tests
+
+on:
+  pull_request:
+    paths:
+      - "src/server/documents/**"
+      - "src/components/draft/preview/**"
+      - "src/templates/**"
+      - "src/schemas/drafting.ts"
+      - "src/lib/paginate.ts"
+      - "src/app/test-pages/**"
+      - "src/app/print/**"
+      - "src/app/globals.css"
+      - "tests/export/**"
+      - "playwright.export.config.ts"
+      - ".github/workflows/export-tests.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: export-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  export:
+    name: Word and PDF pages match the preview
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      # LibreOffice opens the Word files; Liberation fonts have the same sizes as Times New Roman.
+      - run: sudo apt-get update && sudo apt-get install -y --no-install-recommends libreoffice-writer poppler-utils fonts-liberation
+      - run: npm ci
+      - run: npm run build
+      - run: npx playwright install --with-deps chromium
+      - run: npm run test:export
+        env:
+          CI: "true"

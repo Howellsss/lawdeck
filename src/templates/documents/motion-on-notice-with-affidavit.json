@@ -125,7 +125,8 @@
         "align": "center",
         "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
         "required": true,
-        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025. A supporting document such as an affidavit starts on a new page.",
+        "pageBreakBefore": true,
         "forums": [
           "lagos-high-court"
         ]
@@ -136,7 +137,8 @@
         "align": "center",
         "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
         "required": true,
-        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025. A supporting document such as an affidavit starts on a new page.",
+        "pageBreakBefore": true,
         "forums": [
           "fct-high-court"
         ]
@@ -345,6 +347,10 @@
       {
         "date": "2026-10-23",
         "note": "First draft for legal review (step 5g)."
+      },
+      {
+        "date": "2026-10-23",
+        "note": "The affidavit starts on a new page (step 5h)."
       }
     ]
   }

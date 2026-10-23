@@ -127,7 +127,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
 ✅ 5f. "Why is it arranged this way?" and related documents for a Lagos writ (DR-08, DR-09) — the four new front-loading templates wait for the legal reviewer with 5g
 ⚠️ 5g. First templates (writ of summons, statement of claim, motion on notice with affidavit, deed of assignment, tenancy agreement) — written; waiting for the legal reviewer to approve them on /admin/templates; Property Law handbook to be imported into the library (founder)
-⬜ 5h. Export tests: DOCX in Word and Google Docs; PDF matches preview (hosted PDF converter only with founder's approval of about $5–10 a month)
+✅ 5h. Export tests: DOCX pages checked automatically in LibreOffice; Save as PDF prints the preview's pages (no hosted converter, founder 2026-10-23) — founder's 10-minute check in Word and Google Docs with three sample files to do
 
 ## Change log
 
@@ -207,3 +207,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 5e merged; drafting test with one change by instruction run on GitHub. Step 5g planned and approved (founder: all five templates; the legal reviewer approves; founder imports the Property Law handbook). Five templates written from the S.A drafts and the 2025 handbooks, with a source on every part; they load as drafts. No AI cost, no migration.
 - 2026-10-23: Drafting test after 5e: 13/14 checks, $0.031 (draft 4.7 s; change by instruction asked for the new defendant, 5.9 s). The one failure was the test itself reading "N2,350,000," (with the sentence's comma) as a different sum; fixed to compare amounts.
 - 2026-10-23: Step 5g merged. Step 5f planned and approved (founder: with the four front-loading templates). Built: "Why is it arranged this way?" on documents and question pages, related documents drafted with the same facts carried over, numbered lists in templates, and Form 01, list of witnesses, witness statement on oath and list of documents as drafts for review. No AI cost, no migration.
+- 2026-10-23: Step 5f merged. Step 5h planned and approved (founder: Save as PDF from the pages, no hosted converter). Built: Save as PDF, parts that start a new page (the affidavit), Word keeps each paragraph together, preview spacing worked out as Word does, and an automatic export test: all 15 template and court pairs have the same pages on screen, in the PDF and in LibreOffice's print of the Word file. No AI, no migration, no new library.

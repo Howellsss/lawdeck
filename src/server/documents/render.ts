@@ -21,6 +21,8 @@ export type Block = {
   kind: TemplatePart["kind"];
   align: TemplatePart["align"];
   paragraphs: Paragraph[];
+  // Starts a new page (the part's own setting, or the part after a cover page).
+  pageBreakBefore: boolean;
 };
 export type DocModel = {
   title: string;
@@ -68,6 +70,9 @@ export function buildDocument(input: {
       kind: part.kind,
       align: part.align,
       paragraphs,
+      pageBreakBefore:
+        part.pageBreakBefore ||
+        (input.profile.coverPage && blocks.length === 1),
     });
   }
   return { title: input.title, profile: input.profile, blocks };

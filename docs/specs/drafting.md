@@ -91,3 +91,13 @@ Drafting rules from the sources built in: no suit number or hearing date (the Re
 - **The Lagos front-loading set.** A writ (and a statement of claim) now relates to: statement of claim, Pre-action Protocol Form 01 (Lagos only), list of witnesses, witness statement on oath, and list of documents to be relied on. The four new templates load as drafts for the legal reviewer, like those of 5g.
 - **Numbered lists.** In a template, a line starting `#. ` is repeated for each answer of the several-answer facts it uses, numbered 1., 2., … (witnesses with their addresses, documents). With no answers it shows one numbered placeholder line.
 - No AI, no migration, no new library. Drafting a witness statement or Form 01 uses Opus for the depositions or settlement steps, like any draft.
+
+## Export tests, Save as PDF and page breaks (step 5h)
+- **Save as PDF (EX-02).** The document workspace has **Save as PDF**, which opens `/print/documents/[id]`: the same pages as the preview, and nothing else, sized to the court's paper. The browser's print dialog opens by itself; the student chooses "Save as PDF". No hosted converter (founder, 2026-10-23). Sign-in and ownership are checked as on the document page.
+- **Same pages everywhere.** The preview, the print view and the Word file break pages in the same places: line height and spacing are worked out as Word does (lines × line height, plus spacing, not the browser's rounded pixels), and justified lines narrow their spaces by up to a quarter, as Word does.
+- **New pages.** A template part may start a new page (`pageBreakBefore`); the motion on notice's affidavit now does. The part after a cover page always does.
+- **Word keeps paragraphs together.** Every paragraph is kept on one page (`keepLines`), and a heading stays with the paragraph after it.
+- **Automatic export test (EX-01).** `npm run test:export` (after `npm run build`; needs LibreOffice, pdfinfo and the Liberation fonts) draws every template for every court with long made-up facts and checks that "Save as PDF" and LibreOffice's print of the Word file are A4 with exactly the on-screen number of pages. It runs on GitHub when the document engine, preview or templates change (`.github/workflows/export-tests.yml`).
+- **Test-only pages.** `/test-pages/document` and its Word download exist only when `LAWDECK_TEST_PAGES=1` (never set on Vercel); otherwise "not found", checked by a browser test. They use made-up facts only.
+- **By hand (founder, about 10 minutes).** Three sample Word files (writ, Lagos; motion with affidavit, FCT; tenancy agreement) opened in Word and Google Docs: pages, fonts, placeholders and page numbers as on screen.
+- No AI, no migration, no new library.

@@ -77,6 +77,9 @@ export function DocumentWorkspace({ view }: { view: DocumentView & { model: DocM
         <a href={`/api/documents/${view.id}/docx`} download className={`${compactPrimaryButton} no-underline`}>
           Download Word file
         </a>
+        <a href={`/print/documents/${view.id}`} target="_blank" rel="noopener" className={`${compactSecondaryButton} no-underline`}>
+          Save as PDF
+        </a>
       </div>
       <InstructionBox
         documentId={view.id}

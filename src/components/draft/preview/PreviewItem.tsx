@@ -17,6 +17,17 @@ const PX_PER_PT = 96 / 72;
 
 export const SPACE = { headingBeforePt: 12, paragraphAfterPt: 6 };
 
+// Word fits a justified line by narrowing its spaces, by up to a quarter (LibreOffice does the same
+// with Word files; measured in step 5h), where a browser only widens them. A quarter of a Times
+// space (a quarter em) is 0.0625 em, so justified text is set that much tighter to wrap where Word
+// does; justifying then widens the spaces again.
+const JUSTIFY_SPACING = "-0.0625em";
+
+// The space above and below an item, in screen pixels.
+export function itemSpacing(item: Item): number {
+  return ((item.kind === "heading" ? SPACE.headingBeforePt : 0) + SPACE.paragraphAfterPt) * PX_PER_PT;
+}
+
 export function PreviewItem({
   item,
   onPlaceholder,
@@ -36,7 +47,7 @@ export function PreviewItem({
     );
   }
   return (
-    <p className={`${ALIGN[item.align]} break-words`} style={{ paddingBottom: SPACE.paragraphAfterPt * PX_PER_PT }}>
+    <p className={`${ALIGN[item.align]} break-words`} style={{ paddingBottom: SPACE.paragraphAfterPt * PX_PER_PT, wordSpacing: item.align === "justify" ? JUSTIFY_SPACING : undefined }}>
       {item.paragraph?.runs.map((run, i) =>
         !run.placeholder ? (
           <span key={i}>{run.text}</span>
