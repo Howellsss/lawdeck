@@ -59,6 +59,7 @@ Stop the leak before investigating it.
 | `SUPABASE_SERVICE_ROLE_KEY` (most powerful) | Supabase → Project Settings → API keys → roll the secret key | Vercel (Production and Preview), GitHub → Settings → Secrets → Actions |
 | `ANTHROPIC_API_KEY` | platform.claude.com → API keys: create a new key, then delete the old one | Vercel, GitHub secrets |
 | `VOYAGE_API_KEY` | dashboard.voyageai.com → API keys | Vercel, GitHub secrets |
+| `SUPABASE_DB_URL` and `BACKUP_PASSPHRASE` (weekly backup) | Supabase → Project Settings → Database → Reset database password; a new phrase | GitHub secrets. A new phrase applies to new backups only; keep the old phrase for older ones |
 | `HEALTHCHECK_CODE` | Choose a new long phrase | Vercel |
 | Google OAuth client secret | Google Cloud → APIs & Services → Credentials | Supabase → Authentication → Providers → Google |
 | `NEXT_PUBLIC_GOOGLE_PICKER_API_KEY` (not secret, but restricted) | Google Cloud → Credentials: regenerate and restrict to Lawdeck's address | Vercel |
