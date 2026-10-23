@@ -15,7 +15,8 @@
     "eval:retrieval": "vitest run --config vitest.eval.config.mts tests/eval/retrieval.eval.ts",
     "job:archive": "vitest run --config vitest.jobs.config.mts jobs/archive-originals.job.ts",
     "eval:explain": "vitest run --config vitest.jobs.config.mts jobs/explain-eval.job.ts",
-    "eval:routing": "vitest run --config vitest.eval.config.mts tests/eval/routing.eval.ts"
+    "eval:routing": "vitest run --config vitest.eval.config.mts tests/eval/routing.eval.ts",
+    "eval:drafting": "vitest run --config vitest.eval.config.mts tests/eval/drafting.eval.ts"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^0.135.0",

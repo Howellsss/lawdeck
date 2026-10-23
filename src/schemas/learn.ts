@@ -30,7 +30,7 @@ export const chatIdSchema = z.uuid({ error: "That chat could not be found." });
 export const sourceIdSchema = z.uuid({ error: "That source could not be found." });
 
 // Shown when Auto mode treats a request as Draft, until drafting arrives (Phase 5).
-export const DRAFT_LATER = "This looks like a request to draft a document. Drafting arrives in a later build (Phase 5).";
+export const DRAFT_ROUTED = "This looks like a request to draft a document.";
 
 // A course topic's name (curriculum structure only, never legal content: rule H-01).
 export const topicNameSchema = z

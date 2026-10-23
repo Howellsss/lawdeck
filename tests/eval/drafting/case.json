@@ -1,0 +1,27 @@
+{
+  "note": "Made-up template and facts for the drafting test only. No real people, no legal wording from the library. Never loaded into the app.",
+  "template": {
+    "parts": [
+      { "id": "heading", "kind": "fixed", "align": "center", "text": "IN THE HIGH COURT OF WOMBAT STATE\nBETWEEN\n{{claimant}} (CLAIMANT)\nAND\n{{defendant}} (DEFENDANTS)", "required": true, "why": "Names the court and the parties." },
+      { "id": "facts", "heading": "STATEMENT OF FACTS", "kind": "narrative", "instruction": "In numbered paragraphs, state the facts the claimant relies on, in the order they happened, using only the facts given. Say where the defendants can be found.", "maxWords": 250, "required": true, "why": "Sets out the claim's facts." },
+      { "id": "reliefs", "heading": "RELIEFS SOUGHT", "kind": "narrative", "instruction": "In numbered paragraphs, set out what the claimant asks the court for, based on the sum and the facts given.", "maxWords": 120, "required": true, "why": "Says what the claimant wants." },
+      { "id": "signature", "kind": "signature", "required": true, "why": "Signed by counsel." }
+    ],
+    "fields": [
+      { "id": "claimant", "label": "Claimant", "type": "party", "required": true, "question": "Who is suing?", "placeholder": "CLAIMANT" },
+      { "id": "defendant", "label": "Defendants", "type": "party", "required": true, "question": "Who is being sued?", "placeholder": "DEFENDANT", "repeatable": true },
+      { "id": "defendantAddress", "label": "Defendants' address", "type": "address", "required": false, "question": "Where can the defendants be served?", "placeholder": "DEFENDANTS’ ADDRESS" },
+      { "id": "story", "label": "What happened", "type": "longText", "required": true, "question": "What happened?", "placeholder": "FACTS" },
+      { "id": "sum", "label": "Sum owed", "type": "money", "required": false, "question": "How much is owed?", "placeholder": "SUM" },
+      { "id": "agreementDate", "label": "Date of the agreement", "type": "date", "required": false, "question": "When was the agreement made?", "placeholder": "DATE OF AGREEMENT" }
+    ],
+    "changeLog": [{ "date": "2026-10-23", "note": "Test template." }]
+  },
+  "facts": {
+    "claimant": "Wombat Adeyemi Enterprises Ltd",
+    "defendant": ["Quokka Okafor", "Numbat Bello"],
+    "story": "Wombat Adeyemi Enterprises Ltd supplied 400 bags of cement to Quokka Okafor and Numbat Bello on credit. They paid part and refused to pay the balance despite two written demands.",
+    "sum": "N2,350,000",
+    "agreementDate": "2026-03-14"
+  }
+}

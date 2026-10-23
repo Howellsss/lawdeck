@@ -20,6 +20,18 @@ export async function filterContextFor(db: Db, hits: (SearchHit & { label: numbe
   };
 }
 
+// The citation check for text written without passages (a document's narrative parts, step 5d):
+// any case or statute it names must be in the approved library or a recognised statute.
+export async function libraryOnlyContext(db: Db, courseId: string | null): Promise<FilterContext> {
+  return {
+    labels: new Set(),
+    passageTexts: [],
+    statuteTexts: [],
+    recognisedTitles: await recognisedTitles(db, courseId),
+    lookup: libraryLookup(db, courseId),
+  };
+}
+
 // Which items are statutes or rules of court (their quotations may be longer).
 async function itemTypes(db: Db, hits: SearchHit[]): Promise<Map<string, boolean>> {
   const ids = [...new Set(hits.map((hit) => hit.itemId))];

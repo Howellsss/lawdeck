@@ -30,12 +30,13 @@ test("asking from the home screen asks visitors to sign in", async ({ page }) =>
   await expect(page.getByRole("link", { name: "Sign in", exact: true }).first()).toBeVisible();
 });
 
-test("Draft mode says drafting comes later", async ({ page }) => {
+test("Draft mode asks visitors to sign in", async ({ page }) => {
   await page.goto("/");
   await page.getByLabel("Mode", { exact: true }).selectOption("Draft");
   await page.getByLabel("What are we working on?").fill("Draft a writ");
   await page.getByRole("button", { name: "Send" }).click();
-  await expect(page.getByText(/Drafting documents arrives in a later build/)).toBeVisible();
+  await expect(page.getByText("Sign in to draft documents.")).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in", exact: true }).first()).toBeVisible();
 });
 
 test("course hubs never show topics or the topics editor to visitors", async ({ page }) => {

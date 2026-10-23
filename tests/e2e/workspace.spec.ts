@@ -98,3 +98,9 @@ test("the marking guide pages are hidden from visitors", async ({ page }) => {
     await expect(page.getByRole("textbox")).toHaveCount(0);
   }
 });
+
+test("the Word download refuses visitors", async ({ request }) => {
+  const response = await request.get(`/api/documents/${someId}/docx`);
+  expect(response.status()).toBe(401);
+  expect(response.headers()["content-type"]).not.toContain("wordprocessingml");
+});

@@ -45,3 +45,15 @@ Rules the database enforces (tested in `tests/permissions/sql/9d_drafting_test.s
   - a party written two ways (titles, the surname alone and ordinary words are fine);
   - defined terms used only once.
 - On screen, the page keeps the court's proportions at any width. Splitting into separate A4 pages and zoom for phones come with the preview panel (5e).
+
+## Draft flow (step 5d)
+- **Choosing a document (DR-01, DR-02).** The **Drafting catalogue** (`/drafting`) lists approved templates by course. A typed request on the home screen in Draft mode, or one Auto mode sends to Draft, is matched to one approved template by Claude Haiku (prompt `draft-pick-v1`; only the template titles and the request, with emails and phone numbers removed, are sent). No match opens the catalogue with a note. Matching is recorded but free.
+- **Court or registry (DR-03).** Asked only when the template is approved for more than one; with one, it is used without asking.
+- **Intake (DR-04).** One question per template field (`/drafting/[slug]`); several answers where the field allows it. Every answer is optional: what is left out shows as its placeholder. The server keeps only the template's own fields (`factsFor`) and checks dates.
+- **Writing (PRD 7.1).** Opus (prompt `draft-v1`, low effort, 60-second limit) writes only the narrative parts, each within its word limit, as JSON. The template supplies everything else.
+  - **Names never reach the AI (rule G-06).** Parties and addresses are sent only as "given" with a stand-in such as `{{claimant}}`; a party's name typed inside another fact is swapped for its stand-in; emails and phone numbers are removed. Claude writes the stand-ins, and the document engine puts the real fact, or its placeholder, in their place.
+  - **Checks on Claude's text:** stand-ins that are not fields are dropped; Markdown is removed; word limits hold (cut at a full sentence); any case or statute not in the approved library is removed (`libraryOnlyContext`).
+- **Saving and cost.** The document and version 1 are saved only after Claude's text is checked. A draft that used the AI counts as one question (migration 23); failures are free. The allowance is checked before Opus runs.
+- **The document (`/documents/[id]`).** The automatic checks, the document as it will print, and **Download Word file** (`/api/documents/[id]/docx`, owner only). **Documents** (`/documents`) lists the student's drafts. Editing and versions come in 5e.
+- **Unreviewed wording is never shown.** If a document's template or court is sent back for review or removed, the document page says it is being re-checked and the Word file is not offered; the student's facts and text stay saved.
+- **Drafting test** (`npm run eval:drafting`, or Actions → "Drafting test"): one made-up document drafted by Opus with the real prompt, checked for stand-ins, word limits, the missing fact left as its stand-in, no authority named, no sum invented, and 30 seconds. About 5 cents. Prints results only, never the text (public repository).
