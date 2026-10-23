@@ -131,7 +131,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 
 ## Phase 6. Uploads, sharing and account controls
 
-⬜ 6a. Upload notice, private file store, uploads tables and My uploads page (UP-01, UP-02, UP-03, UP-05, UP-06) — migration 24 to apply (founder)
+✅ 6a. Upload notice, private file store, uploads tables and My uploads page (UP-01, UP-02, UP-03, UP-05, UP-06) (migration 24 applied by founder 2026-10-23)
 ⬜ 6b. Reading uploads (text and scans), extraction quality flag, search index tied to the student (UP-01, UP-04)
 ⬜ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library"
 ⬜ 6d. View-only share links, who has access, revoke (EX-04)
@@ -218,3 +218,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 5g merged. Step 5f planned and approved (founder: with the four front-loading templates). Built: "Why is it arranged this way?" on documents and question pages, related documents drafted with the same facts carried over, numbered lists in templates, and Form 01, list of witnesses, witness statement on oath and list of documents as drafts for review. No AI cost, no migration.
 - 2026-10-23: Step 5f merged. Step 5h planned and approved (founder: Save as PDF from the pages, no hosted converter). Built: Save as PDF, parts that start a new page (the affidavit), Word keeps each paragraph together, preview spacing worked out as Word does, and an automatic export test: all 15 template and court pairs have the same pages on screen, in the PDF and in LibreOffice's print of the Word file. No AI, no migration, no new library.
 - 2026-10-23: Phase 6 started (founder: "approve"). Step 6a built: upload notice (Appendix C) accepted once, private "uploads" file store with one folder per student, uploads and upload_passages tables (owner only), 50-file Free limit and notice enforced by the database, My uploads page with upload, real file-type check and delete. Migration 24; 30 database permission checks. No AI, no cost, no new library.
+- 2026-10-23: Migration 24 applied (founder). Real-project check added: a second student cannot list, download, delete, overwrite or add to another student's upload.
