@@ -1,7 +1,11 @@
 import deedOfAssignment from "./documents/deed-of-assignment.json";
+import listOfDocuments from "./documents/list-of-documents.json";
+import listOfWitnesses from "./documents/list-of-witnesses.json";
 import motionOnNoticeWithAffidavit from "./documents/motion-on-notice-with-affidavit.json";
+import preActionProtocolForm01 from "./documents/pre-action-protocol-form-01.json";
 import statementOfClaim from "./documents/statement-of-claim.json";
 import tenancyAgreement from "./documents/tenancy-agreement.json";
+import witnessStatementOnOath from "./documents/witness-statement-on-oath.json";
 import writOfSummons from "./documents/writ-of-summons.json";
 import federalHighCourt from "./forums/federal-high-court.json";
 import fctHighCourt from "./forums/fct-high-court.json";
@@ -26,4 +30,9 @@ export const TEMPLATE_FILES: unknown[] = [
   motionOnNoticeWithAffidavit,
   deedOfAssignment,
   tenancyAgreement,
+  // The Lagos front-loading documents that go with a writ (step 5f).
+  preActionProtocolForm01,
+  listOfWitnesses,
+  witnessStatementOnOath,
+  listOfDocuments,
 ];

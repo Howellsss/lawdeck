@@ -108,7 +108,7 @@ function Pages({ model, caption, onPlaceholder }: { model: DocModel; caption?: s
               >
                 <div className="absolute overflow-hidden" style={{ ...textStyle, top: margins.top, left: margins.left, right: margins.right, height: contentHeight }}>
                   {indexes.map((i) => (
-                    <div key={i} className="flow-root">
+                    <div key={i} className="flow-root" data-part={items[i].partId}>
                       <PreviewItem item={items[i]} onPlaceholder={onPlaceholder} />
                     </div>
                   ))}

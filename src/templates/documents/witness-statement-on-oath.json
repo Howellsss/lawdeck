@@ -1,0 +1,179 @@
+{
+  "slug": "witness-statement-on-oath",
+  "title": "Witness statement on oath",
+  "course": "civil-litigation",
+  "forums": [
+    "lagos-high-court",
+    "fct-high-court"
+  ],
+  "ruleSource": "Written statements on oath of witnesses under the High Court of Lagos State (Civil Procedure) Rules 2019 and the FCT High Court (Civil Procedure) Rules, as set out in S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) and the Civil Litigation Handbook 2025. To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFct",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUIT NO: ............\nBETWEEN:\n{{claimant}} .................... CLAIMANT\nAND\n{{defendant}} .................... DEFENDANT",
+        "required": true,
+        "why": "The suit number is left blank: the Registrar assigns it on filing, so counsel never writes one. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "WITNESS STATEMENT ON OATH OF {{witnessNumber}}",
+        "required": true,
+        "why": "A witness statement on oath has the same form as an affidavit, headed with the witness's number (PW1, PW2 …). It stands as the witness's evidence-in-chief, so it states only what the witness knows. In Lagos a writ must be filed with the front-loaded documents: the statement of claim, a list of witnesses, their written statements on oath, a list and copies of the documents to be relied on, and Pre-action Protocol Form 01. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025."
+      },
+      {
+        "id": "intro",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I, {{witness}}, {{witnessDescription}}, of {{witnessAddress}}, do hereby make oath and state as follows:",
+        "required": true,
+        "why": "The witness's name, description and address, then the oath, as in an affidavit. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "depositions",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "In numbered paragraphs 1, 2, 3…, set out what the witness knows about the case, using only the facts given: first who the witness is and how they know the facts, then the facts in the order they happened, naming any document referred to. Facts within the witness's knowledge only: no law, no arguments and no conclusions. Do not write the closing oath; the template adds it.",
+        "maxWords": 700,
+        "required": true,
+        "why": "The witness's evidence: facts within the witness's own knowledge, in numbered paragraphs, without law, argument or conclusion. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025."
+      },
+      {
+        "id": "oath",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "That I make this statement on oath in good faith, believing the contents to be true and correct, and in accordance with the Oaths Act 2004.",
+        "required": true,
+        "why": "The closing oath under the Oaths Act (not an Oaths Law). Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "jurat",
+        "kind": "fixed",
+        "align": "left",
+        "text": "........................................\nWITNESS\n\nSWORN TO at the High Court Registry, {{sittingPlace}}, this ............ day of ............ 20.....\n\nBEFORE ME\n........................................\nCOMMISSIONER FOR OATHS",
+        "required": true,
+        "why": "The jurat. Left undated: the Commissioner for Oaths dates it when it is sworn. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division will the case be filed in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit? For example: Ikeja, or Maitama in the FCT.",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "claimant",
+        "label": "Claimant",
+        "type": "party",
+        "required": true,
+        "question": "Who is suing? Give the full name (or the company's registered name).",
+        "placeholder": "CLAIMANT",
+        "repeatable": true
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "Who is being sued? Give the full name (or the company's registered name).",
+        "placeholder": "DEFENDANT",
+        "repeatable": true
+      },
+      {
+        "id": "witnessNumber",
+        "label": "Witness number",
+        "type": "text",
+        "required": true,
+        "question": "Which witness is this? For example: PW1 for the claimant's first witness.",
+        "placeholder": "PW1",
+        "repeatable": false
+      },
+      {
+        "id": "witness",
+        "label": "Witness",
+        "type": "party",
+        "required": true,
+        "question": "The witness's full name.",
+        "placeholder": "WITNESS",
+        "repeatable": false
+      },
+      {
+        "id": "witnessDescription",
+        "label": "Witness's description",
+        "type": "party",
+        "required": true,
+        "question": "Sex, religion, adult, nationality and occupation. For example: female, Christian, adult, Nigerian citizen, accountant.",
+        "placeholder": "WITNESS’S DESCRIPTION",
+        "repeatable": false
+      },
+      {
+        "id": "witnessAddress",
+        "label": "Witness's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the witness live?",
+        "placeholder": "WITNESS’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "witnessFacts",
+        "label": "What the witness knows",
+        "type": "longText",
+        "required": true,
+        "question": "What did the witness see, do or know about the case, in order, with dates?",
+        "placeholder": "WITNESS’S EVIDENCE",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "list-of-witnesses",
+      "writ-of-summons"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5f)."
+      }
+    ]
+  }
+}

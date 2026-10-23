@@ -5,6 +5,9 @@ import {
   documentContentSchema,
   draftingIdSchema,
   forumProfileSchema,
+  templateFileSchema,
+  partLabel,
+  sharedFacts,
   templateSpecSchema,
   type ForumProfile,
   type TemplateField,
@@ -14,6 +17,7 @@ import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { checkDocument, type CheckIssue } from "@/server/documents/checks";
 import { buildDocument, type DocModel } from "@/server/documents/render";
+import { TEMPLATE_FILES } from "@/templates";
 import type { Database } from "./types";
 import { WorkspaceLoadError, type Loaded } from "./workspace";
 
@@ -24,7 +28,9 @@ import { WorkspaceLoadError, type Loaded } from "./workspace";
 type Db = SupabaseClient<Database>;
 
 export type CatalogueCourse = { slug: string; name: string; templates: { slug: string; title: string }[] };
-export type IntakeForum = { id: string; name: string };
+export type IntakeForum = { id: string; slug: string; name: string };
+// "Why is it arranged this way?" (DR-08): each part in order, what it does and the rule behind it.
+export type WhyEntry = { partId: string; heading: string | null; why: string; onlyFor: string[] | null };
 export type IntakeView = {
   id: string;
   title: string;
@@ -32,7 +38,13 @@ export type IntakeView = {
   forums: IntakeForum[];
   fields: TemplateField[];
   aiParts: number;
+  why: WhyEntry[];
+  // Answers carried over from one of the student's documents (DR-09), and its court.
+  defaults: Record<string, string[]>;
+  defaultForumId: string | null;
 };
+// A document that usually goes with this one (DR-09); available once its template is approved.
+export type RelatedDocument = { slug: string; title: string; available: boolean };
 export type DocumentSummary = { id: string; title: string; forumName: string | null; updatedAt: string };
 export type EditablePartView = {
   id: string;
@@ -51,6 +63,8 @@ export type DocumentView = DocumentSummary & {
   facts: Record<string, string[]>;
   parts: EditablePartView[];
   versions: VersionSummary[];
+  why: WhyEntry[];
+  related: RelatedDocument[];
 };
 
 function failed(what: string, code: string | undefined): never {
@@ -81,7 +95,7 @@ export async function listCatalogue(): Promise<Loaded<CatalogueCourse[]>> {
 }
 
 // One approved template's intake: its questions and the courts or registries it can be drafted for.
-export async function getIntake(slug: string): Promise<Loaded<IntakeView | null>> {
+export async function getIntake(slug: string, fromDocumentId?: string): Promise<Loaded<IntakeView | null>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   if (!/^[a-z0-9-]{1,80}$/.test(slug)) return { status: "ok", data: null };
   const supabase = await createSupabaseServerClient();
@@ -100,6 +114,8 @@ export async function getIntake(slug: string): Promise<Loaded<IntakeView | null>
     approvedForums(supabase, data.id),
   ]);
   if (course.error) failed("course", course.error.code);
+  const carried = fromDocumentId ? await carriedOver(supabase, fromDocumentId, spec.data.fields, forums) : null;
+  const forumNames = new Map(forums.map((f) => [f.slug, f.name]));
   return {
     status: "ok",
     data: {
@@ -109,9 +125,36 @@ export async function getIntake(slug: string): Promise<Loaded<IntakeView | null>
       forums,
       fields: spec.data.fields,
       aiParts: spec.data.parts.filter((part) => part.kind === "narrative").length,
+      why: spec.data.parts.map((part) => ({
+        partId: part.id,
+        heading: partLabel(part, spec.data.fields),
+        why: part.why,
+        onlyFor: part.forums ? part.forums.map((f) => forumNames.get(f) ?? f) : null,
+      })),
+      defaults: carried?.facts ?? {},
+      defaultForumId: carried?.forumId ?? null,
     },
   };
 }
+
+// The answers a related document can reuse (DR-09): those of the student's own document whose
+// questions are the same (same name), and its court if this template is for it too. Row-level
+// security means only the student's own document can be read.
+async function carriedOver(
+  supabase: Db,
+  documentId: string,
+  fields: TemplateField[],
+  forums: IntakeForum[],
+): Promise<{ facts: Record<string, string[]>; forumId: string | null } | null> {
+  if (!draftingIdSchema.safeParse(documentId).success) return null;
+  const loaded = await loadDocument(supabase, documentId);
+  if (!loaded?.content) return null;
+  return {
+    facts: sharedFacts(loaded.content.fields, fields),
+    forumId: forums.some((f) => f.id === loaded.document.forum_id) ? loaded.document.forum_id : null,
+  };
+}
+
 
 async function approvedForums(supabase: Db, templateId: string): Promise<IntakeForum[]> {
   const links = await supabase.from("template_forums").select("forum_id").eq("template_id", templateId);
@@ -119,12 +162,12 @@ async function approvedForums(supabase: Db, templateId: string): Promise<IntakeF
   if (links.data.length === 0) return [];
   const forums = await supabase
     .from("forums")
-    .select("id, name, profile")
+    .select("id, slug, name, profile")
     .in("id", links.data.map((link) => link.forum_id))
     .eq("status", "approved")
     .order("name");
   if (forums.error) failed("forums", forums.error.code);
-  return forums.data.filter((f) => forumProfileSchema.safeParse(f.profile).success).map((f) => ({ id: f.id, name: f.name }));
+  return forums.data.filter((f) => forumProfileSchema.safeParse(f.profile).success).map((f) => ({ id: f.id, slug: f.slug, name: f.name }));
 }
 
 export async function listDocuments(): Promise<Loaded<DocumentSummary[]>> {
@@ -178,9 +221,38 @@ export async function getDocument(id: string): Promise<Loaded<DocumentView | nul
             })
         : [],
       versions: await listVersions(supabase, document.id, document.current_version_id),
+      why: ready
+        ? ready.model.blocks.flatMap((block) => {
+            const part = ready.spec.parts.find((p) => p.id === block.partId);
+            return part ? [{ partId: part.id, heading: partLabel(part, ready.spec.fields), why: part.why, onlyFor: null }] : [];
+          })
+        : [],
+      related: ready ? await relatedDocuments(supabase, ready.spec.related) : [],
     },
   };
 }
+
+// The documents that go with this one (DR-09), by their template's slug. Titles come from the
+// template files; a link is offered only once that template is approved (unreviewed templates are
+// never shown to students).
+async function relatedDocuments(supabase: Db, slugs: string[]): Promise<RelatedDocument[]> {
+  if (slugs.length === 0) return [];
+  const { data, error } = await supabase.from("templates").select("slug, title").in("slug", slugs).eq("status", "approved");
+  if (error) failed("related documents", error.code);
+  const approved = new Map(data.map((t) => [t.slug, t.title]));
+  return slugs.map((slug) => ({
+    slug,
+    title: approved.get(slug) ?? TEMPLATE_TITLES.get(slug) ?? slug,
+    available: approved.has(slug),
+  }));
+}
+
+const TEMPLATE_TITLES = new Map(
+  TEMPLATE_FILES.flatMap((file) => {
+    const parsed = templateFileSchema.safeParse(file);
+    return parsed.success ? [[parsed.data.slug, parsed.data.title] as const] : [];
+  }),
+);
 
 async function listVersions(supabase: Db, id: string, currentId: string | null): Promise<VersionSummary[]> {
   const { data, error } = await supabase

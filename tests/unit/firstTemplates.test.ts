@@ -22,9 +22,19 @@ function draw(template: TemplateFile, forumSlug: string | null, fields: Record<s
 }
 
 describe("the first templates", () => {
-  it("has the five documents of step 5g", () => {
+  it("has the documents of steps 5g and 5f", () => {
     expect(templates.map((t) => t.slug).sort()).toEqual(
-      ["deed-of-assignment", "motion-on-notice-with-affidavit", "statement-of-claim", "tenancy-agreement", "writ-of-summons"].sort(),
+      [
+        "deed-of-assignment",
+        "list-of-documents",
+        "list-of-witnesses",
+        "motion-on-notice-with-affidavit",
+        "pre-action-protocol-form-01",
+        "statement-of-claim",
+        "tenancy-agreement",
+        "witness-statement-on-oath",
+        "writ-of-summons",
+      ].sort(),
     );
   });
 

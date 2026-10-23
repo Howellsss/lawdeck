@@ -350,3 +350,29 @@ export const instructionSchema = z.strictObject({
       error: `Keep the instruction under ${INSTRUCTION_MAX_CHARS} characters.`,
     }),
 });
+
+// The answers one document can pass to a related one (step 5f, DR-09): those to the same
+// questions (same name), with one answer kept where the new question takes only one.
+export function sharedFacts(
+  from: Record<string, string | string[]>,
+  fields: TemplateField[],
+): Record<string, string[]> {
+  const out: Record<string, string[]> = {};
+  for (const field of fields) {
+    const value = from[field.id];
+    const values = (Array.isArray(value) ? value : [value ?? ""]).filter((v) => v.trim());
+    if (values.length) out[field.id] = field.repeatable ? values : values.slice(0, 1);
+  }
+  return out;
+}
+
+// A readable name for a part: its heading, or else its first line with each {{fact}} shown by its
+// question's label ("IN THE HIGH COURT OF LAGOS STATE", "Dated this … day of …").
+export function partLabel(part: TemplatePart, fields: TemplateField[]): string {
+  if (part.heading) return part.heading;
+  if (part.kind === "signature") return "Signature";
+  if (part.kind === "narrative") return "Written from your facts";
+  const first = (part.text ?? "").split("\n").find((line) => line.trim()) ?? part.id;
+  const named = first.replace(/\{\{\s*([a-zA-Z][a-zA-Z0-9]*)\s*\}\}/g, (_, id: string) => fields.find((f) => f.id === id)?.label ?? id);
+  return named.length > 60 ? `${named.slice(0, 57).trimEnd()}…` : named;
+}

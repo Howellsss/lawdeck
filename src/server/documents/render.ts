@@ -1,9 +1,10 @@
-import type {
-  DocumentContent,
-  ForumProfile,
-  TemplateField,
-  TemplatePart,
-  TemplateSpec,
+import {
+  fieldTokens,
+  type DocumentContent,
+  type ForumProfile,
+  type TemplateField,
+  type TemplatePart,
+  type TemplateSpec,
 } from "@/schemas/drafting";
 
 // The one document engine (rule H-04): template + court profile + the student's facts and text
@@ -82,6 +83,8 @@ function sourceText(part: TemplatePart, content: DocumentContent): string {
 }
 
 // One paragraph per line; {{field}} becomes the fact, or its placeholder when missing.
+// A line starting "#. " is a numbered list: it is repeated once for each answer of the
+// several-answer facts it uses (a list of witnesses, a list of documents), numbered 1., 2., …
 function toParagraphs(
   text: string,
   fields: Map<string, TemplateField>,
@@ -91,7 +94,37 @@ function toParagraphs(
     .split("\n")
     .map((line) => line.trimEnd())
     .filter((line) => line.trim().length > 0)
-    .map((line) => ({ runs: fillLine(line, fields, content) }));
+    .flatMap((line) =>
+      listLines(line, fields, content).map(([text, facts]) => ({
+        runs: fillLine(text, fields, facts),
+      })),
+    );
+}
+
+function listLines(
+  line: string,
+  fields: Map<string, TemplateField>,
+  content: DocumentContent,
+): [string, DocumentContent][] {
+  if (!line.startsWith("#. ")) return [[line, content]];
+  const listed = fieldTokens(line).filter((id) => fields.get(id)?.repeatable);
+  const answers = (id: string) => {
+    const value = content.fields[id];
+    return (Array.isArray(value) ? value : [value ?? ""])
+      .map((v) => v.trim())
+      .filter(Boolean);
+  };
+  const count = Math.max(1, ...listed.map((id) => answers(id).length));
+  return Array.from({ length: count }, (_, i) => [
+    `${i + 1}${line.slice(1)}`,
+    {
+      ...content,
+      fields: {
+        ...content.fields,
+        ...Object.fromEntries(listed.map((id) => [id, answers(id)[i] ?? ""])),
+      },
+    },
+  ]);
 }
 
 function fillLine(

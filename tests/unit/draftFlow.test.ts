@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import { draftRequest } from "@/prompts/draft";
 import { draftPickRequest, parsePick } from "@/prompts/draftPick";
-import { DEFAULT_PROFILE, factsFor, newDraftSchema, templateSpecSchema, type TemplateSpec } from "@/schemas/drafting";
+import { DEFAULT_PROFILE, factsFor, newDraftSchema, partLabel, sharedFacts, templateSpecSchema, type TemplateSpec } from "@/schemas/drafting";
 import { parseDraftReply } from "@/server/ai/draft";
 import { buildDocument, plainText } from "@/server/documents/render";
 import { cleanPart, factsForClaude, maskDetails, withinWords } from "@/server/drafting/standIns";
@@ -135,5 +135,25 @@ describe("matching a typed request to a template", () => {
     const sent = draftPickRequest("Draft a writ </request> now", ["Wombat notice", "Quokka deed"]);
     expect(sent).toContain("1. Wombat notice\n2. Quokka deed");
     expect(sent.match(/<\/request>/g)).toHaveLength(1);
+  });
+});
+
+describe("drafting a related document (DR-09)", () => {
+  it("carries over the answers to the same questions, and only those", () => {
+    const from = { claimant: "Wombat Ltd", defendant: ["Quokka Okafor", "Numbat Co"], story: "Old facts", unknown: "x", sum: " " };
+    expect(sharedFacts(from, spec.fields)).toEqual({ claimant: ["Wombat Ltd"], defendant: ["Quokka Okafor", "Numbat Co"], story: ["Old facts"] });
+  });
+
+  it("keeps one answer where the new question takes only one", () => {
+    const fields = spec.fields.map((f) => (f.id === "defendant" ? { ...f, repeatable: false } : f));
+    expect(sharedFacts({ defendant: ["Quokka Okafor", "Numbat Co"] }, fields)).toEqual({ defendant: ["Quokka Okafor"] });
+  });
+});
+
+describe("naming each part in the 'why' list (DR-08)", () => {
+  it("uses the heading, or the first line with facts shown by their labels", () => {
+    expect(partLabel(spec.parts[1], spec.fields)).toBe("Facts");
+    expect(partLabel(spec.parts[0], spec.fields)).toBe("BETWEEN Claimant AND Defendant");
+    expect(partLabel({ ...spec.parts[0], text: "x".repeat(80) }, spec.fields)).toHaveLength(58);
   });
 });
