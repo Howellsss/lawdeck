@@ -11,7 +11,7 @@ permissions:
 
 jobs:
   drafting:
-    name: Drafting test (Claude Haiku)
+    name: Drafting test (Claude Opus)
     runs-on: ubuntu-latest
     timeout-minutes: 15
     env:
