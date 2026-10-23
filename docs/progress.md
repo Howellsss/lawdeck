@@ -124,8 +124,6 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 5b. Template and forum-profile files checked by schema; reviewer approval page (/admin/templates)
 ✅ 5c. One renderer for preview and DOCX; automatic checks (DR-06)
 ✅ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04) (migration 23 applied by founder 2026-10-23)
-⬜ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
-✅ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04) (migration 23 to apply)
 ✅ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
 ⬜ 5f. "Why is it arranged this way?" and related documents for a Lagos writ (DR-08, DR-09)
 ⚠️ 5g. First templates (writ of summons, statement of claim, motion on notice with affidavit, deed of assignment, tenancy agreement) — legal reviewer approves; Property Law ones need its notes in the library
