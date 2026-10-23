@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ExportButtons } from "@/components/exports/ExportButtons";
 import { DeleteBriefButton } from "@/components/briefs/DeleteBriefButton";
 import { AnswerText } from "@/components/learn/AnswerText";
 import { LoadingRows } from "@/components/ui/LoadingRows";
@@ -65,6 +66,7 @@ async function BriefView({ params }: Pick<PageProps<"/briefs/[id]">, "params">) 
           </section>
         )}
       </article>
+      <ExportButtons kind="brief" id={brief.id} />
       <DeleteBriefButton id={brief.id} />
     </>
   );

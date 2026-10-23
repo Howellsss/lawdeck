@@ -137,3 +137,12 @@ test("A shared link asks visitors to sign in and shows nothing of the shared wor
   await expect(page.getByRole("link", { name: "Sign in" }).last()).toHaveAttribute("href", `/sign-in?next=${encodeURIComponent(path)}`);
   await expect(page.locator("[data-page-count]")).toHaveCount(0);
 });
+
+test("Exports ask visitors to sign in and give them no file", async ({ page, request }) => {
+  const id = "aaaaaaaa-0000-4000-8000-000000000001";
+  const word = await request.get(`/api/exports/chat/${id}`);
+  expect(word.status()).toBe(401);
+  expect(word.headers()["content-type"] ?? "").not.toContain("wordprocessingml");
+  await page.goto(`/print/study/brief/${id}`);
+  await expect(page.getByRole("heading", { name: "Sign in to save your work" })).toBeVisible();
+});
