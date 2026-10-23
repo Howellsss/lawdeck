@@ -122,7 +122,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 
 ✅ 5a. Migration 21: forums, templates, template_forums, documents, document_versions, with permission tests (applied by founder 2026-10-23)
 ✅ 5b. Template and forum-profile files checked by schema; reviewer approval page (/admin/templates)
-⬜ 5c. One renderer for preview and DOCX; automatic checks (DR-06)
+✅ 5c. One renderer for preview and DOCX; automatic checks (DR-06)
 ⬜ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04)
 ⬜ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
 ⬜ 5f. "Why is it arranged this way?" and related documents for a Lagos writ (DR-08, DR-09)
@@ -198,3 +198,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Phase 5 (Draft) started. Plan approved (founder: "start"). Step 5a: migration 21 (forums, templates, template_forums, documents, document_versions) with 40 two-student and reviewer permission checks. Spec: docs/specs/drafting.md. No AI, no cost.
 - 2026-10-23: The fifth course is now shown as "Law in Practice (Professional Ethics)" (founder), so students and uploads find Ethics; files with "ethics" in their name are filed there automatically. Migration 22, name only.
 - 2026-10-23: Step 5b built: template and court-format files in src/templates, checked by schema before approval (rule H-03); Templates page for reviewers (load from files, approve, back to draft, withdraw; admins delete). First four court and registry files use the default formatting until a reviewer confirms them. No AI, no cost, no new library.
+
+- 2026-10-23: Step 5c built: one document engine for the on-screen page and the Word file (library docx 9.13, founder approved), placeholders for missing facts in both, and automatic checks (missing parts and facts, impossible dates, party names written two ways, unused defined terms). A sample Word file printed by LibreOffice matched the on-screen page. No AI, no cost.
