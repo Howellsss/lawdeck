@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 export const PROJECT_NAME_MAX = 120;
 

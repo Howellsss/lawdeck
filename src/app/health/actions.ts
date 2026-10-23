@@ -1,7 +1,7 @@
 "use server";
 
 import { timingSafeEqual } from "node:crypto";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { runHealthCheck, type HealthCheckResult } from "@/server/ai/healthCheck";
 
 const Input = z.object({ code: z.string().min(1).max(200) });

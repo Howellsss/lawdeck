@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { LIBRARY_FILE_TYPES, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
 import { KB_ITEM_TYPES } from "@/lib/libraryLabels";
 

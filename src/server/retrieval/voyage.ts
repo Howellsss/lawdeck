@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { EMBEDDING_DIMENSIONS, EMBEDDING_MODELS, type EmbeddingModel } from "./settings";
 
 // Voyage AI turns text into search vectors (System Design §2). Called directly over HTTPS,

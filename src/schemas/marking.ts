@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // "Mark my answer" (Phase 4, step 4e; PRD LN-08). Typed answers only for now; uploads come with
 // the upload safety work in Phase 6 (founder, 2026-10-22).

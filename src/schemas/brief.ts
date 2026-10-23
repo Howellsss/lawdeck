@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { COURSES } from "@/lib/courses";
 
 // A brief request (Phase 4, step 4f; PRD LN-09): a case or statute named by the student.

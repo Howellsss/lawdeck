@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // Marking guides (Phase 4, step 4d): one exam-style question with the points a good answer makes,
 // each worth some marks. Written and approved by reviewers; used to mark students in step 4e.

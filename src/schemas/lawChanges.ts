@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // A change in the law recorded by a reviewer (rule KB-02).
 export const lawChangeSchema = z.object({

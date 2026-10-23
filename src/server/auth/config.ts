@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // Supabase settings. The URL and publishable key are not secret (they are protected by
 // row-level security), but they still come from environment variables, never from code.

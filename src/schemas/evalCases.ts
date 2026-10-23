@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // The answer quality test set (step 3e): tests/eval/explain/civil-litigation.json.
 const turnSchema = z.object({ role: z.enum(["user", "assistant"]), text: z.string().min(1).max(2000) });

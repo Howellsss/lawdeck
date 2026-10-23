@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 const REVIEW_STATUSES = ["pending", "approved", "rejected", "withdrawn"] as const;
 
