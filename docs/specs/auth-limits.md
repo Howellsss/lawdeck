@@ -16,4 +16,4 @@ Engineering Rules C-04 and K-02. Founder approved 2026-10-23. Migration 29.
 These limits protect Lawdeck's own forms. Someone calling Supabase's sign-in service directly with the public key bypasses them; Supabase's built-in limits cover that path.
 
 ## Tests
-`tests/permissions/sql/9k_auth_limits_test.sql` (15 checks) · `tests/unit/authLimits.test.ts`. A live check on the real project is added once migration 29 is applied. (A browser test of the pause needs a real Supabase project, so it is covered by the unit and database tests instead.)
+`tests/permissions/sql/9k_auth_limits_test.sql` (15 checks) · `tests/unit/authLimits.test.ts`. `tests/permissions/authLimits.test.ts` checks the real project (read-only). (A browser test of the pause needs a real Supabase project, so it is covered by the unit and database tests instead.)

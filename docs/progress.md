@@ -141,7 +141,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ### Phase 7. Pre-pilot hardening
 ⬜ 7a. Supabase Pro and Vercel Pro; separate staging and production keys (B-04, R-01): ⚠️ founder: not upgrading yet (2026-10-23)
 ⬜ 7b. Payments with a Nigerian provider; plans and limits enforced (AC-03, AC-04, K-01): ⚠️ founder: provider, prices, free-tier limits
-⚠️ 7c. Login, sign-up and reset limits (C-04, K-02): built, waiting for the founder to apply migration 29
+✅ 7c. Login, sign-up and reset limits (C-04, K-02) (migration 29 applied by founder 2026-10-23)
 ⬜ 7d. Daily backups and a practice restore into staging (Q-01, Q-02): needs 7a
 ⬜ 7e. Error monitoring and unusual-access alerts (I-04, P-03): ⚠️ founder: approve a monitoring service
 ⬜ 7f. Breach response plan finalised (P-04, Appendix D)
