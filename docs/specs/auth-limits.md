@@ -3,7 +3,7 @@
 Engineering Rules C-04 and K-02. Founder approved 2026-10-23. Migration 29.
 
 ## Limits
-- **Sign-in:** 5 wrong passwords for one email within 15 minutes pauses sign-in for that email (from any device) until 15 minutes after the 5th. The message says how many minutes to wait. Only wrong passwords count; a correct one is never blocked by someone else's failures for 15 minutes at most.
+- **Sign-in:** 5 wrong passwords for one email within 15 minutes pauses sign-in for that email (from any device) until 15 minutes after the 5th. The message says how many minutes to wait. Only wrong passwords count. During a pause even the right password has to wait, so someone guessing could hold an account up for at most 15 minutes at a time; they can never get in.
 - **Sign-up, "forgot password", "resend email":** each limited to 5 per email and 20 per internet address an hour.
 - Supabase's own built-in limits stay on underneath.
 
