@@ -145,7 +145,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ 7d. Daily backups and a practice restore into staging (Q-01, Q-02): needs 7a
 ⬜ 7e. Error monitoring and unusual-access alerts (I-04, P-03): ⚠️ founder: approve a monitoring service
 ⬜ 7f. Breach response plan finalised (P-04, Appendix D)
-✅ 7g. Security review of permissions, secrets and uploads (P-05): findings fixed (docs/security-review.md); migration 30 to apply (founder); content security policy in report-only mode until the live reports are checked
+✅ 7g. Security review of permissions, secrets and uploads (P-05): findings fixed (docs/security-review.md); migration 30 applied by founder 2026-10-23; content security policy in report-only mode until the live reports are checked
 ⬜ 7h. Load test for 500 concurrent users (L-03): needs 7a
 ⬜ 7i. Privacy Notice and Terms of Use reviewed by counsel; consent at sign-up: ⚠️ counsel
 ⬜ 7j. Library, rubrics and templates for all five courses loaded and approved: ⚠️ founder and reviewers
