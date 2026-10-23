@@ -20,6 +20,10 @@ export function StaffNav() {
         <Icon name="pen" />
         <span className={collapsed ? "sr-only" : ""}>Marking guides</span>
       </NavLink>
+      <NavLink href="/admin/templates" onNavigate={onNavigate} className={itemClass} match="prefix">
+        <Icon name="document" />
+        <span className={collapsed ? "sr-only" : ""}>Templates</span>
+      </NavLink>
       <NavLink href="/admin/eval" onNavigate={onNavigate} className={itemClass} match="prefix">
         <Icon name="check" />
         <span className={collapsed ? "sr-only" : ""}>Answer tests</span>
