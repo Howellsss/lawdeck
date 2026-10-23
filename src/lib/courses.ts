@@ -6,7 +6,7 @@ export const COURSES = [
   { slug: "criminal-litigation", name: "Criminal Litigation" },
   { slug: "property-law-practice", name: "Property Law Practice" },
   { slug: "corporate-law-practice", name: "Corporate Law Practice" },
-  { slug: "law-in-practice", name: "Law in Practice" },
+  { slug: "law-in-practice", name: "Law in Practice (Professional Ethics)" },
 ] as const;
 
 export type CourseSlug = (typeof COURSES)[number]["slug"];
