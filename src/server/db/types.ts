@@ -1,20 +1,48 @@
 // Shape of the Lawdeck database, written to match supabase/migrations (same format as
 // Supabase's generated types). Update it in the same pull request as any migration.
-type Json = string | number | boolean | null | { [key: string]: Json | undefined } | Json[];
+type Json =
+  | string
+  | number
+  | boolean
+  | null
+  | { [key: string]: Json | undefined }
+  | Json[];
 
 type Timestamps = { created_at: string; updated_at: string };
 
-type KbItemType = "course_material" | "note" | "draft" | "textbook" | "statute" | "rule_of_court" | "case";
+type KbItemType =
+  | "course_material"
+  | "note"
+  | "draft"
+  | "textbook"
+  | "statute"
+  | "rule_of_court"
+  | "case";
 type ReviewStatus = "pending" | "approved" | "rejected" | "withdrawn";
 type ReadingStatus = "waiting" | "reading" | "done" | "failed";
 type ReadingMethod = "text" | "scan" | "mixed";
 type PracticeKind = "mcq" | "scenario" | "flashcards";
+type ForumKind = "court" | "registry";
+type VersionAuthor = "student" | "ai";
+type Reviewed = {
+  status: ReviewStatus;
+  created_by: string | null;
+  reviewed_by: string | null;
+  reviewed_at: string | null;
+};
 
 export type Database = {
   public: {
     Tables: {
       plans: {
-        Row: { id: string; name: string; price_ngn: number | null; monthly_message_limit: number | null; upload_limit: number | null; created_at: string };
+        Row: {
+          id: string;
+          name: string;
+          price_ngn: number | null;
+          monthly_message_limit: number | null;
+          upload_limit: number | null;
+          created_at: string;
+        };
         Insert: never;
         Update: never;
         Relationships: [];
@@ -29,19 +57,41 @@ export type Database = {
           courses: string[];
         };
         Insert: never;
-        Update: { full_name?: string | null; campus?: string | null; courses?: string[] };
+        Update: {
+          full_name?: string | null;
+          campus?: string | null;
+          courses?: string[];
+        };
         Relationships: [];
       };
       courses: {
-        Row: { id: string; slug: string; name: string; position: number; created_at: string };
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          position: number;
+          created_at: string;
+        };
         Insert: never;
         Update: never;
         Relationships: [];
       };
       topics: {
-        Row: { id: string; course_id: string; slug: string; name: string; position: number; created_at: string };
+        Row: {
+          id: string;
+          course_id: string;
+          slug: string;
+          name: string;
+          position: number;
+          created_at: string;
+        };
         // Admins only (migration 13). The slug never changes once made.
-        Insert: { course_id: string; slug: string; name: string; position?: number };
+        Insert: {
+          course_id: string;
+          slug: string;
+          name: string;
+          position?: number;
+        };
         Update: { name?: string; position?: number };
         Relationships: [];
       };
@@ -68,7 +118,11 @@ export type Database = {
           course_id?: string | null;
           auto_routed?: boolean;
         };
-        Update: { project_id?: string | null; title?: string; course_id?: string | null };
+        Update: {
+          project_id?: string | null;
+          title?: string;
+          course_id?: string | null;
+        };
         Relationships: [];
       };
       messages: {
@@ -204,8 +258,19 @@ export type Database = {
         Relationships: [];
       };
       kb_item_pages: {
-        Row: { item_id: string; page: number; text: string; method: "text" | "scan"; created_at: string };
-        Insert: { item_id: string; page: number; text: string; method: "text" | "scan" };
+        Row: {
+          item_id: string;
+          page: number;
+          text: string;
+          method: "text" | "scan";
+          created_at: string;
+        };
+        Insert: {
+          item_id: string;
+          page: number;
+          text: string;
+          method: "text" | "scan";
+        };
         Update: never;
         Relationships: [
           {
@@ -238,7 +303,12 @@ export type Database = {
           page_to?: number | null;
         };
         // embedding and embedding_model: the marked admin job only (src/server/retrieval/indexJob.ts).
-        Update: { heading?: string | null; text?: string; embedding?: string; embedding_model?: string };
+        Update: {
+          heading?: string | null;
+          text?: string;
+          embedding?: string;
+          embedding_model?: string;
+        };
         Relationships: [
           {
             foreignKeyName: "kb_passages_item_id_fkey";
@@ -260,8 +330,19 @@ export type Database = {
           created_by: string | null;
           created_at: string;
         };
-        Insert: { course_id: string; title: string; effective_on: string; note?: string | null; source?: string | null };
-        Update: { title?: string; effective_on?: string; note?: string | null; source?: string | null };
+        Insert: {
+          course_id: string;
+          title: string;
+          effective_on: string;
+          note?: string | null;
+          source?: string | null;
+        };
+        Update: {
+          title?: string;
+          effective_on?: string;
+          note?: string | null;
+          source?: string | null;
+        };
         Relationships: [];
       };
       // Case and statute briefs (migration 18). Owners only; never edited.
@@ -277,7 +358,118 @@ export type Database = {
           model: string | null;
           created_at: string;
         };
-        Insert: { course_id?: string | null; kind: "case" | "statute"; name: string; sections: Json; sources?: Json; model?: string | null };
+        Insert: {
+          course_id?: string | null;
+          kind: "case" | "statute";
+          name: string;
+          sections: Json;
+          sources?: Json;
+          model?: string | null;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      // Drafting (migration 21). Students read approved forums and templates; documents are owners' only.
+      forums: {
+        Row: {
+          id: string;
+          slug: string;
+          name: string;
+          kind: ForumKind;
+          state: string | null;
+          profile: Json;
+        } & Reviewed &
+          Timestamps;
+        Insert: {
+          slug: string;
+          name: string;
+          kind: ForumKind;
+          state?: string | null;
+          profile?: Json;
+        };
+        Update: {
+          name?: string;
+          kind?: ForumKind;
+          state?: string | null;
+          profile?: Json;
+          status?: ReviewStatus;
+        };
+        Relationships: [];
+      };
+      templates: {
+        Row: {
+          id: string;
+          slug: string;
+          title: string;
+          course_id: string;
+          spec: Json;
+          rule_source: string | null;
+          version: number;
+        } & Reviewed &
+          Timestamps;
+        Insert: {
+          slug: string;
+          title: string;
+          course_id: string;
+          spec?: Json;
+          rule_source?: string | null;
+        };
+        Update: {
+          title?: string;
+          course_id?: string;
+          spec?: Json;
+          rule_source?: string | null;
+          status?: ReviewStatus;
+        };
+        Relationships: [];
+      };
+      template_forums: {
+        Row: { template_id: string; forum_id: string };
+        Insert: { template_id: string; forum_id: string };
+        Update: never;
+        Relationships: [];
+      };
+      documents: {
+        Row: {
+          id: string;
+          owner_id: string;
+          project_id: string | null;
+          template_id: string | null;
+          template_version: number | null;
+          forum_id: string | null;
+          title: string;
+          current_version_id: string | null;
+        } & Timestamps;
+        Insert: {
+          project_id?: string | null;
+          template_id: string;
+          forum_id?: string | null;
+          title: string;
+        };
+        Update: {
+          title?: string;
+          project_id?: string | null;
+          current_version_id?: string | null;
+        };
+        Relationships: [];
+      };
+      document_versions: {
+        Row: {
+          id: string;
+          document_id: string;
+          owner_id: string;
+          number: number;
+          content: Json;
+          created_by: VersionAuthor;
+          model: string | null;
+          created_at: string;
+        };
+        Insert: {
+          document_id: string;
+          content: Json;
+          created_by: VersionAuthor;
+          model?: string | null;
+        };
         Update: never;
         Relationships: [];
       };
@@ -293,7 +485,13 @@ export type Database = {
           model: string | null;
           created_at: string;
         };
-        Insert: { course_id: string; topic_id?: string | null; kind: PracticeKind; title: string; model?: string | null };
+        Insert: {
+          course_id: string;
+          topic_id?: string | null;
+          kind: PracticeKind;
+          title: string;
+          model?: string | null;
+        };
         Update: never;
         Relationships: [];
       };
@@ -362,8 +560,20 @@ export type Database = {
           reviewed_by: string | null;
           reviewed_at: string | null;
         };
-        Insert: { course_id: string; topic_id?: string | null; title: string; question?: string | null; criteria?: Json };
-        Update: { title?: string; topic_id?: string | null; question?: string | null; criteria?: Json; status?: ReviewStatus };
+        Insert: {
+          course_id: string;
+          topic_id?: string | null;
+          title: string;
+          question?: string | null;
+          criteria?: Json;
+        };
+        Update: {
+          title?: string;
+          topic_id?: string | null;
+          question?: string | null;
+          criteria?: Json;
+          status?: ReviewStatus;
+        };
         Relationships: [];
       };
       eval_runs: {
@@ -377,8 +587,16 @@ export type Database = {
           finished_at: string | null;
         };
         // Written by the marked admin job only (jobs/explain-eval.job.ts).
-        Insert: { prompt_version: string; models: string[]; case_count: number; status?: "running" | "done" | "failed" };
-        Update: { status?: "running" | "done" | "failed"; finished_at?: string | null };
+        Insert: {
+          prompt_version: string;
+          models: string[];
+          case_count: number;
+          status?: "running" | "done" | "failed";
+        };
+        Update: {
+          status?: "running" | "done" | "failed";
+          finished_at?: string | null;
+        };
         Relationships: [];
       };
       eval_answers: {
@@ -387,7 +605,12 @@ export type Database = {
           run_id: string;
           case_id: string;
           case_kind: "question" | "pushback";
-          pushback_type: "wrong_statement" | "holds_position" | "fake_authority" | "valid_correction" | null;
+          pushback_type:
+            | "wrong_statement"
+            | "holds_position"
+            | "fake_authority"
+            | "valid_correction"
+            | null;
           topic: string | null;
           level: "simple" | "exam" | null;
           turns: Json;
@@ -419,7 +642,12 @@ export type Database = {
           run_id: string;
           case_id: string;
           case_kind: "question" | "pushback";
-          pushback_type?: "wrong_statement" | "holds_position" | "fake_authority" | "valid_correction" | null;
+          pushback_type?:
+            | "wrong_statement"
+            | "holds_position"
+            | "fake_authority"
+            | "valid_correction"
+            | null;
           topic?: string | null;
           level?: "simple" | "exam" | null;
           turns?: Json;
@@ -440,7 +668,10 @@ export type Database = {
           cost_usd?: number | null;
           error?: string | null;
         };
-        Update: { rating?: "approved" | "needs_fix" | null; review_note?: string | null };
+        Update: {
+          rating?: "approved" | "needs_fix" | null;
+          review_note?: string | null;
+        };
         Relationships: [];
       };
       search_events: {
@@ -452,13 +683,25 @@ export type Database = {
     };
     Views: {
       kb_items_needing_recheck: {
-        Row: { item_id: string; change_id: string; change_title: string; effective_on: string };
+        Row: {
+          item_id: string;
+          change_id: string;
+          change_title: string;
+          effective_on: string;
+        };
         Relationships: [];
       };
     };
     Functions: {
       record_ai_usage: {
-        Args: { kind: string; model: string; tokens_in: number; tokens_out: number; cost_usd: number; duration_ms: number };
+        Args: {
+          kind: string;
+          model: string;
+          tokens_in: number;
+          tokens_out: number;
+          cost_usd: number;
+          duration_ms: number;
+        };
         Returns: undefined;
       };
       question_allowance: {
@@ -516,7 +759,14 @@ export type Database = {
       };
       marking_guide: {
         Args: { rubric: string };
-        Returns: { id: string; title: string; question: string; criteria: Json; course_id: string; topic_id: string | null }[];
+        Returns: {
+          id: string;
+          title: string;
+          question: string;
+          criteria: Json;
+          course_id: string;
+          topic_id: string | null;
+        }[];
       };
       // Which case and statute names appear in approved library material (migration 16).
       library_mentions: {
@@ -524,7 +774,13 @@ export type Database = {
         Returns: { kind: "statute" | "case"; phrase: string }[];
       };
       replace_kb_passages: {
-        Args: { target_item: string; passages: Json; method: ReadingMethod; quality: number; pages: number };
+        Args: {
+          target_item: string;
+          passages: Json;
+          method: ReadingMethod;
+          quality: number;
+          pages: number;
+        };
         Returns: number;
       };
     };
@@ -534,6 +790,8 @@ export type Database = {
       message_role: "user" | "assistant";
       kb_item_type: KbItemType;
       practice_kind: PracticeKind;
+      forum_kind: ForumKind;
+      version_author: VersionAuthor;
       brief_kind: "case" | "statute";
       review_status: ReviewStatus;
       reading_status: ReadingStatus;

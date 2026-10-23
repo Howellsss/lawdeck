@@ -118,6 +118,17 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 4f. Case and statute briefs (LN-09): migration 18 applied by founder 2026-10-22; Sonnet; live trial still to run
 ⬜ 4g. Marking agreement test: 50 answers marked by Lawdeck and by the reviewer (at least 80% agreement) — legal reviewer
 
+## Phase 5. Draft: Nigerian-format documents
+
+⬜ 5a. Migration 21: forums, templates, template_forums, documents, document_versions, with permission tests (waiting for founder to apply)
+⬜ 5b. Template and forum-profile files checked by schema; reviewer approval page
+⬜ 5c. One renderer for preview and DOCX; automatic checks (DR-06)
+⬜ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04)
+⬜ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
+⬜ 5f. "Why is it arranged this way?" and related documents for a Lagos writ (DR-08, DR-09)
+⚠️ 5g. First templates (writ of summons, statement of claim, motion on notice with affidavit, deed of assignment, tenancy agreement) — legal reviewer approves; Property Law ones need its notes in the library
+⬜ 5h. Export tests: DOCX in Word and Google Docs; PDF matches preview (hosted PDF converter only with founder's approval of about $5–10 a month)
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
@@ -184,3 +195,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Step 4f part 2 built: Briefs page (name a case or statute, choose a course), brief written by Sonnet from library passages only after checking the name is in the library; fixed sections (case: facts, issues, decision, ratio, relevance; statute: purpose, key sections, relevance); sections the library does not cover say so; saved briefs list and delete. Prompt brief-v1. No live AI test yet.
 - 2026-10-22: Step 4d editor built: Marking guides page for reviewers (exam-style question, marking points with marks, draft / approve / withdraw; admins delete). Migration 19 adds the question; editing an approved guide puts it back to draft. No AI, no cost.
 - 2026-10-22: Step 4e built: Mark my answer (approved exam-style questions, typed answer, Opus marking against the guide with marks clamped to each point, correct rule from the library, feedback in the right panel, saved in Practice). Migration 20. Founder: Opus for marking, typed answers now.
+- 2026-10-23: Phase 5 (Draft) started. Plan approved (founder: "start"). Step 5a: migration 21 (forums, templates, template_forums, documents, document_versions) with 40 two-student and reviewer permission checks. Spec: docs/specs/drafting.md. No AI, no cost.
