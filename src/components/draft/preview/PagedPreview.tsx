@@ -17,10 +17,11 @@ const ZOOMS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 export function PagedPreview() {
   const { model, caption, onPlaceholder } = usePreview();
   if (!model) return <p className="text-sm text-muted">Nothing to show yet.</p>;
-  return <Pages key={model.title} model={model} caption={caption} onPlaceholder={onPlaceholder} />;
+  return <PageView key={model.title} model={model} caption={caption} onPlaceholder={onPlaceholder} />;
 }
 
-function Pages({ model, caption, onPlaceholder }: { model: DocModel; caption?: string; onPlaceholder?: Parameters<typeof PreviewItem>[0]["onPlaceholder"] }) {
+// Also used on its own, read-only, for documents shared with a student (step 6d).
+export function PageView({ model, caption, onPlaceholder }: { model: DocModel; caption?: string; onPlaceholder?: Parameters<typeof PreviewItem>[0]["onPlaceholder"] }) {
   const { items, heights, pages, layout, measurer } = useMeasuredPages(model);
   const frameRef = useRef<HTMLDivElement>(null);
   const [fitWidth, setFitWidth] = useState(layout.page.width);

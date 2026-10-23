@@ -129,3 +129,11 @@ test("My uploads asks visitors to sign in and offers no upload", async ({ page }
   await expect(page.getByLabel("Add a file")).toHaveCount(0);
   await expect(page.getByRole("button", { name: "I understand" })).toHaveCount(0);
 });
+
+test("A shared link asks visitors to sign in and shows nothing of the shared work", async ({ page }) => {
+  const path = `/shared/${"a".repeat(64)}`;
+  await page.goto(path);
+  await expect(page.getByRole("heading", { name: "Sign in to see shared work" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in" }).last()).toHaveAttribute("href", `/sign-in?next=${encodeURIComponent(path)}`);
+  await expect(page.locator("[data-page-count]")).toHaveCount(0);
+});

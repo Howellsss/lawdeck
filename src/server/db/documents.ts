@@ -1,22 +1,19 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
-  DEFAULT_PROFILE,
-  documentContentSchema,
   draftingIdSchema,
   forumProfileSchema,
   templateFileSchema,
   partLabel,
   sharedFacts,
   templateSpecSchema,
-  type ForumProfile,
   type TemplateField,
-  type TemplateSpec,
 } from "@/schemas/drafting";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { checkDocument, type CheckIssue } from "@/server/documents/checks";
-import { buildDocument, type DocModel } from "@/server/documents/render";
+import { drawDocument, type DocumentLayout } from "@/server/documents/drawable";
+import type { DocModel } from "@/server/documents/render";
 import { TEMPLATE_FILES } from "@/templates";
 import type { Database } from "./types";
 import { WorkspaceLoadError, type Loaded } from "./workspace";
@@ -289,34 +286,17 @@ export async function loadDocument(supabase: Db, id: string) {
   if (version.error) failed("version", version.error.code);
   if (template.error) failed("document template", template.error.code);
   if (forum.error) failed("court", forum.error.code);
-  const content = documentContentSchema.safeParse(version.data?.content ?? {});
-  // Unreviewed wording is never shown (CLAUDE.md): a template or court sent back for review, or
-  // removed, is not drawn until it is approved again. The student's facts and text stay saved.
-  const spec = template.data?.status === "approved" ? templateSpecSchema.safeParse(template.data.spec) : null;
-  const forumUsable = !doc.forum_id || forum.data?.status === "approved";
-  const profile = forum.data && forumUsable ? forumProfileSchema.safeParse(forum.data.profile) : null;
-  const layout: DocumentLayout | null =
-    spec?.success && forumUsable && (!doc.forum_id || profile?.success)
-      ? {
-          title: doc.title,
-          spec: spec.data,
-          profile: profile?.success ? profile.data : DEFAULT_PROFILE,
-          forumSlug: forum.data?.slug ?? null,
-        }
-      : null;
-  const model: DocModel | null = layout && content.success ? buildDocument({ ...layout, content: content.data }) : null;
-  return {
-    document: doc,
-    forumName: forum.data?.name ?? null,
-    // What draws this document (any of its versions); null while it is being re-checked.
-    layout: model ? layout : null,
-    model,
-    spec: model && spec?.success ? (spec.data as TemplateSpec) : null,
-    content: content.success ? content.data : null,
-  };
+  const drawn = drawDocument({
+    title: doc.title,
+    hasForum: doc.forum_id !== null,
+    template: template.data,
+    forum: forum.data,
+    content: version.data?.content,
+  });
+  return { document: doc, forumName: forum.data?.name ?? null, ...drawn };
 }
 
-export type DocumentLayout = { title: string; spec: TemplateSpec; profile: ForumProfile; forumSlug: string | null };
+export type { DocumentLayout };
 
 async function forumNames(supabase: Db, ids: (string | null)[]): Promise<Map<string, string>> {
   const wanted = [...new Set(ids.filter((id): id is string => id !== null))];

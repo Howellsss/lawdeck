@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { DeleteProjectButton } from "@/components/projects/DeleteProjectButton";
 import { ItemList } from "@/components/projects/ItemList";
 import { RenameProjectForm } from "@/components/projects/RenameProjectForm";
+import { ShareSection } from "@/components/sharing/ShareSection";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { getProject } from "@/server/db/workspace";
@@ -53,6 +54,8 @@ async function Project({ params }: Pick<PageProps<"/projects/[id]">, "params">) 
           />
         )}
       </section>
+
+      <ShareSection kind="project" id={project.id} />
 
       <section aria-labelledby="project-settings" className="flex flex-col gap-4 border-t border-line pt-6">
         <h2 id="project-settings" className="text-lg font-medium">
