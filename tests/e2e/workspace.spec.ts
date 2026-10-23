@@ -169,3 +169,27 @@ test("Reports and takedown requests are hidden from visitors", async ({ page }) 
     await expect(page.getByRole("button", { name: /mark resolved|mark done/i })).toHaveCount(0);
   }
 });
+
+test("The pilot page is hidden from visitors", async ({ page }) => {
+  await page.goto("/admin/pilot");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /create invite code/i })).toHaveCount(0);
+});
+
+test("The account page asks visitors to sign in before any invite code", async ({ page }) => {
+  await page.goto("/account");
+  await expect(page.getByRole("heading", { name: "Sign in to see your account" })).toBeVisible();
+  await expect(page.getByLabel("Invite code")).toHaveCount(0);
+});
+
+test("The phone menu scrolls, so every link and the account row can be reached", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 420 });
+  await page.goto("/");
+  await page.getByRole("button", { name: "Open menu" }).click();
+  const menu = page.getByRole("dialog", { name: "Menu" });
+  const last = menu.getByRole("link", { name: "Drafting catalogue" });
+  await last.scrollIntoViewIfNeeded();
+  await expect(last).toBeInViewport();
+  // The account row stays pinned at the bottom of the menu.
+  await expect(menu.getByRole("link", { name: "Sign in" })).toBeInViewport();
+});

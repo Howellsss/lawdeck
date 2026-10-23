@@ -1,9 +1,13 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
+import { NameForm } from "@/components/account/NameForm";
+import { InviteCodeForm } from "@/components/pilot/InviteCodeForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { getCurrentAccount } from "@/server/auth/session";
+import { getOwnName } from "@/server/db/profile";
+import { getPilotStatus } from "@/server/db/pilot";
 
 export const metadata: Metadata = { title: "Account · Lawdeck" };
 
@@ -21,12 +25,29 @@ export default function AccountPage() {
 async function Account() {
   const account = await getCurrentAccount();
   if (!account) return <SignInPrompt level={1} what="account" returnTo="/account" />;
+  const name = await getOwnName();
+  const pilot = await getPilotStatus().catch(() => null);
   return (
     <>
       <div className="flex flex-col gap-1">
         <h1 className="font-serif text-3xl font-normal text-greeting">Account</h1>
         <p className="break-all text-sm text-muted">Signed in as {account.email}</p>
       </div>
+      {pilot?.inviteOnly && !pilot.hasAccess && (
+        <section aria-labelledby="invite-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+          <h2 id="invite-heading" className="text-lg font-medium">
+            Join the pilot
+          </h2>
+          <p className="text-sm text-muted">Lawdeck is in a closed pilot. Enter the invite code you were sent to start asking questions.</p>
+          <InviteCodeForm />
+        </section>
+      )}
+      <section aria-labelledby="name-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+        <h2 id="name-heading" className="text-lg font-medium">
+          Your details
+        </h2>
+        <NameForm name={name} />
+      </section>
       <section aria-labelledby="delete-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="delete-heading" className="text-lg font-medium">
           Delete account

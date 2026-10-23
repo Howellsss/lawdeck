@@ -38,3 +38,12 @@ test("the policy report address accepts reports and returns nothing", async ({ r
   expect(response.status()).toBe(204);
   expect(await response.text()).toBe("");
 });
+
+test("the browser error address takes only small, valid reports", async ({ request }) => {
+  const ok = await request.post("/api/error-report", { data: { type: "TypeError", message: "x is undefined", path: "/courses" } });
+  expect(ok.status()).toBe(204);
+  const wrongShape = await request.post("/api/error-report", { data: { type: "TypeError", message: "x", path: "https://evil.example" } });
+  expect(wrongShape.status()).toBe(400);
+  const tooBig = await request.post("/api/error-report", { data: { type: "Error", message: "x".repeat(3000), path: "/" } });
+  expect(tooBig.status()).toBe(400);
+});

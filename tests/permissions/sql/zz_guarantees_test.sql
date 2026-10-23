@@ -55,7 +55,7 @@ begin
 end;
 $$;
 
--- 5. Trigger functions cannot be called by anyone; they only run when rows change (migration 31).
+-- 5. Trigger functions cannot be called by anyone; they only run when rows change (migration 33).
 do $$
 declare callable text;
 begin

@@ -16,7 +16,7 @@ export function RecentsList({ chats, message }: { chats?: ChatSummary[]; message
       <h2 className="px-2 text-[13px] font-normal text-muted">Recents</h2>
       {message && <p className="px-2 text-sm text-muted">{message}</p>}
       {chats && (
-        <ul className="flex flex-col gap-0.5 overflow-y-auto">
+        <ul className="flex flex-col gap-0.5">
           {chats.map((chat) => {
             const href = `/chats/${chat.id}`;
             return (

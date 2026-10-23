@@ -1,4 +1,4 @@
--- Lawdeck migration 31: security review follow-up (Phase 7, step 7g, rule P-05).
+-- Lawdeck migration 33: security review follow-up (Phase 7, step 7g, rule P-05).
 -- Trigger functions (the ones that run automatically when rows change) were marked as callable
 -- by anyone. Postgres refuses to run them outside a trigger, so nothing was exposed; this removes
 -- the permission itself. Triggers keep working. tests/permissions/sql/zz_guarantees_test.sql now

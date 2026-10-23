@@ -23,6 +23,7 @@ const PUBLIC: Record<string, string> = {
   "src/app/auth/callback/route.ts:GET": "Google sign-in return; only Lawdeck pages as the next address",
   "src/app/auth/confirm/route.ts:GET": "email links; only Lawdeck pages as the next address",
   "src/app/test-pages/document/docx/route.ts:GET": "test-only sample file; \"not found\" unless LAWDECK_TEST_PAGES=1 (never on the live site)",
+  "src/app/api/error-report/route.ts:POST": "browser error reports; any page can crash; size-limited, checked, scrubbed, rate-limited",
   "src/app/api/csp-report/route.ts:POST": "browsers' policy reports; size-limited, logs only the rule and site",
 };
 
