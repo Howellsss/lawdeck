@@ -107,6 +107,8 @@ export const templatePartSchema = z.strictObject({
   // fixed: wording from the approved form; narrative: written by the AI from the intake;
   // signature: the forum's signature block.
   kind: z.enum(["fixed", "narrative", "signature"]),
+  // How the part's paragraphs sit on the page.
+  align: z.enum(["left", "center", "right", "justify"]).default("left"),
   text: z.string().trim().max(10000).optional(),
   // What the AI must write for a narrative part, and its length limit.
   instruction: line(1000).optional(),
@@ -253,3 +255,17 @@ export const DRAFTING_STATUS_LABELS = {
   withdrawn: "Withdrawn",
   rejected: "Rejected",
 } as const;
+
+// ---------------------------------------------------------------------------
+// A student's document content (document_versions.content): the intake facts, the narrative
+// parts (written by the AI or the student), and any part the student rewrote by hand.
+const factValue = z.union([
+  z.string().trim().max(2000),
+  z.array(z.string().trim().max(2000)).max(20),
+]);
+export const documentContentSchema = z.strictObject({
+  fields: z.record(id, factValue).default({}),
+  narrative: z.record(id, z.string().max(20000)).default({}),
+  edits: z.record(id, z.string().max(20000)).default({}),
+});
+export type DocumentContent = z.infer<typeof documentContentSchema>;

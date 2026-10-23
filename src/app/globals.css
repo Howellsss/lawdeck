@@ -17,6 +17,10 @@
   --highlight: #3a3833;
   --success: #5cc48f;
   --warning: #e0a44a;
+  /* A document page is printed paper in both themes. */
+  --sheet: #ffffff;
+  --sheet-ink: #141414;
+  --sheet-line: #e7e5e0;
 }
 
 [data-theme="light"] {
@@ -33,6 +37,9 @@
   --highlight: #e4e1d9;
   --success: #1f7a4d;
   --warning: #9a5b00;
+  --sheet: #ffffff;
+  --sheet-ink: #141414;
+  --sheet-line: #e7e5e0;
 }
 
 @theme inline {
@@ -48,6 +55,9 @@
   --color-highlight: var(--highlight);
   --color-success: var(--success);
   --color-warning: var(--warning);
+  --color-sheet: var(--sheet);
+  --color-sheet-ink: var(--sheet-ink);
+  --color-sheet-line: var(--sheet-line);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-newsreader);
   --font-brand: var(--font-outfit);
@@ -75,6 +85,12 @@ body {
   border-bottom: 2px dashed var(--ink);
   padding: 0 3px;
   font-weight: 700;
+}
+
+/* On a document page, placeholders use the paper colours whatever the theme (as in the Word file). */
+.sheet .placeholder {
+  background: var(--sheet-line);
+  border-bottom-color: var(--sheet-ink);
 }
 
 /* The logo image is black on white: blend it into light pages, invert it on dark ones. */

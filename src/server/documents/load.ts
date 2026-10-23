@@ -165,14 +165,12 @@ async function syncForums(
     if (removed.error) return false;
   }
   if (missing.length > 0) {
-    const added = await db
-      .from("template_forums")
-      .insert(
-        missing.map((forumId) => ({
-          template_id: templateId,
-          forum_id: forumId,
-        })),
-      );
+    const added = await db.from("template_forums").insert(
+      missing.map((forumId) => ({
+        template_id: templateId,
+        forum_id: forumId,
+      })),
+    );
     if (added.error) return false;
   }
   return true;

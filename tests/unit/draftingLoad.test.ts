@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it, vi } from "vitest";
-import { DEFAULT_PROFILE } from "@/schemas/drafting";
+import { DEFAULT_PROFILE, templateFileSchema } from "@/schemas/drafting";
 import { planLoad, sameJson } from "@/server/documents/plan";
 
 // Made-up courts and templates only. A pretend database: nothing real is touched.
@@ -58,12 +58,9 @@ describe("planning a load", () => {
   });
 
   it("leaves unchanged files alone, whatever order the database returns keys in", () => {
-    const parsedSpec = {
-      related: [],
-      definedTerms: [],
-      ...templateFile().spec,
-      fields: [{ repeatable: false, ...templateFile().spec.fields[0] }],
-    };
+    // What the database holds after a load (the checked file), with its keys in reverse order.
+    const stored = templateFileSchema.parse(templateFile()).spec;
+    const parsedSpec = Object.fromEntries(Object.entries(stored).reverse());
     const plan = planLoad({
       forumFiles: [forumFile()],
       templateFiles: [templateFile()],
