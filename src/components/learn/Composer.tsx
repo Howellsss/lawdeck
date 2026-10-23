@@ -11,11 +11,21 @@ import { openNewChat } from "./openNewChat";
 const MODES = ["Auto", "Learn", "Draft"] as const;
 type Mode = (typeof MODES)[number];
 
-const SHORTCUTS: { label: string; icon: IconName; mode: Mode; starter: string }[] = [
+const SHORTCUTS: {
+  label: string;
+  icon: IconName;
+  mode: Mode;
+  starter: string;
+}[] = [
   { label: "Learn", icon: "book", mode: "Learn", starter: "" },
   { label: "Draft", icon: "pen", mode: "Draft", starter: "Draft a " },
   { label: "Practice", icon: "check", mode: "Learn", starter: "Quiz me on " },
-  { label: "Brief a case", icon: "scale", mode: "Learn", starter: "Brief the case of " },
+  {
+    label: "Brief a case",
+    icon: "scale",
+    mode: "Learn",
+    starter: "Brief the case of ",
+  },
 ];
 
 const selectClass =
@@ -43,7 +53,11 @@ export function Composer() {
     setBusy(true);
     setNotice(null);
     if (asMode === "Draft") return goDraft(question);
-    const problem = await openNewChat(router, { question, course, mode: asMode === "Auto" ? "auto" : "learn" });
+    const problem = await openNewChat(router, {
+      question,
+      course,
+      mode: asMode === "Auto" ? "auto" : "learn",
+    });
     if (!problem) return;
     if (problem.routedToDraft) {
       setRoutedToDraft(true);
@@ -97,17 +111,29 @@ export function Composer() {
           <button
             type="button"
             aria-label="Attach a file"
-            onClick={() => setNotice("Uploading your own files arrives in a later build (Phase 6).")}
+            onClick={() =>
+              setNotice(
+                "Uploading your own files arrives in a later build (Phase 6).",
+              )
+            }
             className="flex size-11 items-center justify-center rounded-full bg-pill text-ink"
           >
             <Icon name="plus" size={18} />
           </button>
-          <Picker label="Mode" value={mode} onChange={(value) => setMode(value as Mode)} options={MODES.map((m) => [m, m])} />
+          <Picker
+            label="Mode"
+            value={mode}
+            onChange={(value) => setMode(value as Mode)}
+            options={MODES.map((m) => [m, m])}
+          />
           <Picker
             label="Course"
             value={course}
             onChange={setCourse}
-            options={[["all", "All courses"], ...COURSES.map((c): [string, string] => [c.slug, c.name])]}
+            options={[
+              ["all", "All courses"],
+              ...COURSES.map((c): [string, string] => [c.slug, c.name]),
+            ]}
           />
           <button
             type="submit"
@@ -121,12 +147,18 @@ export function Composer() {
       </form>
 
       {notice && (
-        <p role="status" className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
+        <p
+          role="status"
+          className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted"
+        >
           {notice}
           {needsSignIn && (
             <>
               {" "}
-              <Link href="/sign-in" className="text-ink underline underline-offset-2">
+              <Link
+                href="/sign-in"
+                className="text-ink underline underline-offset-2"
+              >
                 Sign in
               </Link>
             </>
@@ -135,7 +167,9 @@ export function Composer() {
       )}
       {routedToDraft && (
         <div className="flex flex-wrap items-center gap-2 text-sm">
-          <span className="rounded-full border border-line px-3 py-1 text-muted">Treated as: Draft</span>
+          <span className="rounded-full border border-line px-3 py-1 text-muted">
+            Treated as: Draft
+          </span>
           <button
             type="button"
             onClick={(event) => void submit(event, "Learn")}
@@ -163,21 +197,35 @@ export function Composer() {
   );
 }
 
-function Picker(props: { label: string; value: string; onChange: (value: string) => void; options: [string, string][] }) {
+function Picker(props: {
+  label: string;
+  value: string;
+  onChange: (value: string) => void;
+  options: [string, string][];
+}) {
   const id = `picker-${props.label.toLowerCase()}`;
   return (
     <div className="relative">
       <label htmlFor={id} className="sr-only">
         {props.label}
       </label>
-      <select id={id} value={props.value} onChange={(event) => props.onChange(event.target.value)} className={selectClass}>
+      <select
+        id={id}
+        value={props.value}
+        onChange={(event) => props.onChange(event.target.value)}
+        className={selectClass}
+      >
         {props.options.map(([value, text]) => (
           <option key={value} value={value}>
             {text}
           </option>
         ))}
       </select>
-      <Icon name="chevronDown" size={14} className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted" />
+      <Icon
+        name="chevronDown"
+        size={14}
+        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+      />
     </div>
   );
 }

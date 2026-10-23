@@ -19,11 +19,20 @@ export async function askQuestion(
       signal,
     });
   } catch {
-    return onEvent({ type: "error", message: "Lawdeck could not be reached. Check your connection and try again." });
+    return onEvent({
+      type: "error",
+      message:
+        "Lawdeck could not be reached. Check your connection and try again.",
+    });
   }
   if (!response.ok || !response.body) {
-    const body = (await response.json().catch(() => null)) as { message?: string } | null;
-    return onEvent({ type: "error", message: body?.message ?? "Lawdeck could not answer. Please try again." });
+    const body = (await response.json().catch(() => null)) as {
+      message?: string;
+    } | null;
+    return onEvent({
+      type: "error",
+      message: body?.message ?? "Lawdeck could not answer. Please try again.",
+    });
   }
 
   const reader = response.body.pipeThrough(new TextDecoderStream()).getReader();
@@ -45,9 +54,16 @@ export async function askQuestion(
     }
   } catch {
     if (signal?.aborted) return;
-    return onEvent({ type: "error", message: "The answer was cut off. Check your connection and try again." });
+    return onEvent({
+      type: "error",
+      message: "The answer was cut off. Check your connection and try again.",
+    });
   }
-  if (!finished) onEvent({ type: "error", message: "The answer was cut off. Please try again." });
+  if (!finished)
+    onEvent({
+      type: "error",
+      message: "The answer was cut off. Please try again.",
+    });
 }
 
 // The question to ask when a chat page opens straight after the home composer started it.
