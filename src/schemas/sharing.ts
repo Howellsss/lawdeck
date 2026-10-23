@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // View-only share links (Phase 6, step 6d; PRD EX-04).
 export const SHARE_KINDS = ["document", "project"] as const;

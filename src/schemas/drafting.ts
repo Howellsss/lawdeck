@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // Drafting data files (Phase 5, step 5b; System Design §7; rule H-03). Each court or registry has
 // a formatting profile, and each document type has a template spec. Both live as data files in

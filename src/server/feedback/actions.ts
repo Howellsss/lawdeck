@@ -1,9 +1,10 @@
 "use server";
 
 import { refresh } from "next/cache";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { reportSchema, takedownSchema, type ReportInput } from "@/schemas/feedback";
+import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 
@@ -68,29 +69,34 @@ export async function submitTakedown(_prev: TakedownState, formData: FormData): 
 }
 
 // Reviewers mark a report resolved (or open again), and a takedown request done (or open again).
+// The role is checked here and again by the database (row-level security).
+const reportStatusSchema = z.object({ id: z.uuid(), status: z.enum(["open", "resolved"]) });
+const takedownStatusSchema = z.object({ id: z.uuid(), status: z.enum(["open", "done"]) });
+const NOT_FOUND = "That could not be found.";
+const NOT_REVIEWER = "Only reviewers can change this.";
+
 export async function setReportStatus(id: string, status: "open" | "resolved"): Promise<FeedbackResult> {
-  return setStatus("problem_reports", id, status);
+  const parsed = reportStatusSchema.safeParse({ id, status });
+  if (!parsed.success) return { ok: false, message: NOT_FOUND };
+  if (!(await getStaffRole())) return { ok: false, message: NOT_REVIEWER };
+  const supabase = await createSupabaseServerClient();
+  return saved(await supabase.from("problem_reports").update({ status: parsed.data.status }).eq("id", parsed.data.id).select("id"));
 }
 
 export async function setTakedownStatus(id: string, status: "open" | "done"): Promise<FeedbackResult> {
-  return setStatus("takedown_requests", id, status);
+  const parsed = takedownStatusSchema.safeParse({ id, status });
+  if (!parsed.success) return { ok: false, message: NOT_FOUND };
+  if (!(await getStaffRole())) return { ok: false, message: NOT_REVIEWER };
+  const supabase = await createSupabaseServerClient();
+  return saved(await supabase.from("takedown_requests").update({ status: parsed.data.status }).eq("id", parsed.data.id).select("id"));
 }
 
-async function setStatus(table: "problem_reports" | "takedown_requests", id: string, status: string): Promise<FeedbackResult> {
-  if (!z.uuid().safeParse(id).success || !["open", "resolved", "done"].includes(status)) return { ok: false, message: "That could not be found." };
-  if (!(await getCurrentAccount())) return { ok: false, message: "Please sign in again, then try once more." };
-  const supabase = await createSupabaseServerClient();
-  const query =
-    table === "problem_reports"
-      ? supabase.from("problem_reports").update({ status: status as "open" | "resolved" }).eq("id", id).select("id")
-      : supabase.from("takedown_requests").update({ status: status as "open" | "done" }).eq("id", id).select("id");
-  const { data, error } = await query;
+function saved({ data, error }: { data: { id: string }[] | null; error: { code?: string } | null }): FeedbackResult {
   if (error) {
     logFailure("setStatus", error.code);
     return { ok: false, message: "That wasn’t saved. Please try again." };
   }
-  // Row-level security: only reviewers change anything.
-  if (!data || data.length === 0) return { ok: false, message: "That could not be found." };
+  if (!data || data.length === 0) return { ok: false, message: NOT_FOUND };
   refresh();
   return { ok: true };
 }

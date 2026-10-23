@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 export const evalRunIdSchema = z.uuid({ error: "That test run could not be found." });
 export const evalCaseIdSchema = z.string().regex(/^[A-Z][0-9]{2,3}$/, { error: "That test case could not be found." });

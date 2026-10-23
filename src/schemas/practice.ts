@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // Practice set requests (Phase 4; PRD LN-06, LN-07). Founder's decisions: questions default 5,
 // at most 10; flashcards default 10, at most 20.

@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { EVAL_GRADE_SCHEMA, EVAL_GRADE_SYSTEM, gradeRequest } from "@/prompts/evalGrade";
 import { failureDetails, getClaude } from "./client";
 import { costUsd } from "./costs";

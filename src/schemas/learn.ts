@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { COURSES } from "@/lib/courses";
 
 export const QUESTION_MAX_CHARS = 2000;

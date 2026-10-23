@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { RERANK_MODELS, type RerankModel } from "./settings";
 
 // Voyage AI's re-ranker reads the question next to each candidate passage and scores how well

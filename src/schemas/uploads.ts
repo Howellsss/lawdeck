@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { libraryFileSchema } from "./library";
 
 // Students' private uploads (Phase 6, step 6a; PRD UP-01): the same file rules as the library

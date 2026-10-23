@@ -1,5 +1,5 @@
 import "server-only";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
 
 // Fetches one file the admin picked in Google's file picker, using the short-lived access

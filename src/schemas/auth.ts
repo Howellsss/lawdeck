@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/passwordRules";
 
 export const emailSchema = z

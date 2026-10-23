@@ -1,6 +1,6 @@
 import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
-import { z } from "zod";
+import { z } from "@/lib/zod";
 import { DRAFT_PROMPT_VERSION, DRAFT_SCHEMA, DRAFT_SYSTEM, draftRequest, type DraftFact, type DraftPart } from "@/prompts/draft";
 import { DRAFT_EDIT_PROMPT_VERSION, DRAFT_EDIT_SCHEMA, DRAFT_EDIT_SYSTEM, draftEditRequest, type EditablePart } from "@/prompts/draftEdit";
 import { failureDetails, getClaude, MissingKeyError } from "./client";

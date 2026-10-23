@@ -1,4 +1,4 @@
-import { z } from "zod";
+import { z } from "@/lib/zod";
 
 // What can be exported as a study sheet (Phase 6, step 6e; PRD EX-03).
 export const EXPORT_KINDS = ["chat", "brief", "practice"] as const;
