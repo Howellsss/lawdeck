@@ -501,6 +501,23 @@ export type Database = {
           words_rank: number | null;
         }[];
       };
+      // Approved marking questions and guides, for "Mark my answer" (migration 20).
+      marking_questions: {
+        Args: { course?: string };
+        Returns: {
+          id: string;
+          title: string;
+          question: string;
+          course_id: string;
+          course_name: string;
+          topic_name: string | null;
+          total_marks: number;
+        }[];
+      };
+      marking_guide: {
+        Args: { rubric: string };
+        Returns: { id: string; title: string; question: string; criteria: Json; course_id: string; topic_id: string | null }[];
+      };
       // Which case and statute names appear in approved library material (migration 16).
       library_mentions: {
         Args: { statutes: string[]; cases: string[]; course?: string };

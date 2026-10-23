@@ -16,7 +16,8 @@ export const MODELS = {
   brief: "claude-sonnet-5-5",
   // Flashcards (step 4c): short facts from the notes; System Design §5.3 names Haiku for them.
   flashcards: "claude-haiku-5-5",
-  marking: "claude-sonnet-5-5",
+  // Mark my answer (step 4e): Opus, as CLAUDE.md sets for marking (founder, 2026-10-22).
+  marking: "claude-opus-5-5",
   documents: "claude-opus-5-5",
 } as const;
 

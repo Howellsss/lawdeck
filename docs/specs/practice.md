@@ -30,6 +30,12 @@ A set can only name a topic from its own course; an item or attempt can only bel
 - Reviewers and admins write them on **/admin/rubrics** ("Marking guides" in the staff menu): save as draft, approve, withdraw, back to draft; admins can delete. Students never see them directly.
 - Only approved guides are used for marking (step 4e). The database will not approve a guide without its question and points, and puts an approved guide back to draft if its wording or points change. It records who approved and when. A reviewer may approve their own guide for now (founder, 2026-10-22); a second approver can be required later.
 
+## Mark my answer (step 4e, migration 20; PRD LN-08)
+- **/practice/mark**: the approved exam-style questions (from marking guides), with course, topic and total marks; the marking points stay hidden until after marking. The student types an answer (30 to 20,000 characters; uploads come in Phase 6, founder 2026-10-22).
+- Opus marks it against the approved guide (CLAUDE.md; founder 2026-10-22): for each point, whole marks from 0 to its maximum (the server clamps them), what was good and what was missing; the correct rule from library passages with the citation check; advice. The student's answer is material to mark, never instructions; email addresses and phone numbers are removed before marking.
+- The marked answer is saved in the student's Practice (set, item, attempt with score and feedback) and its marking opens in the right panel. It counts as one question once saved; failed marking is free.
+- Students get approved questions and guides only through `marking_questions` and `marking_guide`; they still cannot read the rubrics table.
+
 ## Steps
 - 4a: tables, rules and permission tests (this file, migration 17).
 - 4b: making questions (Sonnet, structured output checked before use, rule F-03), screens.

@@ -13,6 +13,8 @@ for (const [path, heading] of [
   ["/practice/new", "Sign in to see your practice sets"],
   [`/practice/${someId}`, "Sign in to see your practice sets"],
   ["/briefs", "Sign in to see your briefs"],
+  ["/practice/mark", "Sign in to see your marked answers"],
+  [`/practice/mark/${someId}`, "Sign in to see your marked answers"],
   [`/briefs/${someId}`, "Sign in to see your briefs"],
 ] as const) {
   test(`${path} asks visitors to sign in`, async ({ page }) => {

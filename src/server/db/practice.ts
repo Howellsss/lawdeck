@@ -1,5 +1,6 @@
 import "server-only";
 import { parseChoices, parsePracticeSources, type PracticeReveal } from "@/lib/practice";
+import { parseFeedback, type MarkingFeedback } from "@/schemas/marking";
 import { practiceSetIdSchema } from "@/schemas/practice";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -28,6 +29,8 @@ export type PracticeItemView = {
   reveal: PracticeReveal | null;
   // Flashcards: "know it" (true), "not yet" (false), or not marked yet (null).
   known: boolean | null;
+  // "Mark my answer" (step 4e): the student's answer and its marking.
+  marked: { answerText: string; feedback: MarkingFeedback } | null;
 };
 
 export type PracticeSetView = {
@@ -90,7 +93,11 @@ export async function getPracticeSet(id: string): Promise<Loaded<PracticeSetView
   if (items.error) failed("practice items", items.error.code);
   const itemIds = items.data.map((i) => i.id);
   const attempts = itemIds.length
-    ? await supabase.from("attempts").select("item_id, choice, created_at").in("item_id", itemIds).order("created_at", { ascending: false })
+    ? await supabase
+        .from("attempts")
+        .select("item_id, choice, answer_text, feedback, created_at")
+        .in("item_id", itemIds)
+        .order("created_at", { ascending: false })
     : { data: [], error: null };
   if (attempts.error) failed("attempts", attempts.error.code);
 
@@ -114,6 +121,7 @@ export async function getPracticeSet(id: string): Promise<Loaded<PracticeSetView
           chosen,
           reveal: showBack ? { answer: item.answer, correctChoice: item.correct_choice, sources: parsePracticeSources(item.sources) } : null,
           known: item.known,
+          marked: markedFor(attempts.data.find((a) => a.item_id === item.id && a.feedback !== null)),
         };
       }),
     },
@@ -134,4 +142,9 @@ export async function getPracticeTopic(topicId: string | undefined): Promise<Loa
   if (course.error) failed("course", course.error.code);
   if (!course.data) return { status: "ok", data: null };
   return { status: "ok", data: { id: topic.data.id, name: topic.data.name, courseName: course.data.name, courseSlug: course.data.slug } };
+}
+
+function markedFor(attempt: { answer_text: string | null; feedback: unknown } | undefined): PracticeItemView["marked"] {
+  const feedback = parseFeedback(attempt?.feedback);
+  return attempt && feedback ? { answerText: attempt.answer_text ?? "", feedback } : null;
 }
