@@ -2,6 +2,7 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import { z } from "zod";
 import { DRAFT_PROMPT_VERSION, DRAFT_SCHEMA, DRAFT_SYSTEM, draftRequest, type DraftFact, type DraftPart } from "@/prompts/draft";
+import { DRAFT_EDIT_PROMPT_VERSION, DRAFT_EDIT_SCHEMA, DRAFT_EDIT_SYSTEM, draftEditRequest, type EditablePart } from "@/prompts/draftEdit";
 import { failureDetails, getClaude, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
@@ -15,9 +16,17 @@ const draftReplySchema = z.object({
 });
 export type DraftReply = z.infer<typeof draftReplySchema>;
 
-export type DraftResult =
-  | { ok: true; reply: DraftReply; model: string; costUsd: number | null; usage: { tokensIn: number; tokensOut: number; ms: number } }
+const draftEditReplySchema = z.object({
+  parts: z.array(z.object({ id: z.string().max(60), text: z.string().max(20_000) })).max(80),
+  askFor: z.array(z.object({ field: z.string().max(60), addAnother: z.boolean() })).max(40),
+  note: z.string().max(2000),
+});
+export type DraftEditReply = z.infer<typeof draftEditReplySchema>;
+
+export type OpusResult<T> =
+  | { ok: true; reply: T; model: string; costUsd: number | null; usage: { tokensIn: number; tokensOut: number; ms: number } }
   | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable" | "malformed" };
+export type DraftResult = OpusResult<DraftReply>;
 
 type DraftInput = {
   documentTitle: string;
@@ -33,23 +42,66 @@ type DraftInput = {
 // (rule G-08), never the facts or the text. The caller records usage once the draft is saved, so
 // a draft that fails is free.
 export async function writeDraftParts(input: DraftInput): Promise<DraftResult> {
+  return callOpus({
+    job: "draft",
+    prompt: DRAFT_PROMPT_VERSION,
+    system: DRAFT_SYSTEM,
+    schema: DRAFT_SCHEMA,
+    content: draftRequest(input),
+    parse: parseDraftReply,
+    userId: input.userId,
+  });
+}
+
+// Changes a draft's narrative parts by the student's instruction (step 5e, DR-05), with the same
+// stand-ins and logging. Returns the changed parts, any facts to ask the student for, and a note.
+export async function editDraftParts(input: {
+  documentTitle: string;
+  forumName: string | null;
+  parts: EditablePart[];
+  facts: (DraftFact & { several: boolean })[];
+  instruction: string;
+  userId: string;
+}): Promise<OpusResult<DraftEditReply>> {
+  return callOpus({
+    job: "draft_edit",
+    prompt: DRAFT_EDIT_PROMPT_VERSION,
+    system: DRAFT_EDIT_SYSTEM,
+    schema: DRAFT_EDIT_SCHEMA,
+    content: draftEditRequest(input),
+    parse: parseDraftEditReply,
+    userId: input.userId,
+  });
+}
+
+type OpusCall<T> = {
+  job: string;
+  prompt: string;
+  system: string;
+  schema: Record<string, unknown>;
+  content: string;
+  parse: (text: string) => T | null;
+  userId: string;
+};
+
+async function callOpus<T>(call: OpusCall<T>): Promise<OpusResult<T>> {
   for (let attempt = 1; attempt <= ATTEMPTS; attempt++) {
-    const result = await callOnce(input, attempt);
+    const result = await callOnce(call, attempt);
     if (result.ok || result.reason !== "malformed") return result;
   }
   return { ok: false, reason: "malformed" };
 }
 
-async function callOnce(input: DraftInput, attempt: number): Promise<DraftResult> {
+async function callOnce<T>(call: OpusCall<T>, attempt: number): Promise<OpusResult<T>> {
   const started = Date.now();
   try {
     const stream = getClaude().messages.stream(
       {
         model: MODELS.documents,
         max_tokens: 16_000,
-        output_config: { effort: "low", format: { type: "json_schema", schema: DRAFT_SCHEMA } },
-        system: [{ type: "text", text: DRAFT_SYSTEM, cache_control: { type: "ephemeral" } }],
-        messages: [{ role: "user", content: draftRequest(input) }],
+        output_config: { effort: "low", format: { type: "json_schema", schema: call.schema } },
+        system: [{ type: "text", text: call.system, cache_control: { type: "ephemeral" } }],
+        messages: [{ role: "user", content: call.content }],
       },
       { timeout: DRAFT_TIMEOUT_MS },
     );
@@ -58,9 +110,9 @@ async function callOnce(input: DraftInput, attempt: number): Promise<DraftResult
     const tokensIn =
       message.usage.input_tokens + (message.usage.cache_creation_input_tokens ?? 0) + (message.usage.cache_read_input_tokens ?? 0);
     console.info("ai call", {
-      job: "draft",
-      prompt: DRAFT_PROMPT_VERSION,
-      userId: input.userId,
+      job: call.job,
+      prompt: call.prompt,
+      userId: call.userId,
       model: message.model,
       tokensIn,
       tokensOut: message.usage.output_tokens,
@@ -71,14 +123,14 @@ async function callOnce(input: DraftInput, attempt: number): Promise<DraftResult
     });
     if (message.stop_reason === "refusal") return { ok: false, reason: "refused" };
     const text = message.content.map((block) => (block.type === "text" ? block.text : "")).join("");
-    const reply = parseDraftReply(text);
+    const reply = call.parse(text);
     if (!reply) {
-      console.warn("draft reply malformed", { attempt, stop: message.stop_reason });
+      console.warn("draft reply malformed", { job: call.job, attempt, stop: message.stop_reason });
       return { ok: false, reason: "malformed" };
     }
     return { ok: true, reply, model: message.model, costUsd: cost, usage: { tokensIn, tokensOut: message.usage.output_tokens, ms: Date.now() - started } };
   } catch (error) {
-    console.error("ai call failed", { job: "draft", userId: input.userId, ...failureDetails(error), ms: Date.now() - started });
+    console.error("ai call failed", { job: call.job, userId: call.userId, ...failureDetails(error), ms: Date.now() - started });
     if (error instanceof MissingKeyError) return { ok: false, reason: "no_key" };
     if (error instanceof Anthropic.RateLimitError || error instanceof Anthropic.InternalServerError) return { ok: false, reason: "busy" };
     return { ok: false, reason: "unavailable" };
@@ -86,8 +138,16 @@ async function callOnce(input: DraftInput, attempt: number): Promise<DraftResult
 }
 
 export function parseDraftReply(text: string): DraftReply | null {
+  return parseWith(draftReplySchema, text);
+}
+
+export function parseDraftEditReply(text: string): DraftEditReply | null {
+  return parseWith(draftEditReplySchema, text);
+}
+
+function parseWith<T>(schema: z.ZodType<T>, text: string): T | null {
   try {
-    const parsed = draftReplySchema.safeParse(JSON.parse(text));
+    const parsed = schema.safeParse(JSON.parse(text));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;

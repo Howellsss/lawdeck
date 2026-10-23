@@ -10,13 +10,18 @@ import { redactPersonalData } from "@/server/learn/redact";
 
 const HIDDEN_TYPES = new Set<TemplateField["type"]>(["party", "address"]);
 
-export function factsForClaude(spec: TemplateSpec, fields: DocumentContent["fields"]): DraftFact[] {
-  // Every hidden detail, longest first, so "Ada Okafor" is replaced before "Okafor".
-  const hidden = spec.fields
+// Every hidden detail (names and addresses) with its stand-in, longest first, so "Ada Okafor" is
+// replaced before "Okafor".
+export function hiddenDetails(spec: TemplateSpec, fields: DocumentContent["fields"]): { value: string; token: string }[] {
+  return spec.fields
     .filter((field) => HIDDEN_TYPES.has(field.type))
     .flatMap((field) => valuesOf(fields[field.id]).map((value) => ({ value, token: `{{${field.id}}}` })))
     .filter((entry) => entry.value.length >= 2)
     .sort((a, b) => b.value.length - a.value.length);
+}
+
+export function factsForClaude(spec: TemplateSpec, fields: DocumentContent["fields"]): DraftFact[] {
+  const hidden = hiddenDetails(spec, fields);
 
   return spec.fields.map((field) => {
     const values = valuesOf(fields[field.id]);

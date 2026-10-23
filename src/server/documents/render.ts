@@ -11,7 +11,8 @@ import type {
 // this model, so they always say the same thing. Missing facts become visible placeholders such
 // as [DEFENDANT’S ADDRESS]; nothing is invented (DR-04).
 
-export type Run = { text: string; placeholder?: boolean };
+// A placeholder run says which fact it stands for (field), so the preview can open that question.
+export type Run = { text: string; placeholder?: boolean; field?: string };
 export type Paragraph = { runs: Run[] };
 export type Block = {
   partId: string;
@@ -110,6 +111,7 @@ function fillLine(
         : {
             text: `[${field?.placeholder ?? match[1].toUpperCase()}]`,
             placeholder: true,
+            ...(field ? { field: field.id } : {}),
           },
     );
     last = match.index + match[0].length;

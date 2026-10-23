@@ -124,7 +124,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 5b. Template and forum-profile files checked by schema; reviewer approval page (/admin/templates)
 ✅ 5c. One renderer for preview and DOCX; automatic checks (DR-06)
 ✅ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04) (migration 23 applied by founder 2026-10-23)
-⬜ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
+✅ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
 ⬜ 5f. "Why is it arranged this way?" and related documents for a Lagos writ (DR-08, DR-09)
 ⚠️ 5g. First templates (writ of summons, statement of claim, motion on notice with affidavit, deed of assignment, tenancy agreement) — legal reviewer approves; Property Law ones need its notes in the library
 ⬜ 5h. Export tests: DOCX in Word and Google Docs; PDF matches preview (hosted PDF converter only with founder's approval of about $5–10 a month)
@@ -203,3 +203,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 5c merged after all checks passed. Step 5d planned and approved (founder: names as stand-ins, one live test of about $0.10).
 - 2026-10-23: Step 5d built: drafting catalogue, typed requests matched by Haiku, court choice, short intake, Opus writes only the narrative parts with names and addresses as stand-ins, missing facts as placeholders, citation check, automatic checks, document page with Word download, Documents list. Migration 23: a draft counts as one question. Drafting test added (made-up document). Students see documents once templates are approved (5g).
 - 2026-10-23: Migration 23 applied (founder); step 5d merged. Drafting test on a made-up document: 9/9 checks (stand-ins, word limits, missing address left as placeholder, no authority, no invented sum), Opus, 6.2 s, $0.014.
+- 2026-10-23: Step 5e planned and approved (founder: a change by instruction counts as one question; known names masked and new names asked for in Facts; one live test of about 3 cents). Built: A4 pages in the right panel with zoom, placeholders open their question, facts and wording edited by hand, changes by instruction (Opus, narrative parts only), versions with Look and Restore. No migration, no new library.

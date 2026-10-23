@@ -316,3 +316,37 @@ export function factsFor(
   }
   return { ok: true, fields };
 }
+
+// ---------------------------------------------------------------------------
+// Changing a document (step 5e).
+const documentId = z.uuid({ error: "That document could not be found." });
+export const editFactsSchema = z.strictObject({
+  documentId,
+  facts: z.record(z.string().max(60), factValue).default({}),
+});
+export const editPartSchema = z.strictObject({
+  documentId,
+  partId: id,
+  // null puts the part back to the template's (or Lawdeck's) wording.
+  text: z
+    .string()
+    .trim()
+    .min(1, { error: "Write the part, or put back the original wording." })
+    .max(20000, { error: "Keep a part under 20,000 characters." })
+    .nullable(),
+});
+export const versionRefSchema = z.strictObject({
+  documentId,
+  versionId: z.uuid({ error: "That version could not be found." }),
+});
+export const INSTRUCTION_MAX_CHARS = 1000;
+export const instructionSchema = z.strictObject({
+  documentId,
+  instruction: z
+    .string()
+    .trim()
+    .min(3, { error: "Say what to change." })
+    .max(INSTRUCTION_MAX_CHARS, {
+      error: `Keep the instruction under ${INSTRUCTION_MAX_CHARS} characters.`,
+    }),
+});
