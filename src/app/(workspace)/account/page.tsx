@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
+import { NameForm } from "@/components/account/NameForm";
 import { InviteCodeForm } from "@/components/pilot/InviteCodeForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { getCurrentAccount } from "@/server/auth/session";
+import { getOwnName } from "@/server/db/profile";
 import { getPilotStatus } from "@/server/db/pilot";
 
 export const metadata: Metadata = { title: "Account · Lawdeck" };
@@ -23,6 +25,7 @@ export default function AccountPage() {
 async function Account() {
   const account = await getCurrentAccount();
   if (!account) return <SignInPrompt level={1} what="account" returnTo="/account" />;
+  const name = await getOwnName();
   const pilot = await getPilotStatus().catch(() => null);
   return (
     <>
@@ -39,6 +42,12 @@ async function Account() {
           <InviteCodeForm />
         </section>
       )}
+      <section aria-labelledby="name-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+        <h2 id="name-heading" className="text-lg font-medium">
+          Your details
+        </h2>
+        <NameForm name={name} />
+      </section>
       <section aria-labelledby="delete-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="delete-heading" className="text-lg font-medium">
           Delete account

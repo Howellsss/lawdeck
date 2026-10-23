@@ -39,7 +39,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
 
   return (
     <SidebarContext.Provider value={{ collapsed, onNavigate }}>
-      <nav aria-label="Main" className="flex h-full flex-col gap-5 bg-sidebar px-3 py-3">
+      <nav aria-label="Main" className="flex h-full min-h-0 flex-col gap-5 bg-sidebar px-3 py-3">
         <div className={`flex items-center gap-2 px-1 ${collapsed ? "flex-col" : "justify-between"}`}>
           <Link href="/" onClick={onNavigate} className="flex items-center gap-2 no-underline" aria-label="Lawdeck home">
             <BrandMark size={26} />
@@ -71,19 +71,23 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
           </NavLink>
         </div>
 
-        <div className="flex flex-col gap-0.5">
-          {MAIN_LINKS.map((link) => (
-            <NavLink key={link.href} href={link.href} onNavigate={onNavigate} className={itemClass} match="prefix">
-              <Icon name={link.icon} />
-              {label(link.label)}
-            </NavLink>
-          ))}
-          {staffNav}
+        {/* Everything between the top and the account row scrolls, so on a phone the whole menu
+            can be reached however long it gets (staff links, recents). */}
+        <div className="-mx-3 flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-3">
+          <div className="flex flex-col gap-0.5">
+            {MAIN_LINKS.map((link) => (
+              <NavLink key={link.href} href={link.href} onNavigate={onNavigate} className={itemClass} match="prefix">
+                <Icon name={link.icon} />
+                {label(link.label)}
+              </NavLink>
+            ))}
+            {staffNav}
+          </div>
+
+          {recents}
         </div>
 
-        {recents}
-
-        <div className={`mt-auto flex items-center gap-2 border-t border-line pt-3 ${collapsed ? "flex-col" : ""}`}>
+        <div className={`flex shrink-0 items-center gap-2 border-t border-line pt-3 ${collapsed ? "flex-col" : ""}`}>
           {account}
           <ThemeToggle />
         </div>
