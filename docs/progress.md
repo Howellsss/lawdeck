@@ -114,7 +114,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 4b. Practice questions (multiple choice and scenario) by course and topic, from library passages only (LN-06); live trial still to run
 ✅ 4c. Flashcards with known and not-yet tracking (LN-07); Haiku; live trial still to run
 ⬜ 4d. Rubrics written and approved for Civil Litigation topics — editor built (Marking guides, migration 19); writing and approving the guides needs the legal reviewer
-⬜ 4e. Mark my answer: typed or uploaded, structured feedback in the right panel (LN-08)
+✅ 4e. Mark my answer (LN-08): typed answers marked by Opus against an approved guide, point-by-point feedback in the right panel; migration 20 applied by founder 2026-10-22; photo/PDF uploads come in Phase 6; live trial still to run
 ✅ 4f. Case and statute briefs (LN-09): migration 18 applied by founder 2026-10-22; Sonnet; live trial still to run
 ⬜ 4g. Marking agreement test: 50 answers marked by Lawdeck and by the reviewer (at least 80% agreement) — legal reviewer
 
@@ -183,3 +183,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Step 4f planned and approved: saved case and statute briefs on their own page, Sonnet, counting as one question. First part: migration 18 (briefs table) with permission tests.
 - 2026-10-22: Step 4f part 2 built: Briefs page (name a case or statute, choose a course), brief written by Sonnet from library passages only after checking the name is in the library; fixed sections (case: facts, issues, decision, ratio, relevance; statute: purpose, key sections, relevance); sections the library does not cover say so; saved briefs list and delete. Prompt brief-v1. No live AI test yet.
 - 2026-10-22: Step 4d editor built: Marking guides page for reviewers (exam-style question, marking points with marks, draft / approve / withdraw; admins delete). Migration 19 adds the question; editing an approved guide puts it back to draft. No AI, no cost.
+- 2026-10-23: Step 4e built and merged: Mark my answer (/practice/mark). The student picks an approved marking guide's question, types an answer, and Opus marks it point by point from the guide and library passages only; scores can't exceed a point's marks; phone numbers and emails are removed before marking; counts as one question once saved. Migration 20 (applied by founder). No live AI test yet.
