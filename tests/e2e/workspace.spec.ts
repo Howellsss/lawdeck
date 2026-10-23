@@ -146,3 +146,9 @@ test("Exports ask visitors to sign in and give them no file", async ({ page, req
   await page.goto(`/print/study/brief/${id}`);
   await expect(page.getByRole("heading", { name: "Sign in to save your work" })).toBeVisible();
 });
+
+test("Account asks visitors to sign in and offers no delete button", async ({ page }) => {
+  await page.goto("/account");
+  await expect(page.getByRole("heading", { name: "Sign in to see your account" })).toBeVisible();
+  await expect(page.getByRole("button", { name: "Delete my account" })).toHaveCount(0);
+});

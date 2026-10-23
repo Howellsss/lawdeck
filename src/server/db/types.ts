@@ -108,6 +108,46 @@ export type Database = {
         Update: { revoked_at?: string | null };
         Relationships: [];
       };
+      // Report a problem (migration 28). Students see their own; reviewers see all and resolve them.
+      problem_reports: {
+        Row: {
+          id: string;
+          owner_id: string;
+          target_kind: "answer" | "document" | "brief" | "practice_item";
+          target_id: string;
+          category: "wrong_law" | "outdated" | "unclear" | "formatting" | "other";
+          note: string | null;
+          status: "open" | "resolved";
+          resolved_by: string | null;
+          resolved_at: string | null;
+          created_at: string;
+        };
+        Insert: {
+          target_kind: "answer" | "document" | "brief" | "practice_item";
+          target_id: string;
+          category: "wrong_law" | "outdated" | "unclear" | "formatting" | "other";
+          note?: string | null;
+        };
+        Update: { status?: "open" | "resolved" };
+        Relationships: [];
+      };
+      // Takedown requests (migration 28). Reviewers only; anyone submits through submit_takedown().
+      takedown_requests: {
+        Row: {
+          id: string;
+          name: string;
+          email: string;
+          material: string;
+          reason: string;
+          status: "open" | "done";
+          done_by: string | null;
+          done_at: string | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: { status?: "open" | "done" };
+        Relationships: [];
+      };
       plans: {
         Row: {
           id: string;
@@ -777,6 +817,9 @@ export type Database = {
     };
     Functions: {
       accept_upload_notice: { Args: Record<string, never>; Returns: string };
+      delete_my_account: { Args: { confirm: string }; Returns: undefined };
+      problem_report_context: { Args: { report: string }; Returns: { title: string; body: string }[] };
+      submit_takedown: { Args: { name: string; email: string; material: string; reason: string }; Returns: undefined };
       open_share: {
         Args: { share_token: string };
         Returns: { kind: "document" | "project"; title: string | null; document_id: string | null; project_id: string | null; shared_at: string; is_owner: boolean }[];
