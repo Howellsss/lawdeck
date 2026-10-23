@@ -132,7 +132,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ## Phase 6. Uploads, sharing and account controls
 
 ✅ 6a. Upload notice, private file store, uploads tables and My uploads page (UP-01, UP-02, UP-03, UP-05, UP-06) (migration 24 applied by founder 2026-10-23)
-✅ 6b. Reading uploads (text and scans), extraction quality flag, search index tied to the student (UP-01, UP-04); 200 scanned pages a month on Free — migration 25 to apply (founder)
+✅ 6b. Reading uploads (text and scans), extraction quality flag, search index tied to the student (UP-01, UP-04); 200 scanned pages a month on Free (migration 25 applied by founder 2026-10-23)
 ⬜ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library"
 ⬜ 6d. View-only share links, who has access, revoke (EX-04)
 ⬜ 6e. Export notes, briefs and flashcards (EX-03)

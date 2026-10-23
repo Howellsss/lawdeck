@@ -122,4 +122,37 @@ describe("private uploads", () => {
       .insert({ upload_id: uploadId, position: 0, text: "planted" });
     expect(passage.error).not.toBeNull();
   });
+
+  it("B cannot see A's page text or run the reading functions on A's file", async () => {
+    expect(
+      (
+        await b.client
+          .from("upload_pages")
+          .select("page")
+          .eq("upload_id", uploadId)
+      ).data ?? [],
+    ).toEqual([]);
+    for (const [fn, args] of [
+      ["restart_upload_reading", { target: uploadId }],
+      [
+        "replace_upload_passages",
+        {
+          target: uploadId,
+          passages: [{ text: "planted" }],
+          quality: 1,
+          pages: 1,
+        },
+      ],
+      ["finish_upload_reading", { target: uploadId }],
+      ["fail_upload_reading", { target: uploadId, reason: "sabotage" }],
+    ] as const) {
+      expect((await b.client.rpc(fn, args as never)).error).not.toBeNull();
+    }
+    const row = await a.client
+      .from("uploads")
+      .select("status, problem")
+      .eq("id", uploadId)
+      .single();
+    expect(row.data).toEqual({ status: "processing", problem: null });
+  });
 });
