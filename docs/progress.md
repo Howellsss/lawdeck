@@ -135,7 +135,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 6b. Reading uploads (text and scans), extraction quality flag, search index tied to the student (UP-01, UP-04); 200 scanned pages a month on Free (migration 25 applied by founder 2026-10-23)
 ✅ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library" (migration 26 applied by founder 2026-10-23); answer test run 2026-10-23: 10/10 answered, $0.43, grades reviewed by founder
 ✅ 6d. View-only share links, who has access, revoke (EX-04) (migration 27 applied by founder 2026-10-23)
-⬜ 6e. Export notes, briefs and flashcards (EX-03)
+✅ 6e. Export notes, briefs and flashcards (EX-03)
 ⬜ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03)
 
 ## Change log
@@ -222,3 +222,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 6a merged. Step 6b planned and approved (founder: 200 scanned pages per student per month on the Free plan). Built: uploads are read straight after upload by the library's reader (now shared), with scans by Haiku and indexing by Voyage, all with the student's own session; "Ready" only with passages; failures shown with "Try again", which carries on without paying twice; hard-to-read files flagged (UP-04). Migration 25; 30 database permission checks. No live AI test yet.
 - 2026-10-23: Step 6b merged (migration 25 applied). Step 6c approved and built: answers search the library and the student's own Ready uploads together (per-chat "Use my uploads" switch), sources grouped "From the Lawdeck library" / "From your uploads", prompt explain-v3 marks uploads as the student's own notes (library preferred), citation check still library-only. Migration 26; 12 database permission checks. Answer test not yet re-run.
 - 2026-10-23: Step 6c merged after the answer test (10/10 answered, 6 unmatched authorities removed, $0.43; founder reviewed grades). Step 6d approved (founder: viewers must sign in) and built: view-only links to a document or project (long random token), "who opened it" list for the owner, "Turn off link" stops access at once, read-only pages under /shared/<link> for documents, project lists and chats (source titles only, never passages). Migration 27; 25 database permission checks. No AI, no cost, no new library.
+- 2026-10-23: Step 6d merged (migration 27 applied; live permission check passes). Step 6e approved and built: "Download Word" and "Save as PDF" on chats (as study notes), briefs and practice sets, with "only the cards I don't know yet" for flashcards. One study-sheet model draws both files; answers not yet revealed stay hidden; source titles only, never library passages. No migration, no AI, no cost, no new library.

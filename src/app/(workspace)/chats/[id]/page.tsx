@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ExportButtons } from "@/components/exports/ExportButtons";
 import { ChatThread } from "@/components/learn/ChatThread";
 import { UseUploadsSwitch } from "@/components/learn/UseUploadsSwitch";
 import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
@@ -46,6 +47,7 @@ async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
       <Suspense fallback={null}>
         <QuestionAllowance />
       </Suspense>
+      {messages.length > 0 && <ExportButtons kind="chat" id={chat.id} />}
     </>
   );
 }

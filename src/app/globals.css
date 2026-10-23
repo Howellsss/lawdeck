@@ -118,3 +118,14 @@ body {
     break-after: auto;
   }
 }
+
+/* Study sheets (step 6e) print as paper: the light-theme colours, whichever theme is on screen. */
+@media print {
+  .study-sheet {
+    --ink: #141414;
+    --muted: #6b6b6b;
+    --line: #e7e5e0;
+    --greeting: #2a2926;
+    --surface: #ffffff;
+  }
+}

@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ExportButtons } from "@/components/exports/ExportButtons";
 import { DeleteSetButton } from "@/components/practice/DeleteSetButton";
 import { MarkedItem } from "@/components/marking/MarkedItem";
 import { FlashcardDeck } from "@/components/practice/FlashcardDeck";
@@ -99,6 +100,7 @@ async function SetView({
           )}
         </ol>
       )}
+      <ExportButtons kind="practice" id={set.id} notKnownOption={set.kind === "flashcards"} />
       <DeleteSetButton id={set.id} />
     </>
   );
