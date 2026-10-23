@@ -11,6 +11,8 @@ import { projectIdSchema } from "@/schemas/projects";
 
 export type ProjectSummary = { id: string; name: string; updatedAt: string };
 export type ChatSummary = { id: string; title: string; updatedAt: string };
+// A chat with the project it sits in (or none), for the chat menu's "Move to project".
+export type RecentChat = ChatSummary & { projectId: string | null };
 export type CourseSummary = { id: string; slug: string; name: string };
 
 export type Loaded<T> = { status: "signed-out" } | { status: "ok"; data: T };
@@ -45,6 +47,17 @@ export async function listProjects(): Promise<Loaded<ProjectSummary[]>> {
       updatedAt: p.updated_at,
     })),
   };
+}
+
+// The student's projects as menu choices; null when they could not be read, so the chat
+// menu's "Move to project" says so instead of failing.
+export async function loadProjectOptions(): Promise<{ id: string; name: string }[] | null> {
+  try {
+    const result = await listProjects();
+    return result.status === "ok" ? result.data.map(({ id, name }) => ({ id, name })) : null;
+  } catch {
+    return null;
+  }
 }
 
 export async function getProject(
@@ -90,12 +103,12 @@ export async function getProject(
 
 export async function listRecentChats(
   limit = 20,
-): Promise<Loaded<ChatSummary[]>> {
+): Promise<Loaded<RecentChat[]>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("conversations")
-    .select("id, title, updated_at")
+    .select("id, title, updated_at, project_id")
     .order("updated_at", { ascending: false })
     .limit(limit);
   if (error) failed("recent chats", error.code);
@@ -105,6 +118,7 @@ export async function listRecentChats(
       id: c.id,
       title: c.title,
       updatedAt: c.updated_at,
+      projectId: c.project_id,
     })),
   };
 }
@@ -190,7 +204,7 @@ function messageText(content: unknown): string {
 
 export async function getChat(id: string): Promise<
   Loaded<{
-    chat: ChatSummary & {
+    chat: RecentChat & {
       courseName: string | null;
       autoRouted: boolean;
       useUploads: boolean;
@@ -206,7 +220,7 @@ export async function getChat(id: string): Promise<
 
   const chat = await supabase
     .from("conversations")
-    .select("id, title, updated_at, course_id, auto_routed, use_uploads")
+    .select("id, title, updated_at, project_id, course_id, auto_routed, use_uploads")
     .eq("id", id)
     .maybeSingle();
   if (chat.error) failed("chat", chat.error.code);
@@ -269,6 +283,7 @@ export async function getChat(id: string): Promise<
         id: chat.data.id,
         title: chat.data.title,
         updatedAt: chat.data.updated_at,
+        projectId: chat.data.project_id,
         courseName: course.data?.name ?? null,
         autoRouted: chat.data.auto_routed,
         useUploads: chat.data.use_uploads,
