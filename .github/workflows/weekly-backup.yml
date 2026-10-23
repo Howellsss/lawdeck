@@ -1,0 +1,60 @@
+# Free weekly backup of the database (founder, 2026-10-23), while Lawdeck is on Supabase's free
+# plan, which has no automatic backups. ADMIN JOB: reads the whole database with the database
+# password. The repository is public, so the copy is encrypted (AES-256) with BACKUP_PASSPHRASE
+# before it is stored, and kept 30 days (the last four weeks). It never prints data.
+# Restoring: docs/specs/backups.md. Files in storage (uploads, library originals) are not included.
+name: Weekly backup
+
+on:
+  schedule:
+    - cron: "41 1 * * 1" # Mondays 01:41 UTC (02:41 in Lagos)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: weekly-backup
+  cancel-in-progress: false
+
+jobs:
+  backup:
+    name: Encrypted database backup
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Check the two settings are present
+        run: |
+          if [ -z "$SUPABASE_DB_URL" ] || [ -z "$BACKUP_PASSPHRASE" ]; then
+            echo "Set SUPABASE_DB_URL and BACKUP_PASSPHRASE in GitHub > Settings > Secrets > Actions (docs/specs/backups.md)."
+            exit 1
+          fi
+      # pg_dump 17 reads databases from PostgreSQL 15 to 17, which covers Supabase.
+      - name: Install the PostgreSQL 17 tools
+        run: |
+          sudo apt-get install -y --no-install-recommends postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y --no-install-recommends postgresql-client-17
+      - name: Dump and encrypt
+        run: |
+          set -euo pipefail
+          umask 077
+          stamp=$(date -u +%Y-%m-%d)
+          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+            --format=custom --no-owner --no-privileges \
+            --schema=public --schema=auth --schema=storage \
+            --file=lawdeck.dump
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 \
+            --symmetric --cipher-algo AES256 \
+            --output "lawdeck-$stamp.dump.gpg" lawdeck.dump 3<<<"$BACKUP_PASSPHRASE"
+          rm -f lawdeck.dump
+          echo "Backup made: $(du -h "lawdeck-$stamp.dump.gpg" | cut -f1), encrypted."
+      - uses: actions/upload-artifact@v4
+        with:
+          name: lawdeck-database-backup
+          path: lawdeck-*.dump.gpg
+          retention-days: 30
+          if-no-files-found: error
