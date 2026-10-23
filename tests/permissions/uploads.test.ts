@@ -155,4 +155,16 @@ describe("private uploads", () => {
       .single();
     expect(row.data).toEqual({ status: "processing", problem: null });
   });
+
+  it("B's search never returns A's upload passages", async () => {
+    const mine = await b.client.rpc("search_uploads", {
+      query_text: "permission test",
+    });
+    expect(mine.error).toBeNull();
+    expect(
+      (mine.data ?? []).every(
+        (row: { upload_id: string }) => row.upload_id !== uploadId,
+      ),
+    ).toBe(true);
+  });
 });
