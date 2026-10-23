@@ -26,3 +26,11 @@ Rules the database enforces (tested in `tests/permissions/sql/9d_drafting_test.s
 - A document can only be made from an approved template, and only for an approved court or registry that template is for.
 - Versions are numbered by the database and the newest becomes current; a student can go back to an earlier one.
 - Removing a template leaves students' documents in place.
+
+## Template files and reviewer page (step 5b)
+- Files live in `src/templates` (`forums/` and `documents/`, registered in `index.ts`) and are checked by `src/schemas/drafting.ts`:
+  - **Court or registry**: name, kind, state, and formatting profile (paper, font and size, line spacing, margins, page numbers, cover page, who signs) with its source.
+  - **Template**: course, the courts or registries it is for, the rule it follows, and parts in order. Each part is fixed wording (which may use `{{field}}` intake facts), a narrative part the AI writes (with an instruction and a word limit), or the signature block. Each part says why it is there (DR-08). Also: intake questions with the placeholder shown when a fact is missing, defined terms to check, related documents, and a change log.
+  - The checks refuse unknown settings, wording that uses a field that does not exist, AI parts without an instruction or limit, duplicate names, parts limited to a court the template is not for, and placeholders not in capitals.
+- **/admin/templates** (Templates in the staff menu): **Load from files** adds new files and updates changed ones as drafts, and lists any file that fails the checks with what to fix. Reviewers approve, send back to draft or withdraw; admins delete. Nothing is approved unless it passes the checks again at that moment.
+- The first court files (High Court of Lagos State, High Court of the FCT, Federal High Court, Lagos State Lands Registry) use the PRD 7.3 default formatting, marked "to be confirmed by a reviewer".

@@ -1,0 +1,22 @@
+{
+  "slug": "lagos-lands-registry",
+  "name": "Lagos State Lands Registry",
+  "kind": "registry",
+  "state": "Lagos",
+  "profile": {
+    "paper": "A4",
+    "font": "Times New Roman",
+    "fontSizePt": 12,
+    "lineSpacing": 1.5,
+    "marginsMm": {
+      "top": 25.4,
+      "right": 25.4,
+      "bottom": 25.4,
+      "left": 25.4
+    },
+    "pageNumbers": "bottom-centre",
+    "coverPage": false,
+    "signatureBlock": "party",
+    "source": "Lawdeck default (PRD 7.3): to be confirmed by a reviewer"
+  }
+}

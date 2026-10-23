@@ -120,8 +120,8 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 
 ## Phase 5. Draft: Nigerian-format documents
 
-⬜ 5a. Migration 21: forums, templates, template_forums, documents, document_versions, with permission tests (waiting for founder to apply)
-⬜ 5b. Template and forum-profile files checked by schema; reviewer approval page
+✅ 5a. Migration 21: forums, templates, template_forums, documents, document_versions, with permission tests (applied by founder 2026-10-23)
+✅ 5b. Template and forum-profile files checked by schema; reviewer approval page (/admin/templates)
 ⬜ 5c. One renderer for preview and DOCX; automatic checks (DR-06)
 ⬜ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04)
 ⬜ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
@@ -197,3 +197,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-22: Step 4e built: Mark my answer (approved exam-style questions, typed answer, Opus marking against the guide with marks clamped to each point, correct rule from the library, feedback in the right panel, saved in Practice). Migration 20. Founder: Opus for marking, typed answers now.
 - 2026-10-23: Phase 5 (Draft) started. Plan approved (founder: "start"). Step 5a: migration 21 (forums, templates, template_forums, documents, document_versions) with 40 two-student and reviewer permission checks. Spec: docs/specs/drafting.md. No AI, no cost.
 - 2026-10-23: The fifth course is now shown as "Law in Practice (Professional Ethics)" (founder), so students and uploads find Ethics; files with "ethics" in their name are filed there automatically. Migration 22, name only.
+- 2026-10-23: Step 5b built: template and court-format files in src/templates, checked by schema before approval (rule H-03); Templates page for reviewers (load from files, approve, back to draft, withdraw; admins delete). First four court and registry files use the default formatting until a reviewer confirms them. No AI, no cost, no new library.
