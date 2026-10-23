@@ -104,3 +104,21 @@ test("the Word download refuses visitors", async ({ request }) => {
   expect(response.status()).toBe(401);
   expect(response.headers()["content-type"]).not.toContain("wordprocessingml");
 });
+
+test("Save as PDF asks visitors to sign in", async ({ page }) => {
+  const path = `/print/documents/${someId}`;
+  await page.goto(path);
+  await expect(page.getByRole("heading", { name: "Sign in to see your documents" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "Sign in" }).first()).toHaveAttribute("href", `/sign-in?next=${encodeURIComponent(path)}`);
+  await expect(page.locator("[data-page-count]")).toHaveCount(0);
+});
+
+// The export test's sample pages (step 5h) exist only when LAWDECK_TEST_PAGES=1, never on the live site.
+test("the test-only document pages are not there", async ({ page, request }) => {
+  await page.goto("/test-pages/document?t=writ-of-summons&f=lagos-high-court");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.locator("[data-page-count]")).toHaveCount(0);
+  const docx = await request.get("/test-pages/document/docx?t=writ-of-summons&f=lagos-high-court");
+  expect(docx.status()).toBe(404);
+  expect(docx.headers()["content-type"] ?? "").not.toContain("wordprocessingml");
+});

@@ -116,6 +116,8 @@ export const templatePartSchema = z.strictObject({
   required: z.boolean(),
   // Only for these courts or registries (default: all the template's forums).
   forums: z.array(slug).min(1).optional(),
+  // Start this part on a new page (e.g. the affidavit after a motion), on screen, in Word and in PDF.
+  pageBreakBefore: z.boolean().default(false),
   // "Why is it arranged this way?" (DR-08): what the part does and the rule behind it.
   why: line(1500),
 });

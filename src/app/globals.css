@@ -108,3 +108,13 @@ body {
 :root:not([data-theme="light"]) .only-light {
   display: none;
 }
+
+/* "Save as PDF" (step 5h): one document page per printed sheet, nothing else. */
+@media print {
+  .print-page {
+    break-after: page;
+  }
+  .print-page:last-child {
+    break-after: auto;
+  }
+}

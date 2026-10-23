@@ -62,9 +62,9 @@ export async function documentToDocx(model: DocModel): Promise<Buffer> {
           },
         },
         ...pageNumbers(profile),
-        // A cover page: the first part sits alone on page 1, so the second starts a new page.
-        children: model.blocks.flatMap((block, index) =>
-          blockParagraphs(block, profile, index === 1 && profile.coverPage),
+        // A part may start a new page (after a cover page, or an affidavit after its motion).
+        children: model.blocks.flatMap((block) =>
+          blockParagraphs(block, profile, block.pageBreakBefore),
         ),
       },
     ],
@@ -88,12 +88,16 @@ function blockParagraphs(
       alignment: AlignmentType.CENTER,
       spacing: { ...spacing, before: LAYOUT.headingBeforePt * 20 },
       keepNext: true,
+      keepLines: true,
       children: [new TextRun({ text: block.heading, bold: true })],
     });
+  // Each paragraph is kept on one page, as the on-screen pages place it (step 5h), so page
+  // breaks fall in the same places in Word, in PDF and on screen.
   for (const paragraph of block.paragraphs)
     options.push({
       alignment: ALIGN[block.align],
       spacing,
+      keepLines: true,
       children: paragraph.runs.map(toRun),
     });
   return options.map(

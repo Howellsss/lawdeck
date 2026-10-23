@@ -80,3 +80,20 @@ describe("the first templates", () => {
     });
   }
 });
+
+describe("page breaks (step 5h)", () => {
+  it("starts the motion's affidavit on a new page, in the model and in Word", async () => {
+    const motion = templates.find((t) => t.slug === "motion-on-notice-with-affidavit");
+    if (!motion) throw new Error("motion template missing");
+    for (const forum of motion.forums) {
+      const { model } = draw(motion, forum);
+      const breaks = model.blocks.filter((b) => b.pageBreakBefore).map((b) => b.partId);
+      expect(breaks).toEqual([forum === "lagos-high-court" ? "courtLagosAffidavit" : "courtFctAffidavit"]);
+    }
+    const { model } = draw(motion, "lagos-high-court");
+    const JSZip = (await import("jszip")).default;
+    const xml = await (await JSZip.loadAsync(await documentToDocx(model))).file("word/document.xml")!.async("string");
+    expect(xml.match(/<w:pageBreakBefore\/>/g)).toHaveLength(1);
+    expect(xml).toContain("<w:keepLines/>");
+  });
+});
