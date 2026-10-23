@@ -1,0 +1,278 @@
+{
+  "slug": "writ-of-summons",
+  "title": "Writ of summons (within jurisdiction)",
+  "course": "civil-litigation",
+  "forums": [
+    "lagos-high-court",
+    "fct-high-court"
+  ],
+  "ruleSource": "Form 1, High Court of Lagos State (Civil Procedure) Rules 2019; FCT High Court (Civil Procedure) Rules (Abuja variations), as set out in S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) and the Civil Litigation Handbook 2025. To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFct",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUIT NO: ............\nBETWEEN:\n{{claimant}} .................... CLAIMANT\nAND\n{{defendant}} .................... DEFENDANT",
+        "required": true,
+        "why": "The suit number is left blank: the Registrar assigns it on filing, so counsel never writes one. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes). The parties are named as they will appear in every process in the suit."
+      },
+      {
+        "id": "commandLagos",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "To {{defendant}} of {{defendantAddress}}, in the {{division}} Judicial Division of Lagos State.\nYou are hereby commanded that within 42 (forty-two) days after the service of this writ on you, inclusive of the day of such service, you do cause an appearance to be entered for you in an action at the suit of {{claimant}}; and take notice that in default of your so doing the Claimant may proceed therein, and judgment may be given in your absence.",
+        "required": true,
+        "why": "The command to enter appearance in Form 1. In Lagos the defendant has 42 days after service, counting the day of service. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 1); Civil Litigation Handbook 2025.",
+        "heading": "WRIT OF SUMMONS",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "commandFct",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "To {{defendant}} of {{defendantAddress}}, in the {{division}} Judicial Division of the High Court of the Federal Capital Territory.\nYou are hereby commanded that within 14 (fourteen) days after the service of this writ on you, inclusive of the day of such service, you do cause an appearance to be entered for you in an action at the suit of {{claimant}}; and take notice that in default of your so doing the Claimant may proceed therein, and judgment may be given in your absence.",
+        "required": true,
+        "why": "The command to enter appearance in Form 1. In the FCT the defendant has 14 days after service, counting the day of service. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 1, Abuja variation). Reviewer: confirm against the FCT High Court (Civil Procedure) Rules.",
+        "heading": "WRIT OF SUMMONS",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "issue",
+        "kind": "fixed",
+        "align": "left",
+        "text": "DATED this ............ day of ............ 20.....\n........................................\nRegistrar\nBy order of the Court",
+        "required": true,
+        "why": "The writ is issued and signed by the Registrar by order of the Court, so the date and signature are left blank. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 1)."
+      },
+      {
+        "id": "memorandum",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "N.B.: This writ is to be served within six calendar months from the date thereof, or, if renewed, within three calendar months from the date of the last renewal, including the day of such date, and not afterwards.\nThe Defendant may enter appearance personally or by a Legal Practitioner, either by handing in the appropriate forms, duly completed, at the Registry of the High Court of the Judicial Division in which the action is brought, or by sending them to the Registry by registered post or by electronic means.",
+        "required": true,
+        "why": "Tells the defendant how long the writ stays valid for service and how to enter appearance; it must be on every writ. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 1). Reviewer: confirm the FCT wording.",
+        "heading": "MEMORANDUM TO BE SUBSCRIBED ON THE WRIT"
+      },
+      {
+        "id": "claimIntro",
+        "kind": "fixed",
+        "align": "left",
+        "text": "The Claimant's claim against the Defendant is for:",
+        "required": true,
+        "why": "The indorsement of claim states what the claimant claims; a writ without it is incomplete. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "heading": "INDORSEMENT OF CLAIM"
+      },
+      {
+        "id": "claims",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Set out the Claimant's claims as numbered reliefs (i), (ii), (iii)…, using only the facts given: each sum in figures and words, any interest with its rate and the dates it runs from and to, and the costs of the action. Use orders, not declarations, unless a declaratory right is claimed.",
+        "maxWords": 250,
+        "required": true,
+        "why": "The reliefs the claimant asks for, each stated precisely (sums in figures and words, interest rate and period, costs). For a debt or liquidated demand the indorsement must comply strictly with the rules on such claims. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025."
+      },
+      {
+        "id": "dated",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "Left for the date of filing; a process is dated when it is filed. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signature",
+        "kind": "signature",
+        "required": true,
+        "why": "Counsel signs the process; the space is left for the signature."
+      },
+      {
+        "id": "counsel",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{counselName}}\n{{counselFirm}}\n{{counselAddress}}\nClaimant's Counsel",
+        "required": true,
+        "why": "Counsel's name, chambers, address for service, email and phone number must appear on every process so the other side can serve documents. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "service",
+        "kind": "fixed",
+        "align": "left",
+        "text": "FOR SERVICE ON:\nThe Defendant,\n{{defendant}}\n{{defendantAddress}}",
+        "required": true,
+        "why": "Names who is to be served and where. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "issuedBy",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "This Writ was issued by {{counselName}} of {{counselFirm}}, whose address for service is {{counselAddress}}, Legal Practitioner for the Claimant, who resides or carries on business at {{claimantAddress}}.",
+        "required": true,
+        "why": "States who issued the writ and the claimant's address, as Form 1 requires. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 1)."
+      },
+      {
+        "id": "serviceLagos",
+        "kind": "fixed",
+        "align": "left",
+        "text": "This Writ was served by me at .................... on the Defendant .................... accompanied by the following documents: (a) a Statement of Claim; (b) a list of witnesses to be called at the trial; (c) written statements on oath of the witnesses, except witnesses on subpoena; (d) a list and copies of every document to be relied on at the trial; (e) Pre-action Protocol Form 01.\nBy .................... service on the ............ day of ............ 20.....\nIndorsed the ............ day of ............ 20.....\n....................\n(Signed)\n....................\n(Address)",
+        "required": true,
+        "why": "Completed by the bailiff after service. In Lagos the writ must be served with the statement of claim, list of witnesses, their statements on oath, list and copies of documents, and Pre-action Protocol Form 01. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base).",
+        "heading": "INDORSEMENT AS TO SERVICE",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "serviceFct",
+        "kind": "fixed",
+        "align": "left",
+        "text": "This Writ was served by me at .................... on the Defendant .................... accompanied by the following documents: (a) a Statement of Claim; (b) a list of witnesses to be called at the trial; (c) written statements on oath of the witnesses, except witnesses on subpoena; (d) copies of every document to be relied on at the trial; (e) the Pre-action Counselling Certificate (Form 6).\nBy .................... service on the ............ day of ............ 20.....\nIndorsed the ............ day of ............ 20.....\n....................\n(Signed)\n....................\n(Address)",
+        "required": true,
+        "why": "Completed by the bailiff after service. In the FCT the frontloaded documents go with the writ, with the Pre-action Counselling Certificate in Form 6. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base). Reviewer: confirm against the FCT Rules.",
+        "heading": "INDORSEMENT AS TO SERVICE",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "certificate",
+        "kind": "fixed",
+        "align": "left",
+        "text": "The Registry, High Court of Lagos State, in the {{division}} Judicial Division.\nA sufficient affidavit in verification of the indorsement on this writ to authorise the sealing thereof has been produced to me this ............ day of ............ 20.....\n....................\nRegistrar",
+        "required": true,
+        "why": "The Registrar's certificate that must be indorsed before the writ is issued. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 1).",
+        "forums": [
+          "lagos-high-court"
+        ]
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division will the case be filed in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit? For example: Ikeja, or Maitama in the FCT.",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "claimant",
+        "label": "Claimant",
+        "type": "party",
+        "required": true,
+        "question": "Who is suing? Give the full name (or the company's registered name).",
+        "placeholder": "CLAIMANT",
+        "repeatable": true
+      },
+      {
+        "id": "claimantAddress",
+        "label": "Claimant's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the claimant live or carry on business?",
+        "placeholder": "CLAIMANT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "Who is being sued? Give the full name (or the company's registered name).",
+        "placeholder": "DEFENDANT",
+        "repeatable": true
+      },
+      {
+        "id": "defendantAddress",
+        "label": "Defendant's address",
+        "type": "address",
+        "required": true,
+        "question": "Where can the defendant be served?",
+        "placeholder": "DEFENDANT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "claimDetails",
+        "label": "What the claimant claims",
+        "type": "longText",
+        "required": true,
+        "question": "What does the claimant want: sums owed, interest (rate and from when), damages, costs? List each as you have it.",
+        "placeholder": "CLAIMS",
+        "repeatable": false
+      },
+      {
+        "id": "counselName",
+        "label": "Counsel's name",
+        "type": "party",
+        "required": true,
+        "question": "Who is the legal practitioner signing this process?",
+        "placeholder": "COUNSEL’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "counselFirm",
+        "label": "Counsel's chambers",
+        "type": "party",
+        "required": false,
+        "question": "Which law firm or chambers is counsel in?",
+        "placeholder": "CHAMBERS",
+        "repeatable": false
+      },
+      {
+        "id": "counselAddress",
+        "label": "Counsel's address for service and contacts",
+        "type": "address",
+        "required": true,
+        "question": "Counsel's address for service, email and phone number.",
+        "placeholder": "COUNSEL’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "statement-of-claim"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5g)."
+      }
+    ]
+  }
+}

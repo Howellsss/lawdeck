@@ -1,0 +1,351 @@
+{
+  "slug": "motion-on-notice-with-affidavit",
+  "title": "Motion on notice with affidavit in support",
+  "course": "civil-litigation",
+  "forums": [
+    "lagos-high-court",
+    "fct-high-court"
+  ],
+  "ruleSource": "Interlocutory applications under the High Court of Lagos State (Civil Procedure) Rules 2019 and the FCT High Court (Civil Procedure) Rules, as set out in S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) and the Civil Litigation Handbook 2025. The written address that must accompany it is not part of this template. To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFct",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUIT NO: ............\nMOTION NO: ............\nBETWEEN:\n{{claimant}} .................... {{claimantStatus}}\nAND\n{{defendant}} .................... {{defendantStatus}}",
+        "required": true,
+        "why": "The suit number is left blank: the Registrar assigns it on filing, so counsel never writes one. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes). Each party is described by its role in the suit and in the application (for example CLAIMANT/APPLICANT)."
+      },
+      {
+        "id": "motionTitle",
+        "kind": "fixed",
+        "align": "center",
+        "text": "MOTION ON NOTICE BROUGHT PURSUANT TO {{rulesRelied}} AND UNDER THE INHERENT JURISDICTION OF THIS HONOURABLE COURT",
+        "required": true,
+        "why": "States the rules the application is brought under and the court's inherent jurisdiction; the application must be properly titled. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "takeNotice",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "TAKE NOTICE that this Honourable Court will be moved on the ............ day of ............ 20....., at the hour of 9 o'clock in the forenoon or so soon thereafter as Counsel to the Applicant may be heard, praying the Court for the following reliefs:",
+        "required": true,
+        "why": "The hearing date is left blank: the Registrar fixes it. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "reliefs",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Set out the orders sought as numbered reliefs 1, 2, 3…, each beginning 'AN ORDER', using only the facts given. Do not add a final omnibus relief; the template adds it.",
+        "maxWords": 250,
+        "required": true,
+        "why": "The reliefs sought, each as a separate order. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "omnibus",
+        "kind": "fixed",
+        "align": "left",
+        "text": "AND FOR SUCH FURTHER ORDER OR ORDERS as this Honourable Court may deem fit to make in the circumstances.",
+        "required": true,
+        "why": "The omnibus relief. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "groundsIntro",
+        "kind": "fixed",
+        "align": "left",
+        "text": "AND TAKE FURTHER NOTICE that the grounds upon which this application is brought are as follows:",
+        "required": true,
+        "why": "Introduces the grounds of the application. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "groundsText",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Set out the grounds for the application as numbered grounds 1, 2, 3…, using only the facts given. Facts and reasons only; do not name any rule or case.",
+        "maxWords": 250,
+        "required": true,
+        "why": "The grounds on which the application is brought. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "dated",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "Left for the date of filing; a process is dated when it is filed. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signature",
+        "kind": "signature",
+        "required": true,
+        "why": "Counsel signs the process; the space is left for the signature."
+      },
+      {
+        "id": "counsel",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{counselName}}\n{{counselFirm}}\n{{counselAddress}}\nCounsel to the Applicant",
+        "required": true,
+        "why": "Counsel's name, chambers, address for service, email and phone number must appear on every process so the other side can serve documents. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "service",
+        "kind": "fixed",
+        "align": "left",
+        "text": "FOR SERVICE ON:\n{{respondentService}}",
+        "required": true,
+        "why": "The address for service carries the respondent's details (or the respondent's counsel's), not the applicant's counsel. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "courtLagosAffidavit",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFctAffidavit",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "affidavitParties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUIT NO: ............\nMOTION NO: ............\nBETWEEN:\n{{claimant}} .................... {{claimantStatus}}\nAND\n{{defendant}} .................... {{defendantStatus}}",
+        "required": true,
+        "why": "The affidavit carries the same heading and parties as the motion it supports. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "affidavitIntro",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I, {{deponent}}, {{deponentDescription}}, of {{deponentAddress}}, do hereby make oath and state as follows:",
+        "required": true,
+        "why": "The deponent's name, description and address, then the oath. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (affidavits).",
+        "heading": "AFFIDAVIT IN SUPPORT OF MOTION ON NOTICE"
+      },
+      {
+        "id": "depositions",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "In numbered paragraphs 1, 2, 3…, set out the facts the deponent swears to, using only the facts given. Begin with how the deponent knows the facts: as a party, or because someone informed them (say who, when and where, and that the deponent believes it). Then the facts supporting each relief, in order, naming any document attached as Exhibit A, Exhibit B and so on. Facts only: no law, no arguments and no conclusions. Do not write the closing oath; the template adds it.",
+        "maxWords": 600,
+        "required": true,
+        "why": "The depositions: facts within the deponent's knowledge or stating the source of information and belief, with exhibits identified. An affidavit contains facts only, without law, argument or conclusion. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025."
+      },
+      {
+        "id": "oath",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "That I make this affidavit in good faith, believing the contents to be true and correct, and in accordance with the Oaths Act 2004.",
+        "required": true,
+        "why": "The closing oath. The correct reference is the Oaths Act, not an Oaths Law. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "jurat",
+        "kind": "fixed",
+        "align": "left",
+        "text": "........................................\nDEPONENT\n\nSWORN TO at the High Court Registry, {{sittingPlace}}, this ............ day of ............ 20.....\n\nBEFORE ME\n........................................\nCOMMISSIONER FOR OATHS",
+        "required": true,
+        "why": "The jurat. The affidavit is left undated: the Commissioner for Oaths dates it when it is sworn, and only the deponent signs it. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division will the case be filed in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit? For example: Ikeja, or Maitama in the FCT.",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "claimant",
+        "label": "Claimant",
+        "type": "party",
+        "required": true,
+        "question": "Who is suing? Give the full name (or the company's registered name).",
+        "placeholder": "CLAIMANT",
+        "repeatable": true
+      },
+      {
+        "id": "claimantStatus",
+        "label": "How the claimant is described",
+        "type": "text",
+        "required": true,
+        "question": "Write CLAIMANT/APPLICANT if the claimant is applying, or CLAIMANT/RESPONDENT if not.",
+        "placeholder": "CLAIMANT/APPLICANT OR RESPONDENT",
+        "repeatable": false
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "Who is being sued? Give the full name (or the company's registered name).",
+        "placeholder": "DEFENDANT",
+        "repeatable": true
+      },
+      {
+        "id": "defendantStatus",
+        "label": "How the defendant is described",
+        "type": "text",
+        "required": true,
+        "question": "Write DEFENDANT/APPLICANT if the defendant is applying, or DEFENDANT/RESPONDENT if not.",
+        "placeholder": "DEFENDANT/APPLICANT OR RESPONDENT",
+        "repeatable": false
+      },
+      {
+        "id": "rulesRelied",
+        "label": "Rules the application is brought under",
+        "type": "text",
+        "required": true,
+        "question": "Which rules is the application brought under? Write them out in full, for example: ORDER 43 RULE 1 OF THE HIGH COURT OF LAGOS STATE (CIVIL PROCEDURE) RULES 2019.",
+        "placeholder": "RULES RELIED ON",
+        "repeatable": false
+      },
+      {
+        "id": "ordersWanted",
+        "label": "Orders the applicant wants",
+        "type": "longText",
+        "required": true,
+        "question": "What orders does the applicant want the court to make?",
+        "placeholder": "RELIEFS",
+        "repeatable": false
+      },
+      {
+        "id": "grounds",
+        "label": "Why the court should grant them",
+        "type": "longText",
+        "required": true,
+        "question": "What are the reasons for the application?",
+        "placeholder": "GROUNDS",
+        "repeatable": false
+      },
+      {
+        "id": "depositionFacts",
+        "label": "Facts for the affidavit",
+        "type": "longText",
+        "required": true,
+        "question": "What facts support the application, and how does the deponent know them (a party, or told by someone)? Mention any documents to attach as exhibits.",
+        "placeholder": "FACTS SWORN TO",
+        "repeatable": false
+      },
+      {
+        "id": "deponent",
+        "label": "Deponent",
+        "type": "party",
+        "required": true,
+        "question": "Who is swearing the affidavit? Give the full name.",
+        "placeholder": "DEPONENT",
+        "repeatable": false
+      },
+      {
+        "id": "deponentDescription",
+        "label": "Deponent's description",
+        "type": "party",
+        "required": true,
+        "question": "Describe the deponent as the affidavit requires: sex, religion, adult, nationality and occupation. For example: male, Christian, adult, Nigerian citizen, trader.",
+        "placeholder": "DEPONENT’S DESCRIPTION",
+        "repeatable": false
+      },
+      {
+        "id": "deponentAddress",
+        "label": "Deponent's address",
+        "type": "address",
+        "required": true,
+        "question": "Where does the deponent live?",
+        "placeholder": "DEPONENT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "respondentService",
+        "label": "Respondent's address for service",
+        "type": "address",
+        "required": true,
+        "question": "Who is to be served, and where? For example: the defendant/respondent care of their counsel, with counsel's address.",
+        "placeholder": "RESPONDENT’S ADDRESS FOR SERVICE",
+        "repeatable": false
+      },
+      {
+        "id": "counselName",
+        "label": "Counsel's name",
+        "type": "party",
+        "required": true,
+        "question": "Who is the legal practitioner signing this process?",
+        "placeholder": "COUNSEL’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "counselFirm",
+        "label": "Counsel's chambers",
+        "type": "party",
+        "required": false,
+        "question": "Which law firm or chambers is counsel in?",
+        "placeholder": "CHAMBERS",
+        "repeatable": false
+      },
+      {
+        "id": "counselAddress",
+        "label": "Counsel's address for service and contacts",
+        "type": "address",
+        "required": true,
+        "question": "Counsel's address for service, email and phone number.",
+        "placeholder": "COUNSEL’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5g)."
+      }
+    ]
+  }
+}

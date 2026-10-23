@@ -126,7 +126,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 5d. Draft flow: document, court or registry, intake, Opus fills narrative parts, placeholders (DR-02 to DR-04) (migration 23 applied by founder 2026-10-23)
 ✅ 5e. A4 preview panel, edits in the panel or by instruction, versions (DR-05)
 ⬜ 5f. "Why is it arranged this way?" and related documents for a Lagos writ (DR-08, DR-09)
-⚠️ 5g. First templates (writ of summons, statement of claim, motion on notice with affidavit, deed of assignment, tenancy agreement) — legal reviewer approves; Property Law ones need its notes in the library
+⚠️ 5g. First templates (writ of summons, statement of claim, motion on notice with affidavit, deed of assignment, tenancy agreement) — written; waiting for the legal reviewer to approve them on /admin/templates; Property Law handbook to be imported into the library (founder)
 ⬜ 5h. Export tests: DOCX in Word and Google Docs; PDF matches preview (hosted PDF converter only with founder's approval of about $5–10 a month)
 
 ## Change log
@@ -204,3 +204,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 5d built: drafting catalogue, typed requests matched by Haiku, court choice, short intake, Opus writes only the narrative parts with names and addresses as stand-ins, missing facts as placeholders, citation check, automatic checks, document page with Word download, Documents list. Migration 23: a draft counts as one question. Drafting test added (made-up document). Students see documents once templates are approved (5g).
 - 2026-10-23: Migration 23 applied (founder); step 5d merged. Drafting test on a made-up document: 9/9 checks (stand-ins, word limits, missing address left as placeholder, no authority, no invented sum), Opus, 6.2 s, $0.014.
 - 2026-10-23: Step 5e planned and approved (founder: a change by instruction counts as one question; known names masked and new names asked for in Facts; one live test of about 3 cents). Built: A4 pages in the right panel with zoom, placeholders open their question, facts and wording edited by hand, changes by instruction (Opus, narrative parts only), versions with Look and Restore. No migration, no new library.
+- 2026-10-23: Step 5e merged; drafting test with one change by instruction run on GitHub. Step 5g planned and approved (founder: all five templates; the legal reviewer approves; founder imports the Property Law handbook). Five templates written from the S.A drafts and the 2025 handbooks, with a source on every part; they load as drafts. No AI cost, no migration.
+- 2026-10-23: Drafting test after 5e: 13/14 checks, $0.031 (draft 4.7 s; change by instruction asked for the new defendant, 5.9 s). The one failure was the test itself reading "N2,350,000," (with the sentence's comma) as a different sum; fixed to compare amounts.

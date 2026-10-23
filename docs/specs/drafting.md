@@ -67,3 +67,20 @@ Rules the database enforces (tested in `tests/permissions/sql/9d_drafting_test.s
 - **Change by instruction (DR-05).** Opus (prompt `draft-edit-v1`) may rewrite only the document's narrative parts, never the template's fixed wording, the court or the layout. Names and addresses go only as stand-ins, including inside the student's own wording and the instruction (known names masked; emails and phone numbers removed); the box tells students to put new names in Facts. If the change needs a new fact (e.g. a third defendant's name), Claude lists it and Lawdeck opens that question, with an extra entry where several are allowed; nothing is invented. Rewritten parts are cleaned and citation-checked as in 5d. A change by instruction counts as one question (founder, 2026-10-23).
 - **Versions.** Every saved change is a new numbered version marked You or Lawdeck. **Look** shows an earlier version in the panel without changing anything; **Restore** makes it current again. Nothing is deleted. No migration: the 5a rules already allow owners to add versions and choose the current one.
 - **Drafting test** now also makes one change by instruction ("add a third defendant") and checks it asks for the new defendant, writes no real name, names no authority, explains itself and takes under 30 seconds. About 3 cents a run.
+
+## First templates (step 5g)
+Five templates in `src/templates/documents`, registered in `src/templates/index.ts`. Each part says where its wording comes from (in "why"), so the legal reviewer can check it. Sources: S.A Badmus' Civil Litigation and Property Law drafts, the Civil Litigation Handbook 2025 and the Property Law Practice Handbook 2025 (all in the knowledge base folder).
+
+| Template | Courts or registries | Notes |
+|---|---|---|
+| Writ of summons (within jurisdiction) | High Court of Lagos State; High Court of the FCT | Form 1. Appearance within 42 days (Lagos) or 14 days (FCT); memorandum; indorsement of claim (written by Opus from the claims given); issued-by note; indorsement as to service with the frontloaded documents (Pre-action Protocol Form 01 in Lagos, Pre-action Counselling Certificate Form 6 in the FCT); Registrar's certificate (Lagos). |
+| Statement of claim | Lagos; FCT | Introductory averments, facts and reliefs written by Opus from the facts given; omnibus relief fixed. |
+| Motion on notice with affidavit in support | Lagos; FCT | The student gives the rules relied on (Claude never names rules). Reliefs, grounds and depositions written by Opus; the oath (Oaths Act) and jurat are fixed, undated for the Commissioner for Oaths. The written address is not included. |
+| Deed of assignment (statutory right of occupancy) | Lagos State Lands Registry | All fixed wording, no AI: commencement, recitals, testatum (without "now"), consideration and receipt, beneficial owner, ALL THAT, habendum, indemnity and safe-custody covenants, testimonium, schedule, execution and attestation, Governor's consent, franking. |
+| Tenancy agreement | none | Commencement, letting with certain start and end dates, rent, tenant's and landlord's covenants, optional other terms (Opus, only if given), default proviso adapted for Lagos (possession only in accordance with the law), execution under hand. |
+
+Drafting rules from the sources built in: no suit number or hearing date (the Registrar fills them), affidavits undated, "Oaths Act" not "Oaths Law", "of the one part / of the other part", execution without "the within named". Names of parties, counsel and deponents are "party" or "address" facts, so they never reach the AI.
+
+**Not yet:** writs for service outside the jurisdiction (Form 2) and fast-track writs (Form 33); company, attorney, family, illiterate and blind execution variants of the deed (the student adjusts the execution part by hand); a page break before the affidavit (the engine has no in-document page break yet; noted for 5h).
+
+**Review:** the templates load as drafts on **/admin/templates** (Load from files). Students see one only after the legal reviewer approves it there; approval re-runs the checks. Points flagged for the reviewer are marked "Reviewer:" in the part's "why".
