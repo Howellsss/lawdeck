@@ -138,6 +138,19 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 6e. Export notes, briefs and flashcards (EX-03)
 ✅ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03) (migration 28 applied by founder 2026-10-23)
 
+### Phase 7. Pre-pilot hardening
+⬜ 7a. Supabase Pro and Vercel Pro; separate staging and production keys (B-04, R-01): ⚠️ founder: not upgrading yet (2026-10-23)
+⬜ 7b. Payments with a Nigerian provider; plans and limits enforced (AC-03, AC-04, K-01): ⚠️ founder: provider, prices, free-tier limits
+⚠️ 7c. Login, sign-up and reset limits (C-04, K-02): built, waiting for the founder to apply migration 29
+⬜ 7d. Daily backups and a practice restore into staging (Q-01, Q-02): needs 7a
+⬜ 7e. Error monitoring and unusual-access alerts (I-04, P-03): ⚠️ founder: approve a monitoring service
+⬜ 7f. Breach response plan finalised (P-04, Appendix D)
+⬜ 7g. Security review of permissions, secrets and uploads (P-05)
+⬜ 7h. Load test for 500 concurrent users (L-03): needs 7a
+⬜ 7i. Privacy Notice and Terms of Use reviewed by counsel; consent at sign-up: ⚠️ counsel
+⬜ 7j. Library, rubrics and templates for all five courses loaded and approved: ⚠️ founder and reviewers
+⬜ 7k. Full evaluation set (150+ questions, 30 drafting requests) passes all launch gates: ⚠️ reviewer, then AI spend approval
+
 ## Change log
 
 - 2026-10-20: Phase 0 code set-up (app skeleton, design tokens, AI module, health check, documents).
@@ -225,3 +238,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 6d merged (migration 27 applied; live permission check passes). Step 6e approved and built: "Download Word" and "Save as PDF" on chats (as study notes), briefs and practice sets, with "only the cards I don't know yet" for flashcards. One study-sheet model draws both files; answers not yet revealed stay hidden; source titles only, never library passages. No migration, no AI, no cost, no new library.
 - 2026-10-23: Step 6e merged. Step 6f approved (two parts). 6f-1 built: Account page (sidebar email links to it) with "Delete my account" (type DELETE): the student's files are removed first, then the database deletes the account and everything it owns, at once; no service-role key; reviewer and admin accounts are removed by the founder only. Migration 28 also adds the problem_reports and takedown_requests tables used by 6f-2. 30 database permission checks. No AI, no cost, no new library.
 - 2026-10-23: Step 6f-1 merged (migration 28 applied; live check passes). 6f-2 built: "Report a problem" (five categories, optional note) under every answer, document, brief and practice question; reviewer pages Reports (with what was reported, resolve) and Takedowns (due in 7 days, overdue shown, mark done); public /takedown form linked from sign-in, with a hidden spam trap. No migration, no AI, no cost, no new library. Phase 6 tasks complete; exit checklist next.
+- 2026-10-23: Step 6f-2 merged; Phase 6 complete (exit checklist met). Phase 7 started; founder: no paid upgrades yet. Step 7c approved and built: 5 wrong passwords for one email in 15 minutes pauses sign-in for 15 minutes; sign-up, reset and resend limited to 5 per email and 20 per internet address an hour. Only scrambled (SHA-256) emails and addresses kept, for a day. Migration 29; 15 database checks. No AI, no cost, no new library.

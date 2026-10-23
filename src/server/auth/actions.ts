@@ -7,6 +7,7 @@ import { emailOnlySchema, resetPasswordSchema, signInSchema, signUpSchema } from
 import { getSupabaseConfig, isGoogleSignInEnabled } from "./config";
 import { GENERIC_AUTH_ERROR, NOT_CONFIGURED_ERROR, messageForAuthError } from "./errors";
 import { siteOrigin } from "./origin";
+import { recordAttempt, waitMessage, waitSeconds } from "./limits";
 import { getCurrentAccount } from "./session";
 import { createSupabaseServerClient } from "./supabase";
 
@@ -25,6 +26,15 @@ function logAuthFailure(action: string, code: string | undefined) {
   console.warn("auth action failed", { action, code: code ?? "unknown" });
 }
 
+// Sign-up, reset and resend: 5 per email and 20 per internet address an hour (rule K-02). Each
+// request that goes ahead is counted.
+async function limit(kind: "sign_up" | "reset" | "resend", checkedEmail: string, typed: string): Promise<AuthFormState | null> {
+  const wait = await waitSeconds(kind, checkedEmail);
+  if (wait > 0) return { status: "error", message: waitMessage(wait), email: typed };
+  await recordAttempt(kind, checkedEmail);
+  return null;
+}
+
 function emailFrom(formData: FormData): string {
   const value = formData.get("email");
   return typeof value === "string" ? value.slice(0, 254) : "";
@@ -36,10 +46,15 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
   if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email };
   if (!getSupabaseConfig()) return { ...notConfigured, email };
 
+  // After 5 wrong passwords for one email in 15 minutes, sign-in pauses for that email (rule C-04).
+  const wait = await waitSeconds("sign_in", parsed.data.email);
+  if (wait > 0) return { status: "error", message: waitMessage(wait), email };
+
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.signInWithPassword(parsed.data);
   if (error) {
     logAuthFailure("signIn", error.code);
+    if (error.code === "invalid_credentials") await recordAttempt("sign_in_failed", parsed.data.email);
     return { status: "error", message: messageForAuthError(error.code), email };
   }
   redirect(safeNextPath(formData.get("next")));
@@ -50,6 +65,8 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
   const parsed = signUpSchema.safeParse({ email, password: formData.get("password") });
   if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email };
   if (!getSupabaseConfig()) return { ...notConfigured, email };
+  const limited = await limit("sign_up", parsed.data.email, email);
+  if (limited) return limited;
 
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signUp({
@@ -71,6 +88,8 @@ export async function resendConfirmation(_prev: AuthFormState, formData: FormDat
   const parsed = emailOnlySchema.safeParse({ email });
   if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email };
   if (!getSupabaseConfig()) return { ...notConfigured, email };
+  const limited = await limit("resend", parsed.data.email, email);
+  if (limited) return limited;
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resend({
@@ -90,6 +109,8 @@ export async function requestPasswordReset(_prev: AuthFormState, formData: FormD
   const parsed = emailOnlySchema.safeParse({ email });
   if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email };
   if (!getSupabaseConfig()) return { ...notConfigured, email };
+  const limited = await limit("reset", parsed.data.email, email);
+  if (limited) return limited;
 
   const supabase = await createSupabaseServerClient();
   const { error } = await supabase.auth.resetPasswordForEmail(parsed.data.email, {
