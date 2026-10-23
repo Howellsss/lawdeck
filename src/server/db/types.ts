@@ -92,6 +92,22 @@ export type Database = {
         Update: { embedding?: string | null; embedding_model?: string | null };
         Relationships: [];
       };
+      // View-only share links (migration 27). Owners only; viewers read through the share functions.
+      shares: {
+        Row: {
+          id: string;
+          owner_id: string;
+          kind: "document" | "project";
+          document_id: string | null;
+          project_id: string | null;
+          token: string;
+          created_at: string;
+          revoked_at: string | null;
+        };
+        Insert: { kind: "document" | "project"; document_id?: string | null; project_id?: string | null };
+        Update: { revoked_at?: string | null };
+        Relationships: [];
+      };
       plans: {
         Row: {
           id: string;
@@ -761,6 +777,36 @@ export type Database = {
     };
     Functions: {
       accept_upload_notice: { Args: Record<string, never>; Returns: string };
+      open_share: {
+        Args: { share_token: string };
+        Returns: { kind: "document" | "project"; title: string | null; document_id: string | null; project_id: string | null; shared_at: string; is_owner: boolean }[];
+      };
+      shared_document: {
+        Args: { share_token: string; document: string };
+        Returns: {
+          title: string;
+          forum_name: string | null;
+          forum_slug: string | null;
+          forum_profile: Json | null;
+          forum_status: "pending" | "approved" | "rejected" | "withdrawn" | null;
+          template_spec: Json | null;
+          template_status: "pending" | "approved" | "rejected" | "withdrawn" | null;
+          content: Json | null;
+          updated_at: string;
+        }[];
+      };
+      shared_project_items: {
+        Args: { share_token: string };
+        Returns: { item_kind: "document" | "chat"; id: string; title: string; updated_at: string }[];
+      };
+      shared_chat_messages: {
+        Args: { share_token: string; chat: string };
+        Returns: { role: "user" | "assistant"; content: Json; created_at: string; sources: Json }[];
+      };
+      share_viewers: {
+        Args: { share: string };
+        Returns: { viewer_name: string; first_seen_at: string; last_seen_at: string }[];
+      };
       upload_notice_accepted: { Args: Record<string, never>; Returns: boolean };
       restart_upload_reading: { Args: { target: string }; Returns: undefined };
       set_upload_page_count: { Args: { target: string; pages: number }; Returns: undefined };
