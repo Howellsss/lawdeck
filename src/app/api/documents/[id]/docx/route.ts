@@ -3,6 +3,7 @@ import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { loadDocument } from "@/server/db/documents";
 import { documentToDocx } from "@/server/documents/docx";
+import { recordDownload } from "@/server/monitoring/downloads";
 
 function refuse(status: number, message: string) {
   return Response.json({ message }, { status });
@@ -28,6 +29,7 @@ export async function GET(_request: Request, ctx: RouteContext<"/api/documents/[
   if (!loaded.model) return refuse(409, "This document is being re-checked and can’t be downloaded just now.");
 
   const file = await documentToDocx(loaded.model);
+  await recordDownload("document_docx");
   return new Response(new Uint8Array(file), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

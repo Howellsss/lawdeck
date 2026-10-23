@@ -2,6 +2,7 @@ import { exportRequestSchema } from "@/schemas/exports";
 import { getCurrentAccount } from "@/server/auth/session";
 import { sheetToDocx } from "@/server/exports/docx";
 import { exportFileName, loadSheet } from "@/server/exports/load";
+import { recordDownload } from "@/server/monitoring/downloads";
 
 function refuse(status: number, message: string) {
   return Response.json({ message }, { status });
@@ -25,6 +26,7 @@ export async function GET(request: Request, ctx: RouteContext<"/api/exports/[kin
   if (!loaded.data) return refuse(404, "That could not be found.");
 
   const file = await sheetToDocx(loaded.data);
+  await recordDownload("study_export");
   return new Response(new Uint8Array(file), {
     headers: {
       "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",

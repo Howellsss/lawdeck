@@ -1,0 +1,34 @@
+# The hourly unusual-access check (step 7e, rule P-03): an admin job that reads last hour's counts
+# from the real Supabase project and fails when one is over its limit. GitHub emails the founder
+# when a scheduled run fails. Prints counts only. Also run by hand: Actions -> "Unusual access".
+name: Unusual access
+
+on:
+  schedule:
+    - cron: "17 * * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: unusual-access
+  cancel-in-progress: false
+
+jobs:
+  check:
+    name: Unusual access in the last hour
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    env:
+      NEXT_PUBLIC_SUPABASE_URL: ${{ secrets.NEXT_PUBLIC_SUPABASE_URL }}
+      NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY }}
+      SUPABASE_SERVICE_ROLE_KEY: ${{ secrets.SUPABASE_SERVICE_ROLE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npm run job:unusual-access
