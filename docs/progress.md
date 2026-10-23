@@ -143,13 +143,20 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ⬜ 7b. Payments with a Nigerian provider; plans and limits enforced (AC-03, AC-04, K-01): ⚠️ founder: provider, prices, free-tier limits
 ✅ 7c. Login, sign-up and reset limits (C-04, K-02) (migration 29 applied by founder 2026-10-23)
 ⬜ 7d. Daily backups and a practice restore into staging (Q-01, Q-02): needs 7a
-✅ 7e. Error monitoring and unusual-access alerts (I-04, P-03): Sentry free plan (no library) + hourly GitHub check; migration 31 and SENTRY_DSN to set (founder)
+✅ 7e. Error monitoring and unusual-access alerts (I-04, P-03): Sentry free plan (no library) + hourly GitHub check; migration 31 applied by founder 2026-10-23; SENTRY_DSN to set (founder)
 ✅ 7f. Breach response plan (P-04, Appendix D): docs/breach-response-plan.md; founder is incident lead; practice drill with the founder to do; legal duties to be confirmed by counsel with 7i
 ✅ 7g. Security review of permissions, secrets and uploads (P-05): findings fixed (docs/security-review.md); migration 30 applied by founder 2026-10-23; content security policy in report-only mode until the live reports are checked
 ⬜ 7h. Load test for 500 concurrent users (L-03): needs 7a
 ⬜ 7i. Privacy Notice and Terms of Use reviewed by counsel; consent at sign-up: ⚠️ counsel
 ⬜ 7j. Library, rubrics and templates for all five courses loaded and approved: ⚠️ founder and reviewers
 ⬜ 7k. Full evaluation set (150+ questions, 30 drafting requests) passes all launch gates: ⚠️ reviewer, then AI spend approval
+
+### Phase 8. Closed pilot
+⬜ 8.1 Invite 10–20 students, then a wider cohort: invitations built (Admin → Pilot; migration 32 applied by founder 2026-10-23); ⚠️ running the pilot needs AI funding (funding request, 2026-10-23)
+⬜ 8.2 Weekly review of problem reports, evaluation results and costs: Pilot page built; weekly use during the pilot
+⬜ 8.3 Measure weekly active students, messages and cost per student, marking agreement, document use: Pilot page built
+⬜ 8.4 Interview pilot students on value and price: price question built; interview guide written
+⬜ 8.5 Prepare the Council of Legal Education demonstration: demonstration pack written
 
 ## Change log
 
@@ -242,3 +249,5 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Step 7g approved and built: security review (docs/security-review.md). Browser security headers on every page (no framing by other sites, no file-type guessing, secure connections only); content security policy in report-only mode with a report address. Migration 30 (approved): visitors lose read permission on search_events (nothing was exposed). Reviewer status changes now check the role on the server. New automatic checks: every table has row-level security, every owner-rights function fixes its search path, visitors can read no table, and every server action and route checks sign-in and input. No secrets found in the code or its history. No AI, no cost, no new library.
 - 2026-10-23: Step 7g merged (migration 30 applied by founder). Step 7f approved (founder: lead and data protection contact; with a practice drill) and written: docs/breach-response-plan.md (contain, assess, notify the NDPC within 72 hours and students without undue delay, fix with a test, record), with a data map, key-rotation table and incident log template. No code, no cost.
 - 2026-10-23: Step 7f merged (founder's handbook copy made; practice drill done with model answers). Step 7e approved (founder: Sentry free plan) and built: server and browser errors sent to Sentry with personal details blanked (no Sentry library); migration 31 records Word downloads and exports; an hourly GitHub job checks last hour's counts (failed sign-ins, sign-ups, downloads and questions by one account) and fails, emailing the founder, when one is over its limit. No AI, no cost, no new library.
+- 2026-10-23: Funding request written for the founder's finance review: about $390 (₦546,000 at ₦1,400 per $) for the remaining paid work and a two-month pilot, plus the lawyer's fee. Phase 8 pilot tools approved (founder: all six) and built: invite-only mode with invite codes (students without a code have no questions or scans), the admin Pilot page (weekly measures, cost per student in dollars and naira, week-4 retention, price answers, open reports), and a one-time price question for pilot students. Migration 32; 33 database checks. Interview guide, Council demonstration pack and decision template written as documents. No AI, no cost, no new library.
+- 2026-10-23: Migrations 31 and 32 applied (founder). Step 7e merged; Phase 8 pilot tools merged. Remaining: the funded items (funding request), reviewer approvals, the other four courses' material, and running the pilot.

@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Composer } from "@/components/learn/Composer";
 import { Greeting } from "@/components/learn/Greeting";
 import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
+import { PilotHomeCard } from "@/components/pilot/PilotHomeCard";
 import { BrandMark } from "@/components/ui/BrandMark";
 
 // Home: calm and input-first (PRD 4.2). On phones the composer sits at the bottom, as in the M2 design.
@@ -18,6 +19,9 @@ export default function HomePage() {
         <Composer />
         <Suspense fallback={null}>
           <QuestionAllowance />
+        </Suspense>
+        <Suspense fallback={null}>
+          <PilotHomeCard />
         </Suspense>
       </div>
     </div>

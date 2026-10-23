@@ -5,5 +5,5 @@ import { StaffNav } from "./StaffNav";
 // the Library page checks the role on the server itself.
 export async function StaffNavSlot() {
   const role = await getStaffRole().catch(() => null);
-  return role ? <StaffNav /> : null;
+  return role ? <StaffNav isAdmin={role === "admin"} /> : null;
 }

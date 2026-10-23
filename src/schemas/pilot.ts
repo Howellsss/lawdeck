@@ -1,0 +1,40 @@
+import { z } from "@/lib/zod";
+
+// The closed pilot (Phase 8, migration 32).
+
+// Invite codes: 10 characters from letters and digits that are easy to read (no I, L, O, 0 or 1).
+export const INVITE_ALPHABET = "ABCDEFGHJKMNPQRSTUVWXYZ23456789";
+export const inviteCodeSchema = z
+  .string({ error: "Enter your invite code." })
+  .transform((value) => value.replace(/[\s-]/g, "").toUpperCase())
+  .pipe(z.string().regex(/^[ABCDEFGHJKMNPQRSTUVWXYZ23456789]{10}$/, { error: "Invite codes are 10 letters and numbers, like K7MPQ2RXTA." }));
+
+export const newInviteSchema = z.object({
+  label: z
+    .string()
+    .transform((value) => value.replace(/\s+/g, " ").trim())
+    .pipe(z.string().min(1, { error: "Name the group, for example “Resit group A”." }).max(80, { error: "Use 80 characters or fewer." })),
+  maxUses: z.coerce.number({ error: "Enter how many students can use it." }).int().min(1, { error: "At least 1." }).max(500, { error: "At most 500." }),
+  // Days until the code stops working; empty for no end date.
+  expiresInDays: z
+    .string()
+    .trim()
+    .transform((value) => (value === "" ? null : Number(value)))
+    .pipe(z.number({ error: "Enter a number of days." }).int().min(1, { error: "At least 1 day." }).max(90, { error: "At most 90 days." }).nullable()),
+});
+
+export const pilotSettingsSchema = z
+  .object({
+    inviteOnly: z.boolean(),
+    priceQuestionOpen: z.boolean(),
+    priceNgn: z
+      .string()
+      .trim()
+      .transform((value) => (value === "" ? null : Number(value.replace(/[,₦\s]/g, ""))))
+      .pipe(z.number({ error: "Enter the monthly price in naira." }).int().min(100, { error: "At least ₦100." }).max(1000000, { error: "At most ₦1,000,000." }).nullable()),
+  })
+  .refine((value) => !value.priceQuestionOpen || value.priceNgn !== null, { error: "Set a price before opening the question.", path: ["priceNgn"] });
+
+export const PRICE_ANSWERS = { yes: "Yes", maybe: "Maybe", no: "No" } as const;
+export const priceAnswerSchema = z.enum(["yes", "maybe", "no"]);
+export const inviteIdSchema = z.uuid();

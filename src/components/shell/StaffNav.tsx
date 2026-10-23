@@ -4,7 +4,7 @@ import { Icon } from "@/components/ui/Icon";
 import { NavLink } from "./NavLink";
 import { useSidebar } from "./sidebarContext";
 
-export function StaffNav() {
+export function StaffNav({ isAdmin = false }: { isAdmin?: boolean }) {
   const { collapsed, onNavigate } = useSidebar();
   const itemClass = (active: boolean) =>
     `flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
@@ -36,6 +36,12 @@ export function StaffNav() {
         <Icon name="check" />
         <span className={collapsed ? "sr-only" : ""}>Answer tests</span>
       </NavLink>
+      {isAdmin && (
+        <NavLink href="/admin/pilot" onNavigate={onNavigate} className={itemClass} match="prefix">
+          <Icon name="flag" />
+          <span className={collapsed ? "sr-only" : ""}>Pilot</span>
+        </NavLink>
+      )}
     </>
   );
 }

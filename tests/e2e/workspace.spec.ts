@@ -169,3 +169,15 @@ test("Reports and takedown requests are hidden from visitors", async ({ page }) 
     await expect(page.getByRole("button", { name: /mark resolved|mark done/i })).toHaveCount(0);
   }
 });
+
+test("The pilot page is hidden from visitors", async ({ page }) => {
+  await page.goto("/admin/pilot");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /create invite code/i })).toHaveCount(0);
+});
+
+test("The account page asks visitors to sign in before any invite code", async ({ page }) => {
+  await page.goto("/account");
+  await expect(page.getByRole("heading", { name: "Sign in to see your account" })).toBeVisible();
+  await expect(page.getByLabel("Invite code")).toHaveCount(0);
+});
