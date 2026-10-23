@@ -1,3 +1,4 @@
+import { ReportProblem } from "@/components/feedback/ReportProblem";
 import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
 import { formatWat } from "@/lib/dates";
 import type { ChatMessage, ChatSource } from "@/server/db/workspace";
@@ -36,6 +37,7 @@ export function AnswerCard({
         }}
       />
       <SourceList sources={message.sources} onOpen={onOpen} />
+      <ReportProblem key={message.id} kind="answer" id={message.id} />
       <div className="flex flex-wrap items-center justify-between gap-2">
         <span className="text-xs text-muted">
           {formatWat(message.createdAt)}

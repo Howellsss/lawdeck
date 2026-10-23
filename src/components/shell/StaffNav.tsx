@@ -24,6 +24,14 @@ export function StaffNav() {
         <Icon name="document" />
         <span className={collapsed ? "sr-only" : ""}>Templates</span>
       </NavLink>
+      <NavLink href="/admin/reports" onNavigate={onNavigate} className={itemClass} match="prefix">
+        <Icon name="bookmark" />
+        <span className={collapsed ? "sr-only" : ""}>Reports</span>
+      </NavLink>
+      <NavLink href="/admin/takedowns" onNavigate={onNavigate} className={itemClass} match="prefix">
+        <Icon name="close" />
+        <span className={collapsed ? "sr-only" : ""}>Takedowns</span>
+      </NavLink>
       <NavLink href="/admin/eval" onNavigate={onNavigate} className={itemClass} match="prefix">
         <Icon name="check" />
         <span className={collapsed ? "sr-only" : ""}>Answer tests</span>

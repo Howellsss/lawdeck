@@ -1,5 +1,6 @@
 "use client";
 
+import { ReportProblem } from "@/components/feedback/ReportProblem";
 import { useState } from "react";
 import { compactSecondaryButton } from "@/components/ui/buttons";
 import type { PracticeReveal } from "@/lib/practice";
@@ -34,7 +35,10 @@ export function ScenarioItem({ number, id, question }: { number: number; id: str
         </p>
       )}
       {reveal ? (
-        <RevealPanel reveal={reveal} heading="Model answer" />
+        <>
+          <RevealPanel reveal={reveal} heading="Model answer" />
+          <ReportProblem kind="practice_item" id={id} />
+        </>
       ) : (
         <div>
           <button type="button" disabled={busy} onClick={() => void show()} className={compactSecondaryButton}>

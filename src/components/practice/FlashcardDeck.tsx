@@ -1,5 +1,6 @@
 "use client";
 
+import { ReportProblem } from "@/components/feedback/ReportProblem";
 import { useState } from "react";
 import { compactPrimaryButton, compactSecondaryButton } from "@/components/ui/buttons";
 import type { PracticeReveal } from "@/lib/practice";
@@ -89,6 +90,7 @@ export function FlashcardDeck({ cards: initial }: { cards: Flashcard[] }) {
           {flipped && current.reveal ? (
             <>
               <RevealPanel reveal={current.reveal} heading="Answer" />
+              <ReportProblem key={current.id} kind="practice_item" id={current.id} />
               <div className="flex flex-wrap gap-3">
                 <button type="button" disabled={busy} onClick={() => void mark(true)} className={compactPrimaryButton}>
                   Know it

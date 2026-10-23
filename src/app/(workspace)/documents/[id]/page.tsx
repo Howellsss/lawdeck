@@ -4,6 +4,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DeleteDocumentButton } from "@/components/draft/DeleteDocumentButton";
 import { DocumentWorkspace } from "@/components/draft/edit/DocumentWorkspace";
+import { ReportProblem } from "@/components/feedback/ReportProblem";
 import { ShareSection } from "@/components/sharing/ShareSection";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
@@ -48,6 +49,7 @@ async function DocumentView({ params }: Pick<PageProps<"/documents/[id]">, "para
           are saved. Please check back later.
         </StateMessage>
       )}
+      <ReportProblem kind="document" id={document.id} />
       <ShareSection kind="document" id={document.id} />
       <DeleteDocumentButton id={document.id} />
     </>
