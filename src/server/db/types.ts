@@ -818,6 +818,8 @@ export type Database = {
     Functions: {
       accept_upload_notice: { Args: Record<string, never>; Returns: string };
       delete_my_account: { Args: { confirm: string }; Returns: undefined };
+      auth_wait_seconds: { Args: { kind: string; email_hash: string; ip_hash: string }; Returns: number };
+      record_auth_attempt: { Args: { kind: string; email_hash: string; ip_hash: string }; Returns: undefined };
       problem_report_context: { Args: { report: string }; Returns: { title: string; body: string }[] };
       submit_takedown: { Args: { name: string; email: string; material: string; reason: string }; Returns: undefined };
       open_share: {
