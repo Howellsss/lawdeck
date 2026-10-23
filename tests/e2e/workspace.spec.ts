@@ -31,6 +31,14 @@ test("Recents tells visitors to sign in", async ({ page }, testInfo) => {
   await expect(page.getByText("Sign in to keep your chats.").filter({ visible: true })).toBeVisible();
 });
 
+// The chat menu (⋯: rename, move, delete) belongs to signed-in students' own chats only.
+test("visitors get no chat options", async ({ page }, testInfo) => {
+  await page.goto(`/chats/${someId}`);
+  await expect(page.getByRole("heading", { name: "Sign in to see your chats" })).toBeVisible();
+  if (testInfo.project.name === "phone-360") await page.getByRole("button", { name: "Open menu" }).click();
+  await expect(page.getByRole("button", { name: /^Options for/ })).toHaveCount(0);
+});
+
 test("the menu marks the current section", async ({ page }, testInfo) => {
   await page.goto("/projects");
   if (testInfo.project.name === "phone-360") await page.getByRole("button", { name: "Open menu" }).click();

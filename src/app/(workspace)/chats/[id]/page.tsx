@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ExportButtons } from "@/components/exports/ExportButtons";
+import { ChatMenu } from "@/components/learn/ChatMenu";
 import { ChatThread } from "@/components/learn/ChatThread";
 import { UseUploadsSwitch } from "@/components/learn/UseUploadsSwitch";
 import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { RoutedChip } from "@/components/learn/RoutedChip";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
-import { getChat } from "@/server/db/workspace";
+import { getChat, loadProjectOptions } from "@/server/db/workspace";
 
 export const metadata: Metadata = { title: "Chat · Lawdeck" };
 
@@ -25,7 +26,7 @@ export default function ChatPage({ params }: PageProps<"/chats/[id]">) {
 
 async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
   const { id } = await params;
-  const result = await getChat(id);
+  const [result, projects] = await Promise.all([getChat(id), loadProjectOptions()]);
   if (result.status === "signed-out")
     return <SignInPrompt level={1} what="chats" returnTo={`/chats/${id}`} />;
   if (!result.data) notFound();
@@ -34,9 +35,12 @@ async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
   return (
     <>
       <div className="flex flex-col gap-1">
-        <h1 className="break-words font-serif text-3xl font-normal text-greeting">
-          {chat.title}
-        </h1>
+        <div className="flex items-start justify-between gap-2">
+          <h1 className="min-w-0 break-words font-serif text-3xl font-normal text-greeting">
+            {chat.title}
+          </h1>
+          <ChatMenu chat={chat} projects={projects} />
+        </div>
         <p className="text-sm text-muted">{chat.courseName ?? "All courses"}</p>
         {chat.autoRouted && <RoutedChip />}
       </div>

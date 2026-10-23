@@ -23,6 +23,7 @@ const PATHS = {
   chevronDown: "M5 8l5 5 5-5",
   newTask: "M11 3H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2V9M15 2.5l2.5 2.5L10 12.5H7.5V10z",
   chat: "M3.5 9.5a6.5 6 0 1112.5 2.3 6.5 6 0 01-7 3.4L4 16.5l1-3.2a5.8 5.8 0 01-1.5-3.8z",
+  more: "M4 10a1 1 0 102 0 1 1 0 10-2 0zM9 10a1 1 0 102 0 1 1 0 10-2 0zM14 10a1 1 0 102 0 1 1 0 10-2 0z",
 } as const;
 
 export type IconName = keyof typeof PATHS;
