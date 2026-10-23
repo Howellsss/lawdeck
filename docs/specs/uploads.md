@@ -32,3 +32,29 @@ Rules the database enforces (tested in `tests/permissions/sql/9f_private_uploads
 - the plan's file limit;
 - nothing visible to other students, reviewers, admins or visitors;
 - passages go with their upload.
+
+## Reading uploads (step 6b, migration 25)
+- **When:** each file is read straight after it is uploaded, by the same reader as the library (`src/server/library/reader.ts`, now shared).
+  - Word files and PDF text are read without AI.
+  - Scanned pages and photos are read by Claude Haiku three pages at a time; the instructions treat page text as content, never instructions (rule G-07).
+  - The text is split into passages and indexed for search with Voyage.
+- **Whose session:** everything runs with the student's own session, never the master key.
+- **Status:**
+  - "Ready" is set by `finish_upload_reading()`, and only if the file really has passages.
+  - A failure is recorded with its reason, and the student sees "Try again".
+  - Pages already read are kept, so trying again carries on and never pays twice for a scanned page.
+  - Without a Voyage key, the file is still finished and searchable by its words.
+- **Extraction quality (UP-04):** the share of pages with readable text. Below 80%, the student sees "Parts of this file were hard to read…".
+- **Scanned-page allowance (founder, 2026-10-23):** 200 scanned pages per student per month on the Free plan (`plans.monthly_scan_page_limit`).
+  - Pages read are recorded in `scan_page_usage`, which students can read but not change. Deleting a file does not give pages back.
+  - When the allowance runs out, reading stops with a message and carries on next month.
+  - Reviewers and admins have no limit. Text pages are unlimited, and none of this counts toward the 30 questions.
+
+| What (migration 25) | Holds | Access |
+|---|---|---|
+| upload_pages | text of each page while a file is read | owner only; goes with the upload |
+| uploads.problem | why a file could not be read | owner reads; set only by the reading functions |
+| scan_page_usage | scanned pages read, with the time | owner reads; written only by `record_scan_pages()` |
+| plans.monthly_scan_page_limit | scanned pages a month (Free: 200) | everyone signed in reads plans |
+
+Tested in `tests/permissions/sql/9g_reading_uploads_test.sql` (30 checks) and `tests/unit/uploadReading.test.ts`.

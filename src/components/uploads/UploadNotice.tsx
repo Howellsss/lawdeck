@@ -18,18 +18,35 @@ export function UploadNotice() {
   }
 
   return (
-    <section aria-labelledby="upload-notice" className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5">
+    <section
+      aria-labelledby="upload-notice"
+      className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-5"
+    >
       <h2 id="upload-notice" className="font-serif text-2xl font-normal">
         Before you upload
       </h2>
-      <p>Upload material you use for your own study, such as your notes, handouts and past answers.</p>
+      <p>
+        Upload material you use for your own study, such as your notes, handouts
+        and past answers.
+      </p>
       <ul className="flex list-disc flex-col gap-1 pl-5">
         <li>Your files stay private to you. Other students cannot see them.</li>
-        <li>Lawdeck uses them only to answer your questions and build your practice material, and never adds them to its library.</li>
+        <li>
+          Lawdeck uses them only to answer your questions and build your
+          practice material, and never adds them to its library.
+        </li>
         <li>You can delete them at any time.</li>
       </ul>
-      <p>Please do not upload other people’s personal information or anything you have been told to keep confidential.</p>
-      <button type="button" disabled={busy} onClick={() => void accept()} className={`${compactPrimaryButton} self-start`}>
+      <p>
+        Please do not upload other people’s personal information or anything you
+        have been told to keep confidential.
+      </p>
+      <button
+        type="button"
+        disabled={busy}
+        onClick={() => void accept()}
+        className={`${compactPrimaryButton} self-start`}
+      >
         {busy ? "Saving…" : "I understand"}
       </button>
       {message && (

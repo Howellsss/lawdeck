@@ -47,8 +47,21 @@ export type Database = {
           status: "processing" | "ready" | "failed";
           ocr_confidence: number | null;
           page_count: number | null;
+          problem: string | null;
         } & Timestamps;
         Insert: { project_id?: string | null; file_name: string; mime_type: string; size_bytes: number; storage_path: string };
+        Update: never;
+        Relationships: [];
+      };
+      upload_pages: {
+        Row: { upload_id: string; owner_id: string; page: number; text: string; method: "text" | "scan"; created_at: string };
+        Insert: { upload_id: string; page: number; text: string; method: "text" | "scan" };
+        Update: never;
+        Relationships: [];
+      };
+      scan_page_usage: {
+        Row: { id: string; owner_id: string; pages: number; created_at: string };
+        Insert: never;
         Update: never;
         Relationships: [];
       };
@@ -76,7 +89,7 @@ export type Database = {
           embedding?: string | null;
           embedding_model?: string | null;
         };
-        Update: never;
+        Update: { embedding?: string | null; embedding_model?: string | null };
         Relationships: [];
       };
       plans: {
@@ -86,6 +99,7 @@ export type Database = {
           price_ngn: number | null;
           monthly_message_limit: number | null;
           upload_limit: number | null;
+          monthly_scan_page_limit: number | null;
           created_at: string;
         };
         Insert: never;
@@ -741,6 +755,13 @@ export type Database = {
     Functions: {
       accept_upload_notice: { Args: Record<string, never>; Returns: string };
       upload_notice_accepted: { Args: Record<string, never>; Returns: boolean };
+      restart_upload_reading: { Args: { target: string }; Returns: undefined };
+      set_upload_page_count: { Args: { target: string; pages: number }; Returns: undefined };
+      replace_upload_passages: { Args: { target: string; passages: Json; quality: number; pages: number }; Returns: number };
+      finish_upload_reading: { Args: { target: string }; Returns: undefined };
+      fail_upload_reading: { Args: { target: string; reason: string }; Returns: undefined };
+      scan_pages_left: { Args: Record<string, never>; Returns: number | null };
+      record_scan_pages: { Args: { pages: number }; Returns: undefined };
       record_ai_usage: {
         Args: {
           kind: string;

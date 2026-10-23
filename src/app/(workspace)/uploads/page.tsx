@@ -37,6 +37,7 @@ async function Uploads() {
       <p className="text-muted">
         Your own notes, handouts and past answers. Only you can see them.
         {page.fileLimit !== null ? ` ${page.files.length} of ${page.fileLimit} files used.` : ""}
+        {page.scanPagesLeft !== null ? ` Scanned pages left this month: ${page.scanPagesLeft}.` : ""}
       </p>
       {page.noticeAccepted ? <UploadPicker apiKey={apiKey} full={full} /> : <UploadNotice />}
       <UploadList files={page.files} />
