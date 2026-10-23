@@ -295,3 +295,28 @@ describe("the Word file", () => {
     ).toBe(false);
   });
 });
+
+describe("numbered lists", () => {
+  const listSpec = templateSpecSchema.parse({
+    parts: [{ id: "list", kind: "fixed", text: "WITNESSES\n#. {{witness}} of {{witnessAddress}}", required: true, why: "Lists the witnesses." }],
+    fields: [
+      { id: "witness", label: "Witnesses", type: "party", required: true, question: "Who?", placeholder: "WITNESS", repeatable: true },
+      { id: "witnessAddress", label: "Their addresses", type: "address", required: false, question: "Where?", placeholder: "WITNESS’S ADDRESS", repeatable: true },
+    ],
+    changeLog: [{ date: "2026-10-23", note: "Test." }],
+  });
+  const draw = (fields: Record<string, string[]>) =>
+    plainText(
+      buildDocument({ title: "List", spec: listSpec, profile: DEFAULT_PROFILE, forumSlug: null, content: documentContentSchema.parse({ fields }) }),
+    );
+
+  it("repeats a '#.' line once for each answer, numbered, pairing the answers in order", () => {
+    expect(draw({ witness: ["Ada Wombat", "Bayo Quokka"], witnessAddress: ["1 Numbat Road"] })).toBe(
+      "WITNESSES\n1. Ada Wombat of 1 Numbat Road\n2. Bayo Quokka of [WITNESS’S ADDRESS]",
+    );
+  });
+
+  it("shows one numbered placeholder line when nothing is given", () => {
+    expect(draw({})).toBe("WITNESSES\n1. [WITNESS] of [WITNESS’S ADDRESS]");
+  });
+});

@@ -7,13 +7,15 @@ import type { DocumentView } from "@/server/db/documents";
 import type { DocModel } from "@/server/documents/render";
 import { DocumentChecks } from "../DocumentChecks";
 import { PagedPreview } from "../preview/PagedPreview";
+import { RelatedDocuments } from "../RelatedDocuments";
+import { WhyList } from "../WhyList";
 import { setPreview } from "../preview/previewStore";
 import { FactsEditor, type FactRequest } from "./FactsEditor";
 import { InstructionBox } from "./InstructionBox";
 import { PartEditor } from "./PartEditor";
 import { VersionList } from "./VersionList";
 
-type Section = "facts" | "wording" | "versions";
+type Section = "facts" | "wording" | "versions" | "why";
 
 // A drafted document (step 5e, DR-05): its pages in the right panel, with the checks and the
 // ways to change it here: by instruction, the facts, each part's wording, and its versions.
@@ -51,6 +53,15 @@ export function DocumentWorkspace({ view }: { view: DocumentView & { model: DocM
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // "Show on the pages": open the pages and bring that part into view.
+  function showPart(partId: string) {
+    setPreview({ model: view.model, onPlaceholder: jumpTo });
+    showPages();
+    setTimeout(() => {
+      document.querySelector(`[aria-label^="Page "] [data-part="${CSS.escape(partId)}"]`)?.scrollIntoView({ block: "center" });
+    }, 150);
+  }
+
   function showVersion(model: DocModel, number: number) {
     setPreview({ model, caption: `Version ${number}, not the current one. Restore it to use it.` });
     showPages();
@@ -87,6 +98,10 @@ export function DocumentWorkspace({ view }: { view: DocumentView & { model: DocM
       <Collapsible title={`Versions (${view.versions.length})`} id="versions" open={open === "versions"} onToggle={(o) => setOpen(o ? "versions" : null)}>
         <VersionList documentId={view.id} versions={view.versions} onShow={showVersion} />
       </Collapsible>
+      <Collapsible title="Why is it arranged this way?" id="why" open={open === "why"} onToggle={(o) => setOpen(o ? "why" : null)}>
+        <WhyList entries={view.why} onShow={showPart} />
+      </Collapsible>
+      <RelatedDocuments documentId={view.id} related={view.related} />
     </div>
   );
 }

@@ -1,0 +1,176 @@
+{
+  "slug": "list-of-documents",
+  "title": "List of documents to be relied on",
+  "course": "civil-litigation",
+  "forums": [
+    "lagos-high-court",
+    "fct-high-court"
+  ],
+  "ruleSource": "Front-loading of documents under the High Court of Lagos State (Civil Procedure) Rules 2019 and the FCT High Court (Civil Procedure) Rules, as set out in S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) and the Civil Litigation Handbook 2025. To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFct",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUIT NO: ............\nBETWEEN:\n{{claimant}} .................... CLAIMANT\nAND\n{{defendant}} .................... DEFENDANT",
+        "required": true,
+        "why": "The suit number is left blank: the Registrar assigns it on filing, so counsel never writes one. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "list",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "The Claimant intends to rely on the following documents at the trial, copies of which are filed with this list:\n#. {{documents}}",
+        "required": true,
+        "why": "Lists every document the claimant will rely on, filed with copies. In the FCT the documents are filed as exhibits. In Lagos a writ must be filed with the front-loaded documents: the statement of claim, a list of witnesses, their written statements on oath, a list and copies of the documents to be relied on, and Pre-action Protocol Form 01. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "heading": "CLAIMANT'S LIST OF DOCUMENTS TO BE RELIED ON AT THE TRIAL"
+      },
+      {
+        "id": "dated",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "Left for the date of filing; a process is dated when it is filed. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signature",
+        "kind": "signature",
+        "required": true,
+        "why": "Counsel signs the process; the space is left for the signature."
+      },
+      {
+        "id": "counsel",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{counselName}}\n{{counselFirm}}\n{{counselAddress}}\nClaimant's Counsel",
+        "required": true,
+        "why": "Counsel's name, chambers, address for service, email and phone number must appear on every process so the other side can serve documents. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      },
+      {
+        "id": "service",
+        "kind": "fixed",
+        "align": "left",
+        "text": "FOR SERVICE ON:\nThe Defendant,\n{{defendant}}\n{{defendantAddress}}",
+        "required": true,
+        "why": "Names who is to be served and where. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division will the case be filed in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit? For example: Ikeja, or Maitama in the FCT.",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "claimant",
+        "label": "Claimant",
+        "type": "party",
+        "required": true,
+        "question": "Who is suing? Give the full name (or the company's registered name).",
+        "placeholder": "CLAIMANT",
+        "repeatable": true
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "Who is being sued? Give the full name (or the company's registered name).",
+        "placeholder": "DEFENDANT",
+        "repeatable": true
+      },
+      {
+        "id": "defendantAddress",
+        "label": "Defendant's address",
+        "type": "address",
+        "required": true,
+        "question": "Where can the defendant be served?",
+        "placeholder": "DEFENDANT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "documents",
+        "label": "Documents",
+        "type": "text",
+        "required": true,
+        "question": "Each document the claimant will rely on, one per box, with its date. For example: Letter of demand dated 3 March 2026.",
+        "placeholder": "DOCUMENT",
+        "repeatable": true
+      },
+      {
+        "id": "counselName",
+        "label": "Counsel's name",
+        "type": "party",
+        "required": true,
+        "question": "Who is the legal practitioner signing this process?",
+        "placeholder": "COUNSEL’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "counselFirm",
+        "label": "Counsel's chambers",
+        "type": "party",
+        "required": false,
+        "question": "Which law firm or chambers is counsel in?",
+        "placeholder": "CHAMBERS",
+        "repeatable": false
+      },
+      {
+        "id": "counselAddress",
+        "label": "Counsel's address for service and contacts",
+        "type": "address",
+        "required": true,
+        "question": "Counsel's address for service, email and phone number.",
+        "placeholder": "COUNSEL’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "writ-of-summons"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5f)."
+      }
+    ]
+  }
+}

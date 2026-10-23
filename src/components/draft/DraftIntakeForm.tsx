@@ -41,7 +41,7 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
           <p className="text-sm text-muted">The heading, form and layout follow the court or registry you choose.</p>
           {intake.forums.map((forum) => (
             <label key={forum.id} className="flex min-h-11 items-center gap-2">
-              <input type="radio" name="forum" value={forum.id} required />
+              <input type="radio" name="forum" value={forum.id} required defaultChecked={forum.id === intake.defaultForumId} />
               {forum.name}
             </label>
           ))}
@@ -51,7 +51,7 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
       )}
 
       {intake.fields.map((field) => (
-        <IntakeField key={field.id} field={field} />
+        <IntakeField key={field.id} field={field} values={intake.defaults[field.id]} />
       ))}
 
       {message && (

@@ -1,0 +1,150 @@
+{
+  "slug": "pre-action-protocol-form-01",
+  "title": "Pre-action Protocol (Form 01)",
+  "course": "civil-litigation",
+  "forums": [
+    "lagos-high-court"
+  ],
+  "ruleSource": "Pre-action Protocol, High Court of Lagos State (Civil Procedure) Rules 2019 (Form 01), as set out in S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) and the Civil Litigation Handbook 2025. In the FCT the equivalent is the Pre-action Counselling Certificate (Form 6). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits; every process filed in the suit carries this heading. The Lagos and FCT High Courts are headed differently. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUIT NO: ............\nBETWEEN:\n{{claimant}} .................... CLAIMANT\nAND\n{{defendant}} .................... DEFENDANT",
+        "required": true,
+        "why": "The suit number is left blank: the Registrar assigns it on filing, so counsel never writes one. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "intro",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I, {{deponent}}, {{deponentDescription}}, of {{deponentAddress}}, do hereby make oath and state as follows:\n1. That the Claimant has complied with the directions of the Pre-action Protocol as set out in the preamble to the Rules of this Court.",
+        "required": true,
+        "why": "Form 01 is a sworn statement that the claimant tried to settle before suing. It is usually sworn by counsel. The first paragraph states compliance with the Pre-action Protocol. In Lagos a writ must be filed with the front-loaded documents: the statement of claim, a list of witnesses, their written statements on oath, a list and copies of the documents to be relied on, and Pre-action Protocol Form 01. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base); Civil Litigation Handbook 2025.",
+        "heading": "PRE-ACTION PROTOCOL (FORM 01)"
+      },
+      {
+        "id": "steps",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Continue the numbered paragraphs from 2. State, using only the facts given, the steps taken to settle the dispute before filing (letters of demand with their dates, meetings, mediation) and that they did not succeed. Facts only; no law. Do not write the closing oath; the template adds it.",
+        "maxWords": 250,
+        "required": true,
+        "why": "The steps taken to resolve the dispute without going to court, and their outcome. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (Form 01)."
+      },
+      {
+        "id": "oath",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "That I make this oath in good faith, believing the contents to be true and correct, and in accordance with the Oaths Act 2004.",
+        "required": true,
+        "why": "The closing oath under the Oaths Act (not an Oaths Law). Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      },
+      {
+        "id": "jurat",
+        "kind": "fixed",
+        "align": "left",
+        "text": "........................................\nDEPONENT\n\nSWORN TO at the High Court Registry, {{sittingPlace}}, this ............ day of ............ 20.....\n\nBEFORE ME\n........................................\nCOMMISSIONER FOR OATHS",
+        "required": true,
+        "why": "The jurat. Left undated: the Commissioner for Oaths dates it when it is sworn. Source: S.A Badmus' Civil Litigation drafts (Lawdeck knowledge base) (drafting notes)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division will the case be filed in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit? For example: Ikeja, or Maitama in the FCT.",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "claimant",
+        "label": "Claimant",
+        "type": "party",
+        "required": true,
+        "question": "Who is suing? Give the full name (or the company's registered name).",
+        "placeholder": "CLAIMANT",
+        "repeatable": true
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "Who is being sued? Give the full name (or the company's registered name).",
+        "placeholder": "DEFENDANT",
+        "repeatable": true
+      },
+      {
+        "id": "deponent",
+        "label": "Deponent",
+        "type": "party",
+        "required": true,
+        "question": "Who swears Form 01? Usually counsel. Full name.",
+        "placeholder": "DEPONENT",
+        "repeatable": false
+      },
+      {
+        "id": "deponentDescription",
+        "label": "Deponent's description",
+        "type": "party",
+        "required": true,
+        "question": "Sex, occupation and nationality. For example: male, legal practitioner, Nigerian citizen.",
+        "placeholder": "DEPONENT’S DESCRIPTION",
+        "repeatable": false
+      },
+      {
+        "id": "deponentAddress",
+        "label": "Deponent's address",
+        "type": "address",
+        "required": true,
+        "question": "The deponent's address.",
+        "placeholder": "DEPONENT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "settlementSteps",
+        "label": "Steps taken to settle",
+        "type": "longText",
+        "required": true,
+        "question": "What was done to settle before suing: letters of demand (with dates), meetings, mediation, and what happened?",
+        "placeholder": "STEPS TAKEN TO SETTLE",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "writ-of-summons"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-23",
+        "note": "First draft for legal review (step 5f)."
+      }
+    ]
+  }
+}
