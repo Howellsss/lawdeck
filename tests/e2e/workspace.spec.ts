@@ -122,3 +122,10 @@ test("the test-only document pages are not there", async ({ page, request }) => 
   expect(docx.status()).toBe(404);
   expect(docx.headers()["content-type"] ?? "").not.toContain("wordprocessingml");
 });
+
+test("My uploads asks visitors to sign in and offers no upload", async ({ page }) => {
+  await page.goto("/uploads");
+  await expect(page.getByRole("heading", { name: "Sign in to upload" })).toBeVisible();
+  await expect(page.getByLabel("Add a file")).toHaveCount(0);
+  await expect(page.getByRole("button", { name: "I understand" })).toHaveCount(0);
+});

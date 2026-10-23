@@ -13,6 +13,7 @@ const MAIN_LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/briefs", label: "Briefs", icon: "bookmark" },
   { href: "/projects", label: "Projects", icon: "folder" },
   { href: "/documents", label: "Documents", icon: "document" },
+  { href: "/uploads", label: "My uploads", icon: "upload" },
   { href: "/drafting", label: "Drafting catalogue", icon: "pen" },
 ];
 
