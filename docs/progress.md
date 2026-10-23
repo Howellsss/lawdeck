@@ -136,7 +136,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library" (migration 26 applied by founder 2026-10-23); answer test run 2026-10-23: 10/10 answered, $0.43, grades reviewed by founder
 ✅ 6d. View-only share links, who has access, revoke (EX-04) (migration 27 applied by founder 2026-10-23)
 ✅ 6e. Export notes, briefs and flashcards (EX-03)
-⚠️ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03): 6f-1 (delete account + migration 28) built, waiting for the founder to apply migration 28; 6f-2 (report a problem, takedowns screens) next
+⚠️ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03): 6f-1 done (migration 28 applied by founder 2026-10-23); 6f-2 (report a problem, takedown screens) next
 
 ## Change log
 
