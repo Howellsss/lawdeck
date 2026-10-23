@@ -148,7 +148,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 7g. Security review of permissions, secrets and uploads (P-05): findings fixed (docs/security-review.md); migration 30 applied by founder 2026-10-23; content security policy in report-only mode until the live reports are checked
 ⬜ 7h. Load test for 500 concurrent users (L-03): needs 7a
 ⬜ 7i. Privacy Notice and Terms of Use reviewed by counsel; consent at sign-up: ⚠️ counsel
-⬜ 7j. Library, rubrics and templates for all five courses loaded and approved: ⚠️ founder and reviewers
+✅ 7j. Library, rubrics and templates for all five courses loaded and approved (founder, 2026-10-23); topics for the four newer courses still to be added for course hubs and practice by topic
 ⬜ 7k. Full evaluation set (150+ questions, 30 drafting requests) passes all launch gates: ⚠️ reviewer, then AI spend approval
 
 ### Phase 8. Closed pilot
@@ -252,3 +252,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-10-23: Funding request written for the founder's finance review: about $390 (₦546,000 at ₦1,400 per $) for the remaining paid work and a two-month pilot, plus the lawyer's fee. Phase 8 pilot tools approved (founder: all six) and built: invite-only mode with invite codes (students without a code have no questions or scans), the admin Pilot page (weekly measures, cost per student in dollars and naira, week-4 retention, price answers, open reports), and a one-time price question for pilot students. Migration 32; 33 database checks. Interview guide, Council demonstration pack and decision template written as documents. No AI, no cost, no new library.
 - 2026-10-23: Migrations 31 and 32 applied (founder). Step 7e merged; Phase 8 pilot tools merged. Remaining: the funded items (funding request), reviewer approvals, the other four courses' material, and running the pilot.
 - 2026-10-23: Test-phase resources written for the founder: 5 testers need no paid plans, about $10–15 a month of Claude credit (top up $20). Upgrade triggers: Supabase Pro when real students' work is stored or storage passes 70%; Vercel Pro when Lawdeck becomes commercial. Free weekly database backup added (founder): encrypted with a passphrase, kept 30 days on GitHub; needs two GitHub secrets from the founder. Rehearsed locally (dump, encrypt, decrypt, restore).
+- 2026-10-23: Founder reports all five courses' library material, marking guides and templates are loaded, reviewed and approved (7j). Course topics exist only for Civil Litigation; the other four courses need their topic lists for course hubs and practice by topic. Explanations, drafting and marking do not need topics.
