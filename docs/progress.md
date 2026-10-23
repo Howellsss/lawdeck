@@ -134,7 +134,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 6a. Upload notice, private file store, uploads tables and My uploads page (UP-01, UP-02, UP-03, UP-05, UP-06) (migration 24 applied by founder 2026-10-23)
 ✅ 6b. Reading uploads (text and scans), extraction quality flag, search index tied to the student (UP-01, UP-04); 200 scanned pages a month on Free (migration 25 applied by founder 2026-10-23)
 ✅ 6c. Answers use the student's uploads, labelled "From your uploads" or "From the Lawdeck library" (migration 26 applied by founder 2026-10-23); answer test run 2026-10-23: 10/10 answered, $0.43, grades reviewed by founder
-⚠️ 6d. View-only share links, who has access, revoke (EX-04): built; waiting for the founder to apply migration 27
+✅ 6d. View-only share links, who has access, revoke (EX-04) (migration 27 applied by founder 2026-10-23)
 ⬜ 6e. Export notes, briefs and flashcards (EX-03)
 ⬜ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03)
 
