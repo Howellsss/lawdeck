@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { COURSES } from "@/lib/courses";
+import { openDraft } from "@/server/drafting/actions";
 import { openNewChat } from "./openNewChat";
 
 const MODES = ["Auto", "Learn", "Draft"] as const;
@@ -21,7 +22,8 @@ const selectClass =
   "h-11 appearance-none rounded-full border-0 bg-pill pl-4 pr-9 text-[15px] text-ink outline-offset-2 cursor-pointer";
 
 // The input-first composer (PRD 4.3). A Learn question starts a chat and opens it; the chat
-// page asks the question and streams the answer. Drafting arrives in Phase 5.
+// page asks the question and streams the answer. A drafting request (Draft mode, or Auto mode
+// routed to Draft) opens the matching reviewed document's questions, or the catalogue.
 export function Composer() {
   const router = useRouter();
   const [text, setText] = useState("");
@@ -38,15 +40,29 @@ export function Composer() {
     const question = text.trim();
     if (!question || busy) return;
     setRoutedToDraft(false);
-    if (asMode === "Draft") return setNotice("Drafting documents arrives in a later build (Phase 5). Use Learn or Auto to ask a question.");
     setBusy(true);
     setNotice(null);
+    if (asMode === "Draft") return goDraft(question);
     const problem = await openNewChat(router, { question, course, mode: asMode === "Auto" ? "auto" : "learn" });
     if (!problem) return;
+    if (problem.routedToDraft) {
+      setRoutedToDraft(true);
+      return goDraft(question);
+    }
     setBusy(false);
     setNeedsSignIn(Boolean(problem.signIn));
-    setRoutedToDraft(Boolean(problem.routedToDraft));
     setNotice(problem.message);
+  }
+
+  async function goDraft(request: string) {
+    const result = await openDraft({ request, course });
+    if (result.ok) {
+      router.push(result.href);
+      return;
+    }
+    setBusy(false);
+    setNeedsSignIn(Boolean(result.signIn));
+    setNotice(result.message);
   }
 
   function applyShortcut(shortcut: (typeof SHORTCUTS)[number]) {

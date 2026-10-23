@@ -1,7 +1,7 @@
 "use server";
 
 import { pagesLabel } from "@/lib/pages";
-import { DRAFT_LATER, sourceIdSchema, startChatSchema } from "@/schemas/learn";
+import { DRAFT_ROUTED, sourceIdSchema, startChatSchema } from "@/schemas/learn";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { routeRequest } from "@/server/ai/route";
@@ -31,7 +31,7 @@ export async function startChat(input: { question: string; course: string; mode?
 
   const auto = parsed.data.mode === "auto";
   if (auto && (await routeRequest(redactPersonalData(parsed.data.question), account.id)) === "draft") {
-    return { ok: false, routedToDraft: true, message: DRAFT_LATER };
+    return { ok: false, routedToDraft: true, message: DRAFT_ROUTED };
   }
 
   let courseId: string | null = null;

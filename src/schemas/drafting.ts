@@ -269,3 +269,50 @@ export const documentContentSchema = z.strictObject({
   edits: z.record(id, z.string().max(20000)).default({}),
 });
 export type DocumentContent = z.infer<typeof documentContentSchema>;
+
+// ---------------------------------------------------------------------------
+// Starting a draft (step 5d). Facts arrive as typed by the student: one answer per field, or a
+// list for fields that allow several (e.g. defendants). They are checked against the template's
+// own fields on the server (factsFor) before anything is saved or sent.
+export const newDraftSchema = z.strictObject({
+  templateId: z.uuid({ error: "That document could not be found." }),
+  forumId: z.uuid({ error: "Choose a court or registry." }).nullable(),
+  facts: z.record(z.string().max(60), factValue).default({}),
+});
+export type NewDraft = z.infer<typeof newDraftSchema>;
+
+export const DRAFT_REQUEST_MAX_CHARS = 1000;
+export const draftRequestSchema = z.strictObject({
+  request: z
+    .string()
+    .trim()
+    .min(3, { error: "Say which document you need." })
+    .max(DRAFT_REQUEST_MAX_CHARS, {
+      error: `Keep the request under ${DRAFT_REQUEST_MAX_CHARS} characters.`,
+    }),
+  course: z.string().max(80).default("all"),
+});
+
+const ISO_DAY = /^\d{4}-\d{2}-\d{2}$/;
+
+// The student's answers, kept only for the template's own fields, trimmed, with empty answers
+// dropped (they stay as placeholders). A date must be a real day, as the date picker gives.
+export function factsFor(
+  spec: TemplateSpec,
+  facts: Record<string, string | string[]>,
+): { ok: true; fields: DocumentContent["fields"] } | { ok: false; message: string } {
+  const fields: DocumentContent["fields"] = {};
+  for (const field of spec.fields) {
+    const raw = facts[field.id];
+    const values = (Array.isArray(raw) ? raw : [raw ?? ""])
+      .map((value) => value.trim())
+      .filter(Boolean);
+    if (values.length === 0) continue;
+    if (!field.repeatable && values.length > 1)
+      return { ok: false, message: `${field.label}: give one answer.` };
+    if (field.type === "date" && values.some((value) => !ISO_DAY.test(value)))
+      return { ok: false, message: `${field.label}: choose a date.` };
+    fields[field.id] = field.repeatable ? values : values[0];
+  }
+  return { ok: true, fields };
+}

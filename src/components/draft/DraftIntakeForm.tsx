@@ -1,0 +1,85 @@
+"use client";
+
+import Link from "next/link";
+import { useRouter } from "next/navigation";
+import { useState } from "react";
+import { compactPrimaryButton } from "@/components/ui/buttons";
+import type { IntakeView } from "@/server/db/documents";
+import { startDraft } from "@/server/drafting/actions";
+import { IntakeField } from "./IntakeField";
+
+// The short intake for one document (DR-03, DR-04): which court or registry, then the facts.
+// Lawdeck drafts from the approved template; missing facts stay as visible placeholders.
+export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; returnTo: string }) {
+  const router = useRouter();
+  const [busy, setBusy] = useState(false);
+  const [message, setMessage] = useState<string>();
+  const [needsSignIn, setNeedsSignIn] = useState(false);
+  const chooseForum = intake.forums.length > 1;
+
+  async function submit(form: FormData) {
+    setBusy(true);
+    setMessage(undefined);
+    const facts: Record<string, string[]> = {};
+    for (const field of intake.fields) facts[field.id] = form.getAll(field.id).map(String);
+    const forumId = chooseForum ? String(form.get("forum") ?? "") || null : (intake.forums[0]?.id ?? null);
+    const result = await startDraft({ templateId: intake.id, forumId, facts });
+    if (result.ok) {
+      router.push(`/documents/${result.id}`);
+      return;
+    }
+    setBusy(false);
+    setNeedsSignIn(Boolean(result.signIn));
+    setMessage(result.message);
+  }
+
+  return (
+    <form action={submit} className="flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5">
+      {chooseForum ? (
+        <fieldset className="flex flex-col gap-2">
+          <legend className="mb-1 font-medium">Court or registry</legend>
+          <p className="text-sm text-muted">The heading, form and layout follow the court or registry you choose.</p>
+          {intake.forums.map((forum) => (
+            <label key={forum.id} className="flex min-h-11 items-center gap-2">
+              <input type="radio" name="forum" value={forum.id} required />
+              {forum.name}
+            </label>
+          ))}
+        </fieldset>
+      ) : (
+        intake.forums[0] && <p className="text-sm text-muted">Court or registry: {intake.forums[0].name}</p>
+      )}
+
+      {intake.fields.map((field) => (
+        <IntakeField key={field.id} field={field} />
+      ))}
+
+      {message && (
+        <p role="alert" className="text-sm text-warning">
+          {message}
+          {needsSignIn && (
+            <>
+              {" "}
+              <Link href={`/sign-in?next=${encodeURIComponent(returnTo)}`}>Sign in</Link>
+            </>
+          )}
+        </p>
+      )}
+      <div className="flex flex-wrap items-center gap-3">
+        <button type="submit" disabled={busy} className={compactPrimaryButton}>
+          {busy ? "Drafting…" : "Draft the document"}
+        </button>
+        {busy && (
+          <span role="status" className="text-sm text-muted">
+            {intake.aiParts > 0 ? "Writing the narrative parts. This can take up to 30 seconds." : "Preparing the document."}
+          </span>
+        )}
+      </div>
+      <p className="text-sm text-muted">
+        The structure and standard wording come from a reviewed template; Lawdeck only writes the narrative parts from your facts and
+        never invents names, dates or sums. Names and addresses are never sent to the AI.
+        {intake.aiParts > 0 ? " Each draft counts as one of your questions this month." : ""}
+      </p>
+    </form>
+  );
+}
