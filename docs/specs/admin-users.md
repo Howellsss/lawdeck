@@ -1,7 +1,7 @@
 # Admin Users dashboard
 
 Requested by the founder, 2026-10-24: "track who just joined, their plan, paid or not, and everything else that should ordinarily be in the dashboard. Clear and straight to the point."
-Built overnight without a plan approval (the founder was asleep), so it waits as a pull request for the founder's review and is **not merged**.
+Built overnight while the founder slept; the founder reviewed it, applied migration 34 and approved it on 2026-10-24.
 
 ## Where
 - **Admin → Users** (`/admin/users`), in the sidebar for admins only.
