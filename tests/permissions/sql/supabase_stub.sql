@@ -10,7 +10,16 @@ begin
 end $$;
 
 create schema auth;
-create table auth.users (id uuid primary key, email text);
+-- The columns of Supabase's sign-in table that the migrations read (the admin Users page, migration 34).
+create table auth.users (
+  id uuid primary key,
+  email text,
+  created_at timestamptz not null default now(),
+  last_sign_in_at timestamptz,
+  email_confirmed_at timestamptz,
+  raw_app_meta_data jsonb not null default '{}',
+  raw_user_meta_data jsonb not null default '{}'
+);
 
 -- Same idea as Supabase's auth.uid(): the signed-in user's id from the request.
 create function auth.uid() returns uuid language sql stable as $$
