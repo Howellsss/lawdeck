@@ -216,6 +216,22 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Who is on which paid plan (migration 34). Written only by the payment provider's admin job.
+      subscriptions: {
+        Row: Timestamps & {
+          id: string;
+          owner_id: string;
+          plan_id: string;
+          status: "active" | "past_due" | "cancelled" | "expired";
+          amount_ngn: number | null;
+          period_end: string | null;
+          provider: string | null;
+          provider_ref: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       courses: {
         Row: {
           id: string;
@@ -915,6 +931,30 @@ export type Database = {
       redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
       pilot_metrics: { Args: { weeks?: number }; Returns: { week_start: string; metric: string; value: number }[] };
       pilot_summary: { Args: Record<string, never>; Returns: { metric: string; value: number | null }[] };
+      // The admin Users dashboard (migration 34). Admins only.
+      admin_overview: { Args: Record<string, never>; Returns: { metric: string; value: number }[] };
+      admin_signups_by_day: { Args: { days?: number }; Returns: { day: string; signups: number }[] };
+      admin_users: {
+        Args: { search?: string | null; plan_name?: string | null; payment?: "paid" | "unpaid" | "past_due" | null; page_size?: number; page_offset?: number };
+        Returns: {
+          id: string;
+          email: string | null;
+          full_name: string | null;
+          role: "student" | "reviewer" | "admin";
+          joined_at: string;
+          last_sign_in_at: string | null;
+          email_confirmed: boolean;
+          sign_in_method: string;
+          plan: string;
+          payment_status: "paid" | "past_due" | "lapsed" | "never";
+          paid_until: string | null;
+          pilot_access: boolean;
+          questions_this_month: number;
+          last_active_at: string | null;
+          total_count: number;
+        }[];
+      };
+      admin_user_detail: { Args: { person: string }; Returns: { metric: string; value: string | null }[] };
       record_download: { Args: { kind: "document_docx" | "study_export" }; Returns: undefined };
       unusual_activity: { Args: { minutes?: number }; Returns: { metric: string; value: number }[] };
       record_ai_usage: {
