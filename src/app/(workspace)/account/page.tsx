@@ -38,7 +38,7 @@ async function Account() {
           <h2 id="invite-heading" className="text-lg font-medium">
             Join the pilot
           </h2>
-          <p className="text-sm text-muted">Lawdeck is in a closed pilot. Enter the invite code you were sent to start asking questions.</p>
+          <p className="text-sm text-muted">Lawdeck is open to invited testers for now. Enter an invite code if you have one; otherwise the Lawdeck team will give you access soon.</p>
           <InviteCodeForm />
         </section>
       )}

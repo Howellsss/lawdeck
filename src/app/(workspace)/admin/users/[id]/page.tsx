@@ -34,7 +34,7 @@ async function User({ params }: Pick<PageProps<"/admin/users/[id]">, "params">) 
       <Link href="/admin/users" className="text-sm">
         All users
       </Link>
-      <UserDetailView detail={detail} now={now} />
+      <UserDetailView id={id} detail={detail} now={now} />
     </>
   );
 }

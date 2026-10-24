@@ -24,3 +24,29 @@ describe("monthly question allowance", () => {
     );
   });
 });
+
+describe("short-term limit for a public test (migration 35)", () => {
+  const now = new Date("2026-10-24T13:00:00Z"); // 2 pm in Lagos
+  const full = { used: 7, limit: 25, unlimited: false, window: { used: 5, limit: 5, resetsAt: "2026-10-24T15:40:00Z" } };
+
+  it("counts what is left in the window or the month, whichever is less", () => {
+    expect(questionsLeft({ ...full, window: { used: 2, limit: 5, resetsAt: null } })).toBe(3);
+    expect(questionsLeft({ used: 24, limit: 25, unlimited: false, window: { used: 0, limit: 5, resetsAt: null } })).toBe(1);
+    expect(questionsLeft(full)).toBe(0);
+  });
+
+  it("writes both counts under the question box", () => {
+    expect(allowanceNote({ ...full, window: { used: 2, limit: 5, resetsAt: null } })).toBe("3 of 5 left for now · 18 of 25 this month");
+  });
+
+  it("says when the student can ask again, in Lagos time", () => {
+    expect(limitReachedMessage(full, now)).toBe("You’ve used your 5 questions for now. You can ask again at 4:40 pm.");
+    expect(limitReachedMessage({ ...full, window: { ...full.window, resetsAt: "2026-10-24T23:30:00Z" } }, now)).toBe(
+      "You’ve used your 5 questions for now. You can ask again tomorrow at 12:30 am.",
+    );
+  });
+
+  it("puts the monthly limit first once it is used up", () => {
+    expect(limitReachedMessage({ ...full, used: 25 }, now)).toMatch(/all 25 questions for this month/);
+  });
+});

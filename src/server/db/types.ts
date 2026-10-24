@@ -111,9 +111,27 @@ export type Database = {
       // Report a problem (migration 28). Students see their own; reviewers see all and resolve them.
       // The closed pilot (migration 32).
       pilot_settings: {
-        Row: { id: boolean; invite_only: boolean; price_ngn: number | null; price_question_open: boolean; updated_at: string };
+        Row: {
+          id: boolean;
+          invite_only: boolean;
+          price_ngn: number | null;
+          price_question_open: boolean;
+          burst_limit: number | null;
+          burst_hours: number | null;
+          monthly_question_cap: number | null;
+          monthly_scan_page_cap: number | null;
+          updated_at: string;
+        };
         Insert: never;
-        Update: { invite_only?: boolean; price_ngn?: number | null; price_question_open?: boolean };
+        Update: {
+          invite_only?: boolean;
+          price_ngn?: number | null;
+          price_question_open?: boolean;
+          burst_limit?: number | null;
+          burst_hours?: number | null;
+          monthly_question_cap?: number | null;
+          monthly_scan_page_cap?: number | null;
+        };
         Relationships: [];
       };
       invite_codes: {
@@ -929,6 +947,7 @@ export type Database = {
       };
       has_pilot_access: { Args: Record<string, never>; Returns: boolean };
       redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
+      set_pilot_access: { Args: { person: string; allow: boolean }; Returns: "ok" | "not_found" };
       pilot_metrics: { Args: { weeks?: number }; Returns: { week_start: string; metric: string; value: number }[] };
       pilot_summary: { Args: Record<string, never>; Returns: { metric: string; value: number | null }[] };
       // The admin Users dashboard (migration 34). Admins only.
@@ -970,7 +989,14 @@ export type Database = {
       };
       question_allowance: {
         Args: Record<string, never>;
-        Returns: { used: number; monthly_limit: number; unlimited: boolean }[];
+        Returns: {
+          used: number;
+          monthly_limit: number;
+          unlimited: boolean;
+          window_used: number | null;
+          window_limit: number | null;
+          window_resets_at: string | null;
+        }[];
       };
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };

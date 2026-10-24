@@ -8,7 +8,9 @@ import { Pager } from "@/components/library/Pager";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { usersHref } from "@/lib/adminUsers";
 import { userFilterSchema } from "@/schemas/adminUsers";
+import Link from "next/link";
 import { getUsersOverview, listUsers } from "@/server/db/adminUsers";
+import { getInviteOnly } from "@/server/db/pilot";
 
 export const metadata: Metadata = { title: "Users · Lawdeck" };
 
@@ -26,7 +28,7 @@ export default function UsersPage({ searchParams }: PageProps<"/admin/users">) {
 
 async function Users({ searchParams }: Pick<PageProps<"/admin/users">, "searchParams">) {
   const filter = userFilterSchema.parse(await searchParams);
-  const [overview, people] = await Promise.all([getUsersOverview(), listUsers(filter)]);
+  const [overview, people, inviteOnly] = await Promise.all([getUsersOverview(), listUsers(filter), getInviteOnly()]);
   if (!overview || !people) notFound();
   // Time is read once per request for "3 minutes ago".
   // eslint-disable-next-line react-hooks/purity
@@ -45,6 +47,12 @@ async function Users({ searchParams }: Pick<PageProps<"/admin/users">, "searchPa
         <h2 id="people-heading" className="text-lg font-medium">
           {filtered ? "Matching people" : "Everyone, newest first"} ({people.total.toLocaleString("en-NG")})
         </h2>
+        <p className="text-sm">
+          {inviteOnly
+            ? "Invite only is on: new people wait until you press Give access (or they enter an invite code)."
+            : "Invite only is off, so everyone who signs up can use Lawdeck. Switch it on to choose who gets in."}{" "}
+          <Link href="/admin/pilot">Pilot settings and limits</Link>
+        </p>
         <UserFilters filter={filter} planNames={people.planNames} />
         {noPayments && (
           <p className="text-sm text-muted">No payments are recorded yet, so everyone shows as “Not paid”. They will appear here once the payment provider is connected.</p>

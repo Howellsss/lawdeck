@@ -5,6 +5,7 @@ import { InviteCreateForm } from "@/components/pilot/InviteCreateForm";
 import { InviteList } from "@/components/pilot/InviteList";
 import { PilotMeasures } from "@/components/pilot/PilotMeasures";
 import { PilotSettingsForm } from "@/components/pilot/PilotSettingsForm";
+import { UsageLimitsForm } from "@/components/pilot/UsageLimitsForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { getPilotDashboard } from "@/server/db/pilot";
 
@@ -44,6 +45,14 @@ async function Pilot() {
       <section aria-labelledby="settings-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="settings-heading" className="text-lg font-medium">Settings</h2>
         <PilotSettingsForm initial={data.settings} />
+      </section>
+      <section aria-labelledby="limits-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+        <h2 id="limits-heading" className="text-lg font-medium">Limits for a public test</h2>
+        <p className="text-sm text-muted">
+          Each student gets a few questions at a time and a set number a month, so the AI credit can’t run out. Questions include
+          practice, briefs, marking and drafts. Leave a box empty for no extra limit. Reviewers and admins are never limited.
+        </p>
+        <UsageLimitsForm initial={data.limits} />
       </section>
     </>
   );
