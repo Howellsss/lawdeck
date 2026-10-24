@@ -1,5 +1,5 @@
 {
-  "description": "Auto mode routing test (PRD WS-03): 100 student requests and the mode each should go to. Target: at least 90 correct.",
+  "description": "Auto mode routing test (PRD WS-03): student requests (100, plus 8 topic-only ones added 2026-10-24) and the mode each should go to. Target: at least 90% correct.",
   "requests": [
     {
       "request": "Brief the case on the rule in Foss v Harbottle",
@@ -400,6 +400,38 @@
     {
       "request": "Write the particulars of claim for a small claims matter",
       "expect": "draft"
+    },
+    {
+      "request": "charges",
+      "expect": "learn"
+    },
+    {
+      "request": "Charges",
+      "expect": "learn"
+    },
+    {
+      "request": "bail",
+      "expect": "learn"
+    },
+    {
+      "request": "bail pending trial",
+      "expect": "learn"
+    },
+    {
+      "request": "writ of summons",
+      "expect": "learn"
+    },
+    {
+      "request": "affidavit",
+      "expect": "learn"
+    },
+    {
+      "request": "pleadings",
+      "expect": "learn"
+    },
+    {
+      "request": "originating summons",
+      "expect": "learn"
     }
   ]
 }
