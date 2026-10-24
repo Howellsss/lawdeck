@@ -20,6 +20,8 @@ export const EMBEDDING_DIMENSIONS = 1024;
 
 // How many passages a search hands to the screen or the AI at most.
 export const SEARCH_RESULTS = 8;
+// A problem question (a scenario) usually raises several issues, so it gets more passages.
+export const SCENARIO_SEARCH_RESULTS = 12;
 // How many candidates the database returns for the re-ranker to choose from (migration 10 caps
 // this at 30, with a search limit for students).
 export const SEARCH_CANDIDATES = 30;

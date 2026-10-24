@@ -49,6 +49,7 @@ export async function searchLibrary(input: {
   // null searches every course ("All courses").
   courseId: string | null;
   includePending: boolean;
+  results?: number;
   // Only the answer test (a marked admin job) passes its own client; the app searches as the student.
   db?: Db;
 }): Promise<SearchResult> {
@@ -63,6 +64,8 @@ export async function searchForAnswer(input: {
   courseId: string | null;
   includePending: boolean;
   useUploads: boolean;
+  // How many passages to return; problem questions ask for more (SCENARIO_SEARCH_RESULTS).
+  results?: number;
   db?: Db;
 }): Promise<SearchResult> {
   const embedded = await embedTexts(
@@ -97,7 +100,7 @@ export async function searchForAnswer(input: {
     ok: true,
     meaningUsed: vector !== null,
     reranked: reranked?.ok ?? false,
-    hits: ordered.slice(0, SEARCH_RESULTS),
+    hits: ordered.slice(0, input.results ?? SEARCH_RESULTS),
   };
 }
 

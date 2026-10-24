@@ -1,6 +1,6 @@
 {
   "course": "civil-litigation",
-  "source": "D. R. Sarumi's Notes on Civil Litigation (draft by AI from the notes; legal reviewer to check)",
+  "source": "D. R. Sarumi's Notes on Civil Litigation (draft by AI from the notes; legal reviewer to check); Q41–Q45 are problem questions built from the points of earlier cases (2026-10-24)",
   "questions": [
     {
       "id": "Q01",
@@ -598,6 +598,112 @@
         "Loxroy (Nigeria)Limited v. Triana Limited (1989)"
       ],
       "sourcePhrase": "at least 2 clear days between the date of service of motion"
+    },
+    {
+      "id": "Q41",
+      "topic": "Problem question: service, default and setting aside (Lagos)",
+      "level": "exam",
+      "question": "Ada sued Bolu Ltd in the Lagos High Court for a liquidated debt of N4 million. When the bailiff went to serve the writ on Bolu Ltd's managing director, he was threatened with violence, so he dropped the writ at the director's feet and left. Bolu Ltd never entered appearance. Ada now wants judgment, and Bolu Ltd says it will apply to set aside any judgment because service was bad. Identify the issues and advise both parties.",
+      "mustInclude": [
+        "Where violence is threatened, leaving the process within reach of the defendant is good and sufficient service",
+        "Personal service is the general rule for originating processes",
+        "There must be proof of service of the originating process on the defendant",
+        "The claimant may apply for judgment for the claim or a lesser sum and interest",
+        "Apply within a reasonable time, show a good defence and a just cause for the default",
+        "In Abuja the applicant must also prove payment of the penalty"
+      ],
+      "authorities": [
+        "Order 7, Rule 12 Abuja",
+        "Order 9, Rule 12 of Lagos",
+        "Order 12, Rule 1 (Lagos)",
+        "Order 10, Rule 2 (Abuja)",
+        "Order 12, Rule 3 (Lagos)",
+        "Order 10, Rule 11 (Abuja)"
+      ],
+      "sourcePhrase": "the process is left within the reach of the defendant"
+    },
+    {
+      "id": "Q42",
+      "topic": "Problem question: writ not served in time and substituted service (Lagos)",
+      "level": "exam",
+      "question": "Chika issued a writ in the Lagos High Court on 2 January against Dapo, who keeps moving house to avoid the bailiff. It is now late July and the writ has still not been served. Chika's counsel wants to keep the case alive and find another way of getting the writ to Dapo, since personal service seems impossible. Identify the issues and advise Chika on what to do and in what order.",
+      "mustInclude": [
+        "A Lagos writ must be served within 6 calendar months of issue",
+        "It may be renewed for 3 months at a time, up to 2 renewals (12 months in all)",
+        "Renewal is by motion ex parte with affidavit and written address, and may be sought before or after expiry",
+        "Granted where the court is satisfied that prompt personal service cannot be conveniently effected",
+        "Application by motion ex parte with affidavit and written address",
+        "Means include an adult inmate of the abode, an agent, newspaper or gazette advertisement, notice at the abode, and email"
+      ],
+      "authorities": [
+        "Order 8, Rule 6&7 of Lagos",
+        "Kolawole v. D Alberto",
+        "Uchendu v. Ogboni",
+        "Order 7, Rule 11 Abuja",
+        "Order 9, Rule 5 of Lagos"
+      ],
+      "sourcePhrase": "within 3 calendar months from the day of the last renewal"
+    },
+    {
+      "id": "Q43",
+      "topic": "Problem question: recovery of premises in the Magistrate Court, defendant outside Lagos",
+      "level": "exam",
+      "question": "Emeka owns a shop in Ikeja let to Funmi at an annual rent of N9 million. Funmi has not paid for two years and owes N18 million, and she now lives in Abeokuta, Ogun State. Emeka wants to recover the shop and the arrears in a Lagos Magistrate Court and asks whether that court can hear it and whether Funmi can be served in Ogun State. Identify the issues and advise Emeka.",
+      "mustInclude": [
+        "Jurisdiction covers premises whose annual rental value does not exceed N10,000,000 at filing",
+        "The claimant may also claim arrears of rent and mesne profits even if the total exceeds N10,000,000",
+        "It is the annual rent that is considered, not the total arrears",
+        "Summons cannot be served outside Lagos without the permission of the court",
+        "Application is ex parte supported by affidavit and written address",
+        "If granted, the defendant must be given at least 30 days to enter appearance"
+      ],
+      "authorities": [
+        "s. 28 of the Magistrate Court of Lagos State, 2009",
+        "Order 5, Rule 3(1) & 6 of the Rules, 2009"
+      ],
+      "sourcePhrase": "the annual rent that is considered and not the total"
+    },
+    {
+      "id": "Q44",
+      "topic": "Problem question: wrong division, missing pre-action notice and frontloading",
+      "level": "exam",
+      "question": "Gbenga's company had a contract with a government agency to be performed in Ikeja. Gbenga's lawyer filed the writ in the Lagos judicial division without first serving the pre-action notice the agency's statute requires, and without frontloading the witness statements. The agency now argues that the whole suit is a nullity. Identify all the issues and advise both the company and the agency.",
+      "mustInclude": [
+        "Judicial divisions are mainly for administrative convenience and non-compliance is non-fatal",
+        "Actions on contracts go to the division where the contract ought to have been performed or where the defendant resides or carries on business",
+        "Pre-action notice is a condition precedent to be checked before suing",
+        "Non-service of pre-action notice is a procedural jurisdictional issue that can be waived",
+        "In Abuja the Registry shall not accept the originating process for filing if it is not frontloaded",
+        "In Lagos failure to frontload nullifies the action"
+      ],
+      "authorities": [
+        "Order 4, Rule 3 of Lagos",
+        "Order 3, Rule 6 of Abuja",
+        "Katsina Local Auth. v. Makudawa (1971)",
+        "Mobil Unltd v. LASEPA (2002)",
+        "Order 2, Rule 2(4) FCT Abuja",
+        "Order 5, Rule 1(3) of Lagos"
+      ],
+      "sourcePhrase": "for administrative convenience and non-compliance is non-fatal"
+    },
+    {
+      "id": "Q45",
+      "topic": "Problem question: injunction and defences to plead",
+      "level": "exam",
+      "question": "Halima learnt on Friday that Ifeanyi was about to demolish a building on land she claims, starting on Monday. She wants the court to stop him at once and to keep him stopped until the case is decided. Ifeanyi says her claim is caught by the limitation law and that her title documents were obtained by fraud. Identify the issues and advise both parties, including on how Ifeanyi should raise his defences.",
+      "mustInclude": [
+        "Interim injunction lasts a short time, usually until the next adjourned date or hearing of the motion on notice",
+        "Interlocutory injunction lasts until final determination of the substantive suit",
+        "Interim injunction additionally requires a case of utmost urgency",
+        "Grounds such as fraud, illegality, immunity and limitation must be specifically pleaded",
+        "A party who fails to plead them will not be allowed to lead evidence on them at trial"
+      ],
+      "authorities": [
+        "Kotoye v. CBN (1989)",
+        "Order 15, Rule 7 (Abuja)",
+        "Order 17, Rule 7 (Lagos)"
+      ],
+      "sourcePhrase": "Interlocutory injunction lasts until the final determination of the substantive suit"
     }
   ],
   "pushback": [

@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EXPLAIN_SYSTEM, LEVEL_INSTRUCTIONS, questionMessage } from "@/prompts/explain";
+import { EXPLAIN_SYSTEM, isScenario, LEVEL_INSTRUCTIONS, questionMessage } from "@/prompts/explain";
 import { isTopicOnly, parseRoute } from "@/prompts/route";
 import { startChatSchema, topicNameSchema, topicSlug } from "@/schemas/learn";
 import { routeRequest } from "@/server/ai/route";
@@ -10,6 +10,19 @@ describe("answer levels", () => {
     expect(questionMessage([], "Why?", "exam")).toContain(LEVEL_INSTRUCTIONS.exam);
     expect(questionMessage([], "Why?")).toContain(LEVEL_INSTRUCTIONS.exam);
     expect(EXPLAIN_SYSTEM).not.toContain("Answer level");
+  });
+});
+
+describe("problem questions", () => {
+  it("are recognised by their length, so they get more passages", () => {
+    expect(isScenario("What is a pre-action notice?")).toBe(false);
+    expect(isScenario(Array.from({ length: 45 }, (_, i) => `word${i}`).join(" "))).toBe(true);
+  });
+
+  it("are answered issue by issue, ending with advice, from the passages only", () => {
+    for (const heading of ["## The facts in brief", "## Issues", "## Issue 1:", "## Advice"]) expect(EXPLAIN_SYSTEM).toContain(heading);
+    expect(EXPLAIN_SYSTEM).toContain("does not cover it yet");
+    expect(EXPLAIN_SYSTEM).toContain("Never fill a gap with outside knowledge");
   });
 });
 
