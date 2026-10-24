@@ -14,8 +14,9 @@ export async function getAllowance(
     return null;
   }
   const row = data[0];
+  // == null also covers a database without migration 35 (no window columns yet).
   const window =
-    row.window_limit === null ? null : { used: row.window_used ?? 0, limit: row.window_limit, resetsAt: row.window_resets_at };
+    row.window_limit == null ? null : { used: row.window_used ?? 0, limit: row.window_limit, resetsAt: row.window_resets_at };
   return { used: row.used, limit: row.monthly_limit, unlimited: row.unlimited, window };
 }
 

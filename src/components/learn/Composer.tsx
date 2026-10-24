@@ -6,6 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { COURSES } from "@/lib/courses";
 import { openDraft } from "@/server/drafting/actions";
+import { VoiceButton } from "./VoiceButton";
 import { openNewChat } from "./openNewChat";
 
 const MODES = ["Auto", "Learn", "Draft"] as const;
@@ -61,15 +62,26 @@ export function Composer() {
     if (!problem) return;
     if (problem.routedToDraft) {
       setRoutedToDraft(true);
-      return goDraft(question);
+      return goDraft(question, true);
     }
     setBusy(false);
     setNeedsSignIn(Boolean(problem.signIn));
     setNotice(problem.message);
   }
 
-  async function goDraft(request: string) {
+  // Auto mode only: when no reviewed document matches, the request is answered as a question
+  // instead of opening the catalogue (founder, 2026-10-24).
+  async function goDraft(request: string, fromAuto = false) {
     const result = await openDraft({ request, course });
+    if (result.ok && !result.matched && fromAuto) {
+      setRoutedToDraft(false);
+      const problem = await openNewChat(router, { question: request, course, mode: "learn" });
+      if (!problem) return;
+      setBusy(false);
+      setNeedsSignIn(Boolean(problem.signIn));
+      setNotice(problem.message);
+      return;
+    }
     if (result.ok) {
       router.push(result.href);
       return;
@@ -135,11 +147,13 @@ export function Composer() {
               ...COURSES.map((c): [string, string] => [c.slug, c.name]),
             ]}
           />
+          <span className="ml-auto" />
+          <VoiceButton disabled={busy} onText={setText} onError={setNotice} />
           <button
             type="submit"
             aria-label="Send"
             disabled={!text.trim() || busy}
-            className="ml-auto flex size-11 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
+            className="flex size-11 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
           >
             <Icon name="arrowUp" size={18} />
           </button>

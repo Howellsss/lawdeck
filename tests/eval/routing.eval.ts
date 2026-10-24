@@ -1,4 +1,4 @@
-// The Auto mode routing test (PRD WS-03): at least 90 of 100 requests go to the right mode.
+// The Auto mode routing test (PRD WS-03): at least 90% of requests go to the right mode.
 // It calls Claude Haiku for each request (a fraction of a cent in total). Needs ANTHROPIC_API_KEY.
 import { appendFileSync, readFileSync } from "node:fs";
 import { describe, expect, it } from "vitest";
