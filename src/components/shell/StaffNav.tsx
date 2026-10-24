@@ -37,6 +37,12 @@ export function StaffNav({ isAdmin = false }: { isAdmin?: boolean }) {
         <span className={collapsed ? "sr-only" : ""}>Answer tests</span>
       </NavLink>
       {isAdmin && (
+        <NavLink href="/admin/users" onNavigate={onNavigate} className={itemClass} match="prefix">
+          <Icon name="users" />
+          <span className={collapsed ? "sr-only" : ""}>Users</span>
+        </NavLink>
+      )}
+      {isAdmin && (
         <NavLink href="/admin/pilot" onNavigate={onNavigate} className={itemClass} match="prefix">
           <Icon name="flag" />
           <span className={collapsed ? "sr-only" : ""}>Pilot</span>
