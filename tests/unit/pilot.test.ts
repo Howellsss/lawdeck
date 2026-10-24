@@ -45,3 +45,37 @@ describe("students without an invite code", () => {
     expect(limitReachedMessage({ used: 30, limit: 30, unlimited: false })).not.toBe(CLOSED_PILOT_MESSAGE);
   });
 });
+
+describe("access and limits for a public test (migration 35)", () => {
+  it("gives or removes access only for a real person id", async () => {
+    const { pilotAccessSchema } = await import("@/schemas/pilot");
+    expect(pilotAccessSchema.safeParse({ person: "3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", allow: true }).success).toBe(true);
+    expect(pilotAccessSchema.safeParse({ person: "everyone", allow: true }).success).toBe(false);
+    expect(pilotAccessSchema.safeParse({ person: "3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", allow: "yes" }).success).toBe(false);
+  });
+
+  it("reads the limits, with empty boxes meaning no extra limit", async () => {
+    const { usageLimitsSchema } = await import("@/schemas/pilot");
+    expect(usageLimitsSchema.parse({ burstLimit: "5", burstHours: " 3 ", monthlyQuestionCap: "25", monthlyScanPageCap: "20" })).toEqual({
+      burstLimit: 5,
+      burstHours: 3,
+      monthlyQuestionCap: 25,
+      monthlyScanPageCap: 20,
+    });
+    expect(usageLimitsSchema.parse({ burstLimit: "", burstHours: "", monthlyQuestionCap: "", monthlyScanPageCap: "" })).toEqual({
+      burstLimit: null,
+      burstHours: null,
+      monthlyQuestionCap: null,
+      monthlyScanPageCap: null,
+    });
+  });
+
+  it("needs both the questions and the hours for the short period, and sensible numbers", async () => {
+    const { usageLimitsSchema } = await import("@/schemas/pilot");
+    const empty = { burstLimit: "", burstHours: "", monthlyQuestionCap: "", monthlyScanPageCap: "" };
+    expect(usageLimitsSchema.safeParse({ ...empty, burstLimit: "5" }).success).toBe(false);
+    expect(usageLimitsSchema.safeParse({ ...empty, burstLimit: "5", burstHours: "25" }).success).toBe(false);
+    expect(usageLimitsSchema.safeParse({ ...empty, monthlyQuestionCap: "2.5" }).success).toBe(false);
+    expect(usageLimitsSchema.safeParse({ ...empty, monthlyQuestionCap: "lots" }).success).toBe(false);
+  });
+});

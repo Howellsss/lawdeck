@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import type { Allowance } from "@/lib/allowance";
+import { questionsLeft, type Allowance } from "@/lib/allowance";
 import type { Database } from "@/server/db/types";
 
 // The signed-in person's question allowance this month, or null if it could not be read.
@@ -14,11 +14,15 @@ export async function getAllowance(
     return null;
   }
   const row = data[0];
-  return { used: row.used, limit: row.monthly_limit, unlimited: row.unlimited };
+  // == null also covers a database without migration 35 (no window columns yet).
+  const window =
+    row.window_limit == null ? null : { used: row.window_used ?? 0, limit: row.window_limit, resetsAt: row.window_resets_at };
+  return { used: row.used, limit: row.monthly_limit, unlimited: row.unlimited, window };
 }
 
+// Questions left this month and, during a public test, in the current short window.
 export function hasQuestionsLeft(a: Allowance): boolean {
-  return a.unlimited || a.used < a.limit;
+  return a.unlimited || (questionsLeft(a) ?? 0) > 0;
 }
 
 export const ALLOWANCE_UNAVAILABLE =

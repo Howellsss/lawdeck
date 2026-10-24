@@ -40,3 +40,7 @@ Plan approved by the founder ("APPROVE", 2026-10-23). Migration 30 approved by t
 2. **A stricter policy with a fresh code per page** (no `'unsafe-inline'` scripts). Next.js can only do this when every page is built at request time, which would slow the home page against its 3-second budget. Revisit after the pilot.
 3. **The Google picker key** (founder, Google Cloud console): confirm it is restricted to Lawdeck's web address and to the Google Picker API only.
 4. **HSTS preload**: not requested. Lawdeck is on a `vercel.app` address for now; reconsider when it moves to its own domain.
+
+## Change after the review
+
+- 2026-10-24: the microphone is allowed on Lawdeck's own pages (`microphone=(self)`) so students can speak a question (founder's request). Other sites framed or linked from Lawdeck still cannot use it. The browser turns speech into words (Chrome through Google, Safari through Apple); Lawdeck never receives the recording. The Privacy Notice draft names this for the lawyer.

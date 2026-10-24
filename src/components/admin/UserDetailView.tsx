@@ -1,6 +1,7 @@
 import { signInMethodLabel, timeAgo, type PaymentStatus } from "@/lib/adminUsers";
 import { formatWat } from "@/lib/dates";
 import type { UserDetail } from "@/server/db/adminUsers";
+import { AccessButton } from "./AccessButton";
 import { PaymentBadge } from "./PaymentBadge";
 
 const PAYMENT_STATUSES: PaymentStatus[] = ["paid", "past_due", "lapsed", "never"];
@@ -28,7 +29,7 @@ function Facts({ title, items }: { title: string; items: [string, React.ReactNod
 }
 
 // Admin: one person's account, plan and usage. Counts only, never their work itself.
-export function UserDetailView({ detail, now }: { detail: UserDetail; now: Date }) {
+export function UserDetailView({ id, detail, now }: { id: string; detail: UserDetail; now: Date }) {
   const payment = PAYMENT_STATUSES.find((status) => status === detail.payment_status) ?? "never";
   const role = detail.role === "admin" ? "Admin" : detail.role === "reviewer" ? "Reviewer" : "Student";
   const cost = Number(detail.ai_cost_total_usd ?? 0);
@@ -55,7 +56,17 @@ export function UserDetailView({ detail, now }: { detail: UserDetail; now: Date 
           ["Plan", detail.plan ?? "Free"],
           ["Payment", <PaymentBadge key="payment" status={payment} />],
           ["Paid until", detail.paid_until ? formatWat(detail.paid_until) : "–"],
-          ["Pilot access", detail.pilot_access_at ? `Since ${formatWat(detail.pilot_access_at)}` : "No"],
+          [
+            "Access",
+            detail.role === "student" ? (
+              <div key="access" className="flex flex-col gap-1">
+                <AccessButton person={id} name={detail.full_name || detail.email || "this person"} hasAccess={Boolean(detail.pilot_access_at)} />
+                {detail.pilot_access_at && <span className="text-xs text-muted">Since {formatWat(detail.pilot_access_at)}</span>}
+              </div>
+            ) : (
+              "Always (staff)"
+            ),
+          ],
           ["Invite code", detail.invite_code || "None"],
         ]}
       />

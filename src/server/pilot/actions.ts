@@ -3,7 +3,15 @@
 import { refresh } from "next/cache";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { generateInviteCode } from "@/lib/inviteCode";
-import { inviteCodeSchema, inviteIdSchema, newInviteSchema, pilotSettingsSchema, priceAnswerSchema } from "@/schemas/pilot";
+import {
+  inviteCodeSchema,
+  inviteIdSchema,
+  newInviteSchema,
+  pilotAccessSchema,
+  pilotSettingsSchema,
+  priceAnswerSchema,
+  usageLimitsSchema,
+} from "@/schemas/pilot";
 import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -115,4 +123,50 @@ export async function disableInvite(id: string): Promise<PilotResult> {
   }
   refresh();
   return { ok: true };
+}
+
+// Gives or removes one person's access from the Users page (migration 35); the same access an
+// invite code gives. The database checks the admin role again and records it in the audit log.
+export async function setPilotAccess(input: { person: string; allow: boolean }): Promise<PilotResult> {
+  const parsed = pilotAccessSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "That person could not be found." };
+  if ((await getStaffRole()) !== "admin") return { ok: false, message: NOT_ADMIN };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("set_pilot_access", { person: parsed.data.person, allow: parsed.data.allow });
+  if (error) {
+    logFailure("setPilotAccess", error.code);
+    return { ok: false, message: NOT_SAVED };
+  }
+  if (data === "not_found") return { ok: false, message: "That person could not be found. They may have deleted their account." };
+  refresh();
+  return { ok: true, message: parsed.data.allow ? "Access given." : "Access removed." };
+}
+
+// The limits for a public test, on the Pilot page (migration 35).
+export async function saveUsageLimits(input: {
+  burstLimit: string;
+  burstHours: string;
+  monthlyQuestionCap: string;
+  monthlyScanPageCap: string;
+}): Promise<PilotResult> {
+  const parsed = usageLimitsSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Check the highlighted box.", fieldErrors: fieldErrorsFrom(parsed.error) };
+  if ((await getStaffRole()) !== "admin") return { ok: false, message: NOT_ADMIN };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase
+    .from("pilot_settings")
+    .update({
+      burst_limit: parsed.data.burstLimit,
+      burst_hours: parsed.data.burstHours,
+      monthly_question_cap: parsed.data.monthlyQuestionCap,
+      monthly_scan_page_cap: parsed.data.monthlyScanPageCap,
+    })
+    .eq("id", true)
+    .select("id");
+  if (error || !data?.length) {
+    logFailure("saveUsageLimits", error?.code);
+    return { ok: false, message: NOT_SAVED };
+  }
+  refresh();
+  return { ok: true, message: "Limits saved." };
 }

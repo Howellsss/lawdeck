@@ -44,8 +44,16 @@ export type InviteCodeRow = {
   createdAt: string;
 };
 
+export type UsageLimits = {
+  burstLimit: number | null;
+  burstHours: number | null;
+  monthlyQuestionCap: number | null;
+  monthlyScanPageCap: number | null;
+};
+
 export type PilotDashboard = {
   settings: { inviteOnly: boolean; priceNgn: number | null; priceQuestionOpen: boolean };
+  limits: UsageLimits;
   codes: InviteCodeRow[];
   // Weekly counts, newest week first: one row per week with each metric.
   weeks: { weekStart: string; counts: Record<string, number> }[];
@@ -58,7 +66,11 @@ export async function getPilotDashboard(): Promise<PilotDashboard | null> {
   if ((await getStaffRole()) !== "admin") return null;
   const supabase = await createSupabaseServerClient();
   const [settings, codes, metrics, summary, reports] = await Promise.all([
-    supabase.from("pilot_settings").select("invite_only, price_ngn, price_question_open").eq("id", true).maybeSingle(),
+    supabase
+      .from("pilot_settings")
+      .select("invite_only, price_ngn, price_question_open, burst_limit, burst_hours, monthly_question_cap, monthly_scan_page_cap")
+      .eq("id", true)
+      .maybeSingle(),
     supabase.from("invite_codes").select("id, code, label, max_uses, uses, expires_at, disabled, created_at").order("created_at", { ascending: false }).limit(200),
     supabase.rpc("pilot_metrics", { weeks: 6 }),
     supabase.rpc("pilot_summary"),
@@ -77,6 +89,12 @@ export async function getPilotDashboard(): Promise<PilotDashboard | null> {
   }
   return {
     settings: { inviteOnly: settings.data.invite_only, priceNgn: settings.data.price_ngn, priceQuestionOpen: settings.data.price_question_open },
+    limits: {
+      burstLimit: settings.data.burst_limit,
+      burstHours: settings.data.burst_hours,
+      monthlyQuestionCap: settings.data.monthly_question_cap,
+      monthlyScanPageCap: settings.data.monthly_scan_page_cap,
+    },
     codes: (codes.data ?? []).map((c) => ({
       id: c.id,
       code: c.code,
@@ -91,4 +109,16 @@ export async function getPilotDashboard(): Promise<PilotDashboard | null> {
     summary: Object.fromEntries((summary.data ?? []).map((row) => [row.metric, row.value === null ? null : Number(row.value)])),
     openReports: reports.count ?? 0,
   };
+}
+
+// For the admin Users page: whether invite-only is on, or null if it cannot be read.
+export async function getInviteOnly(): Promise<boolean | null> {
+  if ((await getStaffRole()) !== "admin") return null;
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.from("pilot_settings").select("invite_only").eq("id", true).maybeSingle();
+  if (error || !data) {
+    console.error("invite-only read failed", { code: error?.code ?? "no_row" });
+    return null;
+  }
+  return data.invite_only;
 }
