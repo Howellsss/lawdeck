@@ -38,3 +38,34 @@ export const pilotSettingsSchema = z
 export const PRICE_ANSWERS = { yes: "Yes", maybe: "Maybe", no: "No" } as const;
 export const priceAnswerSchema = z.enum(["yes", "maybe", "no"]);
 export const inviteIdSchema = z.uuid();
+
+// Giving or removing someone's access from the Users page (migration 35).
+export const pilotAccessSchema = z.object({ person: z.uuid(), allow: z.boolean() });
+
+// Limits for a public test (migration 35). Each box may be left empty for "no extra limit".
+function optionalWhole(label: string, min: number, max: number) {
+  return z
+    .string()
+    .trim()
+    .transform((value) => (value === "" ? null : Number(value)))
+    .pipe(
+      z
+        .number({ error: `Enter ${label} as a number, or leave it empty.` })
+        .int({ error: "Use a whole number." })
+        .min(min, { error: `At least ${min}.` })
+        .max(max, { error: `At most ${max}.` })
+        .nullable(),
+    );
+}
+
+export const usageLimitsSchema = z
+  .object({
+    burstLimit: optionalWhole("the questions", 1, 100),
+    burstHours: optionalWhole("the hours", 1, 24),
+    monthlyQuestionCap: optionalWhole("the questions a month", 1, 1000),
+    monthlyScanPageCap: optionalWhole("the scanned pages", 0, 1000),
+  })
+  .refine((value) => (value.burstLimit === null) === (value.burstHours === null), {
+    error: "Fill in both boxes, or leave both empty.",
+    path: ["burstHours"],
+  });

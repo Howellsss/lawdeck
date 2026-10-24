@@ -2,6 +2,7 @@ import Link from "next/link";
 import { signInMethodLabel, timeAgo } from "@/lib/adminUsers";
 import { formatWat } from "@/lib/dates";
 import type { UserRow } from "@/server/db/adminUsers";
+import { AccessButton } from "./AccessButton";
 import { PaymentBadge } from "./PaymentBadge";
 
 function When({ value, now, empty }: { value: string | null; now: Date; empty: string }) {
@@ -13,11 +14,12 @@ function When({ value, now, empty }: { value: string | null; now: Date; empty: s
 export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date; filtered: boolean }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-line">
-      <table className="w-full min-w-[760px] text-left text-sm">
+      <table className="w-full min-w-[880px] text-left text-sm">
         <caption className="sr-only">People, newest first</caption>
         <thead className="bg-surface text-muted">
           <tr>
             <th scope="col" className="px-3 py-2 font-medium">Person</th>
+            <th scope="col" className="px-3 py-2 font-medium">Access</th>
             <th scope="col" className="px-3 py-2 font-medium">Joined</th>
             <th scope="col" className="px-3 py-2 font-medium">Plan</th>
             <th scope="col" className="px-3 py-2 font-medium">Payment</th>
@@ -29,7 +31,7 @@ export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date;
         <tbody className="divide-y divide-line">
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={7} className="px-3 py-6 text-center text-muted">
+              <td colSpan={8} className="px-3 py-6 text-center text-muted">
                 {filtered ? "Nobody matches. Try other words or clear the filters." : "Nobody has signed up yet."}
               </td>
             </tr>
@@ -43,6 +45,13 @@ export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date;
                   {row.name && <span className="block truncate text-muted">{row.email}</span>}
                   {row.role !== "student" && <span className="text-xs text-muted">{row.role === "admin" ? "Admin" : "Reviewer"}</span>}
                 </th>
+                <td className="px-3 py-2">
+                  {row.role === "student" ? (
+                    <AccessButton person={row.id} name={row.name ?? row.email} hasAccess={row.pilotAccess} />
+                  ) : (
+                    <span className="text-muted">Always</span>
+                  )}
+                </td>
                 <td className="whitespace-nowrap px-3 py-2"><When value={row.joinedAt} now={now} empty="–" /></td>
                 <td className="px-3 py-2">{row.plan}</td>
                 <td className="px-3 py-2">
