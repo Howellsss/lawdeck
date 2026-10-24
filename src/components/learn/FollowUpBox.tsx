@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
+import { VoiceButton } from "./VoiceButton";
 
 // The box for the next question in a chat, with the answer level (PRD LN-02).
 export function FollowUpBox({
@@ -17,6 +18,7 @@ export function FollowUpBox({
   onAsk: (question: string) => void;
 }) {
   const [text, setText] = useState("");
+  const [voiceError, setVoiceError] = useState<string | null>(null);
 
   function submit(event: FormEvent) {
     event.preventDefault();
@@ -69,6 +71,14 @@ export function FollowUpBox({
           placeholder="Ask a follow-up question"
           className="flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
         />
+        <VoiceButton
+          disabled={busy}
+          onText={(words) => {
+            setVoiceError(null);
+            setText(words);
+          }}
+          onError={setVoiceError}
+        />
         <button
           type="submit"
           disabled={busy || !text.trim()}
@@ -78,6 +88,11 @@ export function FollowUpBox({
           <Icon name="arrowUp" size={18} />
         </button>
       </form>
+      {voiceError && (
+        <p role="status" className="px-1 text-sm text-muted">
+          {voiceError}
+        </p>
+      )}
     </div>
   );
 }

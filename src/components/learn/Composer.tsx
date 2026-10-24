@@ -6,6 +6,7 @@ import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { COURSES } from "@/lib/courses";
 import { openDraft } from "@/server/drafting/actions";
+import { VoiceButton } from "./VoiceButton";
 import { openNewChat } from "./openNewChat";
 
 const MODES = ["Auto", "Learn", "Draft"] as const;
@@ -146,11 +147,13 @@ export function Composer() {
               ...COURSES.map((c): [string, string] => [c.slug, c.name]),
             ]}
           />
+          <span className="ml-auto" />
+          <VoiceButton disabled={busy} onText={setText} onError={setNotice} />
           <button
             type="submit"
             aria-label="Send"
             disabled={!text.trim() || busy}
-            className="ml-auto flex size-11 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
+            className="flex size-11 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
           >
             <Icon name="arrowUp" size={18} />
           </button>
