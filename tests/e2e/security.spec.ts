@@ -11,6 +11,8 @@ for (const path of ["/", "/sign-in", "/sign-up", "/takedown", "/courses"]) {
     expect(headers["x-content-type-options"]).toBe("nosniff");
     expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
     expect(headers["permissions-policy"]).toContain("camera=()");
+    // The microphone only on Lawdeck's own pages, for speaking a question; never for other sites.
+    expect(headers["permissions-policy"]).toContain("microphone=(self)");
     expect(headers["strict-transport-security"]).toContain("max-age=");
     expect(headers["content-security-policy-report-only"]).toContain("frame-ancestors 'none'");
   });
