@@ -61,15 +61,26 @@ export function Composer() {
     if (!problem) return;
     if (problem.routedToDraft) {
       setRoutedToDraft(true);
-      return goDraft(question);
+      return goDraft(question, true);
     }
     setBusy(false);
     setNeedsSignIn(Boolean(problem.signIn));
     setNotice(problem.message);
   }
 
-  async function goDraft(request: string) {
+  // Auto mode only: when no reviewed document matches, the request is answered as a question
+  // instead of opening the catalogue (founder, 2026-10-24).
+  async function goDraft(request: string, fromAuto = false) {
     const result = await openDraft({ request, course });
+    if (result.ok && !result.matched && fromAuto) {
+      setRoutedToDraft(false);
+      const problem = await openNewChat(router, { question: request, course, mode: "learn" });
+      if (!problem) return;
+      setBusy(false);
+      setNeedsSignIn(Boolean(problem.signIn));
+      setNotice(problem.message);
+      return;
+    }
     if (result.ok) {
       router.push(result.href);
       return;

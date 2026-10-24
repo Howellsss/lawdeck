@@ -23,7 +23,10 @@ export async function startDraft(input: unknown): Promise<StartDraftResult> {
   return createDraft(supabase, account.id, parsed.data);
 }
 
-export type OpenDraftResult = { ok: true; href: string } | { ok: false; message: string; signIn?: boolean };
+// `matched` is false when no reviewed template fits; the href is then the catalogue.
+export type OpenDraftResult =
+  | { ok: true; href: string; matched: boolean }
+  | { ok: false; message: string; signIn?: boolean };
 
 // A typed request ("Draft a writ of summons") becomes the matching template's intake (DR-02).
 // When nothing matches, the student chooses from the catalogue; nothing is drafted yet.
@@ -51,7 +54,8 @@ export async function openDraft(input: { request: string; course: string }): Pro
     return { ok: false, message: "Lawdeck couldn’t open the drafting catalogue just now. Please try again." };
   }
   const picked = await pickTemplate(redactPersonalData(parsed.data.request), data.map((t) => t.title), account.id);
-  return { ok: true, href: picked === null ? "/drafting?unmatched=1" : `/drafting/${data[picked].slug}` };
+  if (picked === null) return { ok: true, href: "/drafting?unmatched=1", matched: false };
+  return { ok: true, href: `/drafting/${data[picked].slug}`, matched: true };
 }
 
 export async function deleteDocument(id: string): Promise<{ ok: boolean; message?: string }> {
