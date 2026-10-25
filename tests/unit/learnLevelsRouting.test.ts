@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EXPLAIN_SYSTEM, LEVEL_INSTRUCTIONS, questionMessage } from "@/prompts/explain";
+import { EXPLAIN_SYSTEM, isScenario, LEVEL_INSTRUCTIONS, questionMessage } from "@/prompts/explain";
 import { isTopicOnly, parseRoute } from "@/prompts/route";
 import { startChatSchema, topicNameSchema, topicSlug } from "@/schemas/learn";
 import { routeRequest } from "@/server/ai/route";
@@ -10,6 +10,19 @@ describe("answer levels", () => {
     expect(questionMessage([], "Why?", "exam")).toContain(LEVEL_INSTRUCTIONS.exam);
     expect(questionMessage([], "Why?")).toContain(LEVEL_INSTRUCTIONS.exam);
     expect(EXPLAIN_SYSTEM).not.toContain("Answer level");
+  });
+});
+
+describe("problem questions", () => {
+  it("are recognised by their length, so they get more passages", () => {
+    expect(isScenario("What is a pre-action notice?")).toBe(false);
+    expect(isScenario(Array.from({ length: 45 }, (_, i) => `word${i}`).join(" "))).toBe(true);
+  });
+
+  it("are answered issue by issue, ending with advice, from the passages only", () => {
+    for (const heading of ["## The facts in brief", "## Issues", "## Issue 1:", "## Advice"]) expect(EXPLAIN_SYSTEM).toContain(heading);
+    expect(EXPLAIN_SYSTEM).toContain("does not cover it yet");
+    expect(EXPLAIN_SYSTEM).toContain("Never fill a gap with outside knowledge");
   });
 });
 
@@ -59,5 +72,13 @@ describe("course topics", () => {
     expect(topicNameSchema.parse("  Service   of process ")).toBe("Service of process");
     expect(topicNameSchema.safeParse(" ").success).toBe(false);
     expect(topicNameSchema.safeParse("x".repeat(161)).success).toBe(false);
+  });
+});
+
+describe("question length", () => {
+  it("takes a full exam problem question of about 1,200 words, and no more than 8,000 characters", async () => {
+    const { askSchema } = await import("@/schemas/learn");
+    expect(askSchema.safeParse({ question: "facts ".repeat(1300).slice(0, 7990), level: "exam" }).success).toBe(true);
+    expect(askSchema.safeParse({ question: "x".repeat(8001), level: "exam" }).success).toBe(false);
   });
 });

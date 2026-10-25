@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  isScenario,
   questionMessage,
   type AnswerLevel,
   type ExplainPassage,
@@ -15,6 +16,7 @@ import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
 import { searchForAnswer, type SearchHit } from "@/server/retrieval/search";
+import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 import { limitReachedMessage } from "@/lib/allowance";
 import {
   ALLOWANCE_UNAVAILABLE,
@@ -129,6 +131,7 @@ export async function answerQuestion(input: {
     courseId: chat.data.course_id,
     includePending: false,
     useUploads: chat.data.use_uploads,
+    results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
   });
   if (!found.ok) return send({ type: "error", message: found.message });
   const unsure = searchUnsure(found);

@@ -1,7 +1,8 @@
 import { z } from "@/lib/zod";
 import { COURSES } from "@/lib/courses";
 
-export const QUESTION_MAX_CHARS = 2000;
+// Long enough for a full exam problem question (about 1,200 words; founder, 2026-10-25).
+export const QUESTION_MAX_CHARS = 8000;
 
 const question = z
   .string({ error: "Type a question." })

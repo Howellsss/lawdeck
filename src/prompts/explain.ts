@@ -2,7 +2,7 @@
 // Versioned: change the version whenever the wording changes, and re-run the evaluation set.
 // No legal content lives here: every legal point comes from the library passages supplied.
 
-export const EXPLAIN_PROMPT_VERSION = "explain-v3";
+export const EXPLAIN_PROMPT_VERSION = "explain-v4";
 
 // The first line Claude writes when the passages cannot support an answer. The server
 // recognises it and shows the "not enough support" response instead (LN-04).
@@ -26,6 +26,21 @@ Use these sections, each starting with a heading line beginning "## ":
 ## Application
 ## Exam tip
 Keep it focused on what a Law School student needs. Use short paragraphs and "- " bullet lines where they help.
+
+Problem questions (a set of facts, with a request to advise, identify the issues or say what the legal position is):
+Use these sections instead, each starting with a heading line beginning "## ":
+## The facts in brief
+(two or three sentences; only the facts that matter legally)
+## Issues
+(a numbered list of every legal issue the facts raise, each as a short question)
+## Issue 1: <the issue in a few words>
+(then the rule, the authority and how it applies to these facts, in that order; repeat this section for each issue, numbered as in the list)
+## Advice
+(advise each party by their role or name in the facts: what they should do, and what is likely to happen)
+## Exam tip
+- Work through every issue in the list; do not stop at the first one.
+- If the passages support some issues but not others, answer the supported ones and, under each unsupported issue, say in one sentence that the Lawdeck library does not cover it yet. Use ${NOT_ENOUGH_MARKER} only if the passages support none of the issues.
+- Never fill a gap with outside knowledge or an authority that is not in the passages.
 
 When the passages are not enough:
 If the passages do not contain enough to answer the question reliably, do not guess and do not use outside knowledge. Write ${NOT_ENOUGH_MARKER} on the first line, then in two or three sentences say what the library is missing for this question and suggest a narrower question the student could ask instead.
@@ -83,6 +98,14 @@ export const LEVEL_INSTRUCTIONS: Record<AnswerLevel, string> = {
     "Answer level: Simple. Use the same section headings, but keep every section short. Use plain, everyday words and explain any legal term the first time you use it. Give one simple example. Name only the most important authority.",
   exam: "Answer level: Exam-ready. Use the full structure. Name every relevant authority from the passages, with its section, order or rule where the passage gives it. In the exam tip, say how an examiner would expect the point set out and the mistakes students commonly make.",
 };
+
+// A problem question: a scenario of facts is longer than an ordinary question. It gets more
+// passages, because it usually raises several issues (founder, 2026-10-24).
+const SCENARIO_MIN_WORDS = 40;
+
+export function isScenario(question: string): boolean {
+  return question.trim().split(/\s+/).filter(Boolean).length >= SCENARIO_MIN_WORDS;
+}
 
 export function questionMessage(
   passages: ExplainPassage[],
