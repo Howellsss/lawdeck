@@ -129,3 +129,18 @@ body {
     --surface: #ffffff;
   }
 }
+
+/* Live activity (founder, 2026-10-25): a heartbeat line while Lawdeck searches or listens, and a
+   small orbit inside busy buttons. Still for people who ask for less motion. */
+@keyframes lawdeck-heartbeat {
+  from { transform: translateX(0); }
+  to { transform: translateX(-50%); }
+}
+@keyframes lawdeck-orbit {
+  to { transform: rotate(360deg); }
+}
+.heartbeat-track { animation: lawdeck-heartbeat 1.6s linear infinite; }
+.orbit { animation: lawdeck-orbit 0.9s linear infinite; }
+@media (prefers-reduced-motion: reduce) {
+  .heartbeat-track, .orbit { animation: none; }
+}

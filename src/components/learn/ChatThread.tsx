@@ -10,12 +10,15 @@ import { AnswerCard } from "./AnswerCard";
 import { AnswerText } from "./AnswerText";
 import { askQuestion, takePendingQuestion } from "./askStream";
 import { FollowUpBox } from "./FollowUpBox";
+import { SearchStatus } from "./SearchStatus";
 import { SourcePassage } from "./SourcePassage";
 
 type Live = {
   question: string;
   level: AnswerLevel;
   text: string;
+  // Passages the library search found; unset while it is still searching.
+  found?: number;
   error?: string;
 };
 
@@ -52,7 +55,9 @@ export function ChatThread({
     setBusy(true);
     setLive({ question, level: answerLevel, text: "" });
     await askQuestion(chatId, question, answerLevel, (event) => {
-      if (event.type === "text") {
+      if (event.type === "found") {
+        setLive((current) => current && { ...current, found: event.count });
+      } else if (event.type === "text") {
         setLive(
           (current) =>
             current && { ...current, text: current.text + event.text },
@@ -139,15 +144,8 @@ export function ChatThread({
               aria-busy={!live.error}
             >
               <span className="sr-only">Lawdeck: </span>
-              {live.text ? (
-                <AnswerText text={live.text} citable={new Set()} />
-              ) : (
-                !live.error && (
-                  <p className="text-sm text-muted">
-                    Searching the library and writing an answer…
-                  </p>
-                )
-              )}
+              {!live.error && <SearchStatus found={live.found} writing={Boolean(live.text)} />}
+              {live.text && <AnswerText text={live.text} citable={new Set()} />}
               {live.error && (
                 <div
                   role="alert"
