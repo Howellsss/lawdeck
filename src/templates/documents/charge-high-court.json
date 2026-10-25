@@ -1,0 +1,162 @@
+{
+  "slug": "charge-high-court",
+  "title": "Charge (High Court)",
+  "course": "criminal-litigation",
+  "forums": [
+    "lagos-high-court",
+    "fct-high-court"
+  ],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits. Source: Criminal Litigation drafting materials (Lawdeck knowledge base).",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFct",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits. Source: Criminal Litigation drafting materials (Lawdeck knowledge base).",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "CHARGE NO: {{chargeNumber}}\nBETWEEN:\n{{complainant}} .................... COMPLAINANT\nAND\n{{defendant}} .................... DEFENDANT",
+        "required": true,
+        "why": "Heading, charge number and parties. Name every defendant in full (with any alias or title given); a person not arrested cannot be tried in absentia and is not made a party. Use 'Defendant', never 'Accused'. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "intro",
+        "kind": "fixed",
+        "align": "left",
+        "text": "The {{complainant}} charges the defendant(s) as follows:",
+        "required": true,
+        "why": "The preamble introducing the counts. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "counts",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Draft the counts of the charge from the facts given. Head each 'COUNT 1', 'COUNT 2' and so on. Each count has a 'STATEMENT OF OFFENCE' naming the offence and the section of the law that creates it and punishes it, and 'PARTICULARS OF OFFENCE' stating, in one sentence: the defendant's full name, the date, the place 'within the jurisdiction of this Honourable Court', the act, the property or person, and the owner or victim last. One offence per count; charge conspiracy as 'Conspiracy to commit the offence of …'. Use only offences and sections the facts and the library support.",
+        "maxWords": 700,
+        "required": true,
+        "why": "The counts: each with a statement of offence (the offence and its section) and particulars (who, when, where, what, against whom). One offence per count; the victim comes last; time, value or relationship must be stated where they matter. Source: Criminal Litigation drafting materials (Lawdeck knowledge base).",
+        "heading": "COUNTS"
+      },
+      {
+        "id": "dated",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "Left for the date of filing. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signedBy",
+        "kind": "fixed",
+        "align": "left",
+        "text": "........................................\n{{prosecutorName}}\n{{prosecutorOffice}}\nFor: {{prosecutingAuthority}}",
+        "required": true,
+        "why": "Signed by the prosecuting officer for the Attorney-General or other prosecuting authority. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division is the charge in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit?",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "chargeNumber",
+        "label": "Charge number",
+        "type": "text",
+        "required": false,
+        "question": "The charge number, if known.",
+        "placeholder": "CHARGE NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "complainant",
+        "label": "Complainant",
+        "type": "party",
+        "required": true,
+        "question": "Who prosecutes? For example: The State of Lagos, or The Federal Republic of Nigeria.",
+        "placeholder": "COMPLAINANT",
+        "repeatable": false
+      },
+      {
+        "id": "defendant",
+        "label": "Defendants",
+        "type": "party",
+        "required": true,
+        "question": "Each defendant's full name, with any alias.",
+        "placeholder": "DEFENDANT",
+        "repeatable": true
+      },
+      {
+        "id": "prosecutorName",
+        "label": "Prosecuting counsel",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the charge?",
+        "placeholder": "PROSECUTING COUNSEL",
+        "repeatable": false
+      },
+      {
+        "id": "prosecutorOffice",
+        "label": "Office",
+        "type": "text",
+        "required": true,
+        "question": "Their office, for example: Principal State Counsel.",
+        "placeholder": "OFFICE",
+        "repeatable": false
+      },
+      {
+        "id": "prosecutingAuthority",
+        "label": "Prosecuting authority",
+        "type": "text",
+        "required": true,
+        "question": "For whom? For example: Attorney-General of Lagos State.",
+        "placeholder": "PROSECUTING AUTHORITY",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "consent-to-file-information"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

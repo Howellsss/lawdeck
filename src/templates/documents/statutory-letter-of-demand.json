@@ -1,0 +1,160 @@
+{
+  "slug": "statutory-letter-of-demand",
+  "title": "Statutory letter of demand",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir,",
+        "required": true,
+        "why": "The salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "STATUTORY LETTER OF DEMAND",
+        "required": true,
+        "why": "The subject heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I am directed by the Board of Directors of {{senderName}} to write to your company.\n\nYour company obtained a loan facility of {{debt}} from {{senderName}} on {{loanDate}}. Despite repeated demands, your company has refused or neglected to pay the principal sum and accrued interest.\n\nTAKE NOTICE that unless payment of the outstanding sum and accrued interest is received within three weeks of the service of this letter on your company, winding-up proceedings may be commenced against your company.\n\nThank you.",
+        "required": true,
+        "why": "The debt, the failure to pay despite demand, and the three-week demand: a company that fails to pay within three weeks of a statutory demand is deemed unable to pay its debts, which grounds a winding-up petition. Addressed to the Managing Director at the registered office. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "debt",
+        "label": "Debt",
+        "type": "money",
+        "required": true,
+        "question": "How much is owed?",
+        "placeholder": "AMOUNT OWED",
+        "repeatable": false
+      },
+      {
+        "id": "loanDate",
+        "label": "Date of the loan",
+        "type": "date",
+        "required": true,
+        "question": "When was the loan granted?",
+        "placeholder": "DATE OF LOAN",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "petition-for-winding-up"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

@@ -1,0 +1,118 @@
+{
+  "slug": "special-resolution-re-registration-public",
+  "title": "Special resolution to re-register a private company as public",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "companyHeading",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{companyName}}\n{{companyAddress}}\nRC No: {{rcNumber}}\n\nTHE FEDERAL REPUBLIC OF NIGERIA\nTHE COMPANIES AND ALLIED MATTERS ACT 2020",
+        "required": true,
+        "why": "Company documents carry the company's name, registered address and registration (RC) number, and for resolutions and notices the statutory heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SPECIAL RESOLUTION FOR THE RE-REGISTRATION OF {{companyName}} AS A PUBLIC COMPANY PURSUANT TO {{provision}}",
+        "required": true,
+        "why": "The title and the provision of CAMA relied on. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "At the general meeting of the company held on {{meetingDate}} at {{meetingPlace}}, the following resolutions were proposed and duly passed as special resolutions:\n#. That, subject to the consent of the Corporate Affairs Commission, the company be re-registered as a public company limited by shares by the name of {{newName}}.\n#. That the consequential alterations be made in the memorandum and articles of association of the company to reflect its re-registration.",
+        "required": true,
+        "why": "The resolutions: re-registration subject to the Commission's consent, the new name (ending 'Plc'), and consequential alterations to the memorandum and articles. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....\n\n........................................          ........................................\nDirector                                        Director",
+        "required": true,
+        "why": "Resolutions are dated and signed, usually by two directors or a director and the secretary. Always sign and date in the exam, on or before the exam date. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "companyName",
+        "label": "Company name",
+        "type": "party",
+        "required": true,
+        "question": "What is the company's registered name? For example: Gaskiya Nigeria Limited.",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "companyAddress",
+        "label": "Registered address",
+        "type": "address",
+        "required": true,
+        "question": "The company's registered office address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "rcNumber",
+        "label": "RC number",
+        "type": "text",
+        "required": true,
+        "question": "The company's registration (RC) number.",
+        "placeholder": "RC NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "meetingDate",
+        "label": "Date of the meeting",
+        "type": "date",
+        "required": true,
+        "question": "When is or was the meeting held?",
+        "placeholder": "DATE OF MEETING",
+        "repeatable": false
+      },
+      {
+        "id": "meetingPlace",
+        "label": "Venue",
+        "type": "text",
+        "required": true,
+        "question": "Where is or was the meeting held? For example: the registered office.",
+        "placeholder": "VENUE",
+        "repeatable": false
+      },
+      {
+        "id": "provision",
+        "label": "Provision of CAMA",
+        "type": "text",
+        "required": true,
+        "question": "Which section of the Companies and Allied Matters Act 2020 governs re-registration? Check it in the library.",
+        "placeholder": "SECTION OF CAMA 2020",
+        "repeatable": false
+      },
+      {
+        "id": "newName",
+        "label": "New name",
+        "type": "party",
+        "required": true,
+        "question": "The company's name as a public company, ending in Plc.",
+        "placeholder": "NEW NAME",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "notice-of-extraordinary-general-meeting"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

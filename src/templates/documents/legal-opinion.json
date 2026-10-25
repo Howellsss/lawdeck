@@ -1,0 +1,179 @@
+{
+  "slug": "legal-opinion",
+  "title": "Legal opinion",
+  "course": "law-in-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Professional Ethics and Skills drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir/Madam,",
+        "required": true,
+        "why": "The salutation. A legal opinion is a memo within an organisation, or a letter to a third party. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "LEGAL OPINION ON {{subject}}",
+        "required": true,
+        "why": "The subject heading. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "facts",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Write the 'Facts' section of a legal opinion from the facts given, beginning 'Sequel to our earlier discussion on ...': a short, neutral statement of the material facts and the documents supplied.",
+        "maxWords": 200,
+        "required": true,
+        "why": "States the facts on which the opinion is based. Source: Professional Ethics drafting materials (Lawdeck knowledge base).",
+        "heading": "FACTS"
+      },
+      {
+        "id": "analysis",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Write the 'Analysis' section of a legal opinion: identify each legal issue raised by the facts and analyse it against the applicable law, with authorities only from the library passages supplied.",
+        "maxWords": 450,
+        "required": true,
+        "why": "Analyses the facts against the law, issue by issue. Source: Professional Ethics drafting materials (Lawdeck knowledge base).",
+        "heading": "ANALYSIS"
+      },
+      {
+        "id": "opinion",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Write the 'Opinion' section of a legal opinion: the writer's clear conclusion and recommended course of action, beginning 'Flowing from the foregoing, ...'.",
+        "maxWords": 200,
+        "required": true,
+        "why": "The opinion proper: the conclusion and the recommended option. Source: Professional Ethics drafting materials (Lawdeck knowledge base).",
+        "heading": "OPINION"
+      },
+      {
+        "id": "disclaimer",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "This opinion states the position of the law as at the date it is given, and is based on the facts and documents made available to us.",
+        "required": true,
+        "why": "The disclaimer: the law as at the date, and the facts and documents supplied. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "subject",
+        "label": "Subject of the opinion",
+        "type": "text",
+        "required": true,
+        "question": "What is the opinion about?",
+        "placeholder": "SUBJECT",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

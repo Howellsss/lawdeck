@@ -1,0 +1,203 @@
+{
+  "slug": "bill-of-charges",
+  "title": "Bill of charges",
+  "course": "law-in-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Professional Ethics and Skills drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir/Madam,",
+        "required": true,
+        "why": "The salutation. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "BILL OF CHARGES",
+        "required": true,
+        "why": "The subject heading. The bill may be in the letter itself, or attached to a covering letter. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "We write to notify you of our charges for representing you in {{caseTitle}}.\n\n1. Nature of professional service: {{serviceNature}}\n2. Name of case: {{caseTitle}}\n3. Particulars of charges:\n#. {{chargeItems}}\n\nTotal: {{total}}\n\nKindly pay the balance into the firm's account number {{accountNumber}} with {{bank}} on or before {{paymentDate}}.\n\nThank you for your cooperation.",
+        "required": true,
+        "why": "The particulars of the bill: the nature of the service, the case, each item of work with its date and amount, and the total, with how and when to pay. A bill of charges must be served before a legal practitioner can sue for fees. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "caseTitle",
+        "label": "Case",
+        "type": "text",
+        "required": true,
+        "question": "Which case or transaction?",
+        "placeholder": "CASE",
+        "repeatable": false
+      },
+      {
+        "id": "serviceNature",
+        "label": "Nature of service",
+        "type": "text",
+        "required": true,
+        "question": "For example: litigation.",
+        "placeholder": "NATURE OF SERVICE",
+        "repeatable": false
+      },
+      {
+        "id": "chargeItems",
+        "label": "Items of work",
+        "type": "longText",
+        "required": true,
+        "question": "Each item: date, work done, amount. One per box.",
+        "placeholder": "DATE, WORK DONE, AMOUNT",
+        "repeatable": true
+      },
+      {
+        "id": "total",
+        "label": "Total",
+        "type": "money",
+        "required": true,
+        "question": "What is the total?",
+        "placeholder": "TOTAL",
+        "repeatable": false
+      },
+      {
+        "id": "accountNumber",
+        "label": "Account number",
+        "type": "text",
+        "required": true,
+        "question": "The firm's account number.",
+        "placeholder": "ACCOUNT NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "bank",
+        "label": "Bank",
+        "type": "text",
+        "required": true,
+        "question": "Which bank?",
+        "placeholder": "BANK",
+        "repeatable": false
+      },
+      {
+        "id": "paymentDate",
+        "label": "Pay by",
+        "type": "date",
+        "required": true,
+        "question": "By when should it be paid?",
+        "placeholder": "PAYMENT DATE",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

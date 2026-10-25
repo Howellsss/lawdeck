@@ -1,0 +1,287 @@
+{
+  "slug": "corporate-search-report",
+  "title": "Corporate search report",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir,",
+        "required": true,
+        "why": "The salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "CORPORATE SEARCH REPORT ON {{targetCompany}}",
+        "required": true,
+        "why": "The subject heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "report",
+        "kind": "fixed",
+        "align": "left",
+        "text": "1. Name of the company: {{targetCompany}}\n2. Previous name and date of change: {{previousName}}\n3. Registration number: {{targetRc}}\n4. Date of incorporation: {{incorporationDate}}\n5. Share capital: {{targetCapital}}\n6. Registered address: {{targetAddress}}\n7. Names and addresses of the directors: {{directors}}\n8. Shareholders and their shareholding: {{shareholders}}\n9. Company secretary: {{targetSecretary}}\n10. Objects of the company: {{targetObjects}}\n11. Borrowing powers: {{borrowingPowers}}\n12. Registered charges and encumbrances: {{charges}}\n13. Annual returns: {{annualReturns}}\n14. Date of search: {{searchDate}}\n15. Place of search: {{searchPlace}}",
+        "required": true,
+        "why": "The report itself (not a covering letter): every particular found at the registry, including the directors' names and addresses, the shareholders, the secretary, borrowing powers, charges and annual returns. It must reflect everything in the facts. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "remarks",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Write the remarks or comment of a corporate search report from the facts: whether the company subsists and has filed its returns, its borrowing powers and existing charges, and the writer's view on the purpose of the search (for example whether the loan should be granted), related to the facts. Two to four sentences.",
+        "maxWords": 150,
+        "required": true,
+        "why": "The remarks: your view of the company's position for the client's purpose, related to the facts. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base).",
+        "heading": "REMARKS"
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "targetCompany",
+        "label": "Company searched",
+        "type": "party",
+        "required": true,
+        "question": "Which company was searched?",
+        "placeholder": "COMPANY SEARCHED",
+        "repeatable": false
+      },
+      {
+        "id": "previousName",
+        "label": "Previous name",
+        "type": "text",
+        "required": false,
+        "question": "Any previous name and date of change, or 'None'.",
+        "placeholder": "PREVIOUS NAME",
+        "repeatable": false
+      },
+      {
+        "id": "targetRc",
+        "label": "Registration number",
+        "type": "text",
+        "required": true,
+        "question": "Its RC number.",
+        "placeholder": "RC NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "incorporationDate",
+        "label": "Date of incorporation",
+        "type": "date",
+        "required": true,
+        "question": "When was it incorporated?",
+        "placeholder": "DATE OF INCORPORATION",
+        "repeatable": false
+      },
+      {
+        "id": "targetCapital",
+        "label": "Share capital",
+        "type": "money",
+        "required": true,
+        "question": "Its share capital.",
+        "placeholder": "SHARE CAPITAL",
+        "repeatable": false
+      },
+      {
+        "id": "targetAddress",
+        "label": "Registered address",
+        "type": "address",
+        "required": true,
+        "question": "Its registered address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "directors",
+        "label": "Directors",
+        "type": "longText",
+        "required": true,
+        "question": "The directors' names and addresses.",
+        "placeholder": "DIRECTORS",
+        "repeatable": false
+      },
+      {
+        "id": "shareholders",
+        "label": "Shareholders",
+        "type": "longText",
+        "required": true,
+        "question": "The shareholders and their holdings.",
+        "placeholder": "SHAREHOLDERS",
+        "repeatable": false
+      },
+      {
+        "id": "targetSecretary",
+        "label": "Secretary",
+        "type": "party",
+        "required": true,
+        "question": "The company secretary.",
+        "placeholder": "SECRETARY",
+        "repeatable": false
+      },
+      {
+        "id": "targetObjects",
+        "label": "Objects",
+        "type": "text",
+        "required": true,
+        "question": "Its objects.",
+        "placeholder": "OBJECTS",
+        "repeatable": false
+      },
+      {
+        "id": "borrowingPowers",
+        "label": "Borrowing powers",
+        "type": "text",
+        "required": true,
+        "question": "Its borrowing powers.",
+        "placeholder": "BORROWING POWERS",
+        "repeatable": false
+      },
+      {
+        "id": "charges",
+        "label": "Charges",
+        "type": "text",
+        "required": true,
+        "question": "Registered charges and encumbrances, or 'None'.",
+        "placeholder": "CHARGES",
+        "repeatable": false
+      },
+      {
+        "id": "annualReturns",
+        "label": "Annual returns",
+        "type": "text",
+        "required": true,
+        "question": "The position on annual returns.",
+        "placeholder": "ANNUAL RETURNS",
+        "repeatable": false
+      },
+      {
+        "id": "searchDate",
+        "label": "Date of search",
+        "type": "date",
+        "required": true,
+        "question": "When was the search done?",
+        "placeholder": "DATE OF SEARCH",
+        "repeatable": false
+      },
+      {
+        "id": "searchPlace",
+        "label": "Place of search",
+        "type": "text",
+        "required": true,
+        "question": "Where was the search done?",
+        "placeholder": "PLACE OF SEARCH",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "application-for-corporate-search"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}
