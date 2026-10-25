@@ -1,0 +1,177 @@
+{
+  "slug": "curriculum-vitae",
+  "title": "Curriculum vitae",
+  "course": "law-in-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Professional Ethics and Skills drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "CURRICULUM VITAE",
+        "required": true,
+        "why": "The title. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "personal",
+        "kind": "fixed",
+        "align": "left",
+        "text": "A. PERSONAL DATA\nName: {{fullName}}\nDate of birth: {{birthDate}}\nNationality: {{nationality}}\nState of origin: {{stateOfOrigin}}\nGender: {{gender}}\nContact: {{contact}}",
+        "required": true,
+        "why": "Personal data first. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "education",
+        "kind": "fixed",
+        "align": "left",
+        "text": "B. EDUCATIONAL BACKGROUND AND PROFESSIONAL QUALIFICATIONS\n#. {{education}}",
+        "required": true,
+        "why": "Schools attended, certificates obtained, years and grades, most recent first. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "work",
+        "kind": "fixed",
+        "align": "left",
+        "text": "C. WORK EXPERIENCE AND SKILLS\n#. {{experience}}",
+        "required": true,
+        "why": "Employer, position held and period. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "other",
+        "kind": "fixed",
+        "align": "left",
+        "text": "D. MEMBERSHIP OF PROFESSIONAL BODIES\n#. {{memberships}}\n\nE. LEADERSHIP POSITIONS HELD\n#. {{leadership}}\n\nF. HOBBIES AND INTERESTS\n{{hobbies}}",
+        "required": false,
+        "why": "Professional bodies, leadership positions, and hobbies. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "referees",
+        "kind": "fixed",
+        "align": "left",
+        "text": "G. REFEREES\n#. {{referees}}\n\n........................................\nSIGNATURE\n\nDate: ............",
+        "required": true,
+        "why": "Referees, then the signature and date. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "fullName",
+        "label": "Full name",
+        "type": "party",
+        "required": true,
+        "question": "Your full name, surname first.",
+        "placeholder": "FULL NAME",
+        "repeatable": false
+      },
+      {
+        "id": "birthDate",
+        "label": "Date of birth",
+        "type": "date",
+        "required": true,
+        "question": "Your date of birth.",
+        "placeholder": "DATE OF BIRTH",
+        "repeatable": false
+      },
+      {
+        "id": "nationality",
+        "label": "Nationality",
+        "type": "text",
+        "required": true,
+        "question": "Your nationality.",
+        "placeholder": "NATIONALITY",
+        "repeatable": false
+      },
+      {
+        "id": "stateOfOrigin",
+        "label": "State of origin",
+        "type": "text",
+        "required": true,
+        "question": "Your state of origin.",
+        "placeholder": "STATE OF ORIGIN",
+        "repeatable": false
+      },
+      {
+        "id": "gender",
+        "label": "Gender",
+        "type": "text",
+        "required": true,
+        "question": "Your gender.",
+        "placeholder": "GENDER",
+        "repeatable": false
+      },
+      {
+        "id": "contact",
+        "label": "Contact",
+        "type": "text",
+        "required": true,
+        "question": "Your phone number and email.",
+        "placeholder": "CONTACT",
+        "repeatable": false
+      },
+      {
+        "id": "education",
+        "label": "Education",
+        "type": "longText",
+        "required": true,
+        "question": "Each school: certificate, year and grade. One per box.",
+        "placeholder": "SCHOOL, CERTIFICATE, YEAR, GRADE",
+        "repeatable": true
+      },
+      {
+        "id": "experience",
+        "label": "Work experience",
+        "type": "longText",
+        "required": true,
+        "question": "Each employer: position and period. One per box.",
+        "placeholder": "EMPLOYER, POSITION, PERIOD",
+        "repeatable": true
+      },
+      {
+        "id": "memberships",
+        "label": "Professional bodies",
+        "type": "text",
+        "required": false,
+        "question": "Professional bodies you belong to.",
+        "placeholder": "PROFESSIONAL BODY",
+        "repeatable": true
+      },
+      {
+        "id": "leadership",
+        "label": "Leadership positions",
+        "type": "text",
+        "required": false,
+        "question": "Leadership positions held.",
+        "placeholder": "LEADERSHIP POSITION",
+        "repeatable": true
+      },
+      {
+        "id": "hobbies",
+        "label": "Hobbies",
+        "type": "text",
+        "required": false,
+        "question": "Your hobbies and interests.",
+        "placeholder": "HOBBIES",
+        "repeatable": false
+      },
+      {
+        "id": "referees",
+        "label": "Referees",
+        "type": "longText",
+        "required": true,
+        "question": "Each referee: name, position and contact. One per box.",
+        "placeholder": "REFEREE",
+        "repeatable": true
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

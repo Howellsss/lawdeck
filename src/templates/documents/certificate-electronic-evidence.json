@@ -1,0 +1,133 @@
+{
+  "slug": "certificate-electronic-evidence",
+  "title": "Certificate of compliance for computer-generated evidence",
+  "course": "criminal-litigation",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "court",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{courtHeading}}",
+        "required": true,
+        "why": "The heading of the court where the evidence is tendered. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{caseTitle}}",
+        "required": true,
+        "why": "The case number and the parties, as in the proceedings. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "CERTIFICATE OF COMPUTER-GENERATED EVIDENCE PURSUANT TO SECTION 84 OF THE EVIDENCE ACT 2011",
+        "required": true,
+        "why": "Section 84 of the Evidence Act 2011 makes a computer print-out admissible only with a certificate covering the conditions of the section. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I, {{certifier}}, {{certifierDescription}}, of {{certifierAddress}}, do hereby certify that:\n#. This certificate is made in respect of the following electronic evidence: {{evidence}}.\n#. The documents were produced by the computer {{computer}}, which was used regularly to store and process information for the activities regularly carried on over that period.\n#. Throughout the material part of that period the computer was operating properly.\n#. The information contained in the documents reproduces, or is derived from, information supplied to the computer in the ordinary course of those activities, and the print-outs were not affected in their production.",
+        "required": true,
+        "why": "Identifies the evidence and the computer, and certifies the conditions of section 84: regular use, proper operation, and information supplied in the ordinary course. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "oath",
+        "kind": "fixed",
+        "align": "left",
+        "text": "........................................\nDEPONENT\n\nSworn to at the {{registry}}\nthis ............ day of ............ 20.....\n\nBEFORE ME\n\n........................................\nCOMMISSIONER FOR OATHS",
+        "required": true,
+        "why": "Signed and sworn before a Commissioner for Oaths. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "courtHeading",
+        "label": "Court heading",
+        "type": "longText",
+        "required": true,
+        "question": "The full heading of the court, for example: IN THE HIGH COURT OF LAGOS STATE, IN THE IKEJA JUDICIAL DIVISION, HOLDEN AT IKEJA.",
+        "placeholder": "COURT HEADING",
+        "repeatable": false
+      },
+      {
+        "id": "caseTitle",
+        "label": "Case number and parties",
+        "type": "longText",
+        "required": true,
+        "question": "The case number and parties, for example: CHARGE NO: ID/12/2024, THE STATE OF LAGOS v JOHN OKON.",
+        "placeholder": "CASE NUMBER AND PARTIES",
+        "repeatable": false
+      },
+      {
+        "id": "certifier",
+        "label": "Person certifying",
+        "type": "party",
+        "required": true,
+        "question": "Who makes the certificate? The person responsible for the computer.",
+        "placeholder": "NAME OF CERTIFIER",
+        "repeatable": false
+      },
+      {
+        "id": "certifierDescription",
+        "label": "Description",
+        "type": "text",
+        "required": true,
+        "question": "Describe them: sex, occupation and role.",
+        "placeholder": "DESCRIPTION",
+        "repeatable": false
+      },
+      {
+        "id": "certifierAddress",
+        "label": "Address",
+        "type": "address",
+        "required": true,
+        "question": "Their address.",
+        "placeholder": "ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "evidence",
+        "label": "Electronic evidence",
+        "type": "longText",
+        "required": true,
+        "question": "What documents or records does the certificate cover?",
+        "placeholder": "ELECTRONIC EVIDENCE",
+        "repeatable": false
+      },
+      {
+        "id": "computer",
+        "label": "Computer",
+        "type": "text",
+        "required": true,
+        "question": "Which computer or device produced them? For example: an HP laptop.",
+        "placeholder": "COMPUTER",
+        "repeatable": false
+      },
+      {
+        "id": "registry",
+        "label": "Registry",
+        "type": "text",
+        "required": true,
+        "question": "Where is it sworn? For example: High Court Registry, Ikeja.",
+        "placeholder": "REGISTRY",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

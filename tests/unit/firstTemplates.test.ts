@@ -22,7 +22,7 @@ function draw(template: TemplateFile, forumSlug: string | null, fields: Record<s
 }
 
 describe("the first templates", () => {
-  it("has the documents of steps 5g and 5f", () => {
+  it("has the documents of steps 5g and 5f, and the Criminal, Corporate and Ethics drafts", () => {
     expect(templates.map((t) => t.slug).sort()).toEqual(
       [
         "deed-of-assignment",
@@ -34,6 +34,39 @@ describe("the first templates", () => {
         "tenancy-agreement",
         "witness-statement-on-oath",
         "writ-of-summons",
+        "affidavit-in-support-of-bail",
+        "application-for-change-of-name",
+        "application-for-corporate-search",
+        "arbitration-clause",
+        "bill-of-charges",
+        "certificate-electronic-evidence",
+        "charge-high-court",
+        "consent-to-file-information",
+        "corporate-search-report",
+        "criminal-notice-of-appeal",
+        "curriculum-vitae",
+        "director-resignation-letter",
+        "internal-memorandum",
+        "legal-aid-application",
+        "legal-opinion",
+        "letter-closing-file",
+        "letter-confirming-instructions",
+        "letter-for-adjournment",
+        "letter-of-allotment",
+        "memorandum-of-association-shares",
+        "motion-on-notice-for-bail",
+        "notice-of-annual-general-meeting",
+        "notice-of-board-meeting",
+        "notice-of-extraordinary-general-meeting",
+        "petition-for-winding-up",
+        "police-bail-application",
+        "resolution-appointing-director",
+        "resolution-increase-share-capital",
+        "special-resolution-change-of-name",
+        "special-resolution-re-registration-public",
+        "special-resolution-voluntary-winding-up",
+        "statutory-letter-of-demand",
+        "summons-for-bail",
       ].sort(),
     );
   });

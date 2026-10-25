@@ -1,0 +1,123 @@
+{
+  "slug": "director-resignation-letter",
+  "title": "Letter of resignation of a director",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "sender",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{director}}\n{{directorAddress}}\n\n{{letterDate}}",
+        "required": true,
+        "why": "The director's name and address, then the date. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "The Company Secretary,\n{{companyName}},\n{{companyAddress}}",
+        "required": true,
+        "why": "Addressed to the company secretary. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir/Madam,",
+        "required": true,
+        "why": "The salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "LETTER OF RESIGNATION",
+        "required": true,
+        "why": "The subject heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I write to resign my appointment as a director of the company with effect from {{effectiveDate}}. The company documents in my possession will be handed over to the company secretary.\n\nI appreciate the opportunity given to me to serve the company.",
+        "required": true,
+        "why": "The resignation, when it takes effect, and the handing over of company documents. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{director}}",
+        "required": true,
+        "why": "Signed by the director. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "director",
+        "label": "Director",
+        "type": "party",
+        "required": true,
+        "question": "Who is resigning?",
+        "placeholder": "DIRECTOR",
+        "repeatable": false
+      },
+      {
+        "id": "directorAddress",
+        "label": "Director's address",
+        "type": "address",
+        "required": true,
+        "question": "The director's address.",
+        "placeholder": "DIRECTOR’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear?",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "companyName",
+        "label": "Company",
+        "type": "party",
+        "required": true,
+        "question": "Which company?",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "companyAddress",
+        "label": "Company's address",
+        "type": "address",
+        "required": true,
+        "question": "The company's registered address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "effectiveDate",
+        "label": "Effective date",
+        "type": "text",
+        "required": true,
+        "question": "From when? For example: immediate effect, or a date.",
+        "placeholder": "EFFECTIVE DATE",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

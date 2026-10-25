@@ -1,0 +1,201 @@
+{
+  "slug": "memorandum-of-association-shares",
+  "title": "Memorandum of association (company limited by shares)",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "heading",
+        "kind": "fixed",
+        "align": "center",
+        "text": "THE FEDERAL REPUBLIC OF NIGERIA\nTHE COMPANIES AND ALLIED MATTERS ACT 2020\nMEMORANDUM OF ASSOCIATION\nOF\n{{companyName}}",
+        "required": true,
+        "why": "The statutory heading and the company's name. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "name",
+        "kind": "fixed",
+        "align": "left",
+        "text": "1. The name of the Company is {{companyName}}.",
+        "required": true,
+        "why": "The name clause; it must end with 'Limited' for a private company limited by shares (or 'Plc' for a public company). Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "office",
+        "kind": "fixed",
+        "align": "left",
+        "text": "2. The registered office of the Company shall be situated in Nigeria.",
+        "required": true,
+        "why": "The registered office clause: the memorandum states only that the office is in Nigeria. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "objects",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "3. The business for which the Company is established is:\n(a) to carry on as its principal object the business of {{principalObject}};\n(b) in pursuance of its principal object, to carry on in the ordinary course of its business: {{ancillaryObjects}};\n(c) to undertake all other lawful objects.\nAND IT IS HEREBY DECLARED that the objects specified in each paragraph of this clause shall be regarded as independent objects and shall not be limited or restricted by reference to the terms of any other paragraph or the name of the Company.",
+        "required": true,
+        "why": "The objects clause: the principal object, objects in pursuance of it, and the independent objects declaration. A favourite in the Bar Part II exam. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "status",
+        "kind": "fixed",
+        "align": "left",
+        "text": "4. The Company is a {{companyStatus}} company.",
+        "required": true,
+        "why": "The status clause: private or public. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "liability",
+        "kind": "fixed",
+        "align": "left",
+        "text": "5. The liability of the members is limited by shares.",
+        "required": true,
+        "why": "The liability clause. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "capital",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "6. The issued share capital of the Company is {{shareCapital}} divided into {{numberOfShares}} ordinary shares of {{shareValue}} each, with such rights as are defined by the Articles of Association registered with this Memorandum.",
+        "required": true,
+        "why": "The share capital clause: the issued capital, the number and value of shares. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subscription",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "We, the several persons whose names and addresses are subscribed, are desirous of being formed into a company in pursuance of this Memorandum of Association, and we respectively agree to take the number of shares in the capital of the Company set opposite our respective names.\n\nNAME AND ADDRESS OF SUBSCRIBER | DESCRIPTION | NUMBER OF SHARES TAKEN | SIGNATURE\n#. {{subscribers}} | {{subscriberShares}} | ............\n\nTotal shares taken: ............",
+        "required": true,
+        "why": "The subscription clause and box: each subscriber's name, address, description, shares taken and signature. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "attestation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....\n\nWITNESS TO THE ABOVE SIGNATURES:\nName: {{witnessName}}\nAddress: {{witnessAddress}}\nOccupation: {{witnessOccupation}}\nSignature: ............",
+        "required": true,
+        "why": "Dated, with the attestation of a witness to the subscribers' signatures. Where the facts leave details out, still fill the compulsory parts. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "companyName",
+        "label": "Company name",
+        "type": "party",
+        "required": true,
+        "question": "What is the proposed company name? For example: New Spring Nigeria Limited.",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "principalObject",
+        "label": "Principal object",
+        "type": "text",
+        "required": true,
+        "question": "What is the company's main business?",
+        "placeholder": "PRINCIPAL OBJECT",
+        "repeatable": false
+      },
+      {
+        "id": "ancillaryObjects",
+        "label": "Other objects",
+        "type": "longText",
+        "required": true,
+        "question": "What other activities will it carry on in pursuance of the principal object?",
+        "placeholder": "OTHER OBJECTS",
+        "repeatable": false
+      },
+      {
+        "id": "companyStatus",
+        "label": "Status",
+        "type": "text",
+        "required": true,
+        "question": "Is it a private or a public company?",
+        "placeholder": "PRIVATE OR PUBLIC",
+        "repeatable": false
+      },
+      {
+        "id": "shareCapital",
+        "label": "Issued share capital",
+        "type": "money",
+        "required": true,
+        "question": "What is the issued share capital?",
+        "placeholder": "ISSUED SHARE CAPITAL",
+        "repeatable": false
+      },
+      {
+        "id": "numberOfShares",
+        "label": "Number of shares",
+        "type": "number",
+        "required": true,
+        "question": "Into how many shares is it divided?",
+        "placeholder": "NUMBER OF SHARES",
+        "repeatable": false
+      },
+      {
+        "id": "shareValue",
+        "label": "Value of each share",
+        "type": "money",
+        "required": true,
+        "question": "What is the value of each share?",
+        "placeholder": "VALUE OF EACH SHARE",
+        "repeatable": false
+      },
+      {
+        "id": "subscribers",
+        "label": "Subscribers",
+        "type": "longText",
+        "required": true,
+        "question": "Each subscriber's name, address and description.",
+        "placeholder": "SUBSCRIBER",
+        "repeatable": true
+      },
+      {
+        "id": "subscriberShares",
+        "label": "Shares taken",
+        "type": "text",
+        "required": true,
+        "question": "The number of shares each subscriber takes, in the same order.",
+        "placeholder": "SHARES TAKEN",
+        "repeatable": true
+      },
+      {
+        "id": "witnessName",
+        "label": "Witness",
+        "type": "party",
+        "required": true,
+        "question": "Who witnesses the signatures?",
+        "placeholder": "WITNESS",
+        "repeatable": false
+      },
+      {
+        "id": "witnessAddress",
+        "label": "Witness's address",
+        "type": "address",
+        "required": true,
+        "question": "The witness's address.",
+        "placeholder": "WITNESS’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "witnessOccupation",
+        "label": "Witness's occupation",
+        "type": "text",
+        "required": true,
+        "question": "The witness's occupation.",
+        "placeholder": "WITNESS’S OCCUPATION",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

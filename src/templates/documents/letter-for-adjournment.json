@@ -1,0 +1,185 @@
+{
+  "slug": "letter-for-adjournment",
+  "title": "Letter applying for an adjournment",
+  "course": "law-in-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Professional Ethics and Skills drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir/Madam,",
+        "required": true,
+        "why": "The salutation. Write to the Registrar, never directly to the judge. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "APPLICATION FOR ADJOURNMENT IN {{caseTitle}}",
+        "required": true,
+        "why": "The subject names the case, with its number. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I am {{signatoryName}}, counsel to the {{partyRepresented}} in the above matter. I regret to inform you that I will not be available to attend proceedings on the next adjourned date, {{hearingDate}}, because {{reason}}.\n\nI humbly request a short adjournment, and suggest {{proposedDates}}, subject to the convenience of the Court. I apologise for any inconvenience this may cause the Honourable Court.\n\nAccept the assurances of my highest regards.",
+        "required": true,
+        "why": "Who you are and whom you represent, the date you cannot attend and why, a request for a short adjournment with suggested dates, and an apology. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "caseTitle",
+        "label": "Case",
+        "type": "text",
+        "required": true,
+        "question": "Which case? Give its number and the parties, for example: CHARGE NO: 27811, THE STATE v CHIEF BENSON DOUBRA.",
+        "placeholder": "CASE NUMBER AND PARTIES",
+        "repeatable": false
+      },
+      {
+        "id": "partyRepresented",
+        "label": "Party represented",
+        "type": "text",
+        "required": true,
+        "question": "Whom do you represent? For example: defendant.",
+        "placeholder": "PARTY REPRESENTED",
+        "repeatable": false
+      },
+      {
+        "id": "hearingDate",
+        "label": "Next adjourned date",
+        "type": "date",
+        "required": true,
+        "question": "What is the date you cannot attend?",
+        "placeholder": "ADJOURNED DATE",
+        "repeatable": false
+      },
+      {
+        "id": "reason",
+        "label": "Reason",
+        "type": "longText",
+        "required": true,
+        "question": "Why can't you attend?",
+        "placeholder": "REASON",
+        "repeatable": false
+      },
+      {
+        "id": "proposedDates",
+        "label": "Proposed dates",
+        "type": "text",
+        "required": true,
+        "question": "Which new dates do you suggest?",
+        "placeholder": "PROPOSED DATES",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

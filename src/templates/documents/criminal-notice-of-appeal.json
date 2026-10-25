@@ -1,0 +1,169 @@
+{
+  "slug": "criminal-notice-of-appeal",
+  "title": "Notice of appeal against conviction",
+  "course": "criminal-litigation",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "court",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE COURT OF APPEAL\nIN THE {{appealDivision}} JUDICIAL DIVISION\nHOLDEN AT {{appealDivision}}",
+        "required": true,
+        "why": "The appeal lies to the Court of Appeal; name its division. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "APPEAL NO: ............\nCHARGE NO: {{chargeNumber}}\nBETWEEN:\n{{appellant}} .................... APPELLANT\nAND\n{{respondent}} .................... RESPONDENT",
+        "required": true,
+        "why": "The appeal number is left for the Registry; the charge number from the trial. The convicted defendant is the appellant. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressedTo",
+        "kind": "fixed",
+        "align": "left",
+        "text": "To the Registrar of the High Court, {{trialCourt}}:",
+        "required": true,
+        "why": "The notice is filed in the registry of the court below. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "notice",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "NOTICE OF APPEAL\n\nI, {{appellant}}, having been convicted of the offence of {{offence}} by the {{trialCourt}}, presided over by {{trialJudge}}, on {{judgmentDate}}, and sentenced to {{sentence}}, and now being in custody at {{custodyPlace}}, do hereby give notice of appeal against my conviction on the following grounds:",
+        "required": true,
+        "why": "States the conviction appealed against: the offence, the court and judge, the date and the sentence. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "grounds",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Write the grounds of appeal from the facts given, each headed 'GROUND 1', 'GROUND 2' and so on: each ground states an error of law or fact by the trial court in one sentence, followed by 'PARTICULARS:' setting out the particulars of that error. End with the omnibus ground that the judgment is unreasonable and cannot be supported having regard to the evidence. Do not argue the grounds.",
+        "maxWords": 400,
+        "required": true,
+        "why": "The grounds of appeal, each with its particulars, ending with the omnibus ground. Grounds state the errors; they do not argue them. Source: Criminal Litigation drafting materials (Lawdeck knowledge base).",
+        "heading": "GROUNDS OF APPEAL"
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "........................................\nSignature or mark of the Appellant or his counsel\n\nDated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "The appellant or counsel signs and dates the notice. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "particulars",
+        "kind": "fixed",
+        "align": "left",
+        "text": "PARTICULARS OF TRIAL AND CONVICTION:\nDate of judgment: {{judgmentDate}}\nCourt: {{trialCourt}}\nJudge: {{trialJudge}}\nSentence: {{sentence}}",
+        "required": true,
+        "why": "The particulars of the trial and conviction at the foot of the notice. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "appealDivision",
+        "label": "Court of Appeal division",
+        "type": "text",
+        "required": true,
+        "question": "Which Court of Appeal division? For example: Lagos.",
+        "placeholder": "DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "chargeNumber",
+        "label": "Charge number at the trial",
+        "type": "text",
+        "required": false,
+        "question": "The charge number at the trial, if known.",
+        "placeholder": "CHARGE NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "appellant",
+        "label": "Appellant",
+        "type": "party",
+        "required": true,
+        "question": "The convicted defendant's full name.",
+        "placeholder": "APPELLANT",
+        "repeatable": false
+      },
+      {
+        "id": "respondent",
+        "label": "Respondent",
+        "type": "party",
+        "required": true,
+        "question": "Who prosecuted? For example: The State of Lagos.",
+        "placeholder": "RESPONDENT",
+        "repeatable": false
+      },
+      {
+        "id": "trialCourt",
+        "label": "Trial court",
+        "type": "text",
+        "required": true,
+        "question": "Which court convicted? For example: High Court of Lagos State, Ikeja.",
+        "placeholder": "TRIAL COURT",
+        "repeatable": false
+      },
+      {
+        "id": "trialJudge",
+        "label": "Trial judge",
+        "type": "party",
+        "required": true,
+        "question": "Who presided? For example: Hon. Justice A. B. Ojo.",
+        "placeholder": "TRIAL JUDGE",
+        "repeatable": false
+      },
+      {
+        "id": "offence",
+        "label": "Offence",
+        "type": "text",
+        "required": true,
+        "question": "Of what offence was the appellant convicted?",
+        "placeholder": "OFFENCE",
+        "repeatable": false
+      },
+      {
+        "id": "judgmentDate",
+        "label": "Date of judgment",
+        "type": "date",
+        "required": true,
+        "question": "When was judgment given?",
+        "placeholder": "DATE OF JUDGMENT",
+        "repeatable": false
+      },
+      {
+        "id": "sentence",
+        "label": "Sentence",
+        "type": "text",
+        "required": true,
+        "question": "What sentence was imposed?",
+        "placeholder": "SENTENCE",
+        "repeatable": false
+      },
+      {
+        "id": "custodyPlace",
+        "label": "Place of custody",
+        "type": "text",
+        "required": true,
+        "question": "Where is the appellant held? For example: Kirikiri Custodial Centre, Lagos.",
+        "placeholder": "PLACE OF CUSTODY",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

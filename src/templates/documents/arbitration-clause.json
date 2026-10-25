@@ -1,0 +1,100 @@
+{
+  "slug": "arbitration-clause",
+  "title": "Arbitration clause",
+  "course": "law-in-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Professional Ethics and Skills drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "ARBITRATION CLAUSE",
+        "required": true,
+        "why": "The title. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "clause",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "In the event of any dispute arising out of or in connection with this agreement between {{partyOne}} and {{partyTwo}}, the parties shall first submit the dispute to arbitration.\n\nThe arbitration shall be governed by the {{governingLaw}}.\n\nThe arbitration shall be conducted in the English language, by {{arbitrators}} appointed {{appointment}}.\n\nThe seat of the arbitration shall be {{seat}}.\n\nThe award shall be delivered within {{awardPeriod}} of the appointment of the arbitrators, unless the parties extend the time.",
+        "required": true,
+        "why": "The essentials of an arbitration clause: the disputes covered, the governing law, the language, the number of arbitrators and how they are appointed, the seat, and the time for the award. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "partyOne",
+        "label": "First party",
+        "type": "party",
+        "required": true,
+        "question": "Who is the first party, with address?",
+        "placeholder": "FIRST PARTY",
+        "repeatable": false
+      },
+      {
+        "id": "partyTwo",
+        "label": "Second party",
+        "type": "party",
+        "required": true,
+        "question": "Who is the second party, with address?",
+        "placeholder": "SECOND PARTY",
+        "repeatable": false
+      },
+      {
+        "id": "governingLaw",
+        "label": "Governing law",
+        "type": "text",
+        "required": true,
+        "question": "Which law governs the arbitration? For example: Arbitration and Mediation Act 2023.",
+        "placeholder": "GOVERNING LAW",
+        "repeatable": false
+      },
+      {
+        "id": "arbitrators",
+        "label": "Arbitrators",
+        "type": "text",
+        "required": true,
+        "question": "How many arbitrators? For example: a sole arbitrator, or three arbitrators.",
+        "placeholder": "NUMBER OF ARBITRATORS",
+        "repeatable": false
+      },
+      {
+        "id": "appointment",
+        "label": "Appointment",
+        "type": "text",
+        "required": true,
+        "question": "How are they appointed? For example: by both parties from the Chartered Institute of Arbitrators.",
+        "placeholder": "MODE OF APPOINTMENT",
+        "repeatable": false
+      },
+      {
+        "id": "seat",
+        "label": "Seat",
+        "type": "text",
+        "required": true,
+        "question": "Where is the seat of the arbitration?",
+        "placeholder": "SEAT",
+        "repeatable": false
+      },
+      {
+        "id": "awardPeriod",
+        "label": "Time for the award",
+        "type": "text",
+        "required": true,
+        "question": "Within how long must the award be made? For example: six months.",
+        "placeholder": "TIME FOR THE AWARD",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

@@ -1,0 +1,116 @@
+{
+  "slug": "special-resolution-voluntary-winding-up",
+  "title": "Special resolution for creditors' voluntary winding up",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "companyHeading",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{companyName}}\n{{companyAddress}}\nRC No: {{rcNumber}}\n\nTHE FEDERAL REPUBLIC OF NIGERIA\nTHE COMPANIES AND ALLIED MATTERS ACT 2020",
+        "required": true,
+        "why": "Company documents carry the company's name, registered address and registration (RC) number, and for resolutions and notices the statutory heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SPECIAL RESOLUTION FOR THE CREDITORS' VOLUNTARY WINDING UP OF THE COMPANY AND THE APPOINTMENT OF A LIQUIDATOR PURSUANT TO {{provisions}}",
+        "required": true,
+        "why": "The title and the law relied on. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "At the extraordinary general meeting of the company held at {{meetingPlace}} on {{meetingDate}}, it was resolved that:\n#. The company be wound up voluntarily as a creditors' voluntary winding up; and\n#. {{liquidator}} be and is hereby appointed liquidator to wind up the affairs and distribute the assets of the company.",
+        "required": true,
+        "why": "The resolutions to wind up voluntarily and to appoint the liquidator. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....\n\n........................................          ........................................\nDirector                                        Company Secretary",
+        "required": true,
+        "why": "Resolutions are dated and signed, usually by two directors or a director and the secretary. Always sign and date in the exam, on or before the exam date. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "companyName",
+        "label": "Company name",
+        "type": "party",
+        "required": true,
+        "question": "What is the company's registered name? For example: Gaskiya Nigeria Limited.",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "companyAddress",
+        "label": "Registered address",
+        "type": "address",
+        "required": true,
+        "question": "The company's registered office address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "rcNumber",
+        "label": "RC number",
+        "type": "text",
+        "required": true,
+        "question": "The company's registration (RC) number.",
+        "placeholder": "RC NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "meetingDate",
+        "label": "Date of the meeting",
+        "type": "date",
+        "required": true,
+        "question": "When is or was the meeting held?",
+        "placeholder": "DATE OF MEETING",
+        "repeatable": false
+      },
+      {
+        "id": "meetingPlace",
+        "label": "Venue",
+        "type": "text",
+        "required": true,
+        "question": "Where is or was the meeting held? For example: the registered office.",
+        "placeholder": "VENUE",
+        "repeatable": false
+      },
+      {
+        "id": "provisions",
+        "label": "Law relied on",
+        "type": "text",
+        "required": true,
+        "question": "Which provisions of CAMA 2020 govern a creditors' voluntary winding up? Check them in the library.",
+        "placeholder": "PROVISIONS RELIED ON",
+        "repeatable": false
+      },
+      {
+        "id": "liquidator",
+        "label": "Liquidator",
+        "type": "party",
+        "required": true,
+        "question": "Who is appointed liquidator?",
+        "placeholder": "LIQUIDATOR",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

@@ -1,0 +1,188 @@
+{
+  "slug": "police-bail-application",
+  "title": "Application for bail at the police station",
+  "course": "criminal-litigation",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir,",
+        "required": true,
+        "why": "The salutation. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "APPLICATION FOR BAIL",
+        "required": true,
+        "why": "The subject heading. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "We are solicitors to {{suspect}} of {{suspectAddress}}, who was arrested on {{arrestDate}} on the allegation of {{offence}}, and has been detained in your custody since then.\n\nWe apply for the bail of our client pending the conclusion of your investigation, under {{policeBailProvision}}.\n\nOur client undertakes to report at the station, and to appear in any court, whenever his presence is required. He is ready to comply with any terms or conditions of bail that may be imposed.\n\nThank you for your anticipated cooperation.",
+        "required": true,
+        "why": "The body: who you act for, when and why the client was arrested (name the offence, not just the act), how long the client has been held, the law the application is brought under, and an undertaking to comply with the conditions of bail. Do not offer a surety yet: the terms of bail have not been given. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "suspect",
+        "label": "Client",
+        "type": "party",
+        "required": true,
+        "question": "Who is the client in custody? Give the full name.",
+        "placeholder": "CLIENT",
+        "repeatable": false
+      },
+      {
+        "id": "suspectAddress",
+        "label": "Client's address",
+        "type": "address",
+        "required": true,
+        "question": "The client's address.",
+        "placeholder": "CLIENT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "arrestDate",
+        "label": "Date of arrest",
+        "type": "date",
+        "required": true,
+        "question": "When was the client arrested?",
+        "placeholder": "DATE OF ARREST",
+        "repeatable": false
+      },
+      {
+        "id": "offence",
+        "label": "Offence alleged",
+        "type": "text",
+        "required": true,
+        "question": "What offence is alleged? Name the offence, for example grievous bodily harm.",
+        "placeholder": "OFFENCE ALLEGED",
+        "repeatable": false
+      },
+      {
+        "id": "policeBailProvision",
+        "label": "Law relied on",
+        "type": "text",
+        "required": true,
+        "question": "Which provisions of the Constitution and the Police Act or the ACJL/ACJA do you rely on? Check them in the library.",
+        "placeholder": "LAW RELIED ON",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "summons-for-bail",
+      "legal-aid-application"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}
