@@ -1,12 +1,10 @@
 import type { Metadata } from "next";
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ForumList } from "@/components/draft/ForumList";
 import { LoadFilesButton } from "@/components/draft/LoadFilesButton";
+import { TemplateList } from "@/components/draft/TemplateList";
 import { LoadingRows } from "@/components/ui/LoadingRows";
-import { formatWat } from "@/lib/dates";
-import { DRAFTING_STATUS_LABELS } from "@/schemas/drafting";
 import { getStaffRole } from "@/server/auth/roles";
 import { listDrafting } from "@/server/db/drafting";
 
@@ -49,37 +47,7 @@ async function Templates() {
             library’s prescribed forms for the legal reviewer to check.
           </p>
         ) : (
-          <ul
-            aria-label="Document templates"
-            className="flex flex-col divide-y divide-line rounded-2xl border border-line bg-surface"
-          >
-            {items.templates.map((template) => (
-              <li key={template.id} className="flex flex-col gap-1 px-4 py-3">
-                <Link
-                  href={`/admin/templates/${template.id}`}
-                  className="break-words font-medium"
-                >
-                  {template.title}
-                </Link>
-                <span className="text-sm text-muted">
-                  {template.courseName} · version {template.version} ·{" "}
-                  <span
-                    className={
-                      template.status === "approved" ? "text-success" : ""
-                    }
-                  >
-                    {DRAFTING_STATUS_LABELS[template.status]}
-                  </span>{" "}
-                  · updated {formatWat(template.updatedAt)}
-                </span>
-                {template.forumNames.length > 0 && (
-                  <span className="text-sm text-muted break-words">
-                    For: {template.forumNames.join(", ")}
-                  </span>
-                )}
-              </li>
-            ))}
-          </ul>
+          <TemplateList templates={items.templates} />
         )}
       </section>
 

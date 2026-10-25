@@ -186,6 +186,7 @@ const {
   setForumStatus,
   deleteDraftingItem,
   loadTemplateFiles,
+  approveTemplates,
 } = await import("@/server/documents/actions");
 const ID = "11111111-1111-4111-8111-111111111111";
 
@@ -240,5 +241,32 @@ describe("reviewer actions", () => {
     expect((await deleteDraftingItem("template", ID)).ok).toBe(false);
     role.mockResolvedValue("admin");
     expect(await deleteDraftingItem("template", ID)).toEqual({ ok: true });
+  });
+
+  it("approves many templates at once with the same checks, and lists the ones that fail", async () => {
+    const OTHER = "22222222-2222-4222-8222-222222222222";
+    single
+      .mockResolvedValueOnce({
+        data: { spec: templateFile().spec, rule_source: "Quokka Rules, Form 9" },
+        error: null,
+      })
+      .mockResolvedValueOnce({
+        data: { spec: templateFile().spec, rule_source: null },
+        error: null,
+      });
+    const result = await approveTemplates([ID, OTHER, ID]);
+    expect(result).toMatchObject({ ok: true, approved: 1, failed: [{ id: OTHER }] });
+    expect(updated).toHaveBeenCalledTimes(1);
+  });
+
+  it("refuses a bulk approval from anyone who is not staff, or with nothing ticked", async () => {
+    expect((await approveTemplates([])).ok).toBe(false);
+    expect((await approveTemplates(["not-an-id"])).ok).toBe(false);
+    role.mockResolvedValue(null);
+    expect(await approveTemplates([ID])).toEqual({
+      ok: false,
+      message: "Only reviewers and admins can change templates.",
+    });
+    expect(updated).not.toHaveBeenCalled();
   });
 });

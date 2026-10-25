@@ -114,6 +114,23 @@ test("the main pages fit a phone without sideways scrolling (founder, 2026-10-25
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, path).toBeLessThanOrEqual(0);
+    // The page edge is clipped, so also check that nothing pokes past it.
+    const poking = await page.evaluate(() =>
+      [...document.querySelectorAll("body *")]
+        .filter((el) => {
+          const box = el.getBoundingClientRect();
+          return box.width > 1 && box.height > 1 && box.right > window.innerWidth + 0.5;
+        })
+        .map((el) => `${el.tagName.toLowerCase()}.${String(el.className).slice(0, 60)}`),
+    );
+    expect(poking, path).toEqual([]);
+    // iPhones zoom (and the page then slides sideways) when a field's text is under 16px.
+    const small = await page.evaluate(() =>
+      [...document.querySelectorAll("input:not([type=checkbox]):not([type=radio]), select, textarea")]
+        .filter((el) => parseFloat(getComputedStyle(el).fontSize) < 16)
+        .map((el) => el.id || el.getAttribute("name") || el.tagName),
+    );
+    expect(small, path).toEqual([]);
   }
 });
 
