@@ -51,7 +51,11 @@ export type UsageLimits = {
   monthlyScanPageCap: number | null;
 };
 
+export type PilotEmailRow = { id: string; email: string; createdAt: string; joined: boolean };
+
 export type PilotDashboard = {
+  // Null until migration 36 is in the database (the rest of the page still works).
+  emails: PilotEmailRow[] | null;
   settings: { inviteOnly: boolean; priceNgn: number | null; priceQuestionOpen: boolean };
   limits: UsageLimits;
   codes: InviteCodeRow[];
@@ -65,7 +69,7 @@ export type PilotDashboard = {
 export async function getPilotDashboard(): Promise<PilotDashboard | null> {
   if ((await getStaffRole()) !== "admin") return null;
   const supabase = await createSupabaseServerClient();
-  const [settings, codes, metrics, summary, reports] = await Promise.all([
+  const [settings, codes, metrics, summary, reports, emails] = await Promise.all([
     supabase
       .from("pilot_settings")
       .select("invite_only, price_ngn, price_question_open, burst_limit, burst_hours, monthly_question_cap, monthly_scan_page_cap")
@@ -75,12 +79,14 @@ export async function getPilotDashboard(): Promise<PilotDashboard | null> {
     supabase.rpc("pilot_metrics", { weeks: 6 }),
     supabase.rpc("pilot_summary"),
     supabase.from("problem_reports").select("id", { count: "exact", head: true }).eq("status", "open"),
+    supabase.rpc("pilot_email_list"),
   ]);
   const failed = [settings, codes, metrics, summary, reports].find((result) => result.error);
   if (failed?.error || !settings.data) {
     console.error("pilot dashboard failed", { code: failed?.error?.code ?? "no_settings" });
     throw new Error("The pilot page could not be loaded.");
   }
+  if (emails.error) console.error("registered emails failed", { code: emails.error.code });
   const byWeek = new Map<string, Record<string, number>>();
   for (const row of metrics.data ?? []) {
     const counts = byWeek.get(row.week_start) ?? {};
@@ -88,6 +94,7 @@ export async function getPilotDashboard(): Promise<PilotDashboard | null> {
     byWeek.set(row.week_start, counts);
   }
   return {
+    emails: emails.error ? null : (emails.data ?? []).map((e) => ({ id: e.id, email: e.email, createdAt: e.created_at, joined: e.joined })),
     settings: { inviteOnly: settings.data.invite_only, priceNgn: settings.data.price_ngn, priceQuestionOpen: settings.data.price_question_open },
     limits: {
       burstLimit: settings.data.burst_limit,

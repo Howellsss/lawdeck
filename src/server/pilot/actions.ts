@@ -8,8 +8,10 @@ import {
   inviteIdSchema,
   newInviteSchema,
   pilotAccessSchema,
+  pilotEmailIdSchema,
   pilotSettingsSchema,
   priceAnswerSchema,
+  registerEmailsSchema,
   usageLimitsSchema,
 } from "@/schemas/pilot";
 import { getStaffRole } from "@/server/auth/roles";
@@ -169,4 +171,38 @@ export async function saveUsageLimits(input: {
   }
   refresh();
   return { ok: true, message: "Limits saved." };
+}
+
+// Registers testers' emails on the Pilot page (migration 36). A registered person who signs in
+// with Google through the invite link gets access; the database checks the admin role again.
+export async function addPilotEmails(text: string): Promise<PilotResult> {
+  const parsed = registerEmailsSchema.safeParse(text);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Check the emails." };
+  if ((await getStaffRole()) !== "admin") return { ok: false, message: NOT_ADMIN };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("add_pilot_emails", { emails: parsed.data });
+  if (error) {
+    logFailure("addPilotEmails", error.code);
+    return { ok: false, message: NOT_SAVED };
+  }
+  refresh();
+  const already = parsed.data.length - data;
+  const added = data === 1 ? "1 email registered." : `${data} emails registered.`;
+  return { ok: true, message: already > 0 ? `${added} ${already} ${already === 1 ? "was" : "were"} already on the list.` : added };
+}
+
+// Removes a registered email; the access it gave goes with it.
+export async function removePilotEmail(id: string): Promise<PilotResult> {
+  const parsed = pilotEmailIdSchema.safeParse(id);
+  if (!parsed.success) return { ok: false, message: "That email could not be found." };
+  if ((await getStaffRole()) !== "admin") return { ok: false, message: NOT_ADMIN };
+  const supabase = await createSupabaseServerClient();
+  const { data, error } = await supabase.rpc("remove_pilot_email", { entry: parsed.data });
+  if (error) {
+    logFailure("removePilotEmail", error.code);
+    return { ok: false, message: NOT_SAVED };
+  }
+  refresh();
+  if (data === "not_found") return { ok: false, message: "That email was already removed." };
+  return { ok: true, message: "Email removed, and its access with it." };
 }

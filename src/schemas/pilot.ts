@@ -69,3 +69,17 @@ export const usageLimitsSchema = z
     error: "Fill in both boxes, or leave both empty.",
     path: ["burstHours"],
   });
+
+// Registered emails (migration 36): one or more emails, separated by commas, spaces or new lines,
+// up to 50 at a time. Tidied to lower case, without repeats.
+export const REGISTER_EMAILS_MAX = 50;
+export const registerEmailsSchema = z
+  .string()
+  .transform((value) => [...new Set(value.split(/[\s,;]+/).map((part) => part.trim().toLowerCase()).filter(Boolean))])
+  .superRefine((emails, ctx) => {
+    if (emails.length === 0) ctx.addIssue({ code: "custom", message: "Type at least one email." });
+    if (emails.length > REGISTER_EMAILS_MAX) ctx.addIssue({ code: "custom", message: `Add at most ${REGISTER_EMAILS_MAX} emails at a time.` });
+    const wrong = emails.find((email) => !z.email().max(254).safeParse(email).success);
+    if (wrong) ctx.addIssue({ code: "custom", message: `“${wrong.slice(0, 60)}” is not an email address.` });
+  });
+export const pilotEmailIdSchema = z.uuid();
