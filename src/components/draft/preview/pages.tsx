@@ -113,6 +113,8 @@ export function PageSheet({
   profile,
   scale,
   onPlaceholder,
+  onEdit,
+  editableParts,
 }: {
   number: number;
   indexes: number[];
@@ -122,6 +124,9 @@ export function PageSheet({
   profile: DocModel["profile"];
   scale: number;
   onPlaceholder?: Parameters<typeof PreviewItem>[0]["onPlaceholder"];
+  onEdit?: (partId: string) => void;
+  // The parts the student may reword (the signature block is the court's, not theirs).
+  editableParts?: Set<string>;
 }) {
   const { page, margins, contentHeight, textStyle } = layout;
   return (
@@ -134,7 +139,7 @@ export function PageSheet({
         <div className="absolute overflow-hidden" style={{ ...textStyle, top: margins.top, left: margins.left, right: margins.right, height: contentHeight }}>
           {indexes.map((i) => (
             <div key={i} className="flow-root" data-part={items[i].partId} style={heights ? { height: heights[i] } : undefined}>
-              <PreviewItem item={items[i]} onPlaceholder={onPlaceholder} />
+              <PreviewItem item={items[i]} onPlaceholder={onPlaceholder} onEdit={editableParts?.has(items[i].partId) ? onEdit : undefined} />
             </div>
           ))}
         </div>

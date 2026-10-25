@@ -42,7 +42,7 @@ export function DocumentWorkspace({ view }: { view: DocumentView & { model: DocM
 
   // The pages always show the current version; every saved change reaches the panel at once.
   useEffect(() => {
-    setPreview({ model: view.model, onPlaceholder: jumpTo });
+    setPreview({ model: view.model, onPlaceholder: jumpTo, editing: { documentId: view.id, parts: view.parts } });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [view.model]);
 
@@ -55,7 +55,7 @@ export function DocumentWorkspace({ view }: { view: DocumentView & { model: DocM
 
   // "Show on the pages": open the pages and bring that part into view.
   function showPart(partId: string) {
-    setPreview({ model: view.model, onPlaceholder: jumpTo });
+    setPreview({ model: view.model, onPlaceholder: jumpTo, editing: { documentId: view.id, parts: view.parts } });
     showPages();
     setTimeout(() => {
       document.querySelector(`[aria-label^="Page "] [data-part="${CSS.escape(partId)}"]`)?.scrollIntoView({ block: "center" });
@@ -71,7 +71,7 @@ export function DocumentWorkspace({ view }: { view: DocumentView & { model: DocM
     <div className="flex flex-col gap-5">
       <DocumentChecks issues={view.issues} />
       <div className="flex flex-wrap items-center gap-3">
-        <button type="button" onClick={() => { setPreview({ model: view.model, onPlaceholder: jumpTo }); showPages(); }} className={compactSecondaryButton}>
+        <button type="button" onClick={() => { setPreview({ model: view.model, onPlaceholder: jumpTo, editing: { documentId: view.id, parts: view.parts } }); showPages(); }} className={compactSecondaryButton}>
           Show pages
         </button>
         <a href={`/api/documents/${view.id}/docx`} download className={`${compactPrimaryButton} no-underline`}>

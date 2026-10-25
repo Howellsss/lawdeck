@@ -21,6 +21,8 @@
   --sheet: #ffffff;
   --sheet-ink: #141414;
   --sheet-line: #e7e5e0;
+  /* Dims the page behind the expanded side panel. */
+  --overlay: rgba(0, 0, 0, 0.6);
 }
 
 [data-theme="light"] {
@@ -40,6 +42,7 @@
   --sheet: #ffffff;
   --sheet-ink: #141414;
   --sheet-line: #e7e5e0;
+  --overlay: rgba(20, 20, 20, 0.35);
 }
 
 @theme inline {
@@ -58,6 +61,7 @@
   --color-sheet: var(--sheet);
   --color-sheet-ink: var(--sheet-ink);
   --color-sheet-line: var(--sheet-line);
+  --color-overlay: var(--overlay);
   --font-sans: var(--font-inter);
   --font-serif: var(--font-newsreader);
   --font-brand: var(--font-outfit);

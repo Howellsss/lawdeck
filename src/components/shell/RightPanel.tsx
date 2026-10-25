@@ -7,8 +7,8 @@ import type { PanelContent } from "./panelContext";
 const panelButton = "flex size-10 items-center justify-center rounded-lg text-muted hover:bg-pill hover:text-ink";
 
 // The third pane. Closed until a screen opens it. Side panel on desktop, full-screen sheet on phones.
-// On desktop the expand button makes it fill the screen (founder, 2026-10-25); Escape shrinks it
-// back first, then closes it.
+// On desktop the expand button opens it as a large sheet in the middle of the screen (founder,
+// 2026-10-25); Escape or clicking outside shrinks it back first, then Escape closes it.
 export function RightPanel({ content, onClose }: { content: PanelContent | null; onClose: () => void }) {
   const headingRef = useRef<HTMLHeadingElement>(null);
   // Remembered by panel title, so opening another source in the same panel keeps its size.
@@ -27,17 +27,21 @@ export function RightPanel({ content, onClose }: { content: PanelContent | null;
     onClose();
   }
 
-  return (
+  const panel = (
     <aside
       aria-label={content.title}
+      aria-modal={expanded || undefined}
+      role={expanded ? "dialog" : undefined}
       onKeyDown={(event) => {
         if (event.key !== "Escape") return;
         if (expanded) setExpanded(false);
         else close();
       }}
-      className={`fixed inset-0 z-50 flex flex-col bg-surface ${
-        expanded ? "md:bg-sidebar" : "md:static md:z-auto md:w-[440px] md:shrink-0 md:border-l md:border-line md:bg-sidebar"
-      }`}
+      className={
+        expanded
+          ? "flex h-full w-full max-w-5xl flex-col overflow-hidden rounded-2xl border border-line bg-sidebar shadow-2xl"
+          : "fixed inset-0 z-50 flex flex-col bg-surface md:static md:z-auto md:w-[440px] md:shrink-0 md:border-l md:border-line md:bg-sidebar"
+      }
     >
       <div className="flex items-center justify-between gap-2 border-b border-line px-4 py-3">
         <h2 ref={headingRef} tabIndex={-1} className="text-[15px] font-semibold outline-none">
@@ -48,18 +52,32 @@ export function RightPanel({ content, onClose }: { content: PanelContent | null;
           <button
             type="button"
             onClick={() => setExpanded(!expanded)}
-            aria-label={expanded ? "Shrink panel" : "Expand panel to full screen"}
+            aria-label={expanded ? "Shrink panel" : "Expand panel"}
             aria-pressed={expanded}
+            title={expanded ? "Shrink" : "Expand"}
             className={`hidden md:flex ${panelButton}`}
           >
             <Icon name={expanded ? "collapse" : "expand"} size={16} />
           </button>
-          <button type="button" onClick={close} aria-label="Close panel" className={panelButton}>
+          <button type="button" onClick={close} aria-label="Close panel" title="Close" className={panelButton}>
             <Icon name="close" size={16} />
           </button>
         </div>
       </div>
-      <div className={`flex-1 overflow-auto p-5 ${expanded ? "md:mx-auto md:w-full md:max-w-5xl" : ""}`}>{content.body}</div>
+      <div className="flex-1 overflow-auto p-5">{content.body}</div>
     </aside>
   );
+
+  // Expanded: a large sheet in the middle of the screen, with the workspace dimmed behind it
+  // (clicking the dimmed area shrinks it back). Phones never reach this: the button is hidden.
+  if (expanded)
+    return (
+      <div
+        className="fixed inset-0 z-50 flex items-stretch justify-center bg-overlay p-4 md:p-8"
+        onMouseDown={(event) => event.target === event.currentTarget && setExpanded(false)}
+      >
+        {panel}
+      </div>
+    );
+  return panel;
 }
