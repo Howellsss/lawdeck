@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import type { EditablePartView } from "@/server/db/documents";
 import type { DocModel } from "@/server/documents/render";
 
 // The document the right panel is showing. The panel's content is set once when it opens; this
@@ -11,6 +12,8 @@ export type PreviewState = {
   caption?: string;
   // Clicking a placeholder opens the matching question (field) or part (no field).
   onPlaceholder?: (target: { field?: string; partId: string }) => void;
+  // Set for the current version only: clicking a paragraph on a page edits that part's wording.
+  editing?: { documentId: string; parts: EditablePartView[] };
 };
 
 let state: PreviewState = { model: null };

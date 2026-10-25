@@ -3,9 +3,10 @@
 import { useLayoutEffect, useRef, useState } from "react";
 import { compactSecondaryButton } from "@/components/ui/buttons";
 import type { DocModel } from "@/server/documents/render";
+import { PageEditor } from "./PageEditor";
 import { PageSheet, useMeasuredPages } from "./pages";
 import type { PreviewItem } from "./PreviewItem";
-import { usePreview } from "./previewStore";
+import { usePreview, type PreviewState } from "./previewStore";
 
 export { toItems } from "./pages";
 
@@ -15,13 +16,26 @@ const ZOOMS = [0.5, 0.75, 1, 1.25, 1.5, 2];
 // as the Word file (rule H-04): the court's paper, margins, font, spacing and page numbers. The
 // pages are scaled to fit the panel, with zoom for phones.
 export function PagedPreview() {
-  const { model, caption, onPlaceholder } = usePreview();
+  const { model, caption, onPlaceholder, editing } = usePreview();
   if (!model) return <p className="text-sm text-muted">Nothing to show yet.</p>;
-  return <PageView key={model.title} model={model} caption={caption} onPlaceholder={onPlaceholder} />;
+  return <PageView key={model.title} model={model} caption={caption} onPlaceholder={onPlaceholder} editing={editing} />;
 }
 
 // Also used on its own, read-only, for documents shared with a student (step 6d).
-export function PageView({ model, caption, onPlaceholder }: { model: DocModel; caption?: string; onPlaceholder?: Parameters<typeof PreviewItem>[0]["onPlaceholder"] }) {
+export function PageView({
+  model,
+  caption,
+  onPlaceholder,
+  editing,
+}: {
+  model: DocModel;
+  caption?: string;
+  onPlaceholder?: Parameters<typeof PreviewItem>[0]["onPlaceholder"];
+  editing?: PreviewState["editing"];
+}) {
+  const [editingPart, setEditingPart] = useState<string | null>(null);
+  const editableParts = editing ? new Set(editing.parts.map((part) => part.id)) : undefined;
+  const chosen = editing?.parts.find((part) => part.id === editingPart);
   const { items, heights, pages, layout, measurer } = useMeasuredPages(model);
   const frameRef = useRef<HTMLDivElement>(null);
   const [fitWidth, setFitWidth] = useState(layout.page.width);
@@ -53,6 +67,10 @@ export function PageView({ model, caption, onPlaceholder }: { model: DocModel; c
           +
         </button>
       </div>
+      {editing && !chosen && <p className="text-sm text-muted">Click any paragraph on the pages to change its wording.</p>}
+      {editing && chosen && (
+        <PageEditor key={chosen.id} documentId={editing.documentId} part={chosen} onDone={() => setEditingPart(null)} />
+      )}
       {measurer}
       <div ref={frameRef} className="w-full overflow-x-auto">
         <div className="flex flex-col items-center gap-4" aria-label={`${model.title}, as it will print`}>
@@ -67,6 +85,8 @@ export function PageView({ model, caption, onPlaceholder }: { model: DocModel; c
               profile={model.profile}
               scale={scale}
               onPlaceholder={onPlaceholder}
+              onEdit={editing ? setEditingPart : undefined}
+              editableParts={editableParts}
             />
           ))}
         </div>

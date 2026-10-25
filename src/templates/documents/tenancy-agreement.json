@@ -10,7 +10,7 @@
         "id": "commencement",
         "kind": "fixed",
         "align": "justify",
-        "text": "THIS TENANCY AGREEMENT is made this ............ day of ............ 20.....\nBETWEEN {{landlord}} of {{landlordAddress}} (\"the Landlord\") of the one part\nAND\n{{tenant}} of {{tenantAddress}} (\"the Tenant\") of the other part.",
+        "text": "THIS TENANCY AGREEMENT is made on {{agreementDate}}\nBETWEEN {{landlord}} of {{landlordAddress}} (\"the Landlord\") of the one part\nAND\n{{tenant}} of {{tenantAddress}} (\"the Tenant\") of the other part.",
         "required": true,
         "why": "Commencement, date and parties with their full names and addresses. A tenancy of three years or less may be made by agreement under hand; longer needs a deed of lease. Source: Property Law Practice Handbook 2025 (formal parts of a lease); S.A Badmus' Property Law drafts (Lawdeck knowledge base)."
       },
@@ -74,6 +74,15 @@
       }
     ],
     "fields": [
+      {
+        "id": "agreementDate",
+        "label": "Date of the agreement",
+        "type": "date",
+        "required": false,
+        "question": "On what date is it made? Leave it out if it will be dated when signed.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
       {
         "id": "landlord",
         "label": "Landlord",
@@ -218,6 +227,10 @@
       {
         "date": "2026-10-23",
         "note": "First draft for legal review (step 5g)."
+      },
+      {
+        "date": "2026-10-25",
+        "note": "Date of the agreement asked for (founder); legal reviewer to re-approve."
       }
     ]
   }

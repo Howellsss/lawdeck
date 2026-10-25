@@ -12,7 +12,7 @@
         "id": "commencement",
         "kind": "fixed",
         "align": "justify",
-        "text": "THIS DEED OF ASSIGNMENT is made this ............ day of ............ 20.....\nBETWEEN {{assignor}} of {{assignorAddress}} (\"the Assignor\") of the one part\nAND\n{{assignee}} of {{assigneeAddress}} (\"the Assignee\") of the other part.",
+        "text": "THIS DEED OF ASSIGNMENT is made on {{agreementDate}}\nBETWEEN {{assignor}} of {{assignorAddress}} (\"the Assignor\") of the one part\nAND\n{{assignee}} of {{assigneeAddress}} (\"the Assignee\") of the other part.",
         "required": true,
         "why": "The introductory part: commencement, date and the parties with their status. Two parties are 'of the one part' and 'of the other part' (not 'first part'). The date is the date of execution. Source: S.A Badmus' Property Law drafts (Lawdeck knowledge base); Property Law Practice Handbook 2025."
       },
@@ -83,6 +83,15 @@
       }
     ],
     "fields": [
+      {
+        "id": "agreementDate",
+        "label": "Date of the deed",
+        "type": "date",
+        "required": false,
+        "question": "On what date is it made? Leave it out if it will be dated when signed.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
       {
         "id": "assignor",
         "label": "Assignor",
@@ -201,6 +210,10 @@
       {
         "date": "2026-10-23",
         "note": "First draft for legal review (step 5g)."
+      },
+      {
+        "date": "2026-10-25",
+        "note": "Date of the agreement asked for (founder); legal reviewer to re-approve."
       }
     ]
   }
