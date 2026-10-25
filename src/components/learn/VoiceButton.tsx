@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
-import { Heartbeat } from "@/components/ui/Heartbeat";
+import { VoiceWave } from "@/components/ui/VoiceWave";
 import { Icon } from "@/components/ui/Icon";
 
 // Speaking a question (founder, 2026-10-24). Uses the speech recognition built into the browser
@@ -84,10 +84,10 @@ export function VoiceButton({
     recognition.start();
   }
 
-  // While listening: a moving heartbeat line beside a filled button that reads "Stop dictation".
+  // While listening: a moving wave of bars beside a filled button that reads "Stop dictation".
   return (
     <span className="flex items-center gap-2">
-      {listening && <Heartbeat width={36} className="text-ink" />}
+      {listening && <VoiceWave className="text-ink" />}
       <button
         type="button"
         disabled={disabled}
