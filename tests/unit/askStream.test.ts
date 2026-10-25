@@ -56,6 +56,32 @@ describe("reading the answer stream", () => {
     expect(events[0]?.type).toBe("error");
   });
 
+  it("shows no error when the student presses Stop, while searching or while writing", async () => {
+    const stop = new AbortController();
+    const fetchMock = vi.fn((_url: string, init: RequestInit) => {
+      const encoder = new TextEncoder();
+      const body = new ReadableStream<Uint8Array>({
+        start(controller) {
+          controller.enqueue(encoder.encode('{"type":"text","text":"The rule "}\n'));
+          init.signal?.addEventListener("abort", () => controller.error(new DOMException("Aborted", "AbortError")));
+        },
+      });
+      return Promise.resolve(new Response(body));
+    });
+    vi.stubGlobal("fetch", fetchMock);
+    const events: AnswerEvent[] = [];
+    await askQuestion("3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", "Why?", "exam", (event) => {
+      events.push(event);
+      stop.abort();
+    }, stop.signal);
+    expect(events).toEqual([{ type: "text", text: "The rule " }]);
+
+    vi.stubGlobal("fetch", vi.fn().mockRejectedValue(new DOMException("Aborted", "AbortError")));
+    const early: AnswerEvent[] = [];
+    await askQuestion("3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", "Why?", "exam", (event) => early.push(event), stop.signal);
+    expect(early).toEqual([]);
+  });
+
   it("never fails when the browser blocks storage", () => {
     expect(takePendingQuestion("id")).toBeNull();
   });
