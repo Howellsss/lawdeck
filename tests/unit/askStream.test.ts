@@ -23,6 +23,12 @@ async function collect(response: Response): Promise<AnswerEvent[]> {
 describe("reading the answer stream", () => {
   afterEach(() => vi.unstubAllGlobals());
 
+  it("passes on the search result before the answer, and keeps reading after it", async () => {
+    const done = { type: "done", messageId: "m1", text: "Hi.", sources: [], notEnough: false, level: "exam" };
+    const body = streamOf(['{"type":"found","count":12}\n{"type":"text","text":"Hi."}\n', `${JSON.stringify(done)}\n`]);
+    expect(await collect(new Response(body))).toEqual([{ type: "found", count: 12 }, { type: "text", text: "Hi." }, done]);
+  });
+
   it("reads events even when a line arrives in pieces", async () => {
     const done = { type: "done", messageId: "m1", text: "Hello there.", sources: [], notEnough: false, level: "exam" };
     const body = streamOf(['{"type":"text","te', 'xt":"Hello "}\n{"type":"text","text":"there."}\n', `${JSON.stringify(done)}\n`]);

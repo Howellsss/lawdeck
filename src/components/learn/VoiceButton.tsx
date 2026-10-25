@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { Heartbeat } from "@/components/ui/Heartbeat";
 import { Icon } from "@/components/ui/Icon";
 
 // Speaking a question (founder, 2026-10-24). Uses the speech recognition built into the browser
@@ -83,21 +84,26 @@ export function VoiceButton({
     recognition.start();
   }
 
+  // While listening: a moving heartbeat line beside a filled button that reads "Stop dictation".
   return (
-    <button
-      type="button"
-      disabled={disabled}
-      onClick={() => (listening ? recognitionRef.current?.stop() : start())}
-      aria-label={listening ? "Stop listening" : "Speak your question"}
-      aria-pressed={listening}
-      className={`flex size-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40 ${
-        listening ? "bg-ink text-on-ink" : "bg-pill text-ink"
-      }`}
-    >
-      <Icon name={listening ? "stop" : "mic"} size={18} />
-      <span className="sr-only" aria-live="polite">
-        {listening ? "Listening" : ""}
-      </span>
-    </button>
+    <span className="flex items-center gap-2">
+      {listening && <Heartbeat width={36} className="text-ink" />}
+      <button
+        type="button"
+        disabled={disabled}
+        onClick={() => (listening ? recognitionRef.current?.stop() : start())}
+        aria-label={listening ? "Stop dictation" : "Speak your question"}
+        title={listening ? "Stop dictation" : "Speak your question"}
+        aria-pressed={listening}
+        className={`flex size-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40 ${
+          listening ? "bg-ink text-on-ink" : "bg-pill text-ink"
+        }`}
+      >
+        <Icon name={listening ? "stop" : "mic"} size={18} />
+        <span className="sr-only" aria-live="polite">
+          {listening ? "Listening" : ""}
+        </span>
+      </button>
+    </span>
   );
 }

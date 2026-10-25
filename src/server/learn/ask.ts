@@ -42,6 +42,8 @@ export type SourceSummary = ChatSource;
 
 // One line of the answer stream (newline-delimited JSON).
 export type AnswerEvent =
+  // The library search finished, with this many passages (shown before the answer starts).
+  | { type: "found"; count: number }
   | { type: "text"; text: string }
   | {
       type: "done";
@@ -136,6 +138,7 @@ export async function answerQuestion(input: {
   if (!found.ok) return send({ type: "error", message: found.message });
   const unsure = searchUnsure(found);
   if (unsure) return send({ type: "error", message: unsure });
+  send({ type: "found", count: found.hits.length });
   if (found.hits.length === 0) {
     const saved = await saveAnswer(
       db,

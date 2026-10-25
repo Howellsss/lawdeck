@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { compactPrimaryButton } from "@/components/ui/buttons";
+import { Spinner } from "@/components/ui/Spinner";
 import type { IntakeView } from "@/server/db/documents";
 import { startDraft } from "@/server/drafting/actions";
 import { IntakeField } from "./IntakeField";
@@ -79,7 +80,12 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
       )}
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={busy} className={compactPrimaryButton}>
-          {busy ? "Drafting…" : "Draft the document"}
+          {busy ? (
+            <span className="flex items-center gap-2">
+              <Spinner />
+              {"Drafting…"}
+            </span>
+          ) : "Draft the document"}
         </button>
         {busy && (
           <span role="status" className="text-sm text-muted">

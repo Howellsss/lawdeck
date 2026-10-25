@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { compactPrimaryButton } from "@/components/ui/buttons";
+import { Spinner } from "@/components/ui/Spinner";
 import { INSTRUCTION_MAX_CHARS } from "@/schemas/drafting";
 import { changeByInstruction } from "@/server/drafting/editActions";
 import type { FactRequest } from "./FactsEditor";
@@ -48,7 +49,12 @@ export function InstructionBox({ documentId, onAskFor }: { documentId: string; o
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={busy} className={compactPrimaryButton}>
-          {busy ? "Changing…" : "Make the change"}
+          {busy ? (
+            <span className="flex items-center gap-2">
+              <Spinner />
+              {"Changing…"}
+            </span>
+          ) : "Make the change"}
         </button>
         {note && (
           <p role={note.ok ? "status" : "alert"} className={`text-sm ${note.ok ? "text-muted" : "text-warning"}`}>

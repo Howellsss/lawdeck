@@ -48,7 +48,7 @@ export async function askQuestion(
       for (const line of lines) {
         if (!line.trim()) continue;
         const event = JSON.parse(line) as AnswerEvent;
-        if (event.type !== "text") finished = true;
+        if (event.type !== "text" && event.type !== "found") finished = true;
         onEvent(event);
       }
     }
