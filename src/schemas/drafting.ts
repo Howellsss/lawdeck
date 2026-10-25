@@ -1,4 +1,5 @@
 import { z } from "@/lib/zod";
+import { QUESTION_MAX_CHARS } from "./learn";
 
 // Drafting data files (Phase 5, step 5b; System Design §7; rule H-03). Each court or registry has
 // a formatting profile, and each document type has a template spec. Both live as data files in
@@ -283,14 +284,15 @@ export const newDraftSchema = z.strictObject({
 });
 export type NewDraft = z.infer<typeof newDraftSchema>;
 
-export const DRAFT_REQUEST_MAX_CHARS = 1000;
+// The same as a question, so a long request never fails here (founder, 2026-10-25).
+export const DRAFT_REQUEST_MAX_CHARS = QUESTION_MAX_CHARS;
 export const draftRequestSchema = z.strictObject({
   request: z
     .string()
     .trim()
     .min(3, { error: "Say which document you need." })
     .max(DRAFT_REQUEST_MAX_CHARS, {
-      error: `Keep the request under ${DRAFT_REQUEST_MAX_CHARS} characters.`,
+      error: `Keep the request under ${DRAFT_REQUEST_MAX_CHARS.toLocaleString("en-GB")} characters.`,
     }),
   course: z.string().max(80).default("all"),
 });
