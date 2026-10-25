@@ -20,6 +20,8 @@ type Live = {
   // Passages the library search found; unset while it is still searching.
   found?: number;
   error?: string;
+  // The student pressed Stop: what was written so far stays on screen, and is not saved.
+  stopped?: boolean;
 };
 
 // A Learn chat: earlier messages, the answer being written now, and the next-question box.
@@ -35,6 +37,7 @@ export function ChatThread({
   const [busy, setBusy] = useState(false);
   const [level, setLevel] = useState<AnswerLevel>("exam");
   const started = useRef(false);
+  const stopper = useRef<AbortController | null>(null);
   const panel = useRightPanel();
   const router = useRouter();
 
@@ -51,7 +54,14 @@ export function ChatThread({
     });
   }
 
+  // Stop (founder, 2026-10-25): ends the search or the answer at once; the server stops the AI too.
+  function stop() {
+    stopper.current?.abort();
+  }
+
   async function ask(question: string, answerLevel: AnswerLevel) {
+    const controller = new AbortController();
+    stopper.current = controller;
     setBusy(true);
     setLive({ question, level: answerLevel, text: "" });
     await askQuestion(chatId, question, answerLevel, (event) => {
@@ -88,7 +98,12 @@ export function ChatThread({
         setLive(null);
         router.refresh(); // Updates "questions left this month".
       }
-    });
+    }, controller.signal);
+    if (controller.signal.aborted) {
+      setLive((current) => current && { ...current, stopped: true });
+      router.refresh(); // A stopped question still counts towards the limit.
+    }
+    stopper.current = null;
     setBusy(false);
   }
 
@@ -141,11 +156,23 @@ export function ChatThread({
             <li
               className="flex flex-col gap-3 rounded-2xl border border-line px-4 py-3"
               aria-live="polite"
-              aria-busy={!live.error}
+              aria-busy={!live.error && !live.stopped}
             >
               <span className="sr-only">Lawdeck: </span>
-              {!live.error && <SearchStatus found={live.found} writing={Boolean(live.text)} />}
+              {!live.error && !live.stopped && <SearchStatus found={live.found} writing={Boolean(live.text)} />}
               {live.text && <AnswerText text={live.text} citable={new Set()} />}
+              {live.stopped && (
+                <div role="status" className="flex flex-col items-start gap-2 text-sm text-muted">
+                  <p>Stopped. {live.text ? "This part answer is not saved." : "Nothing was written."}</p>
+                  <button
+                    type="button"
+                    onClick={() => void ask(live.question, live.level)}
+                    className="text-ink underline underline-offset-2"
+                  >
+                    Ask again
+                  </button>
+                </div>
+              )}
               {live.error && (
                 <div
                   role="alert"
@@ -170,6 +197,7 @@ export function ChatThread({
         level={level}
         onLevel={setLevel}
         onAsk={(question) => void ask(question, level)}
+        onStop={stop}
       />
     </div>
   );

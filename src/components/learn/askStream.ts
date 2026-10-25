@@ -19,6 +19,8 @@ export async function askQuestion(
       signal,
     });
   } catch {
+    // Stopped by the student: nothing more to show.
+    if (signal?.aborted) return;
     return onEvent({
       type: "error",
       message:
@@ -59,7 +61,7 @@ export async function askQuestion(
       message: "The answer was cut off. Check your connection and try again.",
     });
   }
-  if (!finished)
+  if (!finished && !signal?.aborted)
     onEvent({
       type: "error",
       message: "The answer was cut off. Please try again.",
