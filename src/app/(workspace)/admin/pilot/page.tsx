@@ -2,9 +2,12 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { InviteCreateForm } from "@/components/pilot/InviteCreateForm";
+import { InviteLinkCopy } from "@/components/pilot/InviteLinkCopy";
 import { InviteList } from "@/components/pilot/InviteList";
 import { PilotMeasures } from "@/components/pilot/PilotMeasures";
 import { PilotSettingsForm } from "@/components/pilot/PilotSettingsForm";
+import { RegisteredEmailForm } from "@/components/pilot/RegisteredEmailForm";
+import { RegisteredEmailList } from "@/components/pilot/RegisteredEmailList";
 import { UsageLimitsForm } from "@/components/pilot/UsageLimitsForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { getPilotDashboard } from "@/server/db/pilot";
@@ -35,6 +38,25 @@ async function Pilot() {
       <section aria-labelledby="measures-heading" className="flex flex-col gap-3">
         <h2 id="measures-heading" className="text-lg font-medium">This week and the last 6 weeks</h2>
         <PilotMeasures data={data} />
+      </section>
+      <section aria-labelledby="emails-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+        <h2 id="emails-heading" className="text-lg font-medium">Registered emails</h2>
+        <p className="text-sm text-muted">
+          Register each tester’s email, then send them the invite link. When they continue with Google using a registered email,
+          they are in. Anyone else who opens the link is told their email is not registered. Works while Invite only is ticked
+          below.
+        </p>
+        {data.emails === null ? (
+          <p role="alert" className="text-sm text-warning">
+            Registered emails need database update 36 first. Paste it into Supabase, then reload this page.
+          </p>
+        ) : (
+          <>
+            <InviteLinkCopy />
+            <RegisteredEmailForm />
+            <RegisteredEmailList emails={data.emails} />
+          </>
+        )}
       </section>
       <section aria-labelledby="invites-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="invites-heading" className="text-lg font-medium">Invite codes</h2>

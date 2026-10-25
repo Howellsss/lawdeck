@@ -142,14 +142,15 @@ export async function updatePassword(_prev: AuthFormState, formData: FormData): 
   redirect("/");
 }
 
-export async function signOut(): Promise<void> {
+// A form may say where to go next (only Lawdeck paths); the invite page sends people back to it.
+export async function signOut(formData?: FormData): Promise<void> {
   if (getSupabaseConfig()) {
     const supabase = await createSupabaseServerClient();
     // Ends the session on the Supabase server too, not just in this browser (rule C-03).
     const { error } = await supabase.auth.signOut();
     if (error) logAuthFailure("signOut", error.code);
   }
-  redirect("/");
+  redirect(safeNextPath(formData?.get("next")));
 }
 
 // Sends the student to Google, which returns them to /auth/callback.
