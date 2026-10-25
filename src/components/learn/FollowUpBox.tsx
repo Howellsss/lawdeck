@@ -12,11 +12,14 @@ export function FollowUpBox({
   level,
   onLevel,
   onAsk,
+  onStop,
 }: {
   busy: boolean;
   level: AnswerLevel;
   onLevel: (level: AnswerLevel) => void;
   onAsk: (question: string) => void;
+  // While Lawdeck searches or writes, the send button becomes Stop.
+  onStop?: () => void;
 }) {
   const [text, setText] = useState("");
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -70,7 +73,7 @@ export function FollowUpBox({
             if (event.key === "Enter" && !event.shiftKey) submit(event);
           }}
           placeholder="Ask a follow-up question"
-          className="flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
+          className="min-w-0 flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
         />
         <VoiceButton
           disabled={busy}
@@ -80,14 +83,26 @@ export function FollowUpBox({
           }}
           onError={setVoiceError}
         />
-        <button
-          type="submit"
-          disabled={busy || !text.trim()}
-          aria-label="Send"
-          className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:opacity-40"
-        >
-          <Icon name="arrowUp" size={18} />
-        </button>
+        {busy && onStop ? (
+          <button
+            type="button"
+            onClick={onStop}
+            aria-label="Stop"
+            title="Stop"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink"
+          >
+            <Icon name="stop" size={18} />
+          </button>
+        ) : (
+          <button
+            type="submit"
+            disabled={busy || !text.trim()}
+            aria-label="Send"
+            className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:opacity-40"
+          >
+            <Icon name="arrowUp" size={18} />
+          </button>
+        )}
       </form>
       {voiceError && (
         <p role="status" className="px-1 text-sm text-muted">

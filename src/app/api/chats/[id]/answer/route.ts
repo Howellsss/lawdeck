@@ -30,9 +30,23 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/chats/[
 
   const db = await createSupabaseServerClient();
   const encoder = new TextEncoder();
+  // Stop (founder, 2026-10-25): when the student presses Stop or leaves, the AI call stops too,
+  // so no more credit is spent, and nothing more is sent to a closed connection.
+  const stop = new AbortController();
+  request.signal.addEventListener("abort", () => stop.abort());
   const stream = new ReadableStream<Uint8Array>({
+    cancel() {
+      stop.abort();
+    },
     async start(controller) {
-      const send = (event: AnswerEvent) => controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+      const send = (event: AnswerEvent) => {
+        if (stop.signal.aborted) return;
+        try {
+          controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+        } catch {
+          stop.abort();
+        }
+      };
       try {
         await answerQuestion({
           db,
@@ -41,14 +55,21 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/chats/[
           question: body.data.question,
           level: body.data.level,
           send,
-          signal: request.signal,
+          signal: stop.signal,
         });
       } catch (error) {
-        // Logs the error name only, never the question or the answer (rule I-03).
-        console.error("learn answer failed", { step: "stream", name: (error as Error)?.name });
+        // A stopped answer is not a failure.
+        if (!stop.signal.aborted) {
+          // Logs the error name only, never the question or the answer (rule I-03).
+          console.error("learn answer failed", { step: "stream", name: (error as Error)?.name });
+        }
         send({ type: "error", message: "Something went wrong while answering. Please try again." });
       } finally {
-        controller.close();
+        try {
+          controller.close();
+        } catch {
+          // Already closed: the student stopped the answer.
+        }
       }
     },
   });
