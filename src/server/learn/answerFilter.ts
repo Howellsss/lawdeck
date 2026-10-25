@@ -66,7 +66,7 @@ const LEADING_WORDS = new Set([
 
 // Names stay on one line ([ \t], not \s), so a removal never swallows the next line.
 const CASE_NAME =
-  /((?:[A-Z][\w.'&-]*[ \t]+){0,5}[A-Z][\w.'&-]*)[ \t]+v\.?[ \t]+([A-Z][\w.'&-]*(?:[ \t]+(?:[A-Z][\w.'&-]*|&|of|and)){0,5})/g;
+  /((?:(?:[A-Z][\w.'&-]*|&)[ \t]+){0,5}[A-Z][\w.'&-]*)[ \t]+v\.?[ \t]+([A-Z][\w.'&-]*(?:[ \t]+(?:[A-Z][\w.'&-]*|&|of|and)){0,5})/g;
 // A statute name runs through "of", "and" and brackets: "High Court of Lagos State (Civil Procedure) Rules".
 const STATUTE_NAME =
   /((?:[A-Z][\w()'-]*[ \t]+)(?:(?:\(?[A-Z][\w()'-]*|of|and)[ \t]+){0,10}(?:Act|Law|Laws|Decree|Rules|Regulations))\b(?:,?[ \t]+(?:Cap\.?[ \t]+[\w.]+[ \t]*,?[ \t]*)?(?:19|20)\d\d)?/g;
@@ -185,12 +185,26 @@ function insideQuote(text: string): boolean {
   return curlyOpen > curlyClose || straight % 2 === 1;
 }
 
+// Words in a party's name that do not identify the case: "Madukolu & Ors v Nkemdilim" is
+// "Madukolu v Nkemdilim". They are left out of case keys and of the passages they are matched in,
+// so a case written with or without them is still recognised.
+const PARTY_FILLER = new Set(["ors", "anor", "others", "another", "ltd", "plc", "limited"]);
+
+function withoutFiller(text: string): string {
+  return text
+    .split(" ")
+    .filter((w) => w && !PARTY_FILLER.has(w))
+    .join(" ");
+}
+
 // The case and statute keys in a stretch of text, with the part of the text each came from.
 function caseKey(left: string, right: string): string | null {
-  const leftWords = normalise(left)
+  // A party named only by filler ("Ors v Musa") keeps it, so it is checked, never waved through.
+  const party = (name: string) => withoutFiller(normalise(name)) || normalise(name);
+  const leftWords = party(left)
     .split(" ")
     .filter((w) => w && !LEADING_WORDS.has(w));
-  const rightWords = normalise(right).split(" ").filter(Boolean);
+  const rightWords = party(right).split(" ").filter(Boolean);
   if (leftWords.length === 0 || rightWords.length === 0) return null;
   return `${leftWords.at(-1)} v ${rightWords[0]}`;
 }
@@ -204,11 +218,13 @@ function statuteKey(name: string): string | null {
 
 function knownLocally(context: FilterContext) {
   const corpus = context.passageTexts.map(normalise);
+  const caseCorpus = corpus.map(withoutFiller);
   const titles = context.recognisedTitles.map(normalise).filter(Boolean);
   const inPassages = (phrase: string) =>
     corpus.some((passage) => ` ${passage} `.includes(` ${phrase} `));
   return {
-    isCase: (key: string) => inPassages(key),
+    isCase: (key: string) =>
+      caseCorpus.some((passage) => ` ${passage} `.includes(` ${key} `)),
     isStatute: (key: string) =>
       inPassages(key) ||
       titles.some((title) => title.includes(key) || key.includes(title)),

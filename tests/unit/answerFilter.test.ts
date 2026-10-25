@@ -43,6 +43,17 @@ describe("citation check", () => {
     expect(checkText("The Invented Evidence Act 2011 says so.", context)).toBe(`The ${REMOVED_AUTHORITY} says so.`);
   });
 
+  it("recognises a case written with or without '& Ors', 'Ltd' or 'Plc', as in full citations", () => {
+    expect(checkText("See Adeyemi & Ors v Bello (2007) 5 NWLR (Pt. 1027) 1 [S1].", context)).not.toContain(REMOVED_AUTHORITY);
+    expect(checkText("See Adeyemi Ltd v. Bello Plc [S1].", context)).not.toContain(REMOVED_AUTHORITY);
+    const withOrs = { ...context, passageTexts: ["In Okafor & Ors v Musa the court held so."] };
+    expect(checkText("As held in Okafor v Musa [S1].", withOrs)).not.toContain(REMOVED_AUTHORITY);
+  });
+
+  it("still removes a case whose parties are not in the library, even in full citation form", () => {
+    expect(checkText("As held in Adeyemi & Ors v Okonkwo (2007) 5 NWLR (Pt. 1027) 1 [S1].", context)).toContain(REMOVED_AUTHORITY);
+  });
+
   it("does not treat general words as named authorities", () => {
     expect(checkText("The Rules say so. This Law applies.", context)).toBe("The Rules say so. This Law applies.");
   });

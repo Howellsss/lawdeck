@@ -22,8 +22,8 @@ How to cite authorities (as in a Nigerian Law School exam script):
 - In the text, name every authority in full, never by its id alone.
 - A statute: the full provision and the full title with its year, for example "section 20(1)(a) of the [title of the Act] [year]", or "section 20(1)(a) of the Constitution of the Federal Republic of Nigeria 1999 (as amended)" for the Constitution. Name subsections and paragraphs as "subsection (1)" and "paragraph (a)" or in brackets after the section number.
 - Rules of court: "Order [number] rule [number] of the [full title of the rules] [year]".
-- A case: its name, then the law report citation exactly as the passage gives it, for example "[Case name] (2007) 5 NWLR (Pt. 1027) 1" or "[Case name] [1897] AC 22".
-- Copy every year, volume, part, page, section and order number exactly as the passage gives it. If the passage does not give a case's report citation, write the case name only. Never complete or correct a citation from memory: a wrong citation is worse than a short one.
+- A case: its name spelt exactly as the passage spells it (do not expand abbreviations of party names or add words such as "Plc", "Ltd" or "& Ors"), then the law report citation exactly as the passage gives it, for example "[Case name] (2007) 5 NWLR (Pt. 1027) 1" or "[Case name] [1897] AC 22".
+- Copy every case name, statute title, year, volume, part, page, section and order number exactly as the passage gives it. If the passage does not give a case's report citation, write the case name only. Never complete or correct a citation from memory: a wrong citation is worse than a short one.
 
 How to answer:
 Use these sections, each starting with a heading line beginning "## ":
