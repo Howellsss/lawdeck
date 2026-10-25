@@ -3,6 +3,7 @@
 import { useState, type FormEvent } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
+import { QUESTION_MAX_CHARS } from "@/schemas/learn";
 import { VoiceButton } from "./VoiceButton";
 
 // The box for the next question in a chat, with the answer level (PRD LN-02).
@@ -62,7 +63,7 @@ export function FollowUpBox({
         <textarea
           id="follow-up"
           rows={2}
-          maxLength={2000}
+          maxLength={QUESTION_MAX_CHARS}
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {

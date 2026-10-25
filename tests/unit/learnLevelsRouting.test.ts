@@ -74,3 +74,11 @@ describe("course topics", () => {
     expect(topicNameSchema.safeParse("x".repeat(161)).success).toBe(false);
   });
 });
+
+describe("question length", () => {
+  it("takes a full exam problem question of about 1,200 words, and no more than 8,000 characters", async () => {
+    const { askSchema } = await import("@/schemas/learn");
+    expect(askSchema.safeParse({ question: "facts ".repeat(1300).slice(0, 7990), level: "exam" }).success).toBe(true);
+    expect(askSchema.safeParse({ question: "x".repeat(8001), level: "exam" }).success).toBe(false);
+  });
+});
