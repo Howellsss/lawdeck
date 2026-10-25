@@ -1,4 +1,5 @@
 import "server-only";
+import { isScenario } from "@/prompts/explain";
 import { isTopicOnly, parseRoute, ROUTE_PROMPT_VERSION, ROUTE_SYSTEM, type Route } from "@/prompts/route";
 import { failureDetails, getClaude } from "./client";
 import { costUsd } from "./costs";
@@ -12,8 +13,9 @@ const ROUTE_TIMEOUT_MS = 8_000;
 // Returns null when Claude cannot be reached or replies oddly; callers then use Learn.
 // Logs model, tokens, cost and time (rule G-08), never the request.
 export async function routeRequest(request: string, userId: string): Promise<Route | null> {
-  // A topic on its own is a question; no AI call needed.
-  if (isTopicOnly(request)) return "learn";
+  // A topic on its own, or a long set of facts (a problem question), is a question; no AI call
+  // needed. A student who wants a document drafted from long facts chooses Draft mode.
+  if (isTopicOnly(request) || isScenario(request)) return "learn";
   const started = Date.now();
   try {
     const response = await getClaude().messages.create(

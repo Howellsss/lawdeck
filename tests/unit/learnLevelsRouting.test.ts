@@ -76,9 +76,18 @@ describe("course topics", () => {
 });
 
 describe("question length", () => {
-  it("takes a full exam problem question of about 1,200 words, and no more than 8,000 characters", async () => {
+  it("takes a long exam problem question, up to 20,000 characters", async () => {
     const { askSchema } = await import("@/schemas/learn");
-    expect(askSchema.safeParse({ question: "facts ".repeat(1300).slice(0, 7990), level: "exam" }).success).toBe(true);
-    expect(askSchema.safeParse({ question: "x".repeat(8001), level: "exam" }).success).toBe(false);
+    expect(askSchema.safeParse({ question: "facts ".repeat(3400).slice(0, 19990), level: "exam" }).success).toBe(true);
+    expect(askSchema.safeParse({ question: "x".repeat(20001), level: "exam" }).success).toBe(false);
+    const { draftRequestSchema } = await import("@/schemas/drafting");
+    expect(draftRequestSchema.safeParse({ request: "facts ".repeat(1000), course: "all" }).success).toBe(true);
+  });
+
+  it("sends a long problem question to Learn without asking Claude, even if it mentions drafting", async () => {
+    vi.stubEnv("ANTHROPIC_API_KEY", "");
+    const scenario = `Ade instructs you to draft a writ. ${"The facts are long and detailed. ".repeat(10)}Advise Ade.`;
+    expect(await routeRequest(scenario, "test")).toBe("learn");
+    vi.unstubAllEnvs();
   });
 });

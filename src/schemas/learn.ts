@@ -1,8 +1,9 @@
 import { z } from "@/lib/zod";
 import { COURSES } from "@/lib/courses";
 
-// Long enough for a full exam problem question (about 1,200 words; founder, 2026-10-25).
-export const QUESTION_MAX_CHARS = 8000;
+// Long enough for any exam problem question (about 3,000 words; founder asked for the highest
+// sensible limit, 2026-10-25). Longer text would cost more and search less well.
+export const QUESTION_MAX_CHARS = 20000;
 
 const question = z
   .string({ error: "Type a question." })
