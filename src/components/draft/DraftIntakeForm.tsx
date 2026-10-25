@@ -23,6 +23,12 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
     const facts: Record<string, string[]> = {};
     for (const field of intake.fields) facts[field.id] = form.getAll(field.id).map(String);
     const forumId = chooseForum ? String(form.get("forum") ?? "") || null : (intake.forums[0]?.id ?? null);
+    // Said plainly next to the button: the browser's own warning would appear at the top, out of sight.
+    if (intake.forums.length > 0 && !forumId) {
+      setBusy(false);
+      setMessage("Choose the court or registry at the top of the form, then press Draft the document again.");
+      return;
+    }
     const result = await startDraft({ templateId: intake.id, forumId, facts });
     if (result.ok) {
       router.push(`/documents/${result.id}`);
@@ -34,20 +40,29 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
   }
 
   return (
-    <form action={submit} className="flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5">
+    <form action={submit} noValidate className="flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5">
       {chooseForum ? (
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 font-medium">Court or registry</legend>
           <p className="text-sm text-muted">The heading, form and layout follow the court or registry you choose.</p>
           {intake.forums.map((forum) => (
             <label key={forum.id} className="flex min-h-11 items-center gap-2">
-              <input type="radio" name="forum" value={forum.id} required defaultChecked={forum.id === intake.defaultForumId} />
+              <input
+                type="radio"
+                name="forum"
+                value={forum.id}
+                defaultChecked={forum.id === (intake.defaultForumId ?? intake.forums[0]?.id)}
+              />
               {forum.name}
             </label>
           ))}
         </fieldset>
+      ) : intake.forums[0] ? (
+        <p className="text-sm text-muted">Court or registry: {intake.forums[0].name}</p>
       ) : (
-        intake.forums[0] && <p className="text-sm text-muted">Court or registry: {intake.forums[0].name}</p>
+        <p role="status" className="text-sm text-warning">
+          No court or registry is approved for this document yet, so it can’t be drafted. An admin approves one on Admin → Templates.
+        </p>
       )}
 
       {intake.fields.map((field) => (
