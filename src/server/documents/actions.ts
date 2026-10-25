@@ -7,6 +7,7 @@ import {
   forumProfileSchema,
   templateSpecSchema,
 } from "@/schemas/drafting";
+import { z } from "@/lib/zod";
 import { getStaffRole } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { FORUM_FILES, TEMPLATE_FILES } from "@/templates";
@@ -126,6 +127,35 @@ export async function setTemplateStatus(
       "The status was not changed. Please try again.",
     );
   return { ok: true };
+}
+
+export type BulkApproveResult =
+  | {
+      ok: true;
+      approved: number;
+      failed: { id: string; message: string; issues?: string[] }[];
+    }
+  | { ok: false; message: string };
+
+const bulkIdsSchema = z.array(draftingIdSchema).min(1).max(200);
+
+// Approve several templates at once (founder, 2026-10-25). Each one goes through exactly the
+// same checks as approving it on its own page; the ones that fail are listed with the reason.
+export async function approveTemplates(
+  ids: string[],
+): Promise<BulkApproveResult> {
+  const parsed = bulkIdsSchema.safeParse(ids);
+  if (!parsed.success)
+    return { ok: false, message: "Tick at least one template to approve." };
+  if (!(await getStaffRole())) return { ok: false, message: NOT_STAFF };
+  let approved = 0;
+  const failed: { id: string; message: string; issues?: string[] }[] = [];
+  for (const id of new Set(parsed.data)) {
+    const result = await setTemplateStatus(id, "approved");
+    if (result.ok) approved += 1;
+    else failed.push({ id, message: result.message, issues: result.issues });
+  }
+  return { ok: true, approved, failed };
 }
 
 export async function deleteDraftingItem(
