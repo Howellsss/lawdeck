@@ -20,6 +20,8 @@ insert into public.kb_items (title, type, course_id)
 insert into public.kb_passages (item_id, position, text)
   select id, 0, 'Quokka consent passage in ' || title from public.kb_items where title like 'Recheck %';
 select test.make_reviewable('Recheck %');
+-- Published items keep their own titles in search results (migration 37).
+update public.kb_items set source_kind = 'publication' where title like 'Recheck %';
 update public.kb_items set law_current_as_of = '2023-01-31' where title = 'Recheck older';
 update public.kb_items set law_current_as_of = '2025-01-31' where title = 'Recheck newer';
 update public.kb_items set review_status = 'approved' where title like 'Recheck %';

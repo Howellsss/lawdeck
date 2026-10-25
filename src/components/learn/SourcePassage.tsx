@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { openSource, type OpenSourceResult } from "@/server/learn/actions";
@@ -49,15 +50,27 @@ export function SourcePassage({
         </p>
       </div>
       {source.available && source.text ? (
-        <p className="whitespace-pre-line break-words text-[15px] leading-relaxed">
-          {source.text}
-        </p>
+        <>
+          <p className="whitespace-pre-line break-words text-[15px] leading-relaxed">
+            {source.text}
+          </p>
+          {!source.fullText && (
+            <p className="text-xs text-muted">
+              A short extract. Lawdeck shows only short extracts of study material; the answer explains the law in full.
+            </p>
+          )}
+        </>
       ) : (
         <p className="rounded-2xl border border-warning px-4 py-3 text-sm text-warning">
           {origin === "upload"
             ? "You have deleted this file, so its wording is no longer shown."
             : "This material has been withdrawn or is being re-checked after a change in the law, so its wording is no longer shown. Ask the question again for an up-to-date answer."}
         </p>
+      )}
+      {source.course && (
+        <Link href={`/courses/${source.course.slug}`} className="text-sm">
+          Study {source.course.name} in Lawdeck
+        </Link>
       )}
     </div>
   );

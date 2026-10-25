@@ -10,6 +10,8 @@ import { WorkspaceLoadError } from "./workspace";
 export type ReportView = {
   id: string;
   kind: ReportTarget;
+  // The reported answer, document, brief or practice question (answers can be traced by admins).
+  targetId: string;
   category: ReportCategory;
   note: string | null;
   status: "open" | "resolved";
@@ -40,7 +42,7 @@ export async function listReports(): Promise<ReportView[] | null> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase
     .from("problem_reports")
-    .select("id, target_kind, category, note, status, created_at, resolved_at")
+    .select("id, target_kind, target_id, category, note, status, created_at, resolved_at")
     .order("status")
     .order("created_at", { ascending: false })
     .limit(100);
@@ -51,6 +53,7 @@ export async function listReports(): Promise<ReportView[] | null> {
       return {
         id: r.id,
         kind: r.target_kind,
+        targetId: r.target_id,
         category: r.category,
         note: r.note,
         status: r.status,

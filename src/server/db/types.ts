@@ -19,6 +19,9 @@ type KbItemType =
   | "rule_of_court"
   | "case";
 type ReviewStatus = "pending" | "approved" | "rejected" | "withdrawn";
+// How a library item is presented to students, and its rights (migration 37).
+export type SourceKind = "official" | "publication" | "lecturer_note" | "unattributed" | "pending";
+export type SourceRights = "unknown" | "permitted" | "restricted";
 type ReadingStatus = "waiting" | "reading" | "done" | "failed";
 type ReadingMethod = "text" | "scan" | "mixed";
 type PracticeKind = "mcq" | "scenario" | "flashcards";
@@ -414,6 +417,11 @@ export type Database = {
           index_model: string | null;
           indexed_at: string | null;
           archive_path: string | null;
+          source_kind: SourceKind;
+          display_title: string | null;
+          display_topic: string | null;
+          rights_status: SourceRights;
+          rights_note: string | null;
         };
         Insert: {
           title: string;
@@ -447,6 +455,11 @@ export type Database = {
           indexed_at?: string | null;
           // The archived original (Q-03): written once by the reading step (admins); never changed.
           archive_path?: string;
+          source_kind?: SourceKind;
+          display_title?: string | null;
+          display_topic?: string | null;
+          rights_status?: SourceRights;
+          rights_note?: string | null;
         };
         Relationships: [];
       };
@@ -1014,8 +1027,39 @@ export type Database = {
           page_from: number | null;
           page_to: number | null;
           available: boolean;
+          // False: a short extract (50 words at most); true for statutes, rules and own uploads.
+          full_text: boolean | null;
+          course_slug: string | null;
+          course_name: string | null;
         }[];
       };
+      // Student labels for search results (migration 37).
+      kb_passage_labels: {
+        Args: { passages: string[] };
+        Returns: { passage_id: string; label: string; heading: string | null; show_pages: boolean; source_kind: SourceKind; course_slug: string }[];
+      };
+      // Source tracing for admins (migration 37).
+      admin_answer_sources: {
+        Args: { answer: string };
+        Returns: {
+          label: number;
+          origin: string;
+          student_label: string;
+          item_id: string | null;
+          original_title: string | null;
+          file_name: string | null;
+          drive_source: string | null;
+          source_kind: SourceKind | null;
+          rights_status: SourceRights | null;
+          review_status: ReviewStatus | null;
+          passage_heading: string | null;
+          page_from: number | null;
+          page_to: number | null;
+          passage_text: string | null;
+        }[];
+      };
+      admin_item_usage: { Args: { item: string }; Returns: { answers: number; students: number; last_used: string | null }[] };
+      admin_item_answers: { Args: { item: string }; Returns: { message_id: string; used_at: string }[] };
       search_library: {
         Args: {
           query_text: string;
@@ -1090,6 +1134,8 @@ export type Database = {
       version_author: VersionAuthor;
       brief_kind: "case" | "statute";
       review_status: ReviewStatus;
+      source_kind: SourceKind;
+      source_rights: SourceRights;
       reading_status: ReadingStatus;
       reading_method: ReadingMethod;
     };

@@ -96,11 +96,16 @@ export type OpenSourceResult =
   | {
       ok: true;
       source: {
+        // The student label (migration 37), never the file's own title.
         itemTitle: string;
         heading: string | null;
         text: string | null;
         pages: string | null;
         available: boolean;
+        // False when only a short extract is shown (study material, not statutes or rules).
+        fullText: boolean;
+        // The Lawdeck course to study it in, when known.
+        course: { slug: string; name: string } | null;
       };
     }
   | { ok: false; message: string };
@@ -138,6 +143,9 @@ export async function openSource(id: string): Promise<OpenSourceResult> {
       text: row.text,
       pages: pagesLabel(row.page_from, row.page_to),
       available: row.available,
+      // Before migration 37 the database returns whole passages and no course.
+      fullText: row.full_text !== false,
+      course: row.course_slug && row.course_name ? { slug: row.course_slug, name: row.course_name } : null,
     },
   };
 }

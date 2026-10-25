@@ -6,7 +6,9 @@ import { Pager } from "@/components/library/Pager";
 import { PassageCard } from "@/components/library/PassageCard";
 import { ReadingSummary } from "@/components/library/ReadingSummary";
 import { RecheckNotice } from "@/components/library/RecheckNotice";
+import { ItemUsage } from "@/components/library/ItemUsage";
 import { ReviewPanel } from "@/components/library/ReviewPanel";
+import { SourcePresentationForm } from "@/components/library/SourcePresentationForm";
 import { SearchSummary } from "@/components/library/SearchSummary";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { formatWat } from "@/lib/dates";
@@ -17,6 +19,7 @@ import { reviewPageSchema } from "@/schemas/libraryReview";
 import { getStaffRole } from "@/server/auth/roles";
 import { getRecheckReasons } from "@/server/db/lawChanges";
 import { getLibraryItem, getReviewPassages, PASSAGES_PER_PAGE } from "@/server/db/library";
+import { getItemUsage, getSourcePresentation } from "@/server/db/sourcePresentation";
 import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
 
 export const metadata: Metadata = { title: "Review · Library · Lawdeck" };
@@ -47,9 +50,11 @@ async function ReviewItem({ params, searchParams }: PageProps<"/admin/library/[i
 
   const query = await searchParams;
   const page = reviewPageSchema.parse(query.page);
-  const [{ passages, total }, recheck] = await Promise.all([
+  const [{ passages, total }, recheck, presentation, usage] = await Promise.all([
     getReviewPassages(id, page, EMBEDDING_MODEL),
     getRecheckReasons([id]),
+    getSourcePresentation(id),
+    getItemUsage(id),
   ]);
   const pages = Math.max(1, Math.ceil(total / PASSAGES_PER_PAGE));
   const blockers = approvalBlockers(
@@ -92,6 +97,26 @@ async function ReviewItem({ params, searchParams }: PageProps<"/admin/library/[i
         blockers={blockers}
         today={todayInLagos()}
       />
+
+      <section aria-labelledby="students-see" className="flex flex-col gap-3 border-t border-line pt-6">
+        <h2 id="students-see" className="text-lg font-medium">
+          What students see
+        </h2>
+        {presentation ? (
+          <>
+            <p className="text-sm text-muted">
+              Students never see a lecturer&apos;s name, the file name, the Drive link or the page numbers of private notes.
+              {presentation.driveSource && <span className="break-all"> Original source (staff only): {presentation.driveSource}</span>}
+            </p>
+            <SourcePresentationForm id={item.id} initial={presentation} />
+          </>
+        ) : (
+          <p role="alert" className="text-sm text-warning">
+            Student labels need database update 37 first. Paste it into Supabase, then reload this page.
+          </p>
+        )}
+        {usage && <ItemUsage usage={usage} />}
+      </section>
 
       <section aria-labelledby="passages" className="flex flex-col gap-3">
         <h2 id="passages" className="text-lg font-medium">

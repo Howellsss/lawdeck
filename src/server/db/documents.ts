@@ -1,5 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { studentSourceText } from "@/lib/sourceLabels";
 import {
   draftingIdSchema,
   forumProfileSchema,
@@ -125,7 +126,7 @@ export async function getIntake(slug: string, fromDocumentId?: string): Promise<
       why: spec.data.parts.map((part) => ({
         partId: part.id,
         heading: partLabel(part, spec.data.fields),
-        why: part.why,
+        why: studentSourceText(part.why),
         onlyFor: part.forums ? part.forums.map((f) => forumNames.get(f) ?? f) : null,
       })),
       defaults: carried?.facts ?? {},
@@ -221,7 +222,7 @@ export async function getDocument(id: string): Promise<Loaded<DocumentView | nul
       why: ready
         ? ready.model.blocks.flatMap((block) => {
             const part = ready.spec.parts.find((p) => p.id === block.partId);
-            return part ? [{ partId: part.id, heading: partLabel(part, ready.spec.fields), why: part.why, onlyFor: null }] : [];
+            return part ? [{ partId: part.id, heading: partLabel(part, ready.spec.fields), why: studentSourceText(part.why), onlyFor: null }] : [];
           })
         : [],
       related: ready ? await relatedDocuments(supabase, ready.spec.related) : [],

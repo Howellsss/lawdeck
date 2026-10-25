@@ -19,6 +19,9 @@ insert into public.kb_items (title, type, course_id)
   select 'Approved note', 'note', id from public.courses where slug = 'civil-litigation';
 insert into public.kb_items (title, type, course_id)
   select 'Pending note', 'note', id from public.courses where slug = 'civil-litigation';
+-- Published items, which students may read directly (lecturer notes stay hidden: migration 37,
+-- tested in 9p_student_source_labels_test.sql).
+update public.kb_items set source_kind = 'publication' where title in ('Approved note', 'Pending note');
 insert into public.kb_passages (item_id, position, text)
   select id, 0, 'Passage of ' || title from public.kb_items;
 insert into storage.objects (bucket_id, name) values ('library', 'civil-litigation/approved.pdf');

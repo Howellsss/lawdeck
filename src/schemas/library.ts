@@ -1,6 +1,6 @@
 import { z } from "@/lib/zod";
 import { LIBRARY_FILE_TYPES, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
-import { KB_ITEM_TYPES } from "@/lib/libraryLabels";
+import { KB_ITEM_TYPES, SOURCE_KIND_LABELS, SOURCE_RIGHTS_LABELS, type SourceKindKey, type SourceRightsKey } from "@/lib/libraryLabels";
 
 const optionalText = (max: number, message: string) =>
   z
@@ -69,4 +69,15 @@ export const driveImportSchema = z.object({
   accessToken: z.string().min(20).max(4096),
   fileId: z.string().regex(/^[A-Za-z0-9_-]{10,200}$/, { error: "That Google Drive file is not recognised." }),
   details: libraryDetailsSchema,
+});
+
+// How an item is presented to students, and its rights (migration 37). The original title,
+// file name and Drive source are never changed here.
+export const sourcePresentationSchema = z.object({
+  id: z.uuid(),
+  kind: z.enum(Object.keys(SOURCE_KIND_LABELS) as [SourceKindKey, ...SourceKindKey[]], { error: "Choose how students see it." }),
+  displayTitle: optionalText(300, "Use 300 characters or fewer."),
+  displayTopic: optionalText(160, "Use 160 characters or fewer."),
+  rightsStatus: z.enum(Object.keys(SOURCE_RIGHTS_LABELS) as [SourceRightsKey, ...SourceRightsKey[]], { error: "Choose the permission." }),
+  rightsNote: optionalText(2000, "Use 2,000 characters or fewer."),
 });
