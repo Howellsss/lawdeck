@@ -22,6 +22,9 @@ insert into public.kb_items (title, type, course_id)
 insert into public.kb_passages (item_id, position, heading, text)
   select id, 0, 'Heading of ' || title, 'Zorilla passage text in ' || title from public.kb_items where title like 'Zorilla %';
 select test.make_reviewable('Zorilla %');
+-- Published items keep their own titles for students (labels for other kinds: migration 37,
+-- tested in 9p_student_source_labels_test.sql).
+update public.kb_items set source_kind = 'publication' where title like 'Zorilla %';
 update public.kb_items set review_status = 'approved' where title in ('Zorilla criminal', 'Zorilla corporate');
 reset role;
 
@@ -89,6 +92,7 @@ select test.check(
   (select not available and text is null and item_title = 'Zorilla corporate'
      from public.source_passage((select id from test.sources where label = 2))),
   'a withdrawn source shows as unavailable, without its wording');
+
 reset role;
 
 -- A later change in the law hides an out-of-date source's wording too ---------------

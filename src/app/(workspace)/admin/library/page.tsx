@@ -15,6 +15,7 @@ import { listLibraryItems } from "@/server/db/library";
 import { getDrivePickerConfig } from "@/server/library/driveConfig";
 import { listCourses } from "@/server/db/workspace";
 import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
+import { getSourceFlags } from "@/server/db/sourcePresentation";
 
 export const metadata: Metadata = { title: "Library · Lawdeck" };
 // Reading a file is done by server actions on this page, in steps of up to about 3 minutes.
@@ -76,7 +77,7 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
             </Link>
           ))}
         </nav>
-        <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} recheck={recheck} />
+        <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} recheck={recheck} flags={await getSourceFlags()} />
       </section>
     </>
   );

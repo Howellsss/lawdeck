@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { formatWat } from "@/lib/dates";
-import { KB_ITEM_TYPES, REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
+import { KB_ITEM_TYPES, REVIEW_STATUS_LABELS, type SourceKindKey, type SourceRightsKey } from "@/lib/libraryLabels";
 import type { LibraryItemSummary } from "@/server/db/library";
 import type { RecheckReason } from "@/server/db/lawChanges";
 import { ReadingSummary } from "./ReadingSummary";
@@ -26,8 +26,11 @@ export function LibraryList({
   isAdmin,
   currentModel,
   recheck,
+  flags,
 }: {
   items: LibraryItemSummary[];
+  // How each item is presented to students and its rights (migration 37); empty before it.
+  flags: Map<string, { kind: SourceKindKey; rights: SourceRightsKey }>;
   isAdmin: boolean;
   currentModel: string;
   recheck: Map<string, RecheckReason[]>;
@@ -59,6 +62,11 @@ export function LibraryList({
               <span className={STATUS_TONE[item.reviewStatus]}>{REVIEW_STATUS_LABELS[item.reviewStatus]}</span>
               <span className="text-muted"> · Added {formatWat(item.createdAt)}</span>
             </p>
+            {flags.get(item.id)?.kind === "pending" && (
+              <p className="text-sm text-warning">Needs identifying: students see it as “Course — Topic” until you set what it is.</p>
+            )}
+            {flags.get(item.id)?.rights === "unknown" && <p className="text-sm text-muted">Permission to use not yet confirmed.</p>}
+            {flags.get(item.id)?.rights === "restricted" && <p className="text-sm text-warning">Restricted: withdrawn from students.</p>}
             {recheck.has(item.id) && (
               <p className="text-sm text-warning">
                 Needs re-check (hidden from students): {recheck.get(item.id)?.[0]?.changeTitle}

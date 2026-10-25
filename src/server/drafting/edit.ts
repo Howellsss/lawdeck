@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { limitReachedMessage } from "@/lib/allowance";
+import { studentSourceText } from "@/lib/sourceLabels";
 import { documentContentSchema, factsFor, type DocumentContent, type TemplateSpec } from "@/schemas/drafting";
 import { editDraftParts, type DraftEditReply } from "@/server/ai/draft";
 import { recordUsage } from "@/server/ai/usage";
@@ -138,7 +139,7 @@ export async function instruct(db: Db, userId: string, id: string, instruction: 
     .map((part) => ({
       id: part.id,
       heading: part.heading ?? null,
-      purpose: part.instruction ?? part.why,
+      purpose: part.instruction ?? studentSourceText(part.why),
       maxWords: part.maxWords ?? 200,
       text: mask(doc.content.edits[part.id] ?? doc.content.narrative[part.id] ?? ""),
     }));

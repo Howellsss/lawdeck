@@ -249,6 +249,7 @@ export async function composeAnswer(input: {
     pages: pagesLabel(hit.pageFrom, hit.pageTo),
     text: hit.text,
     origin: hit.origin ?? "library",
+    sourceKind: hit.sourceKind,
   }));
   const turns: ExplainTurn[] = [
     ...input.history,

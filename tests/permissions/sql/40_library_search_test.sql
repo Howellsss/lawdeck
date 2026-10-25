@@ -32,6 +32,8 @@ insert into public.kb_passages (item_id, position, text)
   select id, n, 'Zebra marker extra passage ' || n from public.kb_items, generate_series(1, 40) n
   where title = 'Search approved';
 select test.make_reviewable('Search %');
+-- Published items keep their own titles in search results (migration 37).
+update public.kb_items set source_kind = 'publication' where title like 'Search %';
 update public.kb_items set review_status = 'approved' where title in ('Search approved', 'Search other course');
 update public.kb_items set review_status = 'withdrawn' where title = 'Search withdrawn';
 update public.kb_items set review_status = 'rejected' where title = 'Search rejected';

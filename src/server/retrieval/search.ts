@@ -1,7 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
-import type { Database } from "@/server/db/types";
+import type { Database, SourceKind } from "@/server/db/types";
 import { passageSearchText } from "./indexJob";
 import { rerankTexts } from "./rerank";
 import { embedTexts, toVectorText } from "./voyage";
@@ -26,6 +26,9 @@ export type SearchHit = {
   wordsRank: number | null;
   // Where it comes from: the reviewed library (the default) or the student's own upload (step 6c).
   origin?: "library" | "upload";
+  // Library items only (migration 37): an official document, a publication, or study notes.
+  // itemTitle is already the student label; the original title never leaves the database.
+  sourceKind?: SourceKind;
 };
 
 export type SearchResult =
@@ -140,6 +143,7 @@ async function libraryCandidates(
     }
     return { ok: false, message: "The search did not work. Please try again." };
   }
+  const kinds = await sourceKinds(supabase, data.map((row) => row.passage_id));
   return {
     ok: true,
     rows: data.map((row) => ({
@@ -154,8 +158,21 @@ async function libraryCandidates(
       meaningRank: row.meaning_rank,
       wordsRank: row.words_rank,
       origin: "library" as const,
+      sourceKind: kinds.get(row.passage_id),
     })),
   };
+}
+
+// What kind of source each passage comes from (migration 37). Without it the answer still works;
+// the model is simply not told which passages are official text.
+async function sourceKinds(supabase: Db, passageIds: string[]): Promise<Map<string, SourceKind>> {
+  if (passageIds.length === 0) return new Map();
+  const { data, error } = await supabase.rpc("kb_passage_labels", { passages: passageIds });
+  if (error) {
+    console.warn("source labels unavailable", { code: error.code });
+    return new Map();
+  }
+  return new Map(data.map((row) => [row.passage_id, row.source_kind]));
 }
 
 // The student's own Ready upload passages. If this search fails, the answer still uses the

@@ -17,3 +17,22 @@ export const REVIEW_STATUS_LABELS = {
   rejected: "Rejected",
   withdrawn: "Withdrawn",
 } as const;
+
+// How a library item is presented to students (migration 37).
+export const SOURCE_KIND_LABELS = {
+  official: "Official legal document (title shown)",
+  publication: "Named publication or handbook (title shown)",
+  lecturer_note: "Lecturer's notes or private material (course and topic shown)",
+  unattributed: "No clear author or title (course and topic shown)",
+  pending: "Not yet identified (course and topic shown)",
+} as const;
+
+export type SourceKindKey = keyof typeof SOURCE_KIND_LABELS;
+
+export const SOURCE_RIGHTS_LABELS = {
+  unknown: "Permission not yet confirmed",
+  permitted: "Lawdeck may use it",
+  restricted: "Restricted: withdrawn from students",
+} as const;
+
+export type SourceRightsKey = keyof typeof SOURCE_RIGHTS_LABELS;

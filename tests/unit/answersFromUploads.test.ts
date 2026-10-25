@@ -75,7 +75,8 @@ describe("searching for an answer", () => {
       includePending: false,
       useUploads: false,
     });
-    expect(rpc.mock.calls.map((c) => c[0])).toEqual(["search_library"]);
+    // kb_passage_labels: the source type of each library result (migration 37).
+    expect(rpc.mock.calls.map((c) => c[0])).toEqual(["search_library", "kb_passage_labels"]);
     rpc.mockClear();
     const result = await searchForAnswer({
       question: "renewal",
@@ -85,6 +86,7 @@ describe("searching for an answer", () => {
     });
     expect(rpc.mock.calls.map((c) => c[0])).toEqual([
       "search_library",
+      "kb_passage_labels",
       "search_uploads",
     ]);
     expect(

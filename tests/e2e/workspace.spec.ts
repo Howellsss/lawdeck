@@ -193,6 +193,14 @@ test("The users dashboard is hidden from visitors", async ({ page }) => {
   }
 });
 
+test("Source tracing is hidden from visitors (admins only)", async ({ page }) => {
+  for (const path of ["/admin/answers/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", "/admin/answers/not-an-id"]) {
+    await page.goto(path);
+    await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+    await expect(page.getByText("drive.google.com")).toHaveCount(0);
+  }
+});
+
 test("The account page asks visitors to sign in before any invite code", async ({ page }) => {
   await page.goto("/account");
   await expect(page.getByRole("heading", { name: "Sign in to see your account" })).toBeVisible();

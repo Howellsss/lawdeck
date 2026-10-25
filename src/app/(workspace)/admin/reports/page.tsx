@@ -1,10 +1,12 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { StatusButton } from "@/components/feedback/StatusButton";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { formatWat } from "@/lib/dates";
 import { REPORT_CATEGORIES } from "@/schemas/feedback";
+import { getStaffRole } from "@/server/auth/roles";
 import { listReports } from "@/server/db/feedback";
 
 export const metadata: Metadata = { title: "Reports · Lawdeck" };
@@ -24,8 +26,9 @@ export default function ReportsPage() {
 }
 
 async function Reports() {
-  const reports = await listReports();
+  const [reports, role] = await Promise.all([listReports(), getStaffRole()]);
   if (!reports) notFound();
+  const isAdmin = role === "admin";
   const open = reports.filter((r) => r.status === "open").length;
   return (
     <>
@@ -56,6 +59,11 @@ async function Reports() {
                 </details>
               ) : (
                 <p className="text-sm text-muted">The student has since deleted what they reported.</p>
+              )}
+              {report.kind === "answer" && report.context && isAdmin && (
+                <Link href={`/admin/answers/${report.targetId}`} className="self-start text-sm">
+                  Trace the sources behind this answer
+                </Link>
               )}
               <StatusButton kind="report" id={report.id} closed={report.status === "resolved"} />
             </li>
