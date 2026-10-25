@@ -143,8 +143,13 @@ body {
 @keyframes lawdeck-orbit {
   to { transform: rotate(360deg); }
 }
+@keyframes lawdeck-wave {
+  0%, 100% { transform: scaleY(0.25); }
+  50% { transform: scaleY(1); }
+}
 .heartbeat-track { animation: lawdeck-heartbeat 1.6s linear infinite; }
 .orbit { animation: lawdeck-orbit 0.9s linear infinite; }
+.voice-wave-bar { animation: lawdeck-wave 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .heartbeat-track, .orbit { animation: none; }
+  .heartbeat-track, .orbit, .voice-wave-bar { animation: none; }
 }
