@@ -277,6 +277,7 @@ export async function composeAnswer(input: {
     },
     signal: input.signal,
     model: input.model,
+    long: isScenario(input.question),
   });
   await checking;
   if (!result.ok) return { ok: false, reason: result.reason };

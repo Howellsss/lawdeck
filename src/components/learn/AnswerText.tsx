@@ -1,4 +1,10 @@
 import type { ReactNode } from "react";
+import { Icon } from "@/components/ui/Icon";
+
+// How citation markers show: "labels" as S1, S2 … (briefs, practice, marking), or "links" as a
+// small book icon that opens the passage, for Learn answers, which name every authority in full
+// (founder, 2026-10-25: "instead of S1, S2, the authorities cited in full").
+export type MarkerStyle = "labels" | "links";
 
 // Shows an answer's simple formatting: "## " headings, "- " bullet lines, **bold** and the
 // citation markers [S1], [S2] … (buttons once the answer's sources are known). Text is
@@ -7,11 +13,14 @@ export function AnswerText({
   text,
   onCite,
   citable,
+  markers = "labels",
 }: {
   text: string;
   onCite?: (label: number) => void;
   citable: Set<number>;
+  markers?: MarkerStyle;
 }) {
+  const inline = (line: string) => inlineParts(line, onCite, citable, markers);
   const blocks: ReactNode[] = [];
   let bullets: string[] = [];
   const flushBullets = () => {
@@ -19,7 +28,7 @@ export function AnswerText({
     blocks.push(
       <ul key={`ul-${blocks.length}`} className="list-disc space-y-1 pl-5">
         {bullets.map((line, i) => (
-          <li key={i}>{inline(line, onCite, citable)}</li>
+          <li key={i}>{inline(line)}</li>
         ))}
       </ul>,
     );
@@ -40,12 +49,12 @@ export function AnswerText({
           key={`h-${blocks.length}`}
           className="pt-2 text-[15px] font-semibold"
         >
-          {inline(heading[1], onCite, citable)}
+          {inline(heading[1])}
         </h3>,
       );
     } else {
       blocks.push(
-        <p key={`p-${blocks.length}`}>{inline(line, onCite, citable)}</p>,
+        <p key={`p-${blocks.length}`}>{inline(line)}</p>,
       );
     }
   }
@@ -58,10 +67,11 @@ export function AnswerText({
 }
 
 // **bold** and [S1] markers inside one line.
-function inline(
+function inlineParts(
   text: string,
   onCite: ((label: number) => void) | undefined,
   citable: Set<number>,
+  markers: MarkerStyle,
 ): ReactNode[] {
   const parts: ReactNode[] = [];
   const pattern = /\*\*([^*]+)\*\*|\[S(\d+)\]/g;
@@ -72,8 +82,27 @@ function inline(
       parts.push(<strong key={match.index}>{match[1]}</strong>);
     } else {
       const label = Number(match[2]);
+      const canOpen = onCite && citable.has(label);
+      if (markers === "links") {
+        // While the answer is still being written, nothing shows; afterwards, a small link.
+        if (onCite && canOpen)
+          parts.push(
+            <button
+              key={match.index}
+              type="button"
+              onClick={() => onCite(label)}
+              aria-label="Open the passage this comes from"
+              title="Open the passage this comes from"
+              className="mx-0.5 inline-flex size-5 items-center justify-center rounded-md border border-line align-text-bottom text-muted hover:bg-pill hover:text-ink"
+            >
+              <Icon name="book" size={12} />
+            </button>,
+          );
+        last = match.index + match[0].length;
+        continue;
+      }
       parts.push(
-        onCite && citable.has(label) ? (
+        onCite && canOpen ? (
           <button
             key={match.index}
             type="button"
