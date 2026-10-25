@@ -10,9 +10,11 @@ import { useQuery } from "./useQuery";
 const initialState: AuthFormState = { status: "idle" };
 
 // "Continue with Google" (design board M1). Shown only when Google sign-in is switched on.
-export function GoogleButton() {
+// Where to go afterwards: the page's own choice (the invite page), else ?next= in the address.
+export function GoogleButton({ next: fixedNext }: { next?: string } = {}) {
   const [state, formAction, pending] = useActionState(signInWithGoogle, initialState);
-  const next = safeNextPath(useQuery().get("next"));
+  const query = safeNextPath(useQuery().get("next"));
+  const next = fixedNext ?? query;
 
   return (
     <form action={formAction} className="flex w-full flex-col gap-3">

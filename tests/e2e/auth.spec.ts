@@ -93,6 +93,15 @@ test("the Google button only appears when Google sign-in is switched on", async 
   await expect(google).toHaveCount(process.env.GOOGLE_SIGN_IN_ENABLED === "true" ? 1 : 0);
 });
 
+test("the invite link welcomes testers and offers Google; its next step needs sign-in", async ({ page }) => {
+  await page.goto("/invite");
+  await expect(page.getByRole("heading", { name: "You’re invited" })).toBeVisible();
+  const google = page.getByRole("button", { name: "Continue with Google" });
+  await expect(google).toHaveCount(process.env.GOOGLE_SIGN_IN_ENABLED === "true" ? 1 : 0);
+  await page.goto("/invite/welcome");
+  await expect(page).toHaveURL(/\/invite$/);
+});
+
 test("signed-out visitors see Sign in in the menu", async ({ page }, testInfo) => {
   await page.goto("/");
   if (testInfo.project.name === "phone-360") await page.getByRole("button", { name: /menu/i }).first().click();
@@ -100,7 +109,7 @@ test("signed-out visitors see Sign in in the menu", async ({ page }, testInfo) =
 });
 
 test("sign-in screens fit a 360 px phone without sideways scrolling", async ({ page }) => {
-  for (const path of ["/sign-in", "/sign-up", "/forgot-password"]) {
+  for (const path of ["/sign-in", "/sign-up", "/forgot-password", "/invite"]) {
     await page.goto(path);
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow, path).toBeLessThanOrEqual(0);
