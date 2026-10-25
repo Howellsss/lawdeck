@@ -104,13 +104,25 @@ export async function searchForAnswer(input: {
   };
 }
 
+// The database's word search takes at most 2,000 characters (migrations 7 and 26). A longer
+// question (a problem question) keeps its whole text for the search by meaning and the re-ranker;
+// the word search gets its start (the facts) and its end (the questions asked).
+export const WORD_SEARCH_MAX_CHARS = 2000;
+
+export function wordSearchText(question: string): string {
+  if (question.length <= WORD_SEARCH_MAX_CHARS) return question;
+  const head = question.slice(0, 600);
+  const tail = question.slice(-(WORD_SEARCH_MAX_CHARS - head.length - 1));
+  return `${head} ${tail}`;
+}
+
 async function libraryCandidates(
   supabase: Db,
   input: { question: string; courseId: string | null; includePending: boolean },
   vector: string | null,
 ): Promise<Candidates> {
   const { data, error } = await supabase.rpc("search_library", {
-    query_text: input.question,
+    query_text: wordSearchText(input.question),
     course: input.courseId,
     query_embedding: vector,
     model: vector ? EMBEDDING_MODEL : null,
@@ -154,7 +166,7 @@ async function uploadCandidates(
   vector: string | null,
 ): Promise<SearchHit[]> {
   const { data, error } = await supabase.rpc("search_uploads", {
-    query_text: question,
+    query_text: wordSearchText(question),
     query_embedding: vector,
     model: vector ? EMBEDDING_MODEL : null,
     match_count: UPLOAD_CANDIDATES,
