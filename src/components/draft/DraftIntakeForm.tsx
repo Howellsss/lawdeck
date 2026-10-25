@@ -57,12 +57,9 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
             </label>
           ))}
         </fieldset>
-      ) : intake.forums[0] ? (
-        <p className="text-sm text-muted">Court or registry: {intake.forums[0].name}</p>
       ) : (
-        <p role="status" className="text-sm text-warning">
-          No court or registry is approved for this document yet, so it can’t be drafted. An admin approves one on Admin → Templates.
-        </p>
+        // Some documents (a tenancy agreement) belong to no court or registry, so nothing shows.
+        intake.forums[0] && <p className="text-sm text-muted">Court or registry: {intake.forums[0].name}</p>
       )}
 
       {intake.fields.map((field) => (
