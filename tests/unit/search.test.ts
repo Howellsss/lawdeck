@@ -10,7 +10,7 @@ vi.mock("@/server/retrieval/voyage", () => ({
 }));
 vi.mock("@/server/retrieval/rerank", () => ({ rerankTexts }));
 
-const { searchLibrary } = await import("@/server/retrieval/search");
+const { searchLibrary, wordSearchText, WORD_SEARCH_MAX_CHARS } = await import("@/server/retrieval/search");
 
 const row = (n: number) => ({
   passage_id: `p${n}`,
@@ -55,5 +55,30 @@ describe("library search with the re-ranker", () => {
     const result = await searchLibrary(input);
     expect(result).toEqual({ ok: false, message: "You have reached the search limit for now. Please try again in an hour." });
     expect(rerankTexts).not.toHaveBeenCalled();
+  });
+});
+
+describe("long problem questions", () => {
+  beforeEach(() => {
+    rpc.mockReset();
+    rerankTexts.mockReset();
+  });
+
+  it("send the database's word search at most 2,000 characters: the facts at the start and the questions at the end", () => {
+    const question = `FACTS ${"x".repeat(5000)} (a) What step will you take?`;
+    const text = wordSearchText(question);
+    expect(text.length).toBeLessThanOrEqual(WORD_SEARCH_MAX_CHARS);
+    expect(text.startsWith("FACTS")).toBe(true);
+    expect(text.endsWith("(a) What step will you take?")).toBe(true);
+    expect(wordSearchText("Short question")).toBe("Short question");
+  });
+
+  it("keep the whole question for the re-ranker", async () => {
+    rpc.mockResolvedValue({ data: rows, error: null });
+    rerankTexts.mockResolvedValue({ ok: true, order: [0, 1] });
+    const question = `Facts ${"y".repeat(9000)} Advise Chief Emeka.`;
+    await searchLibrary({ ...input, question });
+    expect(rpc.mock.calls[0][1].query_text.length).toBeLessThanOrEqual(WORD_SEARCH_MAX_CHARS);
+    expect(rerankTexts.mock.calls[0][0]).toBe(question);
   });
 });
