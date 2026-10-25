@@ -31,6 +31,7 @@ export function AnswerCard({
       <AnswerText
         text={message.text}
         citable={new Set(byLabel.keys())}
+        markers="links"
         onCite={(label) => {
           const source = byLabel.get(label);
           if (source) onOpen(source);

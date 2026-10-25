@@ -2,6 +2,7 @@ import { afterEach, describe, expect, it, vi } from "vitest";
 import { EXPLAIN_SYSTEM, isScenario, LEVEL_INSTRUCTIONS, questionMessage } from "@/prompts/explain";
 import { isTopicOnly, parseRoute } from "@/prompts/route";
 import { startChatSchema, topicNameSchema, topicSlug } from "@/schemas/learn";
+import { EXPLAIN_LONG_MAX_TOKENS, EXPLAIN_MAX_TOKENS } from "@/server/ai/explain";
 import { routeRequest } from "@/server/ai/route";
 
 describe("answer levels", () => {
@@ -23,6 +24,30 @@ describe("problem questions", () => {
     for (const heading of ["## The facts in brief", "## Issues", "## Issue 1:", "## Advice"]) expect(EXPLAIN_SYSTEM).toContain(heading);
     expect(EXPLAIN_SYSTEM).toContain("does not cover it yet");
     expect(EXPLAIN_SYSTEM).toContain("Never fill a gap with outside knowledge");
+  });
+
+  it("go into every issue in depth, at Law School exam standard", () => {
+    expect(EXPLAIN_SYSTEM).toContain("at the standard of a Nigerian Law School exam answer");
+    expect(EXPLAIN_SYSTEM).toContain("apply it to the specific facts");
+  });
+});
+
+describe("citations (founder, 2026-10-25)", () => {
+  it("name authorities in full, as in an exam script, and list them last", () => {
+    expect(EXPLAIN_SYSTEM).toContain("name every authority in full, never by its id alone");
+    expect(EXPLAIN_SYSTEM).toContain("(as amended)");
+    expect(EXPLAIN_SYSTEM).toContain("NWLR");
+    expect(EXPLAIN_SYSTEM.trimEnd().indexOf("## Authorities")).toBeGreaterThan(EXPLAIN_SYSTEM.indexOf("## Exam tip"));
+  });
+
+  it("never complete a citation from memory, and keep the passage ids for the citation check", () => {
+    expect(EXPLAIN_SYSTEM).toContain("Never complete or correct a citation from memory");
+    expect(EXPLAIN_SYSTEM).toContain("write the case name only");
+    expect(EXPLAIN_SYSTEM).toContain("put its id in square brackets");
+  });
+
+  it("give problem questions more room than ordinary answers", () => {
+    expect(EXPLAIN_LONG_MAX_TOKENS).toBeGreaterThan(EXPLAIN_MAX_TOKENS);
   });
 });
 

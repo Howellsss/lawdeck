@@ -22,7 +22,7 @@ export function SharedChatView({ messages }: { messages: SharedMessage[] }) {
           <li key={index} className="flex flex-col gap-3 rounded-2xl border border-line px-4 py-3">
             <span className="sr-only">Lawdeck: </span>
             {message.level && <span className="text-xs font-medium uppercase tracking-wide text-muted">{LEVEL_LABELS[message.level]}</span>}
-            <AnswerText text={message.text} citable={new Set()} />
+            <AnswerText text={message.text} citable={new Set()} markers="links" />
             <Sources sources={message.sources} />
             <span className="text-xs text-muted">{formatWat(message.createdAt)}</span>
           </li>
@@ -36,11 +36,11 @@ function Sources({ sources }: { sources: SharedSource[] }) {
   if (sources.length === 0) return null;
   return (
     <div className="flex flex-col gap-1 border-t border-line pt-3">
-      <p className="text-xs font-medium uppercase tracking-wide text-muted">Sources</p>
+      <p className="text-xs font-medium uppercase tracking-wide text-muted">Library passages used</p>
       <ul className="flex flex-col gap-1 text-sm">
         {sources.map((source) => (
           <li key={source.label} className="break-words">
-            S{source.label} · {source.title} <span className="text-muted">({ORIGIN[source.origin]})</span>
+            {source.title} <span className="text-muted">({ORIGIN[source.origin]})</span>
           </li>
         ))}
       </ul>

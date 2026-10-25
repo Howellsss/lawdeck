@@ -18,7 +18,7 @@ export function SourceList({
   return (
     <div className="flex flex-col gap-2 border-t border-line pt-3">
       <p className="text-xs font-medium uppercase tracking-wide text-muted">
-        Sources
+        Library passages used
       </p>
       {GROUPS.map((group) => {
         const list = sources.filter(
@@ -36,7 +36,6 @@ export function SourceList({
                     onClick={() => onOpen(source)}
                     className="text-left text-sm underline underline-offset-2 hover:text-ink"
                   >
-                    S{source.label} ·{" "}
                     {[source.itemTitle, source.heading, source.pages]
                       .filter(Boolean)
                       .join(" · ")}

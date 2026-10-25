@@ -47,7 +47,7 @@ export function ChatThread({
         ? "From your uploads"
         : "From the Lawdeck library";
     panel.open({
-      title: `Source S${source.label} · ${from}`,
+      title: `Passage · ${from}`,
       body: (
         <SourcePassage key={source.id} id={source.id} origin={source.origin} />
       ),
@@ -160,7 +160,7 @@ export function ChatThread({
             >
               <span className="sr-only">Lawdeck: </span>
               {!live.error && !live.stopped && <SearchStatus found={live.found} writing={Boolean(live.text)} />}
-              {live.text && <AnswerText text={live.text} citable={new Set()} />}
+              {live.text && <AnswerText text={live.text} citable={new Set()} markers="links" />}
               {live.stopped && (
                 <div role="status" className="flex flex-col items-start gap-2 text-sm text-muted">
                   <p>Stopped. {live.text ? "This part answer is not saved." : "Nothing was written."}</p>
