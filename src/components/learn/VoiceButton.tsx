@@ -45,11 +45,14 @@ export function VoiceButton({
   onText,
   onError,
   disabled,
+  compact = false,
 }: {
   // Called with the words heard so far (the whole sentence, replacing earlier partial words).
   onText: (words: string) => void;
   onError: (message: string) => void;
   disabled?: boolean;
+  // Smaller on phones, to match the composer's other buttons.
+  compact?: boolean;
 }) {
   // Whether the browser can do this, read only in the browser (the server renders no button).
   const supported = useSyncExternalStore(noSubscription, () => recognitionConstructor() !== null, () => false);
@@ -95,11 +98,11 @@ export function VoiceButton({
         aria-label={listening ? "Stop dictation" : "Speak your question"}
         title={listening ? "Stop dictation" : "Speak your question"}
         aria-pressed={listening}
-        className={`flex size-11 shrink-0 items-center justify-center rounded-full disabled:opacity-40 ${
+        className={`flex ${compact ? "size-9 sm:size-10" : "size-11"} shrink-0 items-center justify-center rounded-full disabled:opacity-40 ${
           listening ? "bg-ink text-on-ink" : "bg-pill text-ink"
         }`}
       >
-        <Icon name={listening ? "stop" : "mic"} size={18} />
+        <Icon name={listening ? "stop" : "mic"} size={compact ? 17 : 18} />
         <span className="sr-only" aria-live="polite">
           {listening ? "Listening" : ""}
         </span>

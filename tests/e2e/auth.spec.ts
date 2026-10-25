@@ -108,6 +108,15 @@ test("signed-out visitors see Sign in in the menu", async ({ page }, testInfo) =
   await expect(page.getByRole("link", { name: "Sign in" }).first()).toBeVisible();
 });
 
+test("the main pages fit a phone without sideways scrolling (founder, 2026-10-25)", async ({ page }) => {
+  await page.setViewportSize({ width: 360, height: 780 });
+  for (const path of ["/", "/courses", "/drafting", "/invite"]) {
+    await page.goto(path);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow, path).toBeLessThanOrEqual(0);
+  }
+});
+
 test("sign-in screens fit a 360 px phone without sideways scrolling", async ({ page }) => {
   for (const path of ["/sign-in", "/sign-up", "/forgot-password", "/invite"]) {
     await page.goto(path);

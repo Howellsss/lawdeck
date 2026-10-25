@@ -8,7 +8,7 @@ import { RightPanelContext, type PanelContent } from "./panelContext";
 import { Sidebar } from "./Sidebar";
 
 const roundButton =
-  "flex size-12 items-center justify-center rounded-full border border-line bg-paper text-ink hover:bg-pill";
+  "flex size-10 items-center justify-center rounded-full border border-line bg-paper text-ink hover:bg-pill";
 
 // The three-pane workspace: left menu, middle work area, right panel (closed until needed).
 // Below 1024 px the left menu becomes a drawer opened from the top bar (PRD 4.1).
@@ -42,7 +42,7 @@ export function AppShell({
 
   return (
     <RightPanelContext.Provider value={panelControls}>
-      <div className="flex min-h-dvh flex-1 bg-paper text-ink">
+      <div className="flex min-h-dvh flex-1 overflow-x-clip bg-paper text-ink">
         <div className={`hidden shrink-0 border-r border-line lg:block ${collapsed ? "w-[76px]" : "w-[280px]"}`}>
           <div className="sticky top-0 h-dvh">
             <Sidebar
@@ -87,7 +87,7 @@ export function AppShell({
         )}
 
         <div className="flex min-w-0 flex-1 flex-col">
-          <header className="flex items-center justify-between px-4 pt-4 lg:hidden">
+          <header className="flex items-center justify-between px-4 pt-3 lg:hidden">
             <button ref={menuButtonRef} type="button" aria-label="Open menu" onClick={() => setDrawerOpen(true)} className={roundButton}>
               <Icon name="menu" />
             </button>
@@ -95,7 +95,7 @@ export function AppShell({
               <Icon name="newTask" />
             </Link>
           </header>
-          <main className="flex min-w-0 flex-1 flex-col">{children}</main>
+          <main className="flex min-w-0 flex-1 flex-col overflow-x-clip">{children}</main>
         </div>
 
         <RightPanel content={panel} onClose={panelControls.close} />

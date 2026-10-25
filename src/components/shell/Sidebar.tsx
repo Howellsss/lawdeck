@@ -32,7 +32,7 @@ type SidebarProps = {
 
 export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav }: SidebarProps) {
   const itemClass = (active: boolean) =>
-    `flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
+    `flex h-10 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
       active ? "bg-pill font-medium" : ""
     } ${collapsed ? "justify-center" : ""}`;
   const label = (text: string) => <span className={collapsed ? "sr-only" : ""}>{text}</span>;

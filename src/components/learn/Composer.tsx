@@ -30,7 +30,7 @@ const SHORTCUTS: {
 ];
 
 const selectClass =
-  "h-11 appearance-none rounded-full border-0 bg-pill pl-4 pr-9 text-[15px] text-ink outline-offset-2 cursor-pointer";
+  "h-9 w-full min-w-0 truncate appearance-none rounded-full border-0 bg-pill pl-3 pr-7 text-[14px] text-ink outline-offset-2 cursor-pointer sm:h-10 sm:text-[15px]";
 
 // The input-first composer (PRD 4.3). A Learn question starts a chat and opens it; the chat
 // page asks the question and streams the answer. A drafting request (Draft mode, or Auto mode
@@ -102,7 +102,7 @@ export function Composer() {
       <form
         onSubmit={(event) => void submit(event)}
         // The box outlines itself while the student types (visible keyboard focus, WCAG 2.4.7).
-        className="flex flex-col gap-3 rounded-3xl border border-line bg-surface px-3 pb-3 pt-4 shadow-[0_8px_28px_rgba(0,0,0,0.12)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
+        className="flex flex-col gap-2 rounded-3xl border border-line bg-surface px-2.5 pb-2.5 pt-3 shadow-[0_8px_28px_rgba(0,0,0,0.12)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
       >
         <label htmlFor="composer" className="sr-only">
           What are we working on?
@@ -117,9 +117,9 @@ export function Composer() {
             if (event.key === "Enter" && !event.shiftKey) void submit(event);
           }}
           placeholder="What are we working on?"
-          className="resize-none bg-transparent px-2 text-[17px] leading-relaxed text-ink outline-none placeholder:text-muted"
+          className="resize-none bg-transparent px-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted sm:text-[17px]"
         />
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
           <button
             type="button"
             aria-label="Attach a file"
@@ -128,9 +128,9 @@ export function Composer() {
                 "Uploading your own files arrives in a later build (Phase 6).",
               )
             }
-            className="flex size-11 items-center justify-center rounded-full bg-pill text-ink"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-pill text-ink sm:size-10"
           >
-            <Icon name="plus" size={18} />
+            <Icon name="plus" size={17} />
           </button>
           <Picker
             label="Mode"
@@ -140,6 +140,7 @@ export function Composer() {
           />
           <Picker
             label="Course"
+            grow
             value={course}
             onChange={setCourse}
             options={[
@@ -148,14 +149,14 @@ export function Composer() {
             ]}
           />
           <span className="ml-auto" />
-          <VoiceButton disabled={busy} onText={setText} onError={setNotice} />
+          <VoiceButton compact disabled={busy} onText={setText} onError={setNotice} />
           <button
             type="submit"
             aria-label="Send"
             disabled={!text.trim() || busy}
-            className="flex size-11 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted sm:size-10"
           >
-            <Icon name="arrowUp" size={18} />
+            <Icon name="arrowUp" size={17} />
           </button>
         </div>
       </form>
@@ -213,13 +214,15 @@ export function Composer() {
 
 function Picker(props: {
   label: string;
+  // Takes the spare width and shortens its text on small screens (the course list).
+  grow?: boolean;
   value: string;
   onChange: (value: string) => void;
   options: [string, string][];
 }) {
   const id = `picker-${props.label.toLowerCase()}`;
   return (
-    <div className="relative">
+    <div className={`relative min-w-0 ${props.grow ? "max-w-[12rem] flex-1" : "shrink-0"}`}>
       <label htmlFor={id} className="sr-only">
         {props.label}
       </label>
@@ -238,7 +241,7 @@ function Picker(props: {
       <Icon
         name="chevronDown"
         size={14}
-        className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted"
+        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted"
       />
     </div>
   );
