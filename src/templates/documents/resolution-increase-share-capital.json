@@ -1,0 +1,134 @@
+{
+  "slug": "resolution-increase-share-capital",
+  "title": "Ordinary resolution to increase share capital",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "companyHeading",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{companyName}}\n{{companyAddress}}\nRC No: {{rcNumber}}\n\nTHE FEDERAL REPUBLIC OF NIGERIA\nTHE COMPANIES AND ALLIED MATTERS ACT 2020",
+        "required": true,
+        "why": "Company documents carry the company's name, registered address and registration (RC) number, and for resolutions and notices the statutory heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "ORDINARY RESOLUTION TO INCREASE THE SHARE CAPITAL OF THE COMPANY PURSUANT TO SECTION 127 OF THE COMPANIES AND ALLIED MATTERS ACT 2020",
+        "required": true,
+        "why": "The title and the law relied on. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "At the general meeting of the company held on {{meetingDate}} at {{meetingPlace}}, the following resolution was proposed and duly passed:\n\n\"That the share capital of the company be increased from {{currentCapital}} to {{newCapital}} by the creation of {{newShares}} additional ordinary shares of {{shareValue}} each, such new shares ranking pari passu in all respects with the existing shares of the company.\"",
+        "required": true,
+        "why": "The resolution: the present and new capital, the shares created and their value, and that they rank pari passu with existing shares. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....\n\n........................................          ........................................\nDirector                                        Director",
+        "required": true,
+        "why": "Resolutions are dated and signed, usually by two directors or a director and the secretary. Always sign and date in the exam, on or before the exam date. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "companyName",
+        "label": "Company name",
+        "type": "party",
+        "required": true,
+        "question": "What is the company's registered name? For example: Gaskiya Nigeria Limited.",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "companyAddress",
+        "label": "Registered address",
+        "type": "address",
+        "required": true,
+        "question": "The company's registered office address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "rcNumber",
+        "label": "RC number",
+        "type": "text",
+        "required": true,
+        "question": "The company's registration (RC) number.",
+        "placeholder": "RC NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "meetingDate",
+        "label": "Date of the meeting",
+        "type": "date",
+        "required": true,
+        "question": "When is or was the meeting held?",
+        "placeholder": "DATE OF MEETING",
+        "repeatable": false
+      },
+      {
+        "id": "meetingPlace",
+        "label": "Venue",
+        "type": "text",
+        "required": true,
+        "question": "Where is or was the meeting held? For example: the registered office.",
+        "placeholder": "VENUE",
+        "repeatable": false
+      },
+      {
+        "id": "currentCapital",
+        "label": "Present share capital",
+        "type": "money",
+        "required": true,
+        "question": "What is the present share capital?",
+        "placeholder": "PRESENT SHARE CAPITAL",
+        "repeatable": false
+      },
+      {
+        "id": "newCapital",
+        "label": "New share capital",
+        "type": "money",
+        "required": true,
+        "question": "What will the share capital be?",
+        "placeholder": "NEW SHARE CAPITAL",
+        "repeatable": false
+      },
+      {
+        "id": "newShares",
+        "label": "Number of new shares",
+        "type": "number",
+        "required": true,
+        "question": "How many new shares are created?",
+        "placeholder": "NUMBER OF NEW SHARES",
+        "repeatable": false
+      },
+      {
+        "id": "shareValue",
+        "label": "Value of each share",
+        "type": "money",
+        "required": true,
+        "question": "What is each share worth?",
+        "placeholder": "VALUE OF EACH SHARE",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

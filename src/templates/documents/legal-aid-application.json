@@ -1,0 +1,134 @@
+{
+  "slug": "legal-aid-application",
+  "title": "Application for legal aid",
+  "course": "criminal-litigation",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "sender",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{applicant}}\n{{applicantAddress}}\n\n{{letterDate}}",
+        "required": true,
+        "why": "A personal letter from the suspect: name and address, then the date. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "The Director-General,\nLegal Aid Council,\n{{councilAddress}}",
+        "required": true,
+        "why": "Addressed to the Director-General of the Legal Aid Council. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir,",
+        "required": true,
+        "why": "The salutation. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "APPLICATION FOR LEGAL AID",
+        "required": true,
+        "why": "The subject heading. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I, {{applicant}}, humbly apply for legal representation by the Legal Aid Council to assist me in conducting my defence.\n\nI was arrested for the offence of {{offence}} on {{arrestDate}}, and I have been informed that I will be charged to court.\n\nMy annual income is {{annualIncome}}, as shown in the evidence of income attached to this letter.\n\nYour assistance will go a long way in helping my defence. Thank you.",
+        "required": true,
+        "why": "States the request, the offence and arrest, and the applicant's means (with proof of income attached), which decide eligibility for legal aid. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{applicant}}",
+        "required": true,
+        "why": "The applicant signs. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "applicant",
+        "label": "Applicant",
+        "type": "party",
+        "required": true,
+        "question": "Who is applying for legal aid? Give the full name.",
+        "placeholder": "APPLICANT",
+        "repeatable": false
+      },
+      {
+        "id": "applicantAddress",
+        "label": "Applicant's address",
+        "type": "address",
+        "required": true,
+        "question": "The applicant's address.",
+        "placeholder": "APPLICANT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear?",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "councilAddress",
+        "label": "Legal Aid Council address",
+        "type": "address",
+        "required": true,
+        "question": "The address of the Legal Aid Council office.",
+        "placeholder": "COUNCIL’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "offence",
+        "label": "Offence",
+        "type": "text",
+        "required": true,
+        "question": "What offence was the applicant arrested for?",
+        "placeholder": "OFFENCE",
+        "repeatable": false
+      },
+      {
+        "id": "arrestDate",
+        "label": "Date of arrest",
+        "type": "date",
+        "required": true,
+        "question": "When was the applicant arrested?",
+        "placeholder": "DATE OF ARREST",
+        "repeatable": false
+      },
+      {
+        "id": "annualIncome",
+        "label": "Annual income",
+        "type": "money",
+        "required": true,
+        "question": "What is the applicant's annual income?",
+        "placeholder": "ANNUAL INCOME",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "police-bail-application"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

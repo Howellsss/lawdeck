@@ -1,0 +1,159 @@
+{
+  "slug": "internal-memorandum",
+  "title": "Memorandum (internal memo)",
+  "course": "law-in-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Professional Ethics and Skills drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{organisation}}\n{{organisationAddress}}",
+        "required": true,
+        "why": "The organisation's name and address. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "MEMORANDUM",
+        "required": true,
+        "why": "The title. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "details",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Date: {{memoDate}}\n{{firstLine}}\n{{secondLine}}\nSubject: {{subject}}",
+        "required": true,
+        "why": "The date, sender, recipient and subject. When a memo goes from a higher authority to a lower one, 'From' comes first; from a lower to a higher authority, 'To' comes first. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "{{message}}",
+        "required": true,
+        "why": "The message, short and direct. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Signed:\n{{senderName}}\n{{senderTitle}}",
+        "required": true,
+        "why": "The sender's name and title. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "copies",
+        "kind": "fixed",
+        "align": "left",
+        "text": "CC:\n#. {{copies}}",
+        "required": false,
+        "why": "Who receives copies. Source: Professional Ethics drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "organisation",
+        "label": "Organisation",
+        "type": "party",
+        "required": true,
+        "question": "Which organisation is the memo from?",
+        "placeholder": "ORGANISATION",
+        "repeatable": false
+      },
+      {
+        "id": "organisationAddress",
+        "label": "Address",
+        "type": "address",
+        "required": true,
+        "question": "Its address and contacts.",
+        "placeholder": "ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "memoDate",
+        "label": "Date",
+        "type": "date",
+        "required": true,
+        "question": "What date?",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "firstLine",
+        "label": "First line (From or To)",
+        "type": "text",
+        "required": true,
+        "question": "From a higher to a lower authority write 'From: General Manager'; from a lower to a higher authority write 'To: Managing Director'.",
+        "placeholder": "FROM OR TO",
+        "repeatable": false
+      },
+      {
+        "id": "secondLine",
+        "label": "Second line (To or From)",
+        "type": "text",
+        "required": true,
+        "question": "The other line, for example 'To: All Drivers'.",
+        "placeholder": "TO OR FROM",
+        "repeatable": false
+      },
+      {
+        "id": "subject",
+        "label": "Subject",
+        "type": "text",
+        "required": true,
+        "question": "What is the memo about?",
+        "placeholder": "SUBJECT",
+        "repeatable": false
+      },
+      {
+        "id": "message",
+        "label": "Message",
+        "type": "longText",
+        "required": true,
+        "question": "The message.",
+        "placeholder": "MESSAGE",
+        "repeatable": false
+      },
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who signs it?",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderTitle",
+        "label": "Sender's title",
+        "type": "text",
+        "required": true,
+        "question": "Their title, for example General Manager.",
+        "placeholder": "TITLE",
+        "repeatable": false
+      },
+      {
+        "id": "copies",
+        "label": "Copies to",
+        "type": "text",
+        "required": false,
+        "question": "Who gets copies? One per box.",
+        "placeholder": "COPY TO",
+        "repeatable": true
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

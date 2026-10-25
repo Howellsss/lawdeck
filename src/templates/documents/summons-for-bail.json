@@ -1,0 +1,202 @@
+{
+  "slug": "summons-for-bail",
+  "title": "Summons for bail (High Court)",
+  "course": "criminal-litigation",
+  "forums": [
+    "lagos-high-court",
+    "fct-high-court"
+  ],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "courtLagos",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF LAGOS STATE\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits. Source: Criminal Litigation drafting materials (Lawdeck knowledge base).",
+        "forums": [
+          "lagos-high-court"
+        ]
+      },
+      {
+        "id": "courtFct",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE HIGH COURT OF THE FEDERAL CAPITAL TERRITORY\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Names the court, the judicial division and where it sits. Source: Criminal Litigation drafting materials (Lawdeck knowledge base).",
+        "forums": [
+          "fct-high-court"
+        ]
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "CHARGE NO: {{chargeNumber}}\nBETWEEN:\n{{complainant}} .................... COMPLAINANT/RESPONDENT\nAND\n{{defendant}} .................... DEFENDANT/APPLICANT",
+        "required": true,
+        "why": "The charge number and the parties exactly as on the charge. Use 'Defendant', not 'Accused', and the defendant's full name (with any alias given). In Lagos the State is 'The State of Lagos'; in the FCT the Commissioner of Police or the Federal Republic of Nigeria, as on the charge. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "SUMMONS FOR BAIL BROUGHT PURSUANT TO SECTION 35 OF THE CONSTITUTION OF THE FEDERAL REPUBLIC OF NIGERIA 1999 (AS AMENDED), {{bailProvision}} AND UNDER THE INHERENT JURISDICTION OF THIS HONOURABLE COURT",
+        "required": true,
+        "why": "The title of the application and the law it is brought under: section 35 of the Constitution (the right to personal liberty), the bail provision of the ACJL or ACJA, and the court's inherent jurisdiction. An application for bail at the High Court after a magistrate refused bail is made the same way. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "LET ALL PARTIES CONCERNED attend the High Court of {{courtState}} holden at {{sittingPlace}} on the ............ day of ............ 20..... at the hour of 9 o'clock in the forenoon or so soon thereafter as counsel to the Defendant/Applicant may be heard, on the hearing of an application for:\n#. AN ORDER of this Honourable Court admitting the Defendant/Applicant to bail pending trial.\n#. AND FOR SUCH FURTHER ORDER OR ORDERS as this Honourable Court may deem fit to make in the circumstances.",
+        "required": true,
+        "why": "The summons calls the parties to court and states the reliefs: the order for bail and the omnibus relief. The hearing date is left for the Registry. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "dated",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "Left for the date of filing. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signature",
+        "kind": "signature",
+        "required": true,
+        "why": "Counsel signs the process; the space is left for the signature."
+      },
+      {
+        "id": "counsel",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{counselName}}\n{{counselFirm}}\n{{counselAddress}}\nCounsel to the Defendant/Applicant",
+        "required": true,
+        "why": "Counsel's name, chambers, address for service, email and phone number. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "service",
+        "kind": "fixed",
+        "align": "left",
+        "text": "FOR SERVICE ON:\nThe Complainant/Respondent,\n{{prosecutorOffice}}",
+        "required": true,
+        "why": "Names who is to be served: the prosecuting authority, for example the Attorney-General of Lagos State, Ministry of Justice. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which judicial division is the charge in? For example: Ikeja.",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where the division sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does that division sit?",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "chargeNumber",
+        "label": "Charge number",
+        "type": "text",
+        "required": false,
+        "question": "The charge number, if known. Leave it empty to show a blank for it.",
+        "placeholder": "CHARGE NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "complainant",
+        "label": "Complainant",
+        "type": "party",
+        "required": true,
+        "question": "Who is the complainant on the charge? For example: The State of Lagos.",
+        "placeholder": "COMPLAINANT",
+        "repeatable": false
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "The defendant's full name, as on the charge.",
+        "placeholder": "DEFENDANT",
+        "repeatable": false
+      },
+      {
+        "id": "bailProvision",
+        "label": "Statutory provision for bail",
+        "type": "text",
+        "required": true,
+        "question": "Which provision of the Administration of Criminal Justice Law or Act do you bring the application under? Check it in the library.",
+        "placeholder": "PROVISION OF THE ACJL OR ACJA",
+        "repeatable": false
+      },
+      {
+        "id": "prosecutorOffice",
+        "label": "Prosecuting authority and address",
+        "type": "address",
+        "required": true,
+        "question": "Who prosecutes, and where are they served? For example: Attorney-General of Lagos State, Ministry of Justice, Alausa, Ikeja.",
+        "placeholder": "PROSECUTING AUTHORITY AND ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "courtState",
+        "label": "State or territory of the court",
+        "type": "text",
+        "required": true,
+        "question": "Which High Court? For example: Lagos State, or the Federal Capital Territory.",
+        "placeholder": "STATE OR TERRITORY",
+        "repeatable": false
+      },
+      {
+        "id": "counselName",
+        "label": "Counsel's name",
+        "type": "party",
+        "required": true,
+        "question": "Who is the legal practitioner signing this process?",
+        "placeholder": "COUNSEL’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "counselFirm",
+        "label": "Counsel's chambers",
+        "type": "party",
+        "required": false,
+        "question": "Which law firm or chambers is counsel in?",
+        "placeholder": "CHAMBERS",
+        "repeatable": false
+      },
+      {
+        "id": "counselAddress",
+        "label": "Counsel's address for service and contacts",
+        "type": "address",
+        "required": true,
+        "question": "Counsel's address for service, email and phone number.",
+        "placeholder": "COUNSEL’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "affidavit-in-support-of-bail",
+      "motion-on-notice-for-bail"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

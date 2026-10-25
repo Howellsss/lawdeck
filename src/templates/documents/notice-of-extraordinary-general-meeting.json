@@ -1,0 +1,145 @@
+{
+  "slug": "notice-of-extraordinary-general-meeting",
+  "title": "Notice of extraordinary general meeting",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "companyHeading",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{companyName}}\n{{companyAddress}}\nRC No: {{rcNumber}}",
+        "required": true,
+        "why": "Company documents carry the company's name, registered address and registration (RC) number, and for resolutions and notices the statutory heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "NOTICE OF EXTRAORDINARY GENERAL MEETING",
+        "required": true,
+        "why": "The title. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "NOTICE IS HEREBY GIVEN that an Extraordinary General Meeting of the above-named company will be held at {{meetingPlace}} on {{meetingDate}} at {{meetingTime}} for the purpose of considering and, if thought fit, passing the following resolution(s) as {{resolutionKind}} resolution(s):\n#. {{resolutions}}",
+        "required": true,
+        "why": "The venue, date, time, and the resolutions to be considered with their kind (ordinary or special). For re-registration as a public company, the special resolution is 'That, subject to the approval of the Corporate Affairs Commission, the company be re-registered as a public company'. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "proxy",
+        "kind": "fixed",
+        "align": "left",
+        "text": "NOTE: A member entitled to attend and vote at the meeting is entitled to appoint a proxy to attend and vote instead of him. A proxy need not be a member of the company.",
+        "required": true,
+        "why": "The proxy note is compulsory in a notice of a general meeting. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....\n\nBy Order of the Board of Directors\n\n........................................\n{{secretaryName}}\nCompany Secretary",
+        "required": true,
+        "why": "Notices are given by order of the board and signed by the company secretary. Our Ref/Your Ref belong in letters only, not notices or resolutions. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "companyName",
+        "label": "Company name",
+        "type": "party",
+        "required": true,
+        "question": "What is the company's registered name? For example: Gaskiya Nigeria Limited.",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "companyAddress",
+        "label": "Registered address",
+        "type": "address",
+        "required": true,
+        "question": "The company's registered office address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "rcNumber",
+        "label": "RC number",
+        "type": "text",
+        "required": true,
+        "question": "The company's registration (RC) number.",
+        "placeholder": "RC NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "secretaryName",
+        "label": "Company secretary",
+        "type": "party",
+        "required": true,
+        "question": "Who is the company secretary?",
+        "placeholder": "COMPANY SECRETARY",
+        "repeatable": false
+      },
+      {
+        "id": "meetingDate",
+        "label": "Date of the meeting",
+        "type": "date",
+        "required": true,
+        "question": "When is or was the meeting held?",
+        "placeholder": "DATE OF MEETING",
+        "repeatable": false
+      },
+      {
+        "id": "meetingPlace",
+        "label": "Venue",
+        "type": "text",
+        "required": true,
+        "question": "Where is or was the meeting held? For example: the registered office.",
+        "placeholder": "VENUE",
+        "repeatable": false
+      },
+      {
+        "id": "meetingTime",
+        "label": "Time",
+        "type": "text",
+        "required": true,
+        "question": "At what time?",
+        "placeholder": "TIME",
+        "repeatable": false
+      },
+      {
+        "id": "resolutionKind",
+        "label": "Kind of resolution",
+        "type": "text",
+        "required": true,
+        "question": "Ordinary or special?",
+        "placeholder": "ORDINARY OR SPECIAL",
+        "repeatable": false
+      },
+      {
+        "id": "resolutions",
+        "label": "Resolutions",
+        "type": "longText",
+        "required": true,
+        "question": "Each resolution to be proposed, one per box.",
+        "placeholder": "RESOLUTION",
+        "repeatable": true
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "special-resolution-re-registration-public",
+      "notice-of-annual-general-meeting"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

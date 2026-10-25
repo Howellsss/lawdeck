@@ -1,0 +1,141 @@
+{
+  "slug": "consent-to-file-information",
+  "title": "Application for consent to file an information",
+  "course": "criminal-litigation",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Criminal Litigation drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every statutory provision cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "sender",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{applicantName}}\n{{applicantOffice}}\n{{applicantAddress}}\n\n{{letterDate}}",
+        "required": true,
+        "why": "The prosecuting officer's name, office and address, then the date. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "The Honourable Chief Judge of {{state}},\n{{judiciaryAddress}}",
+        "required": true,
+        "why": "Addressed to the Chief Judge, whose consent (leave) is needed to file the information. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "My Lord,",
+        "required": true,
+        "why": "The salutation for a judicial officer. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "APPLICATION FOR CONSENT TO FILE AN INFORMATION",
+        "required": true,
+        "why": "The subject heading. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I am the {{applicantOffice}} and I hereby apply for consent to file an information on a charge of {{offence}} against {{defendant}}.\n\nInvestigation into the case has been concluded and all the witnesses the prosecution intends to call in proof of its case are available. Attached to this application are:\n#. a copy of the proposed information;\n#. the unedited statement of the alleged offender;\n#. the proof of evidence; and\n#. the list of exhibits to be relied upon.\n\nThis application is made on behalf of the Attorney-General of {{state}}. No previous application for consent has been made in respect of this information.",
+        "required": true,
+        "why": "States the charge and the defendant, that investigation is complete and witnesses available, lists the documents attached (proposed information, statement, proof of evidence, exhibits), and confirms no earlier application was made. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{applicantName}}\n{{applicantOffice}}",
+        "required": true,
+        "why": "Signed by the prosecuting officer. Source: Criminal Litigation drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "applicantName",
+        "label": "Prosecuting officer",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the application? For example the Director of Public Prosecutions.",
+        "placeholder": "NAME OF PROSECUTING OFFICER",
+        "repeatable": false
+      },
+      {
+        "id": "applicantOffice",
+        "label": "Office",
+        "type": "text",
+        "required": true,
+        "question": "Their office, for example: Director of Public Prosecutions, Ministry of Justice, Lagos State.",
+        "placeholder": "OFFICE",
+        "repeatable": false
+      },
+      {
+        "id": "applicantAddress",
+        "label": "Address",
+        "type": "address",
+        "required": true,
+        "question": "The office address.",
+        "placeholder": "ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date",
+        "type": "date",
+        "required": true,
+        "question": "What date should the application bear?",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "state",
+        "label": "State",
+        "type": "text",
+        "required": true,
+        "question": "Which State? For example: Lagos State.",
+        "placeholder": "STATE",
+        "repeatable": false
+      },
+      {
+        "id": "judiciaryAddress",
+        "label": "Address of the judiciary",
+        "type": "address",
+        "required": true,
+        "question": "The address of the State judiciary.",
+        "placeholder": "ADDRESS OF THE JUDICIARY",
+        "repeatable": false
+      },
+      {
+        "id": "offence",
+        "label": "Offence",
+        "type": "text",
+        "required": true,
+        "question": "What is the charge? For example: stealing.",
+        "placeholder": "OFFENCE",
+        "repeatable": false
+      },
+      {
+        "id": "defendant",
+        "label": "Defendant",
+        "type": "party",
+        "required": true,
+        "question": "The defendant's full name.",
+        "placeholder": "DEFENDANT",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

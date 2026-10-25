@@ -1,0 +1,184 @@
+{
+  "slug": "letter-of-allotment",
+  "title": "Letter of allotment of shares",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "letterhead",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{senderName}}\n{{senderAddress}}",
+        "required": true,
+        "why": "The letterhead: the sender's name, address and contacts at the top. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "refs",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Our Ref: ............\nYour Ref: ............\n\n{{letterDate}}",
+        "required": true,
+        "why": "References come before the date; leave them blank if none was given. Letters are dated; notices and resolutions carry their date at the end. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "addressee",
+        "kind": "fixed",
+        "align": "left",
+        "text": "{{recipient}}\n{{recipientAddress}}",
+        "required": true,
+        "why": "The addressee's name or office and address, before the salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "salutation",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dear Sir/Madam,",
+        "required": true,
+        "why": "The salutation. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "subject",
+        "kind": "fixed",
+        "align": "center",
+        "text": "LETTER OF ALLOTMENT",
+        "required": true,
+        "why": "The subject heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "I am directed by the Board of Directors of the above-named company to inform you that your application for {{sharesApplied}} ordinary shares of {{shareValue}} each in the company has been approved, and {{sharesAllotted}} shares have been allotted to you by the Board.\n\nPlease find attached a receipt for {{amountPaid}}, being the amount paid for the shares. You will be notified when this letter may be exchanged for your share certificate.",
+        "required": true,
+        "why": "Confirms the allotment by the board, the number and value of shares, the payment received, and that the letter will be exchanged for a share certificate. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "closing",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Yours faithfully,\n\n........................................\n{{signatoryName}}\n{{signatoryCapacity}}\nFor: {{senderName}}",
+        "required": true,
+        "why": "The complimentary close, the signature space, and the name and capacity of the person signing. Always sign a draft in the exam. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "enclosures",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Enclosed:\n#. Receipt for {{amountPaid}} being payment for the shares",
+        "required": true,
+        "why": "The receipt enclosed. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "senderName",
+        "label": "Sender",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter from? The law firm, company or person, as it appears on the letterhead.",
+        "placeholder": "SENDER",
+        "repeatable": false
+      },
+      {
+        "id": "senderAddress",
+        "label": "Sender's address and contacts",
+        "type": "address",
+        "required": true,
+        "question": "The sender's address, email and phone number for the letterhead.",
+        "placeholder": "SENDER’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      },
+      {
+        "id": "letterDate",
+        "label": "Date of the letter",
+        "type": "date",
+        "required": true,
+        "question": "What date should the letter bear? Use a date close to the facts, never after the exam date.",
+        "placeholder": "DATE",
+        "repeatable": false
+      },
+      {
+        "id": "recipient",
+        "label": "Addressee",
+        "type": "party",
+        "required": true,
+        "question": "Who is the letter to? Give the name or office, for example The Divisional Police Officer.",
+        "placeholder": "ADDRESSEE",
+        "repeatable": false
+      },
+      {
+        "id": "recipientAddress",
+        "label": "Addressee's address",
+        "type": "address",
+        "required": true,
+        "question": "The addressee's address.",
+        "placeholder": "ADDRESSEE’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryName",
+        "label": "Name of the person signing",
+        "type": "party",
+        "required": true,
+        "question": "Who signs the letter?",
+        "placeholder": "NAME OF SIGNATORY",
+        "repeatable": false
+      },
+      {
+        "id": "signatoryCapacity",
+        "label": "Capacity of the person signing",
+        "type": "text",
+        "required": true,
+        "question": "In what capacity do they sign? For example: Principal Partner, Company Secretary.",
+        "placeholder": "CAPACITY",
+        "repeatable": false
+      },
+      {
+        "id": "sharesApplied",
+        "label": "Shares applied for",
+        "type": "number",
+        "required": true,
+        "question": "How many shares were applied for?",
+        "placeholder": "SHARES APPLIED FOR",
+        "repeatable": false
+      },
+      {
+        "id": "sharesAllotted",
+        "label": "Shares allotted",
+        "type": "number",
+        "required": true,
+        "question": "How many were allotted?",
+        "placeholder": "SHARES ALLOTTED",
+        "repeatable": false
+      },
+      {
+        "id": "shareValue",
+        "label": "Value of each share",
+        "type": "money",
+        "required": true,
+        "question": "What is each share worth?",
+        "placeholder": "VALUE OF EACH SHARE",
+        "repeatable": false
+      },
+      {
+        "id": "amountPaid",
+        "label": "Amount paid",
+        "type": "money",
+        "required": true,
+        "question": "How much was paid?",
+        "placeholder": "AMOUNT PAID",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

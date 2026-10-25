@@ -1,0 +1,134 @@
+{
+  "slug": "notice-of-board-meeting",
+  "title": "Notice of board meeting",
+  "course": "corporate-law-practice",
+  "forums": [],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "companyHeading",
+        "kind": "fixed",
+        "align": "center",
+        "text": "{{companyName}}\n{{companyAddress}}\nRC No: {{rcNumber}}",
+        "required": true,
+        "why": "Company documents carry the company's name, registered address and registration (RC) number, and for resolutions and notices the statutory heading. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "NOTICE OF {{meetingName}}",
+        "required": true,
+        "why": "The title. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "body",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "NOTICE IS HEREBY GIVEN that the {{meetingName}} of the Board of Directors of the above-named company will be held at {{meetingPlace}} on {{meetingDate}} at {{meetingTime}} to consider the following:\n#. {{agenda}}",
+        "required": true,
+        "why": "Addressed to the directors: the meeting, venue, date and time, and the agenda. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signed",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....\n\nBy Order of the Board of Directors\n\n........................................\n{{secretaryName}}\nCompany Secretary",
+        "required": true,
+        "why": "Notices are given by order of the board and signed by the company secretary. Our Ref/Your Ref belong in letters only, not notices or resolutions. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "companyName",
+        "label": "Company name",
+        "type": "party",
+        "required": true,
+        "question": "What is the company's registered name? For example: Gaskiya Nigeria Limited.",
+        "placeholder": "COMPANY NAME",
+        "repeatable": false
+      },
+      {
+        "id": "companyAddress",
+        "label": "Registered address",
+        "type": "address",
+        "required": true,
+        "question": "The company's registered office address.",
+        "placeholder": "REGISTERED ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "rcNumber",
+        "label": "RC number",
+        "type": "text",
+        "required": true,
+        "question": "The company's registration (RC) number.",
+        "placeholder": "RC NUMBER",
+        "repeatable": false
+      },
+      {
+        "id": "secretaryName",
+        "label": "Company secretary",
+        "type": "party",
+        "required": true,
+        "question": "Who is the company secretary?",
+        "placeholder": "COMPANY SECRETARY",
+        "repeatable": false
+      },
+      {
+        "id": "meetingDate",
+        "label": "Date of the meeting",
+        "type": "date",
+        "required": true,
+        "question": "When is or was the meeting held?",
+        "placeholder": "DATE OF MEETING",
+        "repeatable": false
+      },
+      {
+        "id": "meetingPlace",
+        "label": "Venue",
+        "type": "text",
+        "required": true,
+        "question": "Where is or was the meeting held? For example: the registered office.",
+        "placeholder": "VENUE",
+        "repeatable": false
+      },
+      {
+        "id": "meetingName",
+        "label": "Meeting",
+        "type": "text",
+        "required": true,
+        "question": "Which meeting? For example: FIRST BOARD MEETING.",
+        "placeholder": "MEETING",
+        "repeatable": false
+      },
+      {
+        "id": "meetingTime",
+        "label": "Time",
+        "type": "text",
+        "required": true,
+        "question": "At what time?",
+        "placeholder": "TIME",
+        "repeatable": false
+      },
+      {
+        "id": "agenda",
+        "label": "Agenda",
+        "type": "text",
+        "required": true,
+        "question": "Each item of business, one per box.",
+        "placeholder": "AGENDA ITEM",
+        "repeatable": true
+      }
+    ],
+    "definedTerms": [],
+    "related": [],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}

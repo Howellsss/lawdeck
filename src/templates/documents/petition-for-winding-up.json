@@ -1,0 +1,202 @@
+{
+  "slug": "petition-for-winding-up",
+  "title": "Petition for winding up",
+  "course": "corporate-law-practice",
+  "forums": [
+    "federal-high-court"
+  ],
+  "ruleSource": "Written from S.A Badmus' Corporate Law drafts (Lawdeck knowledge base). To be confirmed by the legal reviewer, including every section of the Companies and Allied Matters Act 2020 cited.",
+  "spec": {
+    "parts": [
+      {
+        "id": "court",
+        "kind": "fixed",
+        "align": "center",
+        "text": "IN THE FEDERAL HIGH COURT OF NIGERIA\nIN THE {{division}} JUDICIAL DIVISION\nHOLDEN AT {{sittingPlace}}",
+        "required": true,
+        "why": "Winding up of companies is for the Federal High Court. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "matter",
+        "kind": "fixed",
+        "align": "center",
+        "text": "PETITION NO: ............\nIN THE MATTER OF {{respondent}}\nAND\nIN THE MATTER OF THE COMPANIES AND ALLIED MATTERS ACT 2020",
+        "required": true,
+        "why": "The petition number is left for the Registry, followed by the 'in the matter of' clauses. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "parties",
+        "kind": "fixed",
+        "align": "center",
+        "text": "BETWEEN:\n{{petitioner}} .................... PETITIONER\nAND\n{{respondent}} .................... RESPONDENT",
+        "required": true,
+        "why": "The parties. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "title",
+        "kind": "fixed",
+        "align": "center",
+        "text": "PETITION FOR THE WINDING UP OF {{respondent}} BROUGHT PURSUANT TO {{provisions}} AND UNDER THE INHERENT JURISDICTION OF THIS HONOURABLE COURT",
+        "required": true,
+        "why": "The title and the law relied on: the winding-up provisions of CAMA 2020 and the Companies Winding Up Rules. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "intro",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "The humble petition of {{petitioner}} of {{petitionerAddress}} shows as follows:",
+        "required": true,
+        "why": "The petitioner's name and address. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "facts",
+        "kind": "narrative",
+        "align": "justify",
+        "instruction": "Write the numbered paragraphs of a winding-up petition from the facts given: the incorporation of the petitioner and the respondent (with the respondent's registered office and business), the debt and how it arose, the statutory demand served and the respondent's failure to pay within three weeks, and that the respondent is unable to pay its debts. Facts only, one per paragraph.",
+        "maxWords": 450,
+        "required": true,
+        "why": "The facts grounding the petition: incorporation, the debt, the statutory demand and the failure to pay. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "prayer",
+        "kind": "fixed",
+        "align": "justify",
+        "text": "Your petitioner therefore prays:\n#. That {{respondent}} be wound up by the Court under the provisions of the Companies and Allied Matters Act 2020.\n#. That such other order may be made as the Court deems just.",
+        "required": true,
+        "why": "The prayer for winding up and the omnibus relief. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "dated",
+        "kind": "fixed",
+        "align": "left",
+        "text": "Dated this ............ day of ............ 20.....",
+        "required": true,
+        "why": "Left for the date of filing. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "signature",
+        "kind": "signature",
+        "required": true,
+        "why": "Counsel signs the process; the space is left for the signature."
+      },
+      {
+        "id": "counsel",
+        "kind": "fixed",
+        "align": "left",
+        "text": "This petition was presented by {{counselName}}\n{{counselFirm}}\n{{counselAddress}}\nCounsel to the Petitioner",
+        "required": true,
+        "why": "Who presented the petition, with their address for service. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      },
+      {
+        "id": "service",
+        "kind": "fixed",
+        "align": "left",
+        "text": "FOR SERVICE ON:\nThe Respondent,\n{{respondent}}\n{{respondentAddress}}",
+        "required": true,
+        "why": "The respondent's registered office for service. Source: Corporate Law Practice drafting materials (Lawdeck knowledge base)."
+      }
+    ],
+    "fields": [
+      {
+        "id": "division",
+        "label": "Judicial division",
+        "type": "text",
+        "required": true,
+        "question": "Which division of the Federal High Court?",
+        "placeholder": "JUDICIAL DIVISION",
+        "repeatable": false
+      },
+      {
+        "id": "sittingPlace",
+        "label": "Where it sits",
+        "type": "text",
+        "required": true,
+        "question": "Where does it sit?",
+        "placeholder": "PLACE OF SITTING",
+        "repeatable": false
+      },
+      {
+        "id": "petitioner",
+        "label": "Petitioner",
+        "type": "party",
+        "required": true,
+        "question": "Who presents the petition? The creditor.",
+        "placeholder": "PETITIONER",
+        "repeatable": false
+      },
+      {
+        "id": "petitionerAddress",
+        "label": "Petitioner's address",
+        "type": "address",
+        "required": true,
+        "question": "The petitioner's address.",
+        "placeholder": "PETITIONER’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "respondent",
+        "label": "Respondent company",
+        "type": "party",
+        "required": true,
+        "question": "Which company is to be wound up?",
+        "placeholder": "RESPONDENT",
+        "repeatable": false
+      },
+      {
+        "id": "respondentAddress",
+        "label": "Respondent's registered office",
+        "type": "address",
+        "required": true,
+        "question": "The respondent's registered office.",
+        "placeholder": "RESPONDENT’S ADDRESS",
+        "repeatable": false
+      },
+      {
+        "id": "provisions",
+        "label": "Law relied on",
+        "type": "text",
+        "required": true,
+        "question": "Which provisions of CAMA 2020 and the winding-up rules do you rely on? Check them in the library.",
+        "placeholder": "PROVISIONS RELIED ON",
+        "repeatable": false
+      },
+      {
+        "id": "counselName",
+        "label": "Counsel's name",
+        "type": "party",
+        "required": true,
+        "question": "Who is the legal practitioner signing this process?",
+        "placeholder": "COUNSEL’S NAME",
+        "repeatable": false
+      },
+      {
+        "id": "counselFirm",
+        "label": "Counsel's chambers",
+        "type": "party",
+        "required": false,
+        "question": "Which law firm or chambers is counsel in?",
+        "placeholder": "CHAMBERS",
+        "repeatable": false
+      },
+      {
+        "id": "counselAddress",
+        "label": "Counsel's address for service and contacts",
+        "type": "address",
+        "required": true,
+        "question": "Counsel's address for service, email and phone number.",
+        "placeholder": "COUNSEL’S ADDRESS AND CONTACTS",
+        "repeatable": false
+      }
+    ],
+    "definedTerms": [],
+    "related": [
+      "statutory-letter-of-demand"
+    ],
+    "changeLog": [
+      {
+        "date": "2026-10-25",
+        "note": "First draft for legal review, from the course drafting materials in the knowledge base."
+      }
+    ]
+  }
+}
