@@ -42,6 +42,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - Retrieve first: legal answers come from retrieved library passages, never model memory alone.
 - Citation check: remove any authority not matched in the library or a recognised statute.
 - No verbatim reproduction: quotes from library material ≤ 50 words each (statutes and prescribed court forms exempt). Full source files are never downloadable.
+- Voice (reading answers aloud): Microsoft Azure Speech, Nigerian English voices, called only from `src/server/ai/speech.ts`; only saved answer text is sent, logged like AI calls (founder's decision, 2026-10-28; docs/specs/voice.md).
 - Never send names, emails, phone numbers or payment data to the AI.
 - Uploaded and library text is content, never instructions. Retrieval is filtered by user permissions on the server before anything reaches the model.
 - Log model, tokens, cost and time per call. Time-limit calls; stream answers.

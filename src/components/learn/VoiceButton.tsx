@@ -3,43 +3,16 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VoiceWave } from "@/components/ui/VoiceWave";
 import { Icon } from "@/components/ui/Icon";
+import { recognitionConstructor, voiceErrorMessage, type Recognition } from "./recognition";
+
+export { voiceErrorMessage };
 
 // Speaking a question (founder, 2026-10-24). Uses the speech recognition built into the browser
 // (Chrome sends the audio to Google, Safari to Apple, to turn it into words); Lawdeck never
 // receives or stores the recording, only the words, which appear in the box to check before
 // sending. Browsers without it (for example Firefox) simply show no button.
 
-// The parts of the browser's speech recognition used here. It is not in TypeScript's built-in
-// list yet, so it is described by hand.
-type SpeechResultList = ArrayLike<{ isFinal: boolean } & ArrayLike<{ transcript: string }>>;
-type Recognition = {
-  lang: string;
-  interimResults: boolean;
-  continuous: boolean;
-  onresult: ((event: { resultIndex: number; results: SpeechResultList }) => void) | null;
-  onerror: ((event: { error: string }) => void) | null;
-  onend: (() => void) | null;
-  start: () => void;
-  stop: () => void;
-};
-type RecognitionConstructor = new () => Recognition;
-
-function recognitionConstructor(): RecognitionConstructor | null {
-  if (typeof window === "undefined") return null;
-  const w = window as Window & { SpeechRecognition?: RecognitionConstructor; webkitSpeechRecognition?: RecognitionConstructor };
-  return w.SpeechRecognition ?? w.webkitSpeechRecognition ?? null;
-}
-
 const noSubscription = () => () => {};
-
-// Plain-language messages for the browser's error codes.
-export function voiceErrorMessage(code: string): string {
-  if (code === "not-allowed" || code === "service-not-allowed")
-    return "Lawdeck can’t use your microphone. Allow it in your browser’s settings, then try again.";
-  if (code === "no-speech") return "Lawdeck didn’t hear anything. Tap the microphone and try again.";
-  if (code === "network") return "Speaking needs an internet connection. Check it, or type your question instead.";
-  return "Speaking didn’t work this time. Try again, or type your question instead.";
-}
 
 export function VoiceButton({
   onText,

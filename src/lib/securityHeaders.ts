@@ -24,6 +24,8 @@ export function contentSecurityPolicy(supabaseUrl: string | undefined, dev: bool
     "style-src 'self' 'unsafe-inline' https://accounts.google.com",
     "img-src 'self' data: blob: https://*.googleusercontent.com https://ssl.gstatic.com",
     "font-src 'self'",
+    // Answers read aloud play from audio made in the page.
+    "media-src 'self' blob: data:",
     `connect-src 'self' ${supabase} ${GOOGLE_APIS}`.trim(),
     `frame-src ${GOOGLE_FRAMES}`,
     "object-src 'none'",

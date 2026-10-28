@@ -3,15 +3,19 @@ import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
 import { formatWat } from "@/lib/dates";
 import type { ChatMessage, ChatSource } from "@/server/db/workspace";
 import { AnswerText } from "./AnswerText";
+import { ReadAloudButton } from "./ReadAloudButton";
 import { SourceList } from "./SourceList";
 
 // One saved answer: its level, text, sources, and a button to ask again at the other level.
 export function AnswerCard({
   message,
+  canRead = false,
   onOpen,
   onOtherLevel,
 }: {
   message: ChatMessage;
+  // Shows "Read" when Lawdeck's voice is set up.
+  canRead?: boolean;
   onOpen: (source: ChatSource) => void;
   // Missing when there is no question to ask again, or an answer is being written.
   onOtherLevel?: (level: AnswerLevel) => void;
@@ -37,6 +41,7 @@ export function AnswerCard({
           if (source) onOpen(source);
         }}
       />
+      {canRead && <ReadAloudButton messageId={message.id} />}
       <SourceList sources={message.sources} onOpen={onOpen} />
       <ReportProblem key={message.id} kind="answer" id={message.id} />
       <div className="flex flex-wrap items-center justify-between gap-2">

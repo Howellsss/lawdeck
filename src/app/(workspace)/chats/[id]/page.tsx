@@ -9,6 +9,7 @@ import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { RoutedChip } from "@/components/learn/RoutedChip";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
+import { speechConfigured } from "@/server/ai/speech";
 import { getChat, loadProjectOptions } from "@/server/db/workspace";
 
 export const metadata: Metadata = { title: "Chat · Lawdeck" };
@@ -47,7 +48,7 @@ async function Chat({ params }: Pick<PageProps<"/chats/[id]">, "params">) {
       {chat.hasReadyUploads && (
         <UseUploadsSwitch chatId={chat.id} initial={chat.useUploads} />
       )}
-      <ChatThread chatId={chat.id} initialMessages={messages} />
+      <ChatThread chatId={chat.id} initialMessages={messages} voice={speechConfigured()} />
       <Suspense fallback={null}>
         <QuestionAllowance />
       </Suspense>

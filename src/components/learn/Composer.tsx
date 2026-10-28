@@ -4,8 +4,12 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
+import { VoiceWave } from "@/components/ui/VoiceWave";
 import { COURSES } from "@/lib/courses";
 import { openDraft } from "@/server/drafting/actions";
+import { listenOnce, voiceErrorMessage } from "./recognition";
+import { speaker } from "./speaker";
+import { TalkButton } from "./TalkBar";
 import { VoiceButton } from "./VoiceButton";
 import { openNewChat } from "./openNewChat";
 
@@ -35,7 +39,7 @@ const selectClass =
 // The input-first composer (PRD 4.3). A Learn question starts a chat and opens it; the chat
 // page asks the question and streams the answer. A drafting request (Draft mode, or Auto mode
 // routed to Draft) opens the matching reviewed document's questions, or the catalogue.
-export function Composer() {
+export function Composer({ voice = false }: { voice?: boolean }) {
   const router = useRouter();
   const [text, setText] = useState("");
   const [mode, setMode] = useState<Mode>("Auto");
@@ -44,6 +48,7 @@ export function Composer() {
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const [routedToDraft, setRoutedToDraft] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [listening, setListening] = useState(false);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   async function submit(event: FormEvent, asMode: Mode = mode) {
@@ -64,6 +69,30 @@ export function Composer() {
       setRoutedToDraft(true);
       return goDraft(question, true);
     }
+    setBusy(false);
+    setNeedsSignIn(Boolean(problem.signIn));
+    setNotice(problem.message);
+  }
+
+  // Voice mode (founder, 2026-10-28): hears one question here, then the chat it opens carries
+  // on talking: it reads the short answer aloud and listens for the next question.
+  async function talk() {
+    speaker.unlock();
+    setNotice(null);
+    setListening(true);
+    let question: string;
+    try {
+      question = await listenOnce();
+    } catch (error) {
+      setListening(false);
+      setNotice(voiceErrorMessage((error as Error).message));
+      return;
+    }
+    setListening(false);
+    setText(question);
+    setBusy(true);
+    const problem = await openNewChat(router, { question, course, mode: "learn", talk: true });
+    if (!problem) return;
     setBusy(false);
     setNeedsSignIn(Boolean(problem.signIn));
     setNotice(problem.message);
@@ -149,7 +178,9 @@ export function Composer() {
             ]}
           />
           <span className="ml-auto" />
-          <VoiceButton compact disabled={busy} onText={setText} onError={setNotice} />
+          {listening && <VoiceWave className="text-ink" />}
+          {voice && <TalkButton compact disabled={busy || listening} onClick={() => void talk()} />}
+          <VoiceButton compact disabled={busy || listening} onText={setText} onError={setNotice} />
           <button
             type="submit"
             aria-label="Send"

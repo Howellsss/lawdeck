@@ -1016,6 +1016,7 @@ export type Database = {
           window_resets_at: string | null;
         }[];
       };
+      speech_used_today: { Args: Record<string, never>; Returns: { used: number; unlimited: boolean }[] };
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };
       source_passage: {
