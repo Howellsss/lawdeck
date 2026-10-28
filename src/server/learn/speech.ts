@@ -28,13 +28,18 @@ async function answerParts(messageId: string, scope: SpeechScope): Promise<strin
   return speechParts(spoken);
 }
 
-// Daily limit (cost control): checked before every part, from what was recorded today.
-async function withinDailyLimit(chars: number): Promise<boolean> {
+// Daily limit (cost control): checked before every part, from what was recorded today. When the
+// check itself fails (for example migration 38 not yet run), nothing is read, and the student is
+// told the voice is unavailable rather than that they used up their limit.
+async function dailyLimit(chars: number): Promise<"ok" | "over" | "unknown"> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.rpc("speech_used_today");
   const row = data?.[0];
-  if (error || !row) return false;
-  return Boolean(row.unlimited) || Number(row.used) + chars <= SPEECH_DAILY_CHARS;
+  if (error || !row) {
+    console.error("speech limit check failed", { code: error?.code ?? "no_row" });
+    return "unknown";
+  }
+  return row.unlimited || Number(row.used) + chars <= SPEECH_DAILY_CHARS ? "ok" : "over";
 }
 
 // One part of an answer as audio. Parts are read one after another, so the first is heard quickly.
@@ -52,11 +57,18 @@ export async function speakAnswerPart(input: {
 }
 
 export async function speakText(text: string, voice: Voice, parts = 1): Promise<SpokenPart> {
-  if (!(await withinDailyLimit(text.length)))
+  const limit = await dailyLimit(text.length);
+  if (limit === "over")
     return {
       ok: false,
       status: 429,
       message: "You have reached today’s reading-aloud limit. It resets at midnight; you can still read the answer on screen.",
+    };
+  if (limit === "unknown")
+    return {
+      ok: false,
+      status: 503,
+      message: "Lawdeck’s voice is not available right now. Please try again shortly; you can still read the answer on screen.",
     };
   const result = await synthesizeSpeech(text, voice);
   return result.ok
