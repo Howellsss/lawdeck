@@ -8,12 +8,11 @@ import type { AnswerLevel } from "@/prompts/explain";
 import type { ChatMessage, ChatSource } from "@/server/db/workspace";
 import { AnswerCard } from "./AnswerCard";
 import { AnswerText } from "./AnswerText";
-import { askQuestion, takePendingQuestion, takePendingTalk } from "./askStream";
+import { askQuestion, takePendingQuestion } from "./askStream";
 import { FollowUpBox } from "./FollowUpBox";
 import { SearchStatus } from "./SearchStatus";
 import { SourcePassage } from "./SourcePassage";
-import { TalkBar, TalkButton } from "./TalkBar";
-import { useTalkMode, type Answered } from "./useTalkMode";
+import { VoiceMode } from "./VoiceMode";
 
 type Live = {
   question: string;
@@ -38,9 +37,17 @@ export function ChatThread({
   voice?: boolean;
 }) {
   const [messages, setMessages] = useState(initialMessages);
+  // When the page refreshes (after voice mode, which saves its conversation itself), show the
+  // saved messages.
+  const [shownInitial, setShownInitial] = useState(initialMessages);
+  if (initialMessages !== shownInitial) {
+    setShownInitial(initialMessages);
+    setMessages(initialMessages);
+  }
   const [live, setLive] = useState<Live | null>(null);
   const [busy, setBusy] = useState(false);
   const [level, setLevel] = useState<AnswerLevel>("exam");
+  const [voiceNote, setVoiceNote] = useState<string | null>(null);
   const started = useRef(false);
   const stopper = useRef<AbortController | null>(null);
   const panel = useRightPanel();
@@ -64,9 +71,7 @@ export function ChatThread({
     stopper.current?.abort();
   }
 
-  // Returns the saved answer, or null when it was stopped or failed (voice mode reads it aloud).
-  async function ask(question: string, answerLevel: AnswerLevel): Promise<Answered> {
-    let answered: Answered = null;
+  async function ask(question: string, answerLevel: AnswerLevel) {
     const controller = new AbortController();
     stopper.current = controller;
     setBusy(true);
@@ -81,7 +86,7 @@ export function ChatThread({
         );
       } else if (event.type === "error") {
         setLive((current) => current && { ...current, error: event.message });
-      } else {
+      } else if (event.type === "done") {
         const now = new Date().toISOString();
         setMessages((current) => [
           ...current,
@@ -102,7 +107,6 @@ export function ChatThread({
             sources: event.sources,
           },
         ]);
-        answered = { id: event.messageId, text: event.text };
         setLive(null);
         router.refresh(); // Updates "questions left this month".
       }
@@ -113,21 +117,16 @@ export function ChatThread({
     }
     stopper.current = null;
     setBusy(false);
-    return answered;
   }
-
-  // Voice mode answers in the spoken Conversation style, whatever level the box is set to.
-  const talk = useTalkMode((question) => ask(question, "talk"));
 
   // A question typed on the home screen (or picked from a course hub) is asked once, when its chat opens.
   useEffect(() => {
     if (started.current) return;
     started.current = true;
     const pending = takePendingQuestion(chatId);
-    // Starting the stream (or voice mode) is the point of this effect: it talks to the answer route.
-    if (pending && voice && takePendingTalk(chatId)) talk.begin(pending);
+    // Starting the stream is the point of this effect: it talks to the answer route.
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    else if (pending) void ask(pending, "exam");
+    if (pending) void ask(pending, "exam");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
 
@@ -209,16 +208,25 @@ export function ChatThread({
           </>
         )}
       </ol>
-      <TalkBar talk={talk.talk} onInterrupt={talk.interrupt} onEnd={talk.end} />
-      {talk.note && (
+      {voiceNote && (
         <p role="status" className="px-1 text-sm text-muted">
-          {talk.note}
+          {voiceNote}
         </p>
       )}
       <FollowUpBox
         busy={busy}
         talkButton={
-          voice && talk.talk === "off" ? <TalkButton disabled={busy} onClick={() => talk.begin()} /> : undefined
+          voice ? (
+            <VoiceMode
+              disabled={busy}
+              chatFor={async () => ({ ok: true, id: chatId })}
+              onEnded={(_chat, note) => {
+                setVoiceNote(note);
+                // The spoken conversation was saved: show it in this chat.
+                router.refresh();
+              }}
+            />
+          ) : undefined
         }
         level={level}
         onLevel={setLevel}

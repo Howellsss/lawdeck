@@ -6,17 +6,20 @@ voices) and that students choose the voice.
 
 ## What students get
 - **Read** on every Learn answer: reads the whole answer, with Pause, Resume and Stop.
-- **Voice mode** (sound-wave button on the home screen and in a chat), a natural spoken
-  conversation like ChatGPT's voice mode (founder, 2026-10-28: "I don't want to have to say
-  stop"): Lawdeck listens until the student pauses (1.5 seconds of quiet ends a turn; shorter
-  pauses do not), replies in a few spoken sentences (answer level "Conversation", `talk`), reads
-  them aloud and listens again. No commands are needed: it handles greetings and thanks, checks
-  what the student wants before explaining at length, and follows "yes, go on" by searching with
-  the recent conversation (`src/lib/talkSearch.ts`). Silence never ends it; **End** (or saying
-  goodbye) does. **Tap to speak** interrupts it. Each reply also appears in the chat with
-  **Explain in full**. A reply that teaches from the library counts as one question; small talk
-  (no passage used) is free but logged (`talk_chat`, migration 40). Lawdeck talks to the student
-  as "you": student names are never sent to the AI.
+- **Voice mode** (sound-wave button on the home screen and in a chat), like ChatGPT's voice mode
+  (founder, 2026-10-28: "you press it, say something, it responds immediately there; it doesn't
+  leave"): a full-screen voice view opens on the same page, with a circle that breathes while
+  listening, pulses while thinking and shows a wave while speaking, and an End button. Lawdeck
+  listens until the student pauses (1.5 seconds), and speaks its reply sentence by sentence as it
+  is written: the answer route sends each spoken sentence (MP3) with the text
+  (`src/server/learn/liveSpeech.ts`), so the first words play within a second or two. Nothing is
+  written out on screen while talking; tapping the circle interrupts. Small talk skips the library
+  (`src/lib/smallTalk.ts`); "yes, go on" is searched with the recent conversation
+  (`src/lib/talkSearch.ts`). Silence never ends it; End (or saying goodbye) does. The conversation
+  is saved as a chat (from the home screen, a new chat is made from the first thing said) with
+  "Read the conversation" afterwards. Teaching replies count as questions; small talk is free
+  (`talk_chat`, migration 40). Lawdeck talks to the student as "you": student names are never
+  sent to the AI.
 - **Reading voice** on the Account page: female (Ezinne, default) or male (Abeo), both Nigerian English.
 
 ## How names and legal shorthand are read
@@ -28,9 +31,9 @@ voices) and that students choose the voice.
   "Order 13 rule 4"; "(Pt. 712)" as "part 712"; NWLR, CFRN, SC and similar spelt out.
 
 ## Safety and cost
-- Only answer text is sent to Azure, from the server (`src/server/ai/speech.ts`). Students can only
-  hear their own saved answers: the server loads the answer under row-level security; no free text
-  from a student's browser reaches the voice service. The test page (free text) is staff only.
+- Only Lawdeck's own answer text is sent to Azure, from the server (`src/server/ai/speech.ts`): Read
+  loads the student's saved answer under row-level security; voice mode speaks the reply as it is
+  written, after the citation check. No free text from a student's browser reaches the voice service. The test page (free text) is staff only.
 - Each part is logged in `usage_events` as kind `speech` (voice, characters, cost, time), never the
   text. Speech never counts towards the monthly question allowance (migration 38).
 - Daily limit: 40,000 characters a student (about ten long answers), Lagos time; staff unlimited.

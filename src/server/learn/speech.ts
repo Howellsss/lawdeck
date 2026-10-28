@@ -31,7 +31,7 @@ async function answerParts(messageId: string, scope: SpeechScope): Promise<strin
 // Daily limit (cost control): checked before every part, from what was recorded today. When the
 // check itself fails (for example migration 38 not yet run), nothing is read, and the student is
 // told the voice is unavailable rather than that they used up their limit.
-async function dailyLimit(chars: number): Promise<"ok" | "over" | { unknown: string }> {
+export async function dailyLimit(chars: number): Promise<"ok" | "over" | { unknown: string }> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.rpc("speech_used_today");
   const row = data?.[0];

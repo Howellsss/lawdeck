@@ -4,12 +4,10 @@ import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
 import { Icon, type IconName } from "@/components/ui/Icon";
-import { VoiceWave } from "@/components/ui/VoiceWave";
 import { COURSES } from "@/lib/courses";
 import { openDraft } from "@/server/drafting/actions";
-import { listenOnce, voiceErrorMessage } from "./recognition";
-import { speaker } from "./speaker";
-import { TalkButton } from "./TalkBar";
+import { startChat } from "@/server/learn/actions";
+import { VoiceMode } from "./VoiceMode";
 import { VoiceButton } from "./VoiceButton";
 import { openNewChat } from "./openNewChat";
 
@@ -48,7 +46,8 @@ export function Composer({ voice = false }: { voice?: boolean }) {
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const [routedToDraft, setRoutedToDraft] = useState(false);
   const [busy, setBusy] = useState(false);
-  const [listening, setListening] = useState(false);
+  // After voice mode: the saved conversation, and why it stopped if it did not end normally.
+  const [voiceDone, setVoiceDone] = useState<{ chatId: string | null; note: string | null } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
 
   async function submit(event: FormEvent, asMode: Mode = mode) {
@@ -69,30 +68,6 @@ export function Composer({ voice = false }: { voice?: boolean }) {
       setRoutedToDraft(true);
       return goDraft(question, true);
     }
-    setBusy(false);
-    setNeedsSignIn(Boolean(problem.signIn));
-    setNotice(problem.message);
-  }
-
-  // Voice mode (founder, 2026-10-28): hears one question here, then the chat it opens carries
-  // on talking: it reads the short answer aloud and listens for the next question.
-  async function talk() {
-    speaker.unlock();
-    setNotice(null);
-    setListening(true);
-    let question: string;
-    try {
-      question = await listenOnce();
-    } catch (error) {
-      setListening(false);
-      setNotice(voiceErrorMessage((error as Error).message));
-      return;
-    }
-    setListening(false);
-    setText(question);
-    setBusy(true);
-    const problem = await openNewChat(router, { question, course, mode: "learn", talk: true });
-    if (!problem) return;
     setBusy(false);
     setNeedsSignIn(Boolean(problem.signIn));
     setNotice(problem.message);
@@ -178,9 +153,21 @@ export function Composer({ voice = false }: { voice?: boolean }) {
             ]}
           />
           <span className="ml-auto" />
-          {listening && <VoiceWave className="text-ink" />}
-          {voice && <TalkButton compact disabled={busy || listening} onClick={() => void talk()} />}
-          <VoiceButton compact disabled={busy || listening} onText={setText} onError={setNotice} />
+          {voice && (
+            <VoiceMode
+              compact
+              disabled={busy}
+              chatFor={async (question) => {
+                const started = await startChat({ question, course, mode: "learn" }).catch(() => ({
+                  ok: false as const,
+                  message: "Lawdeck could not be reached. Check your connection and try again.",
+                }));
+                return started.ok ? { ok: true, id: started.id } : { ok: false, message: started.message };
+              }}
+              onEnded={(chatId, note) => setVoiceDone(chatId || note ? { chatId, note } : null)}
+            />
+          )}
+          <VoiceButton compact disabled={busy} onText={setText} onError={setNotice} />
           <button
             type="submit"
             aria-label="Send"
@@ -192,6 +179,12 @@ export function Composer({ voice = false }: { voice?: boolean }) {
         </div>
       </form>
 
+      {voiceDone && (
+        <p role="status" className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
+          {voiceDone.note ?? "Voice conversation saved."}{" "}
+          {voiceDone.chatId && <Link href={`/chats/${voiceDone.chatId}`}>Read the conversation</Link>}
+        </p>
+      )}
       {notice && (
         <p
           role="status"

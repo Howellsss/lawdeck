@@ -1,5 +1,6 @@
 import { z } from "@/lib/zod";
 import { COURSES } from "@/lib/courses";
+import { VOICES } from "@/schemas/voice";
 
 // Long enough for any exam problem question (about 3,000 words; founder asked for the highest
 // sensible limit, 2026-10-25). Longer text would cost more and search less well.
@@ -18,7 +19,7 @@ const question = z
 export const levelSchema = z.enum(["simple", "exam", "talk"]).default("exam");
 
 // A question sent to the answer route, with the answer level (PRD LN-02).
-export const askSchema = z.object({ question, level: levelSchema });
+export const askSchema = z.object({ question, level: levelSchema, voice: z.enum(VOICES).optional() });
 
 // Starting a chat from the home composer or a course hub: the course is a slug, or "all".
 // "auto" asks the router whether it is a Learn or a Draft request (PRD WS-03).
