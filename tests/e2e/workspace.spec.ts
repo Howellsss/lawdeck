@@ -131,6 +131,12 @@ test("the test-only document pages are not there", async ({ page, request }) => 
   expect(docx.headers()["content-type"] ?? "").not.toContain("wordprocessingml");
 });
 
+test("the test-only voice page is not there", async ({ page }) => {
+  await page.goto("/test-pages/voice");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Voice mode/ })).toHaveCount(0);
+});
+
 test("My uploads asks visitors to sign in and offers no upload", async ({ page }) => {
   await page.goto("/uploads");
   await expect(page.getByRole("heading", { name: "Sign in to upload" })).toBeVisible();
