@@ -84,4 +84,14 @@ describe("reading an answer", () => {
     usedToday.mockReturnValue({ data: [{ used: SPEECH_DAILY_CHARS * 2, unlimited: true }], error: null });
     expect((await speakAnswerPart({ messageId: ID, part: 0, scope: "full", voice: "female" })).ok).toBe(true);
   });
+
+  it("says the voice is unavailable, not that the limit is used up, when the check fails", async () => {
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    usedToday.mockReturnValue({ data: null, error: { code: "PGRST202" } });
+    const result = await speakAnswerPart({ messageId: ID, part: 0, scope: "full", voice: "female" });
+    expect(result).toMatchObject({ ok: false, status: 503 });
+    expect(!result.ok && result.message).not.toMatch(/limit/);
+    expect(fetchMock).not.toHaveBeenCalled();
+    errors.mockRestore();
+  });
 });
