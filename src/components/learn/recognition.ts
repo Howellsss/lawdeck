@@ -39,7 +39,7 @@ export function voiceErrorMessage(code: string): string {
 
 // How long a pause means the student has finished speaking (voice mode), and how long to wait
 // for them to start before listening afresh.
-export const END_OF_TURN_MS = 1500;
+export const END_OF_TURN_MS = 1100;
 const WAIT_FOR_SPEECH_MS = 15_000;
 
 // Listens for one turn of a conversation and returns its words (voice mode). Short pauses

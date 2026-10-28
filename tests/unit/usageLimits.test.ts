@@ -17,6 +17,9 @@ function fakeDb(allowance: { data: unknown; error: unknown }) {
   const chain = {
     select: () => chain,
     eq: () => chain,
+    order: () => chain,
+    // The chat's earlier messages, read alongside the limit check.
+    limit: async () => ({ data: [], error: null }),
     maybeSingle: async () => ({ data: { id: "chat-1", title: "Writs", course_id: null }, error: null }),
   };
   return {

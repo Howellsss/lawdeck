@@ -9,10 +9,10 @@ voices) and that students choose the voice.
 - **Voice mode** (sound-wave button on the home screen and in a chat), like ChatGPT's voice mode
   (founder, 2026-10-28: "you press it, say something, it responds immediately there; it doesn't
   leave"): a full-screen voice view opens on the same page, with a circle that breathes while
-  listening, pulses while thinking and shows a wave while speaking, and an End button. Lawdeck
-  listens until the student pauses (1.5 seconds), and speaks its reply sentence by sentence as it
+  listening, pulses while thinking and shows a wave while speaking, with the Lawdeck mark inside, and an End button. Lawdeck
+  listens until the student pauses (1.1 seconds), and speaks its reply sentence by sentence as it
   is written: the answer route sends each spoken sentence (MP3) with the text
-  (`src/server/learn/liveSpeech.ts`), so the first words play within a second or two. Nothing is
+  (`src/server/learn/liveSpeech.ts`); the first long clause may be spoken before its sentence ends, and the reply's speech is recorded once at the end, so the first words play within a second or two. Small talk is answered by the fastest model (`MODELS.smallTalk`, Haiku); teaching replies use the explanations model. Nothing is
   written out on screen while talking; tapping the circle interrupts. Small talk skips the library
   (`src/lib/smallTalk.ts`); "yes, go on" is searched with the recent conversation
   (`src/lib/talkSearch.ts`). Silence never ends it; End (or saying goodbye) does. The conversation
