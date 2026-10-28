@@ -9,7 +9,7 @@ export const MORE_QUESTION = "Would you like me to read the full explanation?";
 
 export type SpokenPart =
   | { ok: true; audio: ArrayBuffer; parts: number }
-  | { ok: false; status: number; message: string };
+  | { ok: false; status: number; message: string; detail?: string };
 
 // The parts of a saved answer to read, as spoken text. Row-level security means a student can
 // only load answers in their own chats; anyone else's answer is simply "not found".
@@ -31,13 +31,14 @@ async function answerParts(messageId: string, scope: SpeechScope): Promise<strin
 // Daily limit (cost control): checked before every part, from what was recorded today. When the
 // check itself fails (for example migration 38 not yet run), nothing is read, and the student is
 // told the voice is unavailable rather than that they used up their limit.
-async function dailyLimit(chars: number): Promise<"ok" | "over" | "unknown"> {
+async function dailyLimit(chars: number): Promise<"ok" | "over" | { unknown: string }> {
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.rpc("speech_used_today");
   const row = data?.[0];
   if (error || !row) {
-    console.error("speech limit check failed", { code: error?.code ?? "no_row" });
-    return "unknown";
+    const code = error?.code ?? "no_row";
+    console.error("speech limit check failed", { code });
+    return { unknown: `the database check failed (${code}): run migration 38 in the Lawdeck Supabase project` };
   }
   return row.unlimited || Number(row.used) + chars <= SPEECH_DAILY_CHARS ? "ok" : "over";
 }
@@ -64,10 +65,11 @@ export async function speakText(text: string, voice: Voice, parts = 1): Promise<
       status: 429,
       message: "You have reached today’s reading-aloud limit. It resets at midnight; you can still read the answer on screen.",
     };
-  if (limit === "unknown")
+  if (typeof limit === "object")
     return {
       ok: false,
       status: 503,
+      detail: limit.unknown,
       message: "Lawdeck’s voice is not available right now. Please try again shortly; you can still read the answer on screen.",
     };
   const result = await synthesizeSpeech(text, voice);
@@ -76,6 +78,7 @@ export async function speakText(text: string, voice: Voice, parts = 1): Promise<
     : {
         ok: false,
         status: 503,
+        detail: result.detail,
         message:
           result.reason === "busy"
             ? "Lawdeck’s voice is busy. Wait a moment and press Read again."
