@@ -9,6 +9,7 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { EXPLAIN_PROMPT_VERSION, isScenario } from "@/prompts/explain";
+import { isSmallTalk } from "@/lib/smallTalk";
 import { talkSearchText } from "@/lib/talkSearch";
 import { evalCasesSchema } from "@/schemas/evalCases";
 import { gradeAnswer } from "@/server/ai/grade";
@@ -16,7 +17,7 @@ import { EXPLAIN_MODELS, type ExplainModel } from "@/server/ai/models";
 import { createAdminClient } from "@/server/db/admin";
 import { composeAnswer } from "@/server/learn/ask";
 import { redactPersonalData } from "@/server/learn/redact";
-import { searchLibrary } from "@/server/retrieval/search";
+import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 
 const FILE = "tests/eval/explain/civil-litigation.json";
@@ -111,9 +112,13 @@ it("runs the answer quality test and saves it for the legal reviewer", { timeout
     const results = isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS;
     // As in the app: a short voice-mode reply is searched with the conversation before it.
     const searchText = c.level === "talk" ? talkSearchText(question, c.turns) : question;
-    const found = await searchLibrary({ question: searchText, courseId: course.data.id, includePending: false, results, db });
+    // As in the app: voice-mode small talk is answered without searching.
+    const smallTalk = c.level === "talk" && isSmallTalk(question);
+    const found = smallTalk
+      ? { ok: true as const, hits: [] as SearchHit[] }
+      : await searchLibrary({ question: searchText, courseId: course.data.id, includePending: false, results, db });
     if (!found.ok) error = `search failed: ${found.message}`;
-    else if (found.hits.length === 0) error = "the library search found nothing";
+    else if (found.hits.length === 0 && !smallTalk) error = "the library search found nothing";
     else {
       for (let attempt = 0; attempt <= BUSY_RETRIES; attempt++) {
         composed = await composeAnswer({

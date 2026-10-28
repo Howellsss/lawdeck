@@ -173,7 +173,10 @@ export function ChatThread({
               aria-busy={!live.error && !live.stopped}
             >
               <span className="sr-only">Lawdeck: </span>
-              {!live.error && !live.stopped && <SearchStatus found={live.found} writing={Boolean(live.text)} />}
+              {/* Voice mode shows its own "Thinking…" bar, not the library search steps. */}
+              {!live.error && !live.stopped && live.level !== "talk" && (
+                <SearchStatus found={live.found} writing={Boolean(live.text)} />
+              )}
               {live.text && <AnswerText text={live.text} citable={new Set()} markers="links" />}
               {live.stopped && (
                 <div role="status" className="flex flex-col items-start gap-2 text-sm text-muted">
