@@ -9,13 +9,15 @@ export async function askQuestion(
   level: AnswerLevel,
   onEvent: (event: AnswerEvent) => void,
   signal?: AbortSignal,
+  // Voice mode: the server speaks the reply in this voice as it writes it ("audio" events).
+  voice?: string,
 ): Promise<void> {
   let response: Response;
   try {
     response = await fetch(`/api/chats/${chatId}/answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, level }),
+      body: JSON.stringify({ question, level, voice }),
       signal,
     });
   } catch {
@@ -50,7 +52,7 @@ export async function askQuestion(
       for (const line of lines) {
         if (!line.trim()) continue;
         const event = JSON.parse(line) as AnswerEvent;
-        if (event.type !== "text" && event.type !== "found") finished = true;
+        if (event.type === "done" || event.type === "error") finished = true;
         onEvent(event);
       }
     }
@@ -87,26 +89,5 @@ export function takePendingQuestion(chatId: string): string | null {
     return question;
   } catch {
     return null;
-  }
-}
-
-// Voice mode started on the home screen carries on in the chat it opens (this tab only).
-const TALK_KEY = (chatId: string) => `lawdeck-talk-${chatId}`;
-
-export function savePendingTalk(chatId: string) {
-  try {
-    sessionStorage.setItem(TALK_KEY(chatId), "1");
-  } catch {
-    // Without storage the chat simply opens without voice mode.
-  }
-}
-
-export function takePendingTalk(chatId: string): boolean {
-  try {
-    const talk = sessionStorage.getItem(TALK_KEY(chatId)) === "1";
-    sessionStorage.removeItem(TALK_KEY(chatId));
-    return talk;
-  } catch {
-    return false;
   }
 }

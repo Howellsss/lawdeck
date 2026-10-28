@@ -166,9 +166,16 @@ body {
   0%, 100% { transform: scaleY(0.25); }
   50% { transform: scaleY(1); }
 }
+/* Voice mode's circle: breathes while listening, pulses gently while thinking. */
+@keyframes lawdeck-breathe {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.08); }
+}
+.voice-orb-listening { animation: lawdeck-breathe 2.4s ease-in-out infinite; }
+.voice-orb-thinking { animation: lawdeck-breathe 0.9s ease-in-out infinite; }
 .heartbeat-track { animation: lawdeck-heartbeat 1.6s linear infinite; }
 .orbit { animation: lawdeck-orbit 0.9s linear infinite; }
 .voice-wave-bar { animation: lawdeck-wave 1s ease-in-out infinite; }
 @media (prefers-reduced-motion: reduce) {
-  .heartbeat-track, .orbit, .voice-wave-bar { animation: none; }
+  .heartbeat-track, .orbit, .voice-wave-bar, .voice-orb-listening, .voice-orb-thinking { animation: none; }
 }

@@ -14,6 +14,7 @@ export type SpeakerState = {
   message?: string;
 };
 export type SpeakOutcome = "done" | "stopped" | "error";
+export type LiveAudio = { push: (base64: string) => void; end: () => void; done: Promise<SpeakOutcome> };
 
 // A tenth of a second of silence: played during a tap so phones allow audio started later
 // (voice conversations speak after the answer is written, not straight after a tap).
@@ -81,6 +82,57 @@ export const speaker = {
     cleanUp();
     set({ status: "idle", key: null });
     return "done";
+  },
+
+  // Voice mode: plays spoken sentences one after another as they arrive from the server.
+  // onStart runs when the first one starts playing.
+  live(onStart?: () => void): LiveAudio {
+    speaker.stop();
+    const mine = ++run;
+    const queue: string[] = [];
+    let playing = false;
+    let ended = false;
+    let started = false;
+    let settle!: (outcome: SpeakOutcome) => void;
+    const done = new Promise<SpeakOutcome>((resolve) => (settle = resolve));
+    const next = async () => {
+      if (mine !== run) return settle("stopped");
+      const url = queue.shift();
+      if (!url) {
+        playing = false;
+        if (ended) {
+          cleanUp();
+          set({ status: "idle", key: null });
+          settle("done");
+        }
+        return;
+      }
+      playing = true;
+      if (!started) {
+        started = true;
+        onStart?.();
+      }
+      set({ status: "playing", key: "live" });
+      const outcome = await playUrl(url);
+      if (outcome === "stopped" || mine !== run) return settle("stopped");
+      // A sentence that cannot play is skipped, so one bad part never stops the conversation.
+      void next();
+    };
+    return {
+      push(base64: string) {
+        if (mine !== run) return;
+        const bytes = Uint8Array.from(atob(base64), (c) => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: "audio/mpeg" }));
+        urls.push(url);
+        queue.push(url);
+        if (!playing) void next();
+      },
+      end() {
+        ended = true;
+        if (!playing) void next();
+      },
+      done,
+    };
   },
 
   pause() {

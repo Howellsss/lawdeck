@@ -21,6 +21,10 @@ import { limitReachedMessage } from "@/lib/allowance";
 import { isSmallTalk } from "@/lib/smallTalk";
 import { talkSearchText } from "@/lib/talkSearch";
 import { recordUsage } from "@/server/ai/usage";
+import { speechConfigured } from "@/server/ai/speech";
+import type { Voice } from "@/schemas/voice";
+import { LiveSpeech, type LiveSpeechEvent } from "./liveSpeech";
+import { dailyLimit } from "./speech";
 import {
   ALLOWANCE_UNAVAILABLE,
   getAllowance,
@@ -56,7 +60,9 @@ export type AnswerEvent =
       notEnough: boolean;
       level: AnswerLevel;
     }
-  | { type: "error"; message: string };
+  | { type: "error"; message: string }
+  // Voice mode: one spoken sentence of the reply (MP3, base64), or why it cannot be spoken.
+  | LiveSpeechEvent;
 
 export const NO_MATERIAL_TEXT = `${NOT_ENOUGH_HEADING}
 The library has no approved material that matches this question yet, so Lawdeck won't guess. Try a narrower question, name the topic you mean, or choose the course it belongs to.`;
@@ -80,6 +86,8 @@ export async function answerQuestion(input: {
   chatId: string;
   question: string;
   level: AnswerLevel;
+  // Voice mode: speak the reply sentence by sentence in this voice as it is written.
+  voice?: Voice;
   send: (event: AnswerEvent) => void;
   signal?: AbortSignal;
 }): Promise<void> {
@@ -175,6 +183,20 @@ export async function answerQuestion(input: {
     });
   }
 
+  // Voice mode speaks while it writes, within the student's daily reading limit.
+  let live: LiveSpeech | null = null;
+  if (input.level === "talk" && input.voice && speechConfigured()) {
+    const limit = await dailyLimit(0);
+    if (limit === "ok") live = new LiveSpeech(input.voice, send);
+    else
+      send({
+        type: "audio_error",
+        message:
+          limit === "over"
+            ? "You have reached today’s reading-aloud limit; the reply is in the chat."
+            : "Lawdeck’s voice is not available right now. The reply is in the chat.",
+      });
+  }
   const composed = await composeAnswer({
     db,
     hits: found.hits,
@@ -183,9 +205,13 @@ export async function answerQuestion(input: {
     history,
     courseId: chat.data.course_id,
     userId: input.userId,
-    onText: (text) => send({ type: "text", text }),
+    onText: (text) => {
+      send({ type: "text", text });
+      live?.push(text);
+    },
     signal: input.signal,
   });
+  await live?.end();
   if (!composed.ok)
     return send({ type: "error", message: FAILURES[composed.reason] });
   const { shown, notEnough, used, result } = composed;
