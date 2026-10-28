@@ -818,7 +818,7 @@ export type Database = {
             | "valid_correction"
             | null;
           topic: string | null;
-          level: "simple" | "exam" | null;
+          level: "simple" | "exam" | "talk" | null;
           turns: Json;
           question: string;
           must_include: Json;
@@ -855,7 +855,7 @@ export type Database = {
             | "valid_correction"
             | null;
           topic?: string | null;
-          level?: "simple" | "exam" | null;
+          level?: "simple" | "exam" | "talk" | null;
           turns?: Json;
           question: string;
           must_include?: Json;

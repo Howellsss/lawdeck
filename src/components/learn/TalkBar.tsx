@@ -6,13 +6,16 @@ import { useSpeechSupported } from "./recognition";
 import type { Talk } from "./useTalkMode";
 
 const STATUS: Record<Exclude<Talk, "off">, string> = {
-  listening: "Listening… ask your question.",
-  thinking: "Searching the library and writing…",
+  listening: "Listening… go ahead.",
+  thinking: "Thinking…",
   speaking: "Speaking…",
 };
 
-// Shown while voice mode is on: what Lawdeck is doing, and a button to end it.
-export function TalkBar({ talk, offering, onEnd }: { talk: Talk; offering: boolean; onEnd: () => void }) {
+const barButton =
+  "inline-flex h-9 shrink-0 items-center rounded-full border border-line px-3 text-ink hover:bg-pill";
+
+// Shown while voice mode is on: what Lawdeck is doing, "Tap to speak" to interrupt it, and End.
+export function TalkBar({ talk, onInterrupt, onEnd }: { talk: Talk; onInterrupt: () => void; onEnd: () => void }) {
   if (talk === "off") return null;
   return (
     <div
@@ -25,17 +28,13 @@ export function TalkBar({ talk, offering, onEnd }: { talk: Talk; offering: boole
       ) : (
         <Icon name={talk === "speaking" ? "speaker" : "waveform"} size={18} className="shrink-0" />
       )}
-      <span className="min-w-0 flex-1">
-        {talk === "listening" && offering
-          ? "Say “yes” to hear the full explanation, or ask another question."
-          : STATUS[talk]}
-      </span>
-      <button
-        type="button"
-        onClick={onEnd}
-        aria-label="End voice mode"
-        className="inline-flex h-9 shrink-0 items-center rounded-full border border-line px-3 text-ink hover:bg-pill"
-      >
+      <span className="min-w-0 flex-1">{STATUS[talk]}</span>
+      {talk === "speaking" && (
+        <button type="button" onClick={onInterrupt} className={barButton}>
+          Tap to speak
+        </button>
+      )}
+      <button type="button" onClick={onEnd} aria-label="End voice mode" className={barButton}>
         <span className="sm:hidden">End</span>
         <span className="hidden sm:inline">End voice mode</span>
       </button>

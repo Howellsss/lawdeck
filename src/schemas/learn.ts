@@ -15,7 +15,7 @@ const question = z
       .max(QUESTION_MAX_CHARS, { error: `Questions can be up to ${QUESTION_MAX_CHARS.toLocaleString("en-GB")} characters.` }),
   );
 
-export const levelSchema = z.enum(["simple", "exam"]).default("exam");
+export const levelSchema = z.enum(["simple", "exam", "talk"]).default("exam");
 
 // A question sent to the answer route, with the answer level (PRD LN-02).
 export const askSchema = z.object({ question, level: levelSchema });

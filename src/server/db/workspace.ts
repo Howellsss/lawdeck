@@ -1,4 +1,5 @@
 import "server-only";
+import type { AnswerLevel } from "@/prompts/explain";
 import { pagesLabel } from "@/lib/pages";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -179,18 +180,18 @@ export type ChatMessage = {
   id: string;
   role: "user" | "assistant";
   text: string;
-  // Simple or Exam-ready (PRD LN-02); older messages have none.
-  level: "simple" | "exam" | null;
+  // Simple, Exam-ready or a voice-mode Conversation reply (PRD LN-02); older messages have none.
+  level: AnswerLevel | null;
   createdAt: string;
   sources: ChatSource[];
 };
 
-function messageLevel(content: unknown): "simple" | "exam" | null {
+function messageLevel(content: unknown): AnswerLevel | null {
   const level =
     content && typeof content === "object" && "level" in content
       ? content.level
       : null;
-  return level === "simple" || level === "exam" ? level : null;
+  return level === "simple" || level === "exam" || level === "talk" ? level : null;
 }
 
 // The text part of a stored message.

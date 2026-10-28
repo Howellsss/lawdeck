@@ -1,26 +1,24 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import { answerScope } from "@/lib/speech";
 import { listenOnce, recognitionConstructor, voiceErrorMessage } from "./recognition";
 import { speaker } from "./speaker";
 
-// Voice mode (founder, 2026-10-28: "speak to it and it responds with a voice"). Lawdeck listens,
-// asks the question, reads the short answer aloud, offers the rest, then listens again, until
-// the student says "stop" or presses End.
+// Voice mode (founder, 2026-10-28: "something I can communicate with ... back and forth").
+// Lawdeck listens, answers in a few spoken sentences that end with a question back to the
+// student, reads them aloud, then listens again, until the student says "stop" or presses End.
+// "Tap to speak" interrupts Lawdeck while it is speaking.
 
 export type Talk = "off" | "listening" | "thinking" | "speaking";
 export type Answered = { id: string; text: string } | null;
 
-const YES = /^(yes|yeah|yep|yup|ok(ay)?|sure|please|go on|go ahead|continue|read (it|on|more|the rest))\b/i;
-const NO = /^(no|nope|not now|no thanks)\b/i;
 const END = /^(stop|end|exit|goodbye|bye|that'?s all)\b/i;
 
 export function useTalkMode(ask: (question: string) => Promise<Answered>) {
   const [talk, setTalk] = useState<Talk>("off");
-  const [offering, setOffering] = useState(false);
   const [note, setNote] = useState<string | null>(null);
   const on = useRef(false);
+  const interrupted = useRef(false);
   const listening = useRef<AbortController | null>(null);
   const askRef = useRef(ask);
   useEffect(() => {
@@ -32,29 +30,27 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
     on.current = false;
     listening.current?.abort();
     if (!keepAudio) speaker.stop();
-    setOffering(false);
     setTalk("off");
     setNote(message ?? null);
   }, []);
 
   useEffect(() => () => end(), [end]);
 
-  // Reads part of an answer; false when voice mode should not go on.
-  async function speak(id: string, scope: "short" | "rest"): Promise<boolean> {
+  // Reads a reply aloud; false when voice mode should not go on.
+  async function speak(id: string): Promise<boolean> {
     setTalk("speaking");
-    const outcome = await speaker.play(id, scope);
+    interrupted.current = false;
+    const outcome = await speaker.play(id, "full");
     if (outcome === "error") end(speaker.getState().message ?? "Lawdeck’s voice is not available right now.");
-    else if (outcome === "stopped" && on.current) end(undefined, true);
-    return outcome === "done" && on.current;
+    else if (outcome === "stopped" && on.current && !interrupted.current) end(undefined, true);
+    return on.current && (outcome === "done" || interrupted.current);
   }
 
   async function run(first?: string) {
-    let more: string | null = null;
     let question = first;
     while (on.current) {
       if (!question) {
         setTalk("listening");
-        setOffering(Boolean(more));
         const controller = new AbortController();
         listening.current = controller;
         try {
@@ -65,27 +61,14 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
           return end(code === "no-speech" ? "Voice mode ended: Lawdeck didn’t hear anything." : voiceErrorMessage(code));
         }
         if (!on.current) return;
-        setOffering(false);
-        const offered = more;
-        more = null;
-        if (offered && YES.test(question)) {
-          question = undefined;
-          if (!(await speak(offered, "rest"))) return;
-          continue;
-        }
         if (END.test(question)) return end();
-        if (offered && NO.test(question)) {
-          question = undefined;
-          continue;
-        }
       }
       setTalk("thinking");
       const answered = await askRef.current(question);
       question = undefined;
       if (!on.current) return;
       if (!answered) return end("Voice mode ended because the answer did not finish.");
-      if (!(await speak(answered.id, "short"))) return;
-      more = answerScope(answered.text, "rest") ? answered.id : null;
+      if (!(await speak(answered.id))) return;
     }
   }
 
@@ -102,5 +85,12 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
     void run(first);
   }
 
-  return { talk, offering, note, begin, end: () => end() };
+  // Stops Lawdeck mid-sentence and listens to the student straight away.
+  function interrupt() {
+    if (!on.current || talk !== "speaking") return;
+    interrupted.current = true;
+    speaker.stop();
+  }
+
+  return { talk, note, begin, interrupt, end: () => end() };
 }

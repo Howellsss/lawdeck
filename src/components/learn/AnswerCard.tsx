@@ -23,7 +23,8 @@ export function AnswerCard({
   const byLabel = new Map(
     message.sources.map((source) => [source.label, source]),
   );
-  const other: AnswerLevel = message.level === "simple" ? "exam" : "simple";
+  // A voice-mode reply offers the full exam-ready answer; the others swap between the two levels.
+  const other: AnswerLevel = message.level === "exam" ? "simple" : "exam";
   return (
     <li className="flex flex-col gap-3 rounded-2xl border border-line px-4 py-3">
       <span className="sr-only">Lawdeck: </span>
@@ -54,7 +55,7 @@ export function AnswerCard({
             onClick={() => onOtherLevel(other)}
             className="text-sm underline underline-offset-2"
           >
-            {other === "simple" ? "Explain more simply" : "Make it exam-ready"}
+            {other === "simple" ? "Explain more simply" : message.level === "talk" ? "Explain in full" : "Make it exam-ready"}
           </button>
         )}
       </div>

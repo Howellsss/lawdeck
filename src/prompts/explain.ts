@@ -2,7 +2,7 @@
 // Versioned: change the version whenever the wording changes, and re-run the evaluation set.
 // No legal content lives here: every legal point comes from the library passages supplied.
 
-export const EXPLAIN_PROMPT_VERSION = "explain-v6";
+export const EXPLAIN_PROMPT_VERSION = "explain-v7";
 
 // The first line Claude writes when the passages cannot support an answer. The server
 // recognises it and shows the "not enough support" response instead (LN-04).
@@ -128,19 +128,23 @@ function escapeAttribute(text: string): string {
   );
 }
 
-// The two answer levels (PRD LN-02). Sent with each question, so the fixed instructions above
-// stay the same (and cached) whichever level the student picks.
-export type AnswerLevel = "simple" | "exam";
+// The answer levels (PRD LN-02). Sent with each question, so the fixed instructions above
+// stay the same (and cached) whichever level is used. "talk" is voice mode's spoken
+// conversation (founder, 2026-10-28); students pick only Simple or Exam-ready.
+export type AnswerLevel = "simple" | "exam" | "talk";
+export const PICKABLE_LEVELS = ["simple", "exam"] as const;
 
 export const LEVEL_LABELS: Record<AnswerLevel, string> = {
   simple: "Simple",
   exam: "Exam-ready",
+  talk: "Conversation",
 };
 
 export const LEVEL_INSTRUCTIONS: Record<AnswerLevel, string> = {
   simple:
     "Answer level: Simple. Use the same section headings, but keep every section short. Use plain, everyday words and explain any legal term the first time you use it. Give one simple example. Name only the most important authority.",
   exam: "Answer level: Exam-ready. Use the full structure. Name every relevant authority from the passages, with its section, order or rule where the passage gives it. In the exam tip, say how an examiner would expect the point set out and the mistakes students commonly make.",
+  talk: "Answer level: Conversation. This is a spoken, back-and-forth tutoring conversation: your reply is read aloud to the student. Do not use the section headings, the Authorities list, bullet lines or the problem-question layout. Reply in two to five short, natural spoken sentences, talking to the student as \"you\". Answer the point they just raised, building on what was said earlier in the conversation. Name at most one or two key authorities in short spoken form (the case name, or \"section 36 of the Constitution\"), still only from the passages and still with the passage id after the point. Then end with one short question back to the student that moves the conversation on: check their understanding, ask them to apply the point, or offer the next step (for example, an example or the exceptions). All the rules above still apply: answer only from the passages, correct anything wrong the student says, and hold a correct position. If the passages are not enough, follow the rule for that, keeping it to two sentences.",
 };
 
 // A problem question: a scenario of facts is longer than an ordinary question. It gets more

@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent, type ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
-import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
+import { LEVEL_LABELS, PICKABLE_LEVELS, type AnswerLevel } from "@/prompts/explain";
 import { QUESTION_MAX_CHARS } from "@/schemas/learn";
 import { VoiceButton } from "./VoiceButton";
 
@@ -38,7 +38,7 @@ export function FollowUpBox({
     <div className="flex flex-col gap-2">
       <fieldset className="flex items-center gap-2 px-1">
         <legend className="sr-only">Answer level</legend>
-        {(Object.keys(LEVEL_LABELS) as AnswerLevel[]).map((value) => (
+        {PICKABLE_LEVELS.map((value) => (
           <label
             key={value}
             className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink ${

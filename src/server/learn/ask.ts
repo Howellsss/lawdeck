@@ -278,7 +278,8 @@ export async function composeAnswer(input: {
     },
     signal: input.signal,
     model: input.model,
-    long: isScenario(input.question),
+    long: input.level !== "talk" && isScenario(input.question),
+    short: input.level === "talk",
   });
   await checking;
   if (!result.ok) return { ok: false, reason: result.reason };

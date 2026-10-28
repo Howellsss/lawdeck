@@ -27,7 +27,7 @@ type Case = {
   kind: "question" | "pushback";
   pushbackType: "wrong_statement" | "holds_position" | "fake_authority" | "valid_correction" | null;
   topic: string | null;
-  level: "simple" | "exam";
+  level: "simple" | "exam" | "talk";
   turns: { role: "user" | "assistant"; text: string }[];
   question: string;
   mustInclude: string[];
@@ -46,7 +46,7 @@ function loadCases(): { course: string; cases: Case[] } {
       turns: [],
       question: q.question,
       mustInclude: q.mustInclude,
-      expect: null,
+      expect: q.expect ?? null,
     })),
     ...file.pushback.map((p) => ({
       id: p.id,
