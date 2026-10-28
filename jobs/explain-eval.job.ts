@@ -9,6 +9,7 @@
 import { readFileSync } from "node:fs";
 import { expect, it } from "vitest";
 import { EXPLAIN_PROMPT_VERSION, isScenario } from "@/prompts/explain";
+import { talkSearchText } from "@/lib/talkSearch";
 import { evalCasesSchema } from "@/schemas/evalCases";
 import { gradeAnswer } from "@/server/ai/grade";
 import { EXPLAIN_MODELS, type ExplainModel } from "@/server/ai/models";
@@ -43,7 +44,7 @@ function loadCases(): { course: string; cases: Case[] } {
       pushbackType: null,
       topic: q.topic,
       level: q.level,
-      turns: [],
+      turns: q.turns ?? [],
       question: q.question,
       mustInclude: q.mustInclude,
       expect: q.expect ?? null,
@@ -108,7 +109,9 @@ it("runs the answer quality test and saves it for the legal reviewer", { timeout
     let composed: Awaited<ReturnType<typeof composeAnswer>> | null = null;
     // As in the app: problem questions (scenarios) get more passages.
     const results = isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS;
-    const found = await searchLibrary({ question, courseId: course.data.id, includePending: false, results, db });
+    // As in the app: a short voice-mode reply is searched with the conversation before it.
+    const searchText = c.level === "talk" ? talkSearchText(question, c.turns) : question;
+    const found = await searchLibrary({ question: searchText, courseId: course.data.id, includePending: false, results, db });
     if (!found.ok) error = `search failed: ${found.message}`;
     else if (found.hits.length === 0) error = "the library search found nothing";
     else {

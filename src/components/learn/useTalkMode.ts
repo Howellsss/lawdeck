@@ -4,15 +4,16 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { listenOnce, recognitionConstructor, voiceErrorMessage } from "./recognition";
 import { speaker } from "./speaker";
 
-// Voice mode (founder, 2026-10-28: "something I can communicate with ... back and forth").
-// Lawdeck listens, answers in a few spoken sentences that end with a question back to the
-// student, reads them aloud, then listens again, until the student says "stop" or presses End.
-// "Tap to speak" interrupts Lawdeck while it is speaking.
+// Voice mode (founder, 2026-10-28: "the way I do with ChatGPT ... I don't want to have to say
+// stop"). Lawdeck listens until the student pauses, replies in a few spoken sentences (small
+// talk too), reads them aloud, then listens again, with no commands needed. It keeps waiting
+// through silence; End (or saying goodbye) finishes. "Tap to speak" interrupts Lawdeck.
 
 export type Talk = "off" | "listening" | "thinking" | "speaking";
 export type Answered = { id: string; text: string } | null;
 
-const END = /^(stop|end|exit|goodbye|bye|that'?s all)\b/i;
+// Saying goodbye also ends voice mode, after Lawdeck says goodbye back.
+const GOODBYE = /^(ok(ay)?[, ]+)?(good ?bye|bye( bye)?|end voice mode)\b/i;
 
 export function useTalkMode(ask: (question: string) => Promise<Answered>) {
   const [talk, setTalk] = useState<Talk>("off");
@@ -48,27 +49,38 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
 
   async function run(first?: string) {
     let question = first;
+    // Guards against a microphone that fails instantly over and over.
+    let quickFailures = 0;
     while (on.current) {
       if (!question) {
         setTalk("listening");
         const controller = new AbortController();
         listening.current = controller;
+        const startedAt = Date.now();
         try {
           question = await listenOnce(controller.signal);
         } catch (error) {
           if (!on.current) return;
           const code = (error as Error).message;
-          return end(code === "no-speech" ? "Voice mode ended: Lawdeck didn’t hear anything." : voiceErrorMessage(code));
+          // Silence is part of a conversation: keep waiting until the student speaks or presses End.
+          if (code === "no-speech" || code === "aborted") {
+            quickFailures = Date.now() - startedAt < 1000 ? quickFailures + 1 : 0;
+            if (quickFailures >= 5) return end("Voice mode stopped: the microphone isn’t responding. Tap the sound-wave button to try again.");
+            continue;
+          }
+          return end(voiceErrorMessage(code));
         }
         if (!on.current) return;
-        if (END.test(question)) return end();
+        quickFailures = 0;
       }
+      const leaving = GOODBYE.test(question);
       setTalk("thinking");
       const answered = await askRef.current(question);
       question = undefined;
       if (!on.current) return;
       if (!answered) return end("Voice mode ended because the answer did not finish.");
       if (!(await speak(answered.id))) return;
+      if (leaving) return end();
     }
   }
 

@@ -18,6 +18,8 @@ import type { ChatSource } from "@/server/db/workspace";
 import { searchForAnswer, type SearchHit } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 import { limitReachedMessage } from "@/lib/allowance";
+import { talkSearchText } from "@/lib/talkSearch";
+import { recordUsage } from "@/server/ai/usage";
 import {
   ALLOWANCE_UNAVAILABLE,
   getAllowance,
@@ -128,18 +130,23 @@ export async function answerQuestion(input: {
   // Rule G-06: nothing that looks like an email address or phone number leaves Lawdeck.
   const question = redactPersonalData(input.question);
   // The student's own Ready uploads join the library unless this chat has them turned off (6c).
+  const history = historyTurns(earlier.data);
+  // Voice mode: a short reply ("yes, go on") is searched together with the recent conversation.
+  const searchText = input.level === "talk" ? talkSearchText(question, history) : question;
   const found = await searchForAnswer({
-    question,
+    question: searchText,
     courseId: chat.data.course_id,
     includePending: false,
     useUploads: chat.data.use_uploads,
     results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
   });
   if (!found.ok) return send({ type: "error", message: found.message });
+  // Voice mode keeps the conversation going even when the library has nothing for this turn
+  // (small talk, thanks): the reply then uses no passages and gives no legal content.
   const unsure = searchUnsure(found);
-  if (unsure) return send({ type: "error", message: unsure });
+  if (unsure && input.level !== "talk") return send({ type: "error", message: unsure });
   send({ type: "found", count: found.hits.length });
-  if (found.hits.length === 0) {
+  if (found.hits.length === 0 && input.level !== "talk") {
     const saved = await saveAnswer(
       db,
       input.chatId,
@@ -168,7 +175,7 @@ export async function answerQuestion(input: {
     hits: found.hits,
     question,
     level: input.level,
-    history: historyTurns(earlier.data),
+    history,
     courseId: chat.data.course_id,
     userId: input.userId,
     onText: (text) => send({ type: "text", text }),
@@ -280,6 +287,8 @@ export async function composeAnswer(input: {
     model: input.model,
     long: input.level !== "talk" && isScenario(input.question),
     short: input.level === "talk",
+    // Voice mode records the call below, once it knows whether the reply taught from the library.
+    record: input.level !== "talk",
   });
   await checking;
   if (!result.ok) return { ok: false, reason: result.reason };
@@ -294,6 +303,17 @@ export async function composeAnswer(input: {
   const used = cited.filter(
     (hit): hit is SearchHit & { label: number } => hit !== undefined,
   );
+  // Voice mode: a reply that used no library passage (a greeting, thanks, checking what the
+  // student wants) is free; one that teaches from the library counts as a question.
+  if (input.level === "talk")
+    await recordUsage({
+      kind: used.length > 0 ? "explain" : "talk_chat",
+      model: result.model,
+      tokensIn: result.tokensIn,
+      tokensOut: result.tokensOut,
+      costUsd: result.costUsd,
+      ms: result.ms,
+    });
   const removedAuthorities = shown.split(REMOVED_AUTHORITY).length - 1;
   return {
     ok: true,

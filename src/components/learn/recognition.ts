@@ -37,26 +37,40 @@ export function voiceErrorMessage(code: string): string {
 }
 
 
-// Listens for one spoken sentence and returns its words (voice conversations). Rejects with the
-// browser's error code ("no-speech", "not-allowed" …); `cancel` stops listening early.
+// How long a pause means the student has finished speaking (voice mode), and how long to wait
+// for them to start before listening afresh.
+export const END_OF_TURN_MS = 1500;
+const WAIT_FOR_SPEECH_MS = 15_000;
+
+// Listens for one turn of a conversation and returns its words (voice mode). Short pauses
+// mid-sentence do not end the turn: it ends once the student has been quiet for END_OF_TURN_MS.
+// Rejects with the browser's error code ("no-speech", "not-allowed" …); `cancel` stops early.
 export function listenOnce(cancel?: AbortSignal): Promise<string> {
   return new Promise((resolve, reject) => {
     const Constructor = recognitionConstructor();
     if (!Constructor) return reject(new Error("unsupported"));
     const recognition = new Constructor();
     recognition.lang = "en-NG";
-    recognition.interimResults = false;
-    recognition.continuous = false;
+    recognition.interimResults = true;
+    recognition.continuous = true;
     let words = "";
     let failed = "";
+    let lastHeard = Date.now();
+    const started = Date.now();
     recognition.onresult = (event) => {
       words = "";
       for (let i = 0; i < event.results.length; i++) words += event.results[i][0]?.transcript ?? "";
+      lastHeard = Date.now();
     };
     recognition.onerror = (event) => {
       failed = event.error;
     };
+    const timer = setInterval(() => {
+      const quiet = Date.now() - lastHeard;
+      if (words.trim() ? quiet >= END_OF_TURN_MS : Date.now() - started >= WAIT_FOR_SPEECH_MS) recognition.stop();
+    }, 200);
     recognition.onend = () => {
+      clearInterval(timer);
       cancel?.removeEventListener("abort", stop);
       if (cancel?.aborted) reject(new Error("aborted"));
       else if (words.trim()) resolve(words.trim());

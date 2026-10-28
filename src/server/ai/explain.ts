@@ -25,6 +25,8 @@ export type ExplainResult =
       stop: string | null;
       // Time until the first words of the answer arrived (budget L-02: 3 seconds).
       firstTextMs: number | null;
+      // The whole call, for the usage record when the caller saves it.
+      ms: number;
     }
   | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable" | "cancelled" };
 
@@ -42,6 +44,9 @@ export async function streamExplanation(input: {
   long?: boolean;
   // A spoken reply in voice mode: short.
   short?: boolean;
+  // false: the caller records the usage itself, once it knows what kind of reply it was
+  // (voice-mode small talk is free).
+  record?: boolean;
 }): Promise<ExplainResult> {
   const started = Date.now();
   const model = input.model ?? MODELS.explain;
@@ -83,7 +88,7 @@ export async function streamExplanation(input: {
       stop: message.stop_reason,
     });
     // A refused answer is not a question answered, so it does not count against the limit.
-    if (message.stop_reason !== "refusal") {
+    if (message.stop_reason !== "refusal" && input.record !== false) {
       await recordUsage({
         kind: "explain",
         model: message.model,
@@ -108,6 +113,7 @@ export async function streamExplanation(input: {
       costUsd: cost,
       stop: message.stop_reason,
       firstTextMs,
+      ms: Date.now() - started,
     };
   } catch (error) {
     console.error("ai call failed", { job: "explain", userId: input.userId, ...failureDetails(error), ms: Date.now() - started });
