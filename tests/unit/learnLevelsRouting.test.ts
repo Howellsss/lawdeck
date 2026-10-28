@@ -1,8 +1,8 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
-import { EXPLAIN_SYSTEM, isScenario, LEVEL_INSTRUCTIONS, questionMessage } from "@/prompts/explain";
+import { EXPLAIN_SYSTEM, isScenario, LEVEL_INSTRUCTIONS, PICKABLE_LEVELS, questionMessage } from "@/prompts/explain";
 import { isTopicOnly, parseRoute } from "@/prompts/route";
-import { startChatSchema, topicNameSchema, topicSlug } from "@/schemas/learn";
-import { EXPLAIN_LONG_MAX_TOKENS, EXPLAIN_MAX_TOKENS } from "@/server/ai/explain";
+import { askSchema, startChatSchema, topicNameSchema, topicSlug } from "@/schemas/learn";
+import { EXPLAIN_LONG_MAX_TOKENS, EXPLAIN_MAX_TOKENS, EXPLAIN_TALK_MAX_TOKENS } from "@/server/ai/explain";
 import { routeRequest } from "@/server/ai/route";
 
 describe("answer levels", () => {
@@ -11,6 +11,30 @@ describe("answer levels", () => {
     expect(questionMessage([], "Why?", "exam")).toContain(LEVEL_INSTRUCTIONS.exam);
     expect(questionMessage([], "Why?")).toContain(LEVEL_INSTRUCTIONS.exam);
     expect(EXPLAIN_SYSTEM).not.toContain("Answer level");
+  });
+});
+
+describe("voice-mode conversation (founder, 2026-10-28)", () => {
+  it("replies in a few spoken sentences that end with a question back to the student", () => {
+    const talk = LEVEL_INSTRUCTIONS.talk;
+    expect(questionMessage([], "Why?", "talk")).toContain(talk);
+    expect(talk).toContain("two to five short");
+    expect(talk).toContain("end with one short question back to the student");
+    expect(talk).toContain("Do not use the section headings");
+  });
+
+  it("keeps every safety rule: passages only, ids for the citation check, corrections", () => {
+    const talk = LEVEL_INSTRUCTIONS.talk;
+    expect(talk).toContain("only from the passages");
+    expect(talk).toContain("passage id after the point");
+    expect(talk).toContain("correct anything wrong the student says");
+  });
+
+  it("is short, used by voice mode only, and never offered in the level picker", () => {
+    expect(EXPLAIN_TALK_MAX_TOKENS).toBeLessThan(EXPLAIN_MAX_TOKENS);
+    expect(PICKABLE_LEVELS).not.toContain("talk");
+    expect(askSchema.parse({ question: "Why?", level: "talk" }).level).toBe("talk");
+    expect(askSchema.safeParse({ question: "Why?", level: "chatty" }).success).toBe(false);
   });
 });
 

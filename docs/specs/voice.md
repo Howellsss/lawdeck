@@ -6,9 +6,13 @@ voices) and that students choose the voice.
 
 ## What students get
 - **Read** on every Learn answer: reads the whole answer, with Pause, Resume and Stop.
-- **Voice mode** (sound-wave button on the home screen and in a chat): Lawdeck listens, answers on
-  screen, reads the **Short answer** aloud, asks "Would you like me to read the full explanation?",
-  then listens again. Saying "yes" reads the rest; "stop" or **End** ends voice mode.
+- **Voice mode** (sound-wave button on the home screen and in a chat), a spoken back-and-forth
+  conversation (founder, 2026-10-28): Lawdeck listens, replies in two to five short spoken
+  sentences (answer level "Conversation", `talk`) that end with a question back to the student,
+  reads them aloud, then listens again. **Tap to speak** interrupts it; saying "stop" or **End**
+  ends voice mode. Each reply also appears in the chat with **Explain in full** for the complete
+  exam-ready answer. Every spoken turn counts as one question (founder's decision). Lawdeck talks
+  to the student as "you": student names are never sent to the AI.
 - **Reading voice** on the Account page: female (Ezinne, default) or male (Abeo), both Nigerian English.
 
 ## How names and legal shorthand are read

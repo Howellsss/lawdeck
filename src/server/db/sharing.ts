@@ -1,4 +1,5 @@
 import "server-only";
+import type { AnswerLevel } from "@/prompts/explain";
 import { shareTokenSchema, sharedItemSchema, type ShareKind } from "@/schemas/sharing";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -26,7 +27,7 @@ export type SharedSource = { label: number; title: string; origin: "library" | "
 export type SharedMessage = {
   role: "user" | "assistant";
   text: string;
-  level: "simple" | "exam" | null;
+  level: AnswerLevel | null;
   createdAt: string;
   sources: SharedSource[];
 };
@@ -141,7 +142,7 @@ export async function getSharedChat(token: string, id: string): Promise<SharedMe
     return {
       role: m.role,
       text: typeof content.text === "string" ? content.text : "",
-      level: content.level === "simple" || content.level === "exam" ? content.level : null,
+      level: content.level === "simple" || content.level === "exam" || content.level === "talk" ? content.level : null,
       createdAt: m.created_at,
       sources: sources(m.sources),
     };

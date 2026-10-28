@@ -11,11 +11,13 @@ export const evalCasesSchema = z.object({
       z.object({
         id: z.string().regex(/^Q[0-9]{2,3}$/),
         topic: z.string().min(1).max(200),
-        level: z.enum(["simple", "exam"]),
+        level: z.enum(["simple", "exam", "talk"]),
         question: z.string().min(3).max(2000),
         mustInclude: z.array(z.string().min(3).max(300)).min(1).max(6),
         authorities: z.array(z.string().min(1).max(200)).max(6).default([]),
         sourcePhrase: z.string().min(5).max(200),
+        // What the reply must also do (voice-mode Conversation cases: its spoken form).
+        expect: z.string().min(10).max(400).optional(),
       }),
     )
     .min(1),

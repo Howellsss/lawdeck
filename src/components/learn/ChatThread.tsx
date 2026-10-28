@@ -116,7 +116,8 @@ export function ChatThread({
     return answered;
   }
 
-  const talk = useTalkMode((question) => ask(question, level));
+  // Voice mode answers in the spoken Conversation style, whatever level the box is set to.
+  const talk = useTalkMode((question) => ask(question, "talk"));
 
   // A question typed on the home screen (or picked from a course hub) is asked once, when its chat opens.
   useEffect(() => {
@@ -205,7 +206,7 @@ export function ChatThread({
           </>
         )}
       </ol>
-      <TalkBar talk={talk.talk} offering={talk.offering} onEnd={talk.end} />
+      <TalkBar talk={talk.talk} onInterrupt={talk.interrupt} onEnd={talk.end} />
       {talk.note && (
         <p role="status" className="px-1 text-sm text-muted">
           {talk.note}

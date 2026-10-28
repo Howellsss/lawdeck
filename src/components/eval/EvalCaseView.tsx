@@ -1,6 +1,7 @@
 import { AnswerText } from "@/components/learn/AnswerText";
 import type { EvalAnswer } from "@/server/db/evals";
 import { RateAnswerForm } from "./RateAnswerForm";
+import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
 
 const PUSHBACK_LABELS: Record<string, string> = {
   wrong_statement: "Student states something wrong",
@@ -21,7 +22,7 @@ export function EvalCaseView({ answers }: { answers: EvalAnswer[] }) {
       <div className="flex flex-col gap-2 rounded-2xl border border-line p-4">
         <h2 id="case-heading" className="text-lg font-medium">
           {first.caseId} · {first.pushbackType ? PUSHBACK_LABELS[first.pushbackType] : first.topic}
-          {first.level && <span className="text-sm font-normal text-muted"> · {first.level === "simple" ? "Simple" : "Exam-ready"}</span>}
+          {first.level && <span className="text-sm font-normal text-muted"> · {LEVEL_LABELS[first.level as AnswerLevel] ?? first.level}</span>}
         </h2>
         {first.turns.length > 0 && (
           <ol className="flex flex-col gap-2 text-[15px]">

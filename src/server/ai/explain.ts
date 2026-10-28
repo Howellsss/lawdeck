@@ -12,6 +12,8 @@ export type ExplainTurn = { role: "user" | "assistant"; text: string };
 // more room for exam-depth answers (founder, 2026-10-25); the route allows 120 seconds.
 export const EXPLAIN_MAX_TOKENS = 4_000;
 export const EXPLAIN_LONG_MAX_TOKENS = 7_000;
+// A spoken reply in voice mode: a few sentences, so it comes back quickly.
+export const EXPLAIN_TALK_MAX_TOKENS = 700;
 
 export type ExplainResult =
   | {
@@ -38,6 +40,8 @@ export async function streamExplanation(input: {
   model?: ExplainModel;
   // A problem question: the answer goes into every issue in depth, so it may be longer.
   long?: boolean;
+  // A spoken reply in voice mode: short.
+  short?: boolean;
 }): Promise<ExplainResult> {
   const started = Date.now();
   const model = input.model ?? MODELS.explain;
@@ -47,7 +51,7 @@ export async function streamExplanation(input: {
     const stream = getClaude().messages.stream(
       {
         model,
-        max_tokens: input.long ? EXPLAIN_LONG_MAX_TOKENS : EXPLAIN_MAX_TOKENS,
+        max_tokens: input.short ? EXPLAIN_TALK_MAX_TOKENS : input.long ? EXPLAIN_LONG_MAX_TOKENS : EXPLAIN_MAX_TOKENS,
         // No long thinking before answering, so the first words appear quickly (budget: 3 s).
         ...(settings.thinking ? { thinking: settings.thinking } : {}),
         ...(settings.effort ? { output_config: { effort: settings.effort } } : {}),

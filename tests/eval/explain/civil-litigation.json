@@ -704,6 +704,76 @@
         "Order 17, Rule 7 (Lagos)"
       ],
       "sourcePhrase": "Interlocutory injunction lasts until the final determination of the substantive suit"
+    },
+    {
+      "id": "Q46",
+      "topic": "Pleadings vs originating processes (voice conversation)",
+      "level": "talk",
+      "question": "So is a writ of summons a pleading or not?",
+      "mustInclude": [
+        "Writ, originating summons, originating motion and petition are not pleadings"
+      ],
+      "authorities": [
+        "Murray v. Stephenson (1887)"
+      ],
+      "sourcePhrase": "originating motion and petition are not pleadings",
+      "expect": "Replies as a spoken tutor in voice mode: a few short sentences with no headings, lists or Authorities section, answers the point correctly from the notes, and ends with one short question back to the student."
+    },
+    {
+      "id": "Q47",
+      "topic": "Service on a company (Lagos) (voice conversation)",
+      "level": "talk",
+      "question": "How do I serve a writ on a company in Lagos?",
+      "mustInclude": [
+        "Deliver to a director, secretary, trustee or other senior or principal officer, or leave it at the registered office"
+      ],
+      "authorities": [
+        "Order 9, Rule 9 of Lagos"
+      ],
+      "sourcePhrase": "there is nothing like substituted service on a company",
+      "expect": "Replies as a spoken tutor in voice mode: a few short sentences with no headings, lists or Authorities section, answers the point correctly from the notes, and ends with one short question back to the student."
+    },
+    {
+      "id": "Q48",
+      "topic": "Third party proceedings (voice conversation)",
+      "level": "talk",
+      "question": "Who is allowed to bring third party proceedings?",
+      "mustInclude": [
+        "Brought by a defendant only, or a claimant who is a defendant to a counterclaim"
+      ],
+      "authorities": [
+        "Order 13, Rule 21 FCT Abuja"
+      ],
+      "sourcePhrase": "Special proceedings brought by a defendant only",
+      "expect": "Replies as a spoken tutor in voice mode: a few short sentences with no headings, lists or Authorities section, answers the point correctly from the notes, and ends with one short question back to the student."
+    },
+    {
+      "id": "Q49",
+      "topic": "ADR screening (Abuja) (voice conversation)",
+      "level": "talk",
+      "question": "Can the FCT High Court send my case to ADR without me asking?",
+      "mustInclude": [
+        "Originating processes are screened for ADR suitability upon acceptance for filing in Abuja"
+      ],
+      "authorities": [
+        "Order 2, Rule 7 of the High Court of Federal Capital Abuja (Civil Procedures) Rules 2018"
+      ],
+      "sourcePhrase": "be screened for suitability for ADR, and where it is considered appropriate",
+      "expect": "Replies as a spoken tutor in voice mode: a few short sentences with no headings, lists or Authorities section, answers the point correctly from the notes, and ends with one short question back to the student."
+    },
+    {
+      "id": "Q50",
+      "topic": "Small Claims: Abuja vs Lagos (voice conversation)",
+      "level": "talk",
+      "question": "What's the Small Claims limit in Lagos?",
+      "mustInclude": [
+        "Lagos Small Claims limit is N5,000,000 excluding interest and cost"
+      ],
+      "authorities": [
+        "Practice Direction on Small Claims 2023"
+      ],
+      "sourcePhrase": "The jurisdiction of the Court is 4 million",
+      "expect": "Replies as a spoken tutor in voice mode: a few short sentences with no headings, lists or Authorities section, answers the point correctly from the notes, and ends with one short question back to the student."
     }
   ],
   "pushback": [
