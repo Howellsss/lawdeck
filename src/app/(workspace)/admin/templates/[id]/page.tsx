@@ -15,7 +15,7 @@ export default function TemplatePage({
   params,
 }: PageProps<"/admin/templates/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/admin/templates" className="text-sm">
         All templates
       </Link>

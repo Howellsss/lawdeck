@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Chat · Lawdeck" };
 // A Learn chat: its messages, sourced answers and the next-question box (Phase 3).
 export default function ChatPage({ params }: PageProps<"/chats/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the chat" />}>
         <Chat params={params} />
       </Suspense>

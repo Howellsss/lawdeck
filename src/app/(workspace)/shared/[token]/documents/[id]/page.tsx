@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Shared document · Lawdeck", robots:
 // A document inside a shared project, read-only.
 export default function SharedProjectDocumentPage({ params }: PageProps<"/shared/[token]/documents/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Opening the document" />}>
         <SharedProjectDocument params={params} />
       </Suspense>

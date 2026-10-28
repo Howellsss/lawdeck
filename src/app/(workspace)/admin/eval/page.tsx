@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "Answer tests · Lawdeck" };
 // The answer quality tests (step 3e): each run puts the test cases through each model.
 export default function EvalRunsPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <div className="flex flex-col gap-2">
         <h1 className="font-serif text-3xl font-normal text-greeting">Answer tests</h1>
         <p className="text-muted">

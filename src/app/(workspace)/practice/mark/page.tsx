@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Mark my answer · Lawdeck" };
 // Exam-style questions approved by a legal reviewer; the student answers one and Lawdeck marks it.
 export default function MarkPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/practice" className="text-sm">
         All practice
       </Link>

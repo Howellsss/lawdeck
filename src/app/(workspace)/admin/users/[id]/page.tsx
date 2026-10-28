@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "User · Lawdeck" };
 // gets "page not found". Counts only: never their chats, documents or uploads themselves.
 export default function UserPage(props: PageProps<"/admin/users/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading this person" />}>
         <User {...props} />
       </Suspense>

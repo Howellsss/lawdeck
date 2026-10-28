@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Shared chat · Lawdeck", robots: { i
 // A chat inside a shared project, read-only.
 export default function SharedChatPage({ params }: PageProps<"/shared/[token]/chats/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Opening the chat" />}>
         <SharedChat params={params} />
       </Suspense>

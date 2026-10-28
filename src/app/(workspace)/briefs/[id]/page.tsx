@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Brief · Lawdeck" };
 // One saved brief: its sections in order, with the library sources it came from.
 export default function BriefPage({ params }: PageProps<"/briefs/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/briefs" className="text-sm">
         All briefs
       </Link>

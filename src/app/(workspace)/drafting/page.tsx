@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Drafting catalogue · Lawdeck" };
 // The drafting catalogue (PRD DR-01): reviewed documents by course. Only approved templates show.
 export default function DraftingPage({ searchParams }: PageProps<"/drafting">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <h1 className="font-serif text-3xl font-normal text-greeting">Drafting catalogue</h1>
       <Suspense fallback={<LoadingRows label="Loading the catalogue" />}>
         <Catalogue searchParams={searchParams} />

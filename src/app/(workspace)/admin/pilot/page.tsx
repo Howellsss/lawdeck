@@ -18,7 +18,7 @@ export const metadata: Metadata = { title: "Pilot · Lawdeck" };
 // invite-only and price-question settings. Everyone else gets "page not found".
 export default function PilotPage() {
   return (
-    <div className="mx-auto flex w-full max-w-5xl flex-col gap-8 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the pilot" />}>
         <Pilot />
       </Suspense>
