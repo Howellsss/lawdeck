@@ -35,6 +35,10 @@ jobs:
       - run: npm run test:e2e
         env:
           CI: "true"
+      # Voice mode, with a pretend microphone, against the test-only page (never on the live site).
+      - run: npm run test:voice
+        env:
+          CI: "true"
 
   database:
     name: Database permission rules (local PostgreSQL)

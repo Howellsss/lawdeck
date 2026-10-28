@@ -21,6 +21,12 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
   const on = useRef(false);
   const interrupted = useRef(false);
   const listening = useRef<AbortController | null>(null);
+  // The page can be hidden for a moment and shown again without leaving it (Next.js keeps
+  // pages alive while it refreshes or navigates). Voice mode pauses while hidden and carries on
+  // when shown, rather than ending: ending here is what stopped it after the first answer
+  // (founder, 2026-10-28). While hidden it never listens or speaks.
+  const hidden = useRef(false);
+  const shown = useRef<(() => void) | null>(null);
   const askRef = useRef(ask);
   useEffect(() => {
     askRef.current = ask;
@@ -35,7 +41,29 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
     setNote(message ?? null);
   }, []);
 
-  useEffect(() => () => end(), [end]);
+  useEffect(() => {
+    hidden.current = false;
+    shown.current?.();
+    shown.current = null;
+    return () => {
+      hidden.current = true;
+      if (!on.current) return;
+      interrupted.current = true;
+      listening.current?.abort();
+      speaker.stop();
+    };
+  }, []);
+
+  // Leaving the page for good (closing or reloading it) ends voice mode.
+  useEffect(() => {
+    const leave = () => end();
+    window.addEventListener("pagehide", leave);
+    return () => window.removeEventListener("pagehide", leave);
+  }, [end]);
+
+  function whileHidden(): Promise<void> {
+    return hidden.current ? new Promise((resolve) => (shown.current = resolve)) : Promise.resolve();
+  }
 
   // Reads a reply aloud; false when voice mode should not go on.
   async function speak(id: string): Promise<boolean> {
@@ -53,6 +81,8 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
     let quickFailures = 0;
     while (on.current) {
       if (!question) {
+        await whileHidden();
+        if (!on.current) return;
         setTalk("listening");
         const controller = new AbortController();
         listening.current = controller;
@@ -79,6 +109,8 @@ export function useTalkMode(ask: (question: string) => Promise<Answered>) {
       question = undefined;
       if (!on.current) return;
       if (!answered) return end("Voice mode ended because the answer did not finish.");
+      await whileHidden();
+      if (!on.current) return;
       if (!(await speak(answered.id))) return;
       if (leaving) return end();
     }
