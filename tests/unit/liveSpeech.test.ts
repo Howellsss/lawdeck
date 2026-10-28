@@ -3,7 +3,13 @@ import { beforeEach, describe, expect, it, vi } from "vitest";
 // A pretend voice service: each sentence "audio" is its own text, ready after a delay that makes
 // later sentences finish first, to prove they are still sent in order.
 const synthesize = vi.fn();
-vi.mock("@/server/ai/speech", () => ({ synthesizeSpeech: synthesize }));
+const recordUsage = vi.fn();
+vi.mock("@/server/ai/speech", () => ({
+  synthesizeSpeech: synthesize,
+  speechCostUsd: (chars: number) => chars / 1_000_000,
+  VOICE_NAMES: { female: "en-NG-EzinneNeural", male: "en-NG-AbeoNeural" },
+}));
+vi.mock("@/server/ai/usage", () => ({ recordUsage }));
 const { LiveSpeech } = await import("@/server/learn/liveSpeech");
 
 const audioOf = (text: string) => new TextEncoder().encode(text).buffer;
@@ -11,6 +17,7 @@ const textOf = (data: string) => Buffer.from(data, "base64").toString();
 
 describe("speaking a reply while it is written", () => {
   beforeEach(() => {
+    recordUsage.mockReset();
     synthesize.mockReset().mockImplementation(async (text: string) => {
       await new Promise((resolve) => setTimeout(resolve, text.startsWith("Hey") ? 30 : 5));
       return { ok: true, audio: audioOf(text) };
@@ -26,7 +33,10 @@ describe("speaking a reply while it is written", () => {
     live.push(" studying today?");
     await live.end();
     expect(sent.map((event) => textOf(event.data ?? ""))).toEqual(["Hey!", "Doing well, thanks.", "What are we studying today?"]);
-    expect(synthesize).toHaveBeenCalledWith("Doing well, thanks.", "female");
+    expect(synthesize).toHaveBeenCalledWith("Doing well, thanks.", "female", false);
+    // The reply's speech is recorded once, with its characters, never its text.
+    expect(recordUsage).toHaveBeenCalledTimes(1);
+    expect(recordUsage).toHaveBeenCalledWith(expect.objectContaining({ kind: "speech", model: "en-NG-EzinneNeural", tokensIn: 50 }));
   });
 
   it("stops speaking after a failure and says so once", async () => {
@@ -36,5 +46,6 @@ describe("speaking a reply while it is written", () => {
     live.push("One. Two. Three.");
     await live.end();
     expect(sent).toEqual([{ type: "audio_error", message: expect.any(String) }]);
+    expect(recordUsage).not.toHaveBeenCalled();
   });
 });

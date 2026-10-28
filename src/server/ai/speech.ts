@@ -23,6 +23,10 @@ export const SPEECH_DAILY_CHARS = 40_000;
 // Azure answers in about a second; a part that takes longer than this is given up on.
 const TIMEOUT_MS = 20_000;
 
+export function speechCostUsd(chars: number): number {
+  return Math.round(((chars * USD_PER_MILLION_CHARS) / 1_000_000) * 1_000_000) / 1_000_000;
+}
+
 export function speechConfigured(): boolean {
   return Boolean(process.env.AZURE_SPEECH_KEY && process.env.AZURE_SPEECH_REGION);
 }
@@ -32,7 +36,9 @@ export type SpeechResult =
   | { ok: true; audio: ArrayBuffer }
   | { ok: false; reason: "unavailable" | "busy"; detail: string };
 
-export async function synthesizeSpeech(text: string, voice: Voice): Promise<SpeechResult> {
+// record: false when the caller records the usage itself (voice mode records a whole reply once,
+// so each sentence's audio goes out without waiting for the database).
+export async function synthesizeSpeech(text: string, voice: Voice, record = true): Promise<SpeechResult> {
   const key = process.env.AZURE_SPEECH_KEY;
   const region = process.env.AZURE_SPEECH_REGION;
   if (!key || !region) return { ok: false, reason: "unavailable", detail: "the Azure key or region is not set on Vercel" };
@@ -58,14 +64,15 @@ export async function synthesizeSpeech(text: string, voice: Voice): Promise<Spee
       return { ok: false, reason: response.status === 429 ? "busy" : "unavailable", detail: azureProblem(response.status) };
     }
     const audio = await response.arrayBuffer();
-    await recordUsage({
-      kind: "speech",
-      model: voiceName,
-      tokensIn: text.length,
-      tokensOut: 0,
-      costUsd: Math.round(((text.length * USD_PER_MILLION_CHARS) / 1_000_000) * 1_000_000) / 1_000_000,
-      ms: Date.now() - started,
-    });
+    if (record)
+      await recordUsage({
+        kind: "speech",
+        model: voiceName,
+        tokensIn: text.length,
+        tokensOut: 0,
+        costUsd: speechCostUsd(text.length),
+        ms: Date.now() - started,
+      });
     return { ok: true, audio };
   } catch (error) {
     const name = (error as Error)?.name;

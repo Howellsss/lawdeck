@@ -4,8 +4,15 @@
 // "Ltd." do not end one.
 const ABBREVIATION = /\b(?:s|ss|o|r|rr|pt|no|v|vs|e\.g|i\.e|ltd|nig|co|mr|mrs|ms|dr|prof|art|arts|para|paras|cf|etc|hon|sec|ch|vol)\.$/i;
 
+// quickStart: the first piece may end at a comma once it is long enough, so voice mode starts
+// speaking sooner ("Yes, I can help with that, ..." starts after "Yes, I can help with that,").
+const QUICK_START_CHARS = 40;
+
 export class SentenceSplitter {
   private pending = "";
+  private started = false;
+
+  constructor(private readonly options: { quickStart?: boolean } = {}) {}
 
   // Adds a piece of text and returns the sentences it completed.
   push(text: string): string[] {
@@ -21,6 +28,14 @@ export class SentenceSplitter {
       start = cut;
     }
     this.pending = this.pending.slice(start);
+    if (this.options.quickStart && !this.started && done.length === 0) {
+      const comma = this.pending.lastIndexOf(", ");
+      if (comma + 1 >= QUICK_START_CHARS) {
+        done.push(this.pending.slice(0, comma + 1).trim());
+        this.pending = this.pending.slice(comma + 2);
+      }
+    }
+    if (done.length) this.started = true;
     return done;
   }
 

@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandMark } from "@/components/ui/BrandMark";
 import { Icon } from "@/components/ui/Icon";
 import { VoiceWave } from "@/components/ui/VoiceWave";
 import { useSpeechSupported } from "./recognition";
@@ -59,11 +60,12 @@ export function VoiceMode({
             className="flex flex-col items-center gap-6"
           >
             <span
-              className={`flex size-40 items-center justify-center rounded-full bg-ink text-on-ink sm:size-48 ${
+              className={`flex size-40 flex-col items-center justify-center gap-3 rounded-full border border-line bg-surface sm:size-48 ${
                 voice.talk === "listening" ? "voice-orb-listening" : voice.talk === "thinking" ? "voice-orb-thinking" : ""
               }`}
             >
-              {voice.talk === "speaking" && <VoiceWave className="h-10 scale-150" />}
+              <BrandMark size={64} />
+              <span className="flex h-6 items-center text-ink">{voice.talk === "speaking" && <VoiceWave />}</span>
             </span>
             <span className="text-lg" aria-live="polite">
               {STATUS[voice.talk]}

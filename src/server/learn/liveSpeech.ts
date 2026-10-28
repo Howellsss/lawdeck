@@ -2,7 +2,8 @@ import "server-only";
 import { SentenceSplitter } from "@/lib/sentences";
 import { speakableText } from "@/lib/speech";
 import type { Voice } from "@/schemas/voice";
-import { synthesizeSpeech } from "@/server/ai/speech";
+import { speechCostUsd, synthesizeSpeech, VOICE_NAMES } from "@/server/ai/speech";
+import { recordUsage } from "@/server/ai/usage";
 
 export type LiveSpeechEvent = { type: "audio"; data: string } | { type: "audio_error"; message: string };
 
@@ -11,7 +12,9 @@ export type LiveSpeechEvent = { type: "audio"; data: string } | { type: "audio_e
 // while it is still thinking of the rest. Only the checked reply text is spoken (it comes through
 // the citation check first), from the server; nothing else reaches the voice service.
 export class LiveSpeech {
-  private readonly split = new SentenceSplitter();
+  private readonly split = new SentenceSplitter({ quickStart: true });
+  private chars = 0;
+  private readonly started = Date.now();
   private chain: Promise<void> = Promise.resolve();
   private failed = false;
 
@@ -25,20 +28,34 @@ export class LiveSpeech {
   }
 
   // Speaks what is left and waits until every sentence has been sent.
+  // Speaks what is left, waits until every sentence has been sent, then records the reply's speech
+  // once (characters, cost and time; never the text).
   async end() {
     for (const sentence of this.split.end()) this.say(sentence);
     await this.chain;
+    if (this.chars > 0)
+      await recordUsage({
+        kind: "speech",
+        model: VOICE_NAMES[this.voice],
+        tokensIn: this.chars,
+        tokensOut: 0,
+        costUsd: speechCostUsd(this.chars),
+        ms: Date.now() - this.started,
+      });
   }
 
   private say(sentence: string) {
     const spoken = speakableText(sentence);
     if (!spoken || this.failed) return;
     // Started now, sent in order: the next sentence is being made while this one plays.
-    const audio = synthesizeSpeech(spoken, this.voice);
+    const audio = synthesizeSpeech(spoken, this.voice, false);
     this.chain = this.chain.then(async () => {
       const result = await audio;
       if (this.failed) return;
-      if (result.ok) this.send({ type: "audio", data: Buffer.from(result.audio).toString("base64") });
+      if (result.ok) {
+        this.chars += spoken.length;
+        this.send({ type: "audio", data: Buffer.from(result.audio).toString("base64") });
+      }
       else {
         this.failed = true;
         this.send({ type: "audio_error", message: "Lawdeck’s voice is not available right now. The reply is in the chat." });

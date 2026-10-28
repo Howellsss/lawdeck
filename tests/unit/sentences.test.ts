@@ -30,4 +30,12 @@ describe("splitting a streamed reply into sentences", () => {
       "Under s. 36 of the Act, see Agbonmagbe Bank Ltd. v. Ollivant.",
     ]);
   });
+
+  it("can start with the first long clause, so speech begins sooner", () => {
+    const split = new SentenceSplitter({ quickStart: true });
+    expect(split.push("Yes")).toEqual([]);
+    expect(split.push(", I can help with originating processes, and the")).toEqual(["Yes, I can help with originating processes,"]);
+    expect(split.push(" pleadings. Next, a short one, ok")).toEqual(["and the pleadings."]);
+    expect(split.end()).toEqual(["Next, a short one, ok"]);
+  });
 });

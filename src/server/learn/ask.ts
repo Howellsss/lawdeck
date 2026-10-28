@@ -11,7 +11,7 @@ import {
   type ExplainResult,
   type ExplainTurn,
 } from "@/server/ai/explain";
-import type { ExplainModel } from "@/server/ai/models";
+import { MODELS, type ExplainModel } from "@/server/ai/models";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
@@ -92,49 +92,30 @@ export async function answerQuestion(input: {
   signal?: AbortSignal;
 }): Promise<void> {
   const { db, send } = input;
-  const chat = await db
-    .from("conversations")
-    .select("id, title, course_id, use_uploads")
-    .eq("id", input.chatId)
-    .maybeSingle();
+  // Independent reads run together, so the answer starts sooner (voice mode, founder 2026-10-28:
+  // "it responded but really slow").
+  const [chat, allowance, earlier] = await Promise.all([
+    db.from("conversations").select("id, title, course_id, use_uploads").eq("id", input.chatId).maybeSingle(),
+    // Rule K-01: the monthly limit is checked before anything is saved or any AI is called.
+    getAllowance(db),
+    db
+      .from("messages")
+      .select("role, content")
+      .eq("conversation_id", input.chatId)
+      .order("created_at", { ascending: false })
+      .limit(HISTORY_MESSAGES),
+  ]);
   if (chat.error || !chat.data)
     return send({ type: "error", message: "That chat could not be found." });
-
-  // Rule K-01: the monthly limit is checked before anything is saved or any AI is called.
-  const allowance = await getAllowance(db);
   if (!allowance)
     return send({ type: "error", message: ALLOWANCE_UNAVAILABLE });
   if (!hasQuestionsLeft(allowance))
     return send({ type: "error", message: limitReachedMessage(allowance) });
-
-  const earlier = await db
-    .from("messages")
-    .select("role, content")
-    .eq("conversation_id", input.chatId)
-    .order("created_at", { ascending: false })
-    .limit(HISTORY_MESSAGES);
   if (earlier.error)
     return send({
       type: "error",
       message: "The chat could not be loaded. Please try again.",
     });
-
-  const asked = await db.from("messages").insert({
-    conversation_id: input.chatId,
-    role: "user",
-    content: { text: input.question, level: input.level },
-  });
-  if (asked.error)
-    return send({
-      type: "error",
-      message: "Your question was not saved. Please try again.",
-    });
-  if (chat.data.title === "New chat") {
-    await db
-      .from("conversations")
-      .update({ title: titleFrom(input.question) })
-      .eq("id", input.chatId);
-  }
 
   // Rule G-06: nothing that looks like an email address or phone number leaves Lawdeck.
   const question = redactPersonalData(input.question);
@@ -144,15 +125,34 @@ export async function answerQuestion(input: {
   const searchText = input.level === "talk" ? talkSearchText(question, history) : question;
   // Voice-mode small talk ("Hey, what's up?") is answered straight away, without searching.
   const smallTalk = input.level === "talk" && isSmallTalk(question);
-  const found: SearchResult = smallTalk
-    ? { ok: true, hits: [], meaningUsed: true, reranked: false }
-    : await searchForAnswer({
-        question: searchText,
-        courseId: chat.data.course_id,
-        includePending: false,
-        useUploads: chat.data.use_uploads,
-        results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
-      });
+  // Saving the question, naming a new chat, the search and (voice mode) the reading limit run
+  // together.
+  const title = chat.data.title === "New chat";
+  const [asked, , found, speechLimit] = await Promise.all([
+    db.from("messages").insert({
+      conversation_id: input.chatId,
+      role: "user",
+      content: { text: input.question, level: input.level },
+    }),
+    title
+      ? db.from("conversations").update({ title: titleFrom(input.question) }).eq("id", input.chatId)
+      : null,
+    smallTalk
+      ? ({ ok: true, hits: [], meaningUsed: true, reranked: false } satisfies SearchResult)
+      : searchForAnswer({
+          question: searchText,
+          courseId: chat.data.course_id,
+          includePending: false,
+          useUploads: chat.data.use_uploads,
+          results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
+        }),
+    input.level === "talk" && input.voice && speechConfigured() ? dailyLimit(0) : null,
+  ]);
+  if (asked.error)
+    return send({
+      type: "error",
+      message: "Your question was not saved. Please try again.",
+    });
   if (!found.ok) return send({ type: "error", message: found.message });
   // Voice mode keeps the conversation going even when the library has nothing for this turn
   // (small talk, thanks): the reply then uses no passages and gives no legal content.
@@ -185,14 +185,13 @@ export async function answerQuestion(input: {
 
   // Voice mode speaks while it writes, within the student's daily reading limit.
   let live: LiveSpeech | null = null;
-  if (input.level === "talk" && input.voice && speechConfigured()) {
-    const limit = await dailyLimit(0);
-    if (limit === "ok") live = new LiveSpeech(input.voice, send);
+  if (speechLimit && input.voice) {
+    if (speechLimit === "ok") live = new LiveSpeech(input.voice, send);
     else
       send({
         type: "audio_error",
         message:
-          limit === "over"
+          speechLimit === "over"
             ? "You have reached today’s reading-aloud limit; the reply is in the chat."
             : "Lawdeck’s voice is not available right now. The reply is in the chat.",
       });
@@ -205,6 +204,8 @@ export async function answerQuestion(input: {
     history,
     courseId: chat.data.course_id,
     userId: input.userId,
+    // Small talk needs no legal reasoning: the fastest model answers it.
+    model: smallTalk ? MODELS.smallTalk : undefined,
     onText: (text) => {
       send({ type: "text", text });
       live?.push(text);

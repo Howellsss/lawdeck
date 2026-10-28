@@ -10,6 +10,9 @@ export const MODELS = {
   // Reading scanned pages and photos into text (step 2c). Switch to Sonnet if a sample scan shows mistakes.
   transcribe: "claude-haiku-5-5",
   explain: "claude-sonnet-5-5",
+  // Voice-mode small talk ("Hey, what's up?"): no legal content, so the fastest model (founder,
+  // 2026-10-28: replies were slow). Teaching replies stay on the explanations model.
+  smallTalk: "claude-haiku-5-5",
   // Practice questions (step 4b): the model chosen for explanations in step 3e.
   practice: "claude-sonnet-5-5",
   // Case and statute briefs (step 4f): legal judgement, so the explanations model.
