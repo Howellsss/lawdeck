@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "New marking guide · Lawdeck" };
 
 export default function NewRubricPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/admin/rubrics" className="text-sm">
         All marking guides
       </Link>

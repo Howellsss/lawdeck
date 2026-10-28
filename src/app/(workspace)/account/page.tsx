@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Account · Lawdeck" };
 // The student's account: who is signed in, and deleting the account (PRD AC-05).
 export default function AccountPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading your account" />}>
         <Account />
       </Suspense>

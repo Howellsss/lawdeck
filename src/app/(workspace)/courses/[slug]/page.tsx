@@ -15,7 +15,7 @@ export const metadata: Metadata = { title: "Course · Lawdeck" };
 // explanation. Admins also manage the topics here.
 export default function CourseHubPage({ params }: PageProps<"/courses/[slug]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the course" />}>
         <Hub params={params} />
       </Suspense>

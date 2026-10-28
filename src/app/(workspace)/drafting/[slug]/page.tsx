@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Draft a document · Lawdeck" };
 // One reviewed document's intake (DR-03, DR-04): court or registry, then the facts.
 export default function DraftIntakePage({ params, searchParams }: PageProps<"/drafting/[slug]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/drafting" className="text-sm">
         Drafting catalogue
       </Link>

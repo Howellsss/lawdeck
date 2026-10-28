@@ -98,7 +98,7 @@ export function Composer() {
   }
 
   return (
-    <div className="flex w-full max-w-[760px] flex-col gap-4">
+    <div className="flex w-full max-w-5xl flex-col gap-4">
       <form
         onSubmit={(event) => void submit(event)}
         // The box outlines itself while the student types (visible keyboard focus, WCAG 2.4.7).

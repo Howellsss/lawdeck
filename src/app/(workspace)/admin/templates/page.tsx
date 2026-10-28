@@ -14,7 +14,7 @@ export const metadata: Metadata = { title: "Templates · Lawdeck" };
 // "page not found". Students see only what is approved here.
 export default function TemplatesPage() {
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the templates" />}>
         <Templates />
       </Suspense>

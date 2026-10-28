@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Answer a question · Lawdeck" };
 
 export default function AnswerPage({ params }: PageProps<"/practice/mark/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/practice/mark" className="text-sm">
         All questions
       </Link>

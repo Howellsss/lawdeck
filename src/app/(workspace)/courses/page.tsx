@@ -10,7 +10,7 @@ export const metadata: Metadata = { title: "Courses · Lawdeck" };
 
 export default function CoursesPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <div className="flex flex-col gap-2">
         <h1 className="font-serif text-3xl font-normal text-greeting">Courses</h1>
         <p className="text-muted">

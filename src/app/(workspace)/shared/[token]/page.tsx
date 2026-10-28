@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Shared with you · Lawdeck", robots:
 // documents and chats. Only signed-in Lawdeck users can open it.
 export default function SharedPage({ params }: PageProps<"/shared/[token]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Opening the shared work" />}>
         <Shared params={params} />
       </Suspense>

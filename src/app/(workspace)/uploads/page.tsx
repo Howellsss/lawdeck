@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "My uploads · Lawdeck" };
 // A student's own study material (Phase 6, step 6a): private to them, never part of the library.
 export default function UploadsPage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading your uploads" />}>
         <Uploads />
       </Suspense>

@@ -12,7 +12,7 @@ export const metadata: Metadata = { title: "New practice set · Lawdeck" };
 // Make a practice set on one topic (PRD LN-06). Reached from "Practise" on a course page.
 export default function NewPracticePage({ searchParams }: PageProps<"/practice/new">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the topic" />}>
         <NewSet searchParams={searchParams} />
       </Suspense>

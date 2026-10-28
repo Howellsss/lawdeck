@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Answer sources · Lawdeck" };
 // Everyone else gets "page not found".
 export default function AnswerSourcesPage(props: PageProps<"/admin/answers/[id]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Link href="/admin/reports" className="text-sm">
         Reports
       </Link>
