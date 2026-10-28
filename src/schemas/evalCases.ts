@@ -18,6 +18,8 @@ export const evalCasesSchema = z.object({
         sourcePhrase: z.string().min(5).max(200),
         // What the reply must also do (voice-mode Conversation cases: its spoken form).
         expect: z.string().min(10).max(400).optional(),
+        // Earlier turns of a conversation (voice-mode follow-ups such as "yes, go on").
+        turns: z.array(turnSchema).max(5).optional(),
       }),
     )
     .min(1),

@@ -774,6 +774,42 @@
       ],
       "sourcePhrase": "The jurisdiction of the Court is 4 million",
       "expect": "Replies as a spoken tutor in voice mode: a few short sentences with no headings, lists or Authorities section, answers the point correctly from the notes, and ends with one short question back to the student."
+    },
+    {
+      "id": "Q51",
+      "topic": "Small talk (voice conversation)",
+      "level": "talk",
+      "question": "Hey Lawdeck, what's up?",
+      "mustInclude": [
+        "Greets the student back warmly and asks what they would like to work on"
+      ],
+      "authorities": [],
+      "sourcePhrase": "originating motion and petition are not pleadings",
+      "expect": "Replies briefly and warmly like a friend in a voice chat, gives no legal content, uses no headings or lists, and asks what the student would like to work on."
+    },
+    {
+      "id": "Q52",
+      "topic": "Follow-up: yes, go on (voice conversation)",
+      "level": "talk",
+      "question": "Yeah, please go on.",
+      "mustInclude": [
+        "Writ, originating summons, originating motion and petition are not pleadings"
+      ],
+      "authorities": [
+        "Murray v. Stephenson (1887)"
+      ],
+      "sourcePhrase": "originating motion and petition are not pleadings",
+      "expect": "Carries on with originating processes and pleadings from the conversation in a few spoken sentences with no headings or lists, and ends with a short question or offer.",
+      "turns": [
+        {
+          "role": "user",
+          "text": "I'm confused about originating processes. Do you know about them?"
+        },
+        {
+          "role": "assistant",
+          "text": "Yes, I can help with that. Would you like me to explain what they are and how they differ from pleadings?"
+        }
+      ]
     }
   ],
   "pushback": [

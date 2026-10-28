@@ -16,6 +16,12 @@ select public.record_ai_usage('speech', 'en-NG-EzinneNeural', 1200, 0, 0.0192, 9
 select public.record_ai_usage('speech', 'en-NG-EzinneNeural', 800, 0, 0.0128, 700);
 select test.check((select used from public.speech_used_today()) = 2000, 'what a student hears adds up for the day');
 select test.check((select used from public.question_allowance()) = 0, 'reading aloud never uses up questions');
+-- Migration 40: voice-mode small talk is recorded but free; a reply that teaches counts.
+select public.record_ai_usage('talk_chat', 'claude-sonnet-5-5', 900, 40, 0.002, 1500);
+select test.check((select used from public.question_allowance()) = 0, 'voice-mode small talk never uses up questions');
+select public.record_ai_usage('explain', 'claude-sonnet-5-5', 9000, 200, 0.02, 4000);
+select test.check((select used from public.question_allowance()) = 1, 'a voice-mode reply that teaches from the library counts as a question');
+select test.check((select count(*) from public.usage_events where kind = 'talk_chat') = 1, 'small talk is still logged with its cost');
 reset role;
 
 select test.as_user('a5c38002-0000-0000-0000-000000000002');

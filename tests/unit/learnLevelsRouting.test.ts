@@ -19,15 +19,17 @@ describe("voice-mode conversation (founder, 2026-10-28)", () => {
     const talk = LEVEL_INSTRUCTIONS.talk;
     expect(questionMessage([], "Why?", "talk")).toContain(talk);
     expect(talk).toContain("two to five short");
-    expect(talk).toContain("end with one short question back to the student");
-    expect(talk).toContain("Do not use the section headings");
+    expect(talk).toContain("If the student greets you");
+    expect(talk).toContain("check what they want before explaining at length");
+    expect(talk).toContain("end with one short question or offer");
+    expect(talk).toContain("Never use the section headings");
   });
 
   it("keeps every safety rule: passages only, ids for the citation check, corrections", () => {
     const talk = LEVEL_INSTRUCTIONS.talk;
-    expect(talk).toContain("only from the passages");
+    expect(talk).toContain("Legal points come only from the passages; never from memory");
     expect(talk).toContain("passage id after the point");
-    expect(talk).toContain("correct anything wrong the student says");
+    expect(talk).toContain("Correct anything wrong the student says");
   });
 
   it("is short, used by voice mode only, and never offered in the level picker", () => {

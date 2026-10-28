@@ -6,13 +6,17 @@ voices) and that students choose the voice.
 
 ## What students get
 - **Read** on every Learn answer: reads the whole answer, with Pause, Resume and Stop.
-- **Voice mode** (sound-wave button on the home screen and in a chat), a spoken back-and-forth
-  conversation (founder, 2026-10-28): Lawdeck listens, replies in two to five short spoken
-  sentences (answer level "Conversation", `talk`) that end with a question back to the student,
-  reads them aloud, then listens again. **Tap to speak** interrupts it; saying "stop" or **End**
-  ends voice mode. Each reply also appears in the chat with **Explain in full** for the complete
-  exam-ready answer. Every spoken turn counts as one question (founder's decision). Lawdeck talks
-  to the student as "you": student names are never sent to the AI.
+- **Voice mode** (sound-wave button on the home screen and in a chat), a natural spoken
+  conversation like ChatGPT's voice mode (founder, 2026-10-28: "I don't want to have to say
+  stop"): Lawdeck listens until the student pauses (1.5 seconds of quiet ends a turn; shorter
+  pauses do not), replies in a few spoken sentences (answer level "Conversation", `talk`), reads
+  them aloud and listens again. No commands are needed: it handles greetings and thanks, checks
+  what the student wants before explaining at length, and follows "yes, go on" by searching with
+  the recent conversation (`src/lib/talkSearch.ts`). Silence never ends it; **End** (or saying
+  goodbye) does. **Tap to speak** interrupts it. Each reply also appears in the chat with
+  **Explain in full**. A reply that teaches from the library counts as one question; small talk
+  (no passage used) is free but logged (`talk_chat`, migration 40). Lawdeck talks to the student
+  as "you": student names are never sent to the AI.
 - **Reading voice** on the Account page: female (Ezinne, default) or male (Abeo), both Nigerian English.
 
 ## How names and legal shorthand are read
