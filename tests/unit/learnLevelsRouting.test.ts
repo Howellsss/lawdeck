@@ -20,6 +20,7 @@ describe("voice-mode conversation (founder, 2026-10-28)", () => {
     expect(questionMessage([], "Why?", "talk")).toContain(talk);
     expect(talk).toContain("two to five short");
     expect(talk).toContain("If the student greets you");
+    expect(talk).toContain("Never introduce yourself");
     expect(talk).toContain("check what they want before explaining at length");
     expect(talk).toContain("end with one short question or offer");
     expect(talk).toContain("Never use the section headings");

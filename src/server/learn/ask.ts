@@ -15,9 +15,10 @@ import type { ExplainModel } from "@/server/ai/models";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
-import { searchForAnswer, type SearchHit } from "@/server/retrieval/search";
+import { searchForAnswer, type SearchHit, type SearchResult } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 import { limitReachedMessage } from "@/lib/allowance";
+import { isSmallTalk } from "@/lib/smallTalk";
 import { talkSearchText } from "@/lib/talkSearch";
 import { recordUsage } from "@/server/ai/usage";
 import {
@@ -133,13 +134,17 @@ export async function answerQuestion(input: {
   const history = historyTurns(earlier.data);
   // Voice mode: a short reply ("yes, go on") is searched together with the recent conversation.
   const searchText = input.level === "talk" ? talkSearchText(question, history) : question;
-  const found = await searchForAnswer({
-    question: searchText,
-    courseId: chat.data.course_id,
-    includePending: false,
-    useUploads: chat.data.use_uploads,
-    results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
-  });
+  // Voice-mode small talk ("Hey, what's up?") is answered straight away, without searching.
+  const smallTalk = input.level === "talk" && isSmallTalk(question);
+  const found: SearchResult = smallTalk
+    ? { ok: true, hits: [], meaningUsed: true, reranked: false }
+    : await searchForAnswer({
+        question: searchText,
+        courseId: chat.data.course_id,
+        includePending: false,
+        useUploads: chat.data.use_uploads,
+        results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
+      });
   if (!found.ok) return send({ type: "error", message: found.message });
   // Voice mode keeps the conversation going even when the library has nothing for this turn
   // (small talk, thanks): the reply then uses no passages and gives no legal content.
