@@ -22,6 +22,7 @@ export async function POST(request: NextRequest) {
   if (!body.success) return refuse(400, body.error.issues[0]?.message ?? "Type something to hear.");
   if (!speechConfigured()) return refuse(503, "Reading aloud is not switched on yet: add the Azure key on Vercel.");
   const result = await speakText(speakableText(body.data.text), body.data.voice);
-  if (!result.ok) return refuse(result.status, result.message);
+  // Staff see the technical reason too, to fix the set-up.
+  if (!result.ok) return refuse(result.status, result.detail ? `${result.message} Reason: ${result.detail}.` : result.message);
   return new Response(result.audio, { headers: { "Content-Type": "audio/mpeg", "Cache-Control": "private, no-store" } });
 }

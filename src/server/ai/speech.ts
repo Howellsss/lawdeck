@@ -27,12 +27,17 @@ export function speechConfigured(): boolean {
   return Boolean(process.env.AZURE_SPEECH_KEY && process.env.AZURE_SPEECH_REGION);
 }
 
-export type SpeechResult = { ok: true; audio: ArrayBuffer } | { ok: false; reason: "unavailable" | "busy" };
+// detail: a short technical reason for staff (the voice test page), never shown to students.
+export type SpeechResult =
+  | { ok: true; audio: ArrayBuffer }
+  | { ok: false; reason: "unavailable" | "busy"; detail: string };
 
 export async function synthesizeSpeech(text: string, voice: Voice): Promise<SpeechResult> {
   const key = process.env.AZURE_SPEECH_KEY;
   const region = process.env.AZURE_SPEECH_REGION;
-  if (!key || !region || !/^[a-z0-9]+$/.test(region)) return { ok: false, reason: "unavailable" };
+  if (!key || !region) return { ok: false, reason: "unavailable", detail: "the Azure key or region is not set on Vercel" };
+  if (!/^[a-z0-9]+$/.test(region))
+    return { ok: false, reason: "unavailable", detail: "the region must be small letters with no spaces, for example northeurope" };
   const voiceName = VOICE_NAMES[voice];
   const started = Date.now();
   try {
@@ -50,7 +55,7 @@ export async function synthesizeSpeech(text: string, voice: Voice): Promise<Spee
     if (!response.ok) {
       // The status only: never the text being read (rule I-03).
       console.error("speech failed", { status: response.status });
-      return { ok: false, reason: response.status === 429 ? "busy" : "unavailable" };
+      return { ok: false, reason: response.status === 429 ? "busy" : "unavailable", detail: azureProblem(response.status) };
     }
     const audio = await response.arrayBuffer();
     await recordUsage({
@@ -63,7 +68,22 @@ export async function synthesizeSpeech(text: string, voice: Voice): Promise<Spee
     });
     return { ok: true, audio };
   } catch (error) {
-    console.error("speech failed", { name: (error as Error)?.name });
-    return { ok: false, reason: "unavailable" };
+    const name = (error as Error)?.name;
+    console.error("speech failed", { name });
+    return {
+      ok: false,
+      reason: "unavailable",
+      detail:
+        name === "TimeoutError"
+          ? "Azure took too long to answer"
+          : "Azure could not be reached: check the region name matches the one the Speech resource was created in",
+    };
   }
+}
+
+function azureProblem(status: number): string {
+  if (status === 401 || status === 403) return `Azure refused the key (${status}): copy KEY 1 again into AZURE_SPEECH_KEY`;
+  if (status === 404) return "Azure did not recognise the address (404): check the region name";
+  if (status === 429) return "Azure is limiting requests (429): wait a minute, or move to the Standard S0 tier";
+  return `Azure answered ${status}`;
 }

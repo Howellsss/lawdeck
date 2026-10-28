@@ -49,7 +49,7 @@ describe("the voice service call", () => {
   it("reports a failure without the text, and records nothing", async () => {
     const errors = vi.spyOn(console, "error").mockImplementation(() => {});
     fetchMock.mockResolvedValue(new Response("", { status: 429 }));
-    expect(await synthesizeSpeech("Secret answer text", "female")).toEqual({ ok: false, reason: "busy" });
+    expect(await synthesizeSpeech("Secret answer text", "female")).toMatchObject({ ok: false, reason: "busy", detail: expect.stringContaining("429") });
     expect(JSON.stringify(errors.mock.calls)).not.toContain("Secret");
     expect(recordUsage).not.toHaveBeenCalled();
     errors.mockRestore();
@@ -57,7 +57,7 @@ describe("the voice service call", () => {
 
   it("does nothing without the key", async () => {
     vi.stubEnv("AZURE_SPEECH_KEY", "");
-    expect(await synthesizeSpeech("Hi.", "female")).toEqual({ ok: false, reason: "unavailable" });
+    expect(await synthesizeSpeech("Hi.", "female")).toMatchObject({ ok: false, reason: "unavailable", detail: expect.stringContaining("not set") });
     expect(fetchMock).not.toHaveBeenCalled();
   });
 });
@@ -92,6 +92,17 @@ describe("reading an answer", () => {
     expect(result).toMatchObject({ ok: false, status: 503 });
     expect(!result.ok && result.message).not.toMatch(/limit/);
     expect(fetchMock).not.toHaveBeenCalled();
+    errors.mockRestore();
+  });
+
+  it("tells staff why the voice failed: a wrong key or a wrong region", async () => {
+    const errors = vi.spyOn(console, "error").mockImplementation(() => {});
+    fetchMock.mockResolvedValue(new Response("", { status: 401 }));
+    expect(await synthesizeSpeech("Hi.", "female")).toMatchObject({ detail: expect.stringContaining("KEY 1") });
+    fetchMock.mockRejectedValue(new TypeError("fetch failed"));
+    expect(await synthesizeSpeech("Hi.", "female")).toMatchObject({ detail: expect.stringContaining("region") });
+    vi.stubEnv("AZURE_SPEECH_REGION", "North Europe");
+    expect(await synthesizeSpeech("Hi.", "female")).toMatchObject({ detail: expect.stringContaining("small letters") });
     errors.mockRestore();
   });
 });
