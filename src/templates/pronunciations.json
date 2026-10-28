@@ -1,0 +1,17 @@
+{
+  "note": "How Lawdeck's voice says names it gets wrong (founder, 2026-10-28). The Nigerian English voice already says most Nigerian names well, so a name goes here only after listening on Admin → Voice test and hearing it said wrongly. 'say' is a respelling read instead of the name; the screen always shows the name as written. Matching ignores capitals. Longer names are matched first.",
+  "names": [
+    { "name": "Agbonmagbe", "say": "Agbon magbeh" },
+    { "name": "Njemanze", "say": "Njeh manzeh" },
+    { "name": "Shitta", "say": "Sheetah" },
+    { "name": "Shitta-Bey", "say": "Sheetah Bay" },
+    { "name": "Nnamdi", "say": "Nnahmdee" },
+    { "name": "Ngozi", "say": "Ngozee" },
+    { "name": "Chukwuemeka", "say": "Chookwoo emeka" },
+    { "name": "Osun", "say": "Oshoon" },
+    { "name": "Osogbo", "say": "Oshogbo" },
+    { "name": "Ijebu", "say": "Eejebu" },
+    { "name": "Ikeja", "say": "Eekeja" },
+    { "name": "Onitsha", "say": "Onicha" }
+  ]
+}

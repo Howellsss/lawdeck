@@ -8,10 +8,12 @@ import type { AnswerLevel } from "@/prompts/explain";
 import type { ChatMessage, ChatSource } from "@/server/db/workspace";
 import { AnswerCard } from "./AnswerCard";
 import { AnswerText } from "./AnswerText";
-import { askQuestion, takePendingQuestion } from "./askStream";
+import { askQuestion, takePendingQuestion, takePendingTalk } from "./askStream";
 import { FollowUpBox } from "./FollowUpBox";
 import { SearchStatus } from "./SearchStatus";
 import { SourcePassage } from "./SourcePassage";
+import { TalkBar, TalkButton } from "./TalkBar";
+import { useTalkMode, type Answered } from "./useTalkMode";
 
 type Live = {
   question: string;
@@ -28,9 +30,12 @@ type Live = {
 export function ChatThread({
   chatId,
   initialMessages,
+  voice = false,
 }: {
   chatId: string;
   initialMessages: ChatMessage[];
+  // Whether Lawdeck's voice is set up (Read buttons and voice mode).
+  voice?: boolean;
 }) {
   const [messages, setMessages] = useState(initialMessages);
   const [live, setLive] = useState<Live | null>(null);
@@ -59,7 +64,9 @@ export function ChatThread({
     stopper.current?.abort();
   }
 
-  async function ask(question: string, answerLevel: AnswerLevel) {
+  // Returns the saved answer, or null when it was stopped or failed (voice mode reads it aloud).
+  async function ask(question: string, answerLevel: AnswerLevel): Promise<Answered> {
+    let answered: Answered = null;
     const controller = new AbortController();
     stopper.current = controller;
     setBusy(true);
@@ -95,6 +102,7 @@ export function ChatThread({
             sources: event.sources,
           },
         ]);
+        answered = { id: event.messageId, text: event.text };
         setLive(null);
         router.refresh(); // Updates "questions left this month".
       }
@@ -105,16 +113,20 @@ export function ChatThread({
     }
     stopper.current = null;
     setBusy(false);
+    return answered;
   }
+
+  const talk = useTalkMode((question) => ask(question, level));
 
   // A question typed on the home screen (or picked from a course hub) is asked once, when its chat opens.
   useEffect(() => {
     if (started.current) return;
     started.current = true;
     const pending = takePendingQuestion(chatId);
-    // Starting the stream is the point of this effect: it talks to the answer route.
+    // Starting the stream (or voice mode) is the point of this effect: it talks to the answer route.
+    if (pending && voice && takePendingTalk(chatId)) talk.begin(pending);
     // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (pending) void ask(pending, "exam");
+    else if (pending) void ask(pending, "exam");
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [chatId]);
 
@@ -141,6 +153,7 @@ export function ChatThread({
             <AnswerCard
               key={message.id}
               message={message}
+              canRead={voice}
               onOpen={openSource}
               onOtherLevel={
                 question && !busy
@@ -192,8 +205,17 @@ export function ChatThread({
           </>
         )}
       </ol>
+      <TalkBar talk={talk.talk} offering={talk.offering} onEnd={talk.end} />
+      {talk.note && (
+        <p role="status" className="px-1 text-sm text-muted">
+          {talk.note}
+        </p>
+      )}
       <FollowUpBox
         busy={busy}
+        talkButton={
+          voice && talk.talk === "off" ? <TalkButton disabled={busy} onClick={() => talk.begin()} /> : undefined
+        }
         level={level}
         onLevel={setLevel}
         onAsk={(question) => void ask(question, level)}

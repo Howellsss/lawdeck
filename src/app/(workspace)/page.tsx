@@ -5,6 +5,7 @@ import { NamedGreeting } from "@/components/learn/NamedGreeting";
 import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { PilotHomeCard } from "@/components/pilot/PilotHomeCard";
 import { BrandMark } from "@/components/ui/BrandMark";
+import { speechConfigured } from "@/server/ai/speech";
 
 // Home: calm and input-first (PRD 4.2). On phones the composer sits at the bottom, as in the M2 design.
 export default function HomePage() {
@@ -20,7 +21,7 @@ export default function HomePage() {
         </h1>
       </div>
       <div className="flex flex-col items-center gap-3">
-        <Composer />
+        <Composer voice={speechConfigured()} />
         <Suspense fallback={null}>
           <QuestionAllowance />
         </Suspense>

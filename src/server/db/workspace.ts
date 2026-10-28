@@ -194,7 +194,7 @@ function messageLevel(content: unknown): "simple" | "exam" | null {
 }
 
 // The text part of a stored message.
-function messageText(content: unknown): string {
+export function messageText(content: unknown): string {
   if (content && typeof content === "object" && "text" in content) {
     const text = (content as { text: unknown }).text;
     if (typeof text === "string") return text;

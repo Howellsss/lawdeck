@@ -3,8 +3,10 @@ import { Suspense } from "react";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
 import { NameForm } from "@/components/account/NameForm";
 import { InviteCodeForm } from "@/components/pilot/InviteCodeForm";
+import { VoicePicker } from "@/components/voice/VoicePicker";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
+import { speechConfigured } from "@/server/ai/speech";
 import { getCurrentAccount } from "@/server/auth/session";
 import { getOwnName } from "@/server/db/profile";
 import { getPilotStatus } from "@/server/db/pilot";
@@ -48,6 +50,15 @@ async function Account() {
         </h2>
         <NameForm name={name} />
       </section>
+      {speechConfigured() && (
+        <section aria-labelledby="voice-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+          <h2 id="voice-heading" className="text-lg font-medium">
+            Reading voice
+          </h2>
+          <p className="text-sm text-muted">The voice that reads answers aloud when you press Read or use voice mode.</p>
+          <VoicePicker />
+        </section>
+      )}
       <section aria-labelledby="delete-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="delete-heading" className="text-lg font-medium">
           Delete account

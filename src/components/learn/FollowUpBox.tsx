@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
+import { useState, type FormEvent, type ReactNode } from "react";
 import { Icon } from "@/components/ui/Icon";
 import { LEVEL_LABELS, type AnswerLevel } from "@/prompts/explain";
 import { QUESTION_MAX_CHARS } from "@/schemas/learn";
@@ -13,6 +13,7 @@ export function FollowUpBox({
   onLevel,
   onAsk,
   onStop,
+  talkButton,
 }: {
   busy: boolean;
   level: AnswerLevel;
@@ -20,6 +21,8 @@ export function FollowUpBox({
   onAsk: (question: string) => void;
   // While Lawdeck searches or writes, the send button becomes Stop.
   onStop?: () => void;
+  // Starts voice mode, when Lawdeck's voice is set up.
+  talkButton?: ReactNode;
 }) {
   const [text, setText] = useState("");
   const [voiceError, setVoiceError] = useState<string | null>(null);
@@ -75,6 +78,7 @@ export function FollowUpBox({
           placeholder="Ask a follow-up question"
           className="min-w-0 flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
         />
+        {talkButton}
         <VoiceButton
           disabled={busy}
           onText={(words) => {

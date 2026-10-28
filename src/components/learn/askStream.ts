@@ -89,3 +89,24 @@ export function takePendingQuestion(chatId: string): string | null {
     return null;
   }
 }
+
+// Voice mode started on the home screen carries on in the chat it opens (this tab only).
+const TALK_KEY = (chatId: string) => `lawdeck-talk-${chatId}`;
+
+export function savePendingTalk(chatId: string) {
+  try {
+    sessionStorage.setItem(TALK_KEY(chatId), "1");
+  } catch {
+    // Without storage the chat simply opens without voice mode.
+  }
+}
+
+export function takePendingTalk(chatId: string): boolean {
+  try {
+    const talk = sessionStorage.getItem(TALK_KEY(chatId)) === "1";
+    sessionStorage.removeItem(TALK_KEY(chatId));
+    return talk;
+  } catch {
+    return false;
+  }
+}
