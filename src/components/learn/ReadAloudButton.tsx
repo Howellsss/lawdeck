@@ -1,6 +1,7 @@
 "use client";
 
 import { Icon } from "@/components/ui/Icon";
+import { VoiceSelect } from "@/components/voice/VoiceSelect";
 import { speaker } from "./speaker";
 import { useSpeaker } from "./useSpeaker";
 
@@ -8,7 +9,7 @@ const pill =
   "inline-flex h-9 items-center gap-1.5 rounded-full border border-line px-3 text-sm text-ink hover:bg-pill";
 
 // "Read" on an answer (founder, 2026-10-28): reads the whole answer aloud in the student's
-// chosen voice, with Pause, Resume and Stop while it plays.
+// chosen voice (changeable right here), with Pause, Resume and Stop while it plays.
 export function ReadAloudButton({ messageId }: { messageId: string }) {
   const state = useSpeaker();
   const key = `${messageId}:full`;
@@ -17,10 +18,13 @@ export function ReadAloudButton({ messageId }: { messageId: string }) {
   if (!mine || state.status === "idle" || state.status === "error")
     return (
       <span className="flex flex-col items-start gap-1">
-        <button type="button" onClick={() => void speaker.play(messageId, "full")} className={pill}>
-          <Icon name="speaker" size={16} />
-          Read
-        </button>
+        <span className="flex flex-wrap items-center gap-2">
+          <button type="button" onClick={() => void speaker.play(messageId, "full")} className={pill}>
+            <Icon name="speaker" size={16} />
+            Read
+          </button>
+          <VoiceSelect />
+        </span>
         {mine && state.status === "error" && (
           <span role="status" className="text-sm text-muted">
             {state.message}

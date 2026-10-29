@@ -12,7 +12,7 @@ voices) and that students choose the voice.
   listening, pulses while thinking and shows a wave while speaking, with the Lawdeck mark inside, and an End button. Lawdeck
   listens until the student pauses (1.1 seconds), and speaks its reply sentence by sentence as it
   is written: the answer route sends each spoken sentence (MP3) with the text
-  (`src/server/learn/liveSpeech.ts`); the first long clause may be spoken before its sentence ends, and the reply's speech is recorded once at the end, so the first words play within a second or two. Small talk is answered by the fastest model (`MODELS.smallTalk`, Haiku); teaching replies use the explanations model. Nothing is
+  (`src/server/learn/liveSpeech.ts`); the first long clause may be spoken before its sentence ends, and the reply's speech is recorded once at the end, so the first words play within a second or two. Every voice-mode reply, small talk and teaching, is answered by the fastest model (`MODELS.voice`, Haiku, founder 2026-10-29); written answers use the explanations model. Nothing is
   written out on screen while talking; tapping the circle interrupts. Small talk skips the library
   (`src/lib/smallTalk.ts`); "yes, go on" is searched with the recent conversation
   (`src/lib/talkSearch.ts`). Silence never ends it; End (or saying goodbye) does. The conversation
@@ -24,6 +24,8 @@ voices) and that students choose the voice.
   English female (Sonia, default) or male (Ryan), American English female (Ava) or male (Andrew),
   Nigerian English female (Ezinne) or male (Abeo) (founder, 2026-10-29: "a balanced English accent
   that pronounces clear"; Azure has only these two Nigerian English voices).
+  The same choice is also a small Voice menu beside Read and at the top of voice mode
+  (founder, 2026-10-29); one choice per device, used from the next Read or spoken reply.
 
 ## How names and legal shorthand are read
 - Nigerian English voices say most Nigerian names properly.
