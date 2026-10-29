@@ -3,6 +3,7 @@
 import { BrandMark } from "@/components/ui/BrandMark";
 import { Icon } from "@/components/ui/Icon";
 import { VoiceWave } from "@/components/ui/VoiceWave";
+import { VoiceSelect } from "@/components/voice/VoiceSelect";
 import { useSpeechSupported } from "./recognition";
 import { useVoiceConversation, type Talk } from "./useVoiceConversation";
 
@@ -52,7 +53,11 @@ export function VoiceMode({
           aria-label="Voice mode"
           className="fixed inset-0 z-50 flex flex-col items-center justify-between bg-paper px-6 pb-10 pt-16 text-ink"
         >
-          <p className="text-sm text-muted">Voice mode</p>
+          <div className="flex flex-col items-center gap-3">
+            <p className="text-sm text-muted">Voice mode</p>
+            {/* A new voice is used from Lawdeck's next reply. */}
+            <VoiceSelect />
+          </div>
           <button
             type="button"
             onClick={voice.interrupt}

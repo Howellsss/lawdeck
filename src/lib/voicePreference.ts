@@ -1,7 +1,10 @@
 import { DEFAULT_VOICE, VOICES, type Voice } from "@/schemas/voice";
 
-// The voice a student chose on the Account page, kept in this browser like the theme.
+// The voice a student chose (Account page, voice mode or beside Read), kept in this browser like
+// the theme. Every picker on the page follows a change made in any of them.
 export const VOICE_STORAGE_KEY = "lawdeck-voice";
+
+const listeners = new Set<() => void>();
 
 export function readVoice(): Voice {
   try {
@@ -18,4 +21,18 @@ export function saveVoice(voice: Voice) {
   } catch {
     // Private browsing may block storage; the default voice is used.
   }
+  listeners.forEach((listener) => listener());
+}
+
+// For useSyncExternalStore: changes here and in other tabs.
+export function subscribeVoice(listener: () => void) {
+  listeners.add(listener);
+  const onStorage = (event: StorageEvent) => {
+    if (event.key === VOICE_STORAGE_KEY) listener();
+  };
+  window.addEventListener("storage", onStorage);
+  return () => {
+    listeners.delete(listener);
+    window.removeEventListener("storage", onStorage);
+  };
 }

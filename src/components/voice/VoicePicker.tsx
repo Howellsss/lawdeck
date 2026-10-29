@@ -2,20 +2,16 @@
 
 import { useRef, useState, useSyncExternalStore } from "react";
 import { compactSecondaryButton } from "@/components/ui/buttons";
-import { readVoice, saveVoice } from "@/lib/voicePreference";
-import { VOICE_LABELS, VOICES, type Voice } from "@/schemas/voice";
-
-const noSubscription = () => () => {};
+import { readVoice, saveVoice, subscribeVoice } from "@/lib/voicePreference";
+import { VOICE_LABELS, VOICES } from "@/schemas/voice";
 
 // The voice that reads answers aloud and talks in voice mode (founder, 2026-10-28: students
 // choose; 2026-10-29: British, American and Nigerian English). Saved in this browser.
 export function VoicePicker() {
-  const saved = useSyncExternalStore(noSubscription, readVoice, () => null);
-  const [chosen, setChosen] = useState<Voice | null>(null);
+  const current = useSyncExternalStore(subscribeVoice, readVoice, () => null);
   const [playing, setPlaying] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement | null>(null);
-  const current = chosen ?? saved;
 
   async function hear() {
     if (!current) return;
@@ -60,10 +56,7 @@ export function VoicePicker() {
               name="voice"
               value={voice}
               checked={current === voice}
-              onChange={() => {
-                saveVoice(voice);
-                setChosen(voice);
-              }}
+              onChange={() => saveVoice(voice)}
               className="sr-only"
             />
             {VOICE_LABELS[voice]}
@@ -78,7 +71,7 @@ export function VoicePicker() {
           {error}
         </p>
       )}
-      <p className="text-sm text-muted">Your choice is saved on this device.</p>
+      <p className="text-sm text-muted">Your choice is saved on this device. You can also change it in voice mode or beside Read.</p>
     </fieldset>
   );
 }

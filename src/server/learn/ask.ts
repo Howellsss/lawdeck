@@ -204,8 +204,8 @@ export async function answerQuestion(input: {
     history,
     courseId: chat.data.course_id,
     userId: input.userId,
-    // Small talk needs no legal reasoning: the fastest model answers it.
-    model: smallTalk ? MODELS.smallTalk : undefined,
+    // Voice mode answers with the fastest model, so it starts speaking sooner.
+    model: input.level === "talk" ? MODELS.voice : undefined,
     onText: (text) => {
       send({ type: "text", text });
       live?.push(text);

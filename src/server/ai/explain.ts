@@ -38,7 +38,7 @@ export async function streamExplanation(input: {
   userId: string;
   onText: (text: string) => void;
   signal?: AbortSignal;
-  // Only the model test (step 3e) chooses another model; the app uses MODELS.explain.
+  // The model test (step 3e) and voice mode (MODELS.voice) choose another model; otherwise MODELS.explain.
   model?: ExplainModel;
   // A problem question: the answer goes into every issue in depth, so it may be longer.
   long?: boolean;

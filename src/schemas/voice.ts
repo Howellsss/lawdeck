@@ -16,6 +16,16 @@ export const VOICE_LABELS: Record<Voice, string> = {
   "ng-male": "Nigerian English, male (Abeo)",
 };
 
+// Shorter names for the small voice menus in voice mode and beside Read.
+export const VOICE_SHORT_LABELS: Record<Voice, string> = {
+  "uk-female": "Sonia (British)",
+  "uk-male": "Ryan (British)",
+  "us-female": "Ava (American)",
+  "us-male": "Andrew (American)",
+  "ng-female": "Ezinne (Nigerian)",
+  "ng-male": "Abeo (Nigerian)",
+};
+
 // What to read: the whole answer, only its "Short answer" (voice conversations), or the rest
 // after the short answer (when the student says "yes, read the rest").
 export const SPEECH_SCOPES = ["full", "short", "rest"] as const;
