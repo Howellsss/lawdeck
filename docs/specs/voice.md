@@ -30,6 +30,10 @@ voices) and that students choose the voice.
   against A"; "& Anor/Ors" as "and another/others"; "s. 36" as "section 36"; "O. 13 r. 4" as
   "Order 13 rule 4"; "(Pt. 712)" as "part 712"; NWLR, CFRN, SC and similar spelt out.
 
+## Speed
+- The server runs in Vercel's Dublin region (`vercel.json`), beside Supabase (Ireland) and Azure North
+  Europe (Ireland), so the database and voice calls in each turn stay within the region.
+
 ## Safety and cost
 - Only Lawdeck's own answer text is sent to Azure, from the server (`src/server/ai/speech.ts`): Read
   loads the student's saved answer under row-level security; voice mode speaks the reply as it is
