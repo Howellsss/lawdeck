@@ -20,7 +20,10 @@ voices) and that students choose the voice.
   "Read the conversation" afterwards. Teaching replies count as questions; small talk is free
   (`talk_chat`, migration 40). Lawdeck talks to the student as "you": student names are never
   sent to the AI.
-- **Reading voice** on the Account page: female (Ezinne, default) or male (Abeo), both Nigerian English.
+- **Reading voice** on the Account page, with "Hear this voice" (a fixed sample sentence): British
+  English female (Sonia, default) or male (Ryan), American English female (Ava) or male (Andrew),
+  Nigerian English female (Ezinne) or male (Abeo) (founder, 2026-10-29: "a balanced English accent
+  that pronounces clear"; Azure has only these two Nigerian English voices).
 
 ## How names and legal shorthand are read
 - Nigerian English voices say most Nigerian names properly.

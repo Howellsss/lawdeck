@@ -7,7 +7,7 @@ const recordUsage = vi.fn();
 vi.mock("@/server/ai/speech", () => ({
   synthesizeSpeech: synthesize,
   speechCostUsd: (chars: number) => chars / 1_000_000,
-  VOICE_NAMES: { female: "en-NG-EzinneNeural", male: "en-NG-AbeoNeural" },
+  VOICE_NAMES: { "uk-female": "en-GB-SoniaNeural", "ng-male": "en-NG-AbeoNeural" },
 }));
 vi.mock("@/server/ai/usage", () => ({ recordUsage }));
 const { LiveSpeech } = await import("@/server/learn/liveSpeech");
@@ -26,23 +26,23 @@ describe("speaking a reply while it is written", () => {
 
   it("speaks each finished sentence at once, in order, and the rest at the end", async () => {
     const sent: { type: string; data?: string }[] = [];
-    const live = new LiveSpeech("female", (event) => sent.push(event));
+    const live = new LiveSpeech("uk-female", (event) => sent.push(event));
     live.push("Hey! Doing well [S1]");
     expect(synthesize).toHaveBeenCalledTimes(1);
     live.push(", thanks. What are we");
     live.push(" studying today?");
     await live.end();
     expect(sent.map((event) => textOf(event.data ?? ""))).toEqual(["Hey!", "Doing well, thanks.", "What are we studying today?"]);
-    expect(synthesize).toHaveBeenCalledWith("Doing well, thanks.", "female", false);
+    expect(synthesize).toHaveBeenCalledWith("Doing well, thanks.", "uk-female", false);
     // The reply's speech is recorded once, with its characters, never its text.
     expect(recordUsage).toHaveBeenCalledTimes(1);
-    expect(recordUsage).toHaveBeenCalledWith(expect.objectContaining({ kind: "speech", model: "en-NG-EzinneNeural", tokensIn: 50 }));
+    expect(recordUsage).toHaveBeenCalledWith(expect.objectContaining({ kind: "speech", model: "en-GB-SoniaNeural", tokensIn: 50 }));
   });
 
   it("stops speaking after a failure and says so once", async () => {
     synthesize.mockResolvedValue({ ok: false, reason: "unavailable", detail: "x" });
     const sent: { type: string }[] = [];
-    const live = new LiveSpeech("male", (event) => sent.push(event));
+    const live = new LiveSpeech("ng-male", (event) => sent.push(event));
     live.push("One. Two. Three.");
     await live.end();
     expect(sent).toEqual([{ type: "audio_error", message: expect.any(String) }]);

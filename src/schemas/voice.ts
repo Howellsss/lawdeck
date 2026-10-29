@@ -1,9 +1,20 @@
 import { z } from "@/lib/zod";
 
-// Reading answers aloud (founder, 2026-10-28). Students choose the voice; female by default.
-export const VOICES = ["female", "male"] as const;
+// Reading answers aloud (founder, 2026-10-28). Students choose the voice: British, American or
+// Nigerian English, female or male (founder, 2026-10-29: "a balanced English accent that
+// pronounces clear"). British female by default.
+export const VOICES = ["uk-female", "uk-male", "us-female", "us-male", "ng-female", "ng-male"] as const;
 export type Voice = (typeof VOICES)[number];
-export const DEFAULT_VOICE: Voice = "female";
+export const DEFAULT_VOICE: Voice = "uk-female";
+
+export const VOICE_LABELS: Record<Voice, string> = {
+  "uk-female": "British English, female (Sonia)",
+  "uk-male": "British English, male (Ryan)",
+  "us-female": "American English, female (Ava)",
+  "us-male": "American English, male (Andrew)",
+  "ng-female": "Nigerian English, female (Ezinne)",
+  "ng-male": "Nigerian English, male (Abeo)",
+};
 
 // What to read: the whole answer, only its "Short answer" (voice conversations), or the rest
 // after the short answer (when the student says "yes, read the rest").
@@ -18,6 +29,11 @@ export const speechRequestSchema = z.object({
   scope: z.enum(SPEECH_SCOPES).default("full"),
   voice: z.enum(VOICES).default(DEFAULT_VOICE),
 });
+
+// "Hear this voice" on the Account page: only this fixed sentence is ever read for it.
+export const VOICE_SAMPLE_TEXT =
+  "Hello! I'm Lawdeck. I'll read your answers in this voice, and we can talk through any topic together.";
+export const voiceSampleSchema = z.object({ voice: z.enum(VOICES) });
 
 // Staff only: the voice test page reads any short text, to check how names sound.
 export const VOICE_TEST_MAX_CHARS = 600;

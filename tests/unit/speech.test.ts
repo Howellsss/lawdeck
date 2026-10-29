@@ -94,8 +94,12 @@ describe("checks", () => {
 
   it("speech requests need a real answer id and a known voice", () => {
     const id = "11111111-1111-4111-8111-111111111111";
-    expect(speechRequestSchema.parse({ messageId: id, part: 0 })).toMatchObject({ scope: "full", voice: "female" });
+    expect(speechRequestSchema.parse({ messageId: id, part: 0 })).toMatchObject({ scope: "full", voice: "uk-female" });
     expect(speechRequestSchema.safeParse({ messageId: "x", part: 0 }).success).toBe(false);
     expect(speechRequestSchema.safeParse({ messageId: id, part: 0, voice: "robot" }).success).toBe(false);
+    // The old two-voice choice is no longer accepted; browsers holding it fall back to the default.
+    expect(speechRequestSchema.safeParse({ messageId: id, part: 0, voice: "female" }).success).toBe(false);
+    for (const voice of ["uk-male", "us-female", "us-male", "ng-female", "ng-male"])
+      expect(speechRequestSchema.safeParse({ messageId: id, part: 0, voice }).success).toBe(true);
   });
 });

@@ -4,12 +4,17 @@ import { speechSsml } from "@/lib/speech";
 import type { Voice } from "@/schemas/voice";
 import { recordUsage } from "./usage";
 
-// Lawdeck's voice (founder, 2026-10-28): Microsoft Azure's Nigerian English voices, which say
-// Nigerian names properly, plus Lawdeck's own pronunciation list. Only answer text is sent, never
-// a student's name, email or details. Called only from the server; the key never reaches a browser.
+// Lawdeck's voice (founder, 2026-10-28; choices widened 2026-10-29): Microsoft Azure's British,
+// American and Nigerian English voices, plus Lawdeck's own pronunciation list. Only answer text is
+// sent, never a student's name, email or details. Called only from the server; the key never
+// reaches a browser.
 export const VOICE_NAMES: Record<Voice, string> = {
-  female: "en-NG-EzinneNeural",
-  male: "en-NG-AbeoNeural",
+  "uk-female": "en-GB-SoniaNeural",
+  "uk-male": "en-GB-RyanNeural",
+  "us-female": "en-US-AvaNeural",
+  "us-male": "en-US-AndrewNeural",
+  "ng-female": "en-NG-EzinneNeural",
+  "ng-male": "en-NG-AbeoNeural",
 };
 
 // US dollars per million characters (Azure neural voices, 2026-10; the first 500,000 characters
