@@ -2,13 +2,13 @@
 
 import { useRef, useState, type FormEvent } from "react";
 import { compactPrimaryButton } from "@/components/ui/buttons";
-import { VOICE_TEST_MAX_CHARS, type Voice } from "@/schemas/voice";
+import { DEFAULT_VOICE, VOICE_LABELS, VOICE_TEST_MAX_CHARS, VOICES, type Voice } from "@/schemas/voice";
 
 // Admin → Voice test: type a name or sentence and hear Lawdeck say it, to find names for the
 // pronunciation list.
 export function VoiceTestForm() {
   const [text, setText] = useState("Agbonmagbe Bank Ltd v. General Manager, G. B. Ollivant (Nig.) Ltd & Anor");
-  const [voice, setVoice] = useState<Voice>("female");
+  const [voice, setVoice] = useState<Voice>(DEFAULT_VOICE);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const audioRef = useRef<HTMLAudioElement>(null);
@@ -62,8 +62,11 @@ export function VoiceTestForm() {
             onChange={(event) => setVoice(event.target.value as Voice)}
             className="h-10 rounded-full border border-line bg-surface px-3 text-[16px] text-ink"
           >
-            <option value="female">Female</option>
-            <option value="male">Male</option>
+            {VOICES.map((v) => (
+              <option key={v} value={v}>
+                {VOICE_LABELS[v]}
+              </option>
+            ))}
           </select>
         </label>
         <button type="submit" disabled={busy || !text.trim()} className={compactPrimaryButton}>

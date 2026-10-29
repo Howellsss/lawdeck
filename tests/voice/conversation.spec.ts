@@ -72,9 +72,9 @@ test("voice mode talks back and forth on the same screen", async ({ page }) => {
   await expect(dialog).toBeVisible();
   await expect.poll(() => asked.length, { timeout: 30_000 }).toBe(3);
   expect(asked).toEqual([
-    "talk/female: Hey, what's up?",
-    "talk/female: Tell me about originating processes",
-    "talk/female: Yeah, please go on",
+    "talk/uk-female: Hey, what's up?",
+    "talk/uk-female: Tell me about originating processes",
+    "talk/uk-female: Yeah, please go on",
   ]);
   // Still on the same page, listening for the next thing; nothing written out.
   await expect(dialog.getByText("Listening")).toBeVisible({ timeout: 10_000 });

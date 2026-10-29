@@ -1,5 +1,5 @@
 {
-  "note": "How Lawdeck's voice says names it gets wrong (founder, 2026-10-28). The Nigerian English voice already says most Nigerian names well, so a name goes here only after listening on Admin → Voice test and hearing it said wrongly. 'say' is a respelling read instead of the name; the screen always shows the name as written. Matching ignores capitals. Longer names are matched first.",
+  "note": "How Lawdeck's voice says names it gets wrong (founder, 2026-10-28). The Nigerian English voices say most Nigerian names well; the British and American voices need more help. A name goes here only after listening on Admin → Voice test and hearing it said wrongly (the respelling is used by every voice). 'say' is a respelling read instead of the name; the screen always shows the name as written. Matching ignores capitals. Longer names are matched first.",
   "names": [
     { "name": "Agbonmagbe", "say": "Agbon magbeh" },
     { "name": "Njemanze", "say": "Njeh manzeh" },

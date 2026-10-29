@@ -34,3 +34,10 @@ test("without the voice set up there is no voice mode button", async ({ page }) 
   await expect(page.getByLabel("What are we working on?")).toBeVisible();
   await expect(page.getByRole("button", { name: /Voice mode/ })).toHaveCount(0);
 });
+
+test("hearing a voice sample needs a sign-in and a real voice", async ({ request, baseURL }) => {
+  const visitor = await request.post("/api/speech/sample", { data: { voice: "uk-female" }, headers: { Origin: baseURL ?? "" } });
+  expect(visitor.status()).toBe(401);
+  const elsewhere = await request.post("/api/speech/sample", { data: { voice: "uk-female" }, headers: { Origin: "https://example.com" } });
+  expect(elsewhere.status()).toBe(403);
+});

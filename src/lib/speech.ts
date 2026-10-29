@@ -133,5 +133,5 @@ export function speechSsml(text: string, voiceName: string, names: Pronunciation
       return say ? `<sub alias="${escapeXml(say)}">${match}</sub>` : match;
     });
   }
-  return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="en-NG"><voice name="${escapeXml(voiceName)}">${body}</voice></speak>`;
+  return `<speak version="1.0" xmlns="http://www.w3.org/2001/10/synthesis" xml:lang="${escapeXml(voiceName.slice(0, 5))}"><voice name="${escapeXml(voiceName)}">${body}</voice></speak>`;
 }

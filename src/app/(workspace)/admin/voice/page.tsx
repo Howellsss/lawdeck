@@ -27,8 +27,8 @@ async function VoiceTest() {
     <>
       <h1 className="font-serif text-3xl font-normal text-greeting">Voice test</h1>
       <p className="text-muted">
-        Lawdeck reads answers aloud in a Nigerian English voice. Type a name or a sentence to hear how it is
-        said. If a name sounds wrong, tell the Lawdeck team how it should sound and it will be added to the
+        Lawdeck reads answers aloud in the voice each student picks: British, American or Nigerian English,
+        female or male. Type a name or a sentence and pick a voice to hear how it is said. If a name sounds wrong, tell the Lawdeck team how it should sound and it will be added to the
         pronunciation list below.
       </p>
       {configured ? (
