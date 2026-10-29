@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { compactPrimaryButton } from "@/components/ui/buttons";
 import { Spinner } from "@/components/ui/Spinner";
 import type { IntakeView } from "@/server/db/documents";
@@ -18,7 +18,13 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const chooseForum = intake.forums.length > 1;
 
-  async function submit(form: FormData) {
+  // Sent by hand, not as a form action: React clears a form after its action runs, which wiped
+  // every answer whenever a draft could not be made (founder, 2026-10-29: "does not work after
+  // adding all the information"). The answers now stay, with the reason beside the button.
+  async function submit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault();
+    if (busy) return;
+    const form = new FormData(event.currentTarget);
     setBusy(true);
     setMessage(undefined);
     const facts: Record<string, string[]> = {};
@@ -30,7 +36,15 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
       setMessage("Choose the court or registry at the top of the form, then press Draft the document again.");
       return;
     }
-    const result = await startDraft({ templateId: intake.id, forumId, facts });
+    let result: Awaited<ReturnType<typeof startDraft>>;
+    try {
+      result = await startDraft({ templateId: intake.id, forumId, facts });
+    } catch {
+      // The connection dropped or the server stopped (for example a very long draft).
+      setBusy(false);
+      setMessage("Lawdeck could not finish the draft. Your answers are still here: press Draft the document to try again.");
+      return;
+    }
     if (result.ok) {
       router.push(`/documents/${result.id}`);
       return;
@@ -41,7 +55,7 @@ export function DraftIntakeForm({ intake, returnTo }: { intake: IntakeView; retu
   }
 
   return (
-    <form action={submit} noValidate className="flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5">
+    <form onSubmit={(event) => void submit(event)} noValidate className="flex flex-col gap-6 rounded-2xl border border-line bg-surface p-5">
       {chooseForum ? (
         <fieldset className="flex flex-col gap-2">
           <legend className="mb-1 font-medium">Court or registry</legend>

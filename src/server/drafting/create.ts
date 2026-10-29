@@ -88,11 +88,17 @@ export async function createDraft(db: Db, userId: string, input: NewDraft): Prom
     usage = { model: written.model, costUsd: written.costUsd, ...written.usage };
   }
 
+  // Checked without throwing, so a draft that cannot be saved says so instead of an error screen.
+  const valid = documentContentSchema.safeParse(content);
+  if (!valid.success) {
+    console.error("draft failed", { step: "content", path: valid.error.issues[0]?.path.join(".") ?? "" });
+    return { ok: false, message: "The draft was not saved. Please try again." };
+  }
   const saved = await saveDocument(db, {
     templateId: input.templateId,
     forumId: forum.id,
     title: template.data.title,
-    content: documentContentSchema.parse(content),
+    content: valid.data,
     model: usage?.model ?? null,
   });
   if (!saved) return { ok: false, message: "The draft was not saved. Please try again." };

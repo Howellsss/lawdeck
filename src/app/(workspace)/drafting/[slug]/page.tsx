@@ -10,6 +10,10 @@ import { getIntake } from "@/server/db/documents";
 
 export const metadata: Metadata = { title: "Draft a document · Lawdeck" };
 
+// Drafting runs here (the form's server action): Opus writes the narrative parts, which can take
+// a few minutes for a long document, so the server is allowed the most time Vercel gives.
+export const maxDuration = 300;
+
 // One reviewed document's intake (DR-03, DR-04): court or registry, then the facts.
 export default function DraftIntakePage({ params, searchParams }: PageProps<"/drafting/[slug]">) {
   return (

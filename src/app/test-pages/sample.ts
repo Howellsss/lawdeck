@@ -1,5 +1,6 @@
 import "server-only";
 import { DEFAULT_PROFILE, forumFileSchema, templateFileSchema, type DocumentContent, type TemplateField } from "@/schemas/drafting";
+import type { IntakeView } from "@/server/db/documents";
 import { buildDocument, type DocModel } from "@/server/documents/render";
 import { FORUM_FILES, TEMPLATE_FILES } from "@/templates";
 
@@ -33,4 +34,24 @@ function sampleFact(field: TemplateField): string | string[] {
   if (field.type === "date") return "2026-10-23";
   const one = (n: number) => `Quokka ${field.label} ${n}`;
   return field.repeatable ? [one(1), one(2), one(3)] : one(1);
+}
+
+// For the drafting form test only: a template's intake as a student sees it, with made-up ids for
+// its courts. Pressing "Draft the document" here as a visitor is refused by the server ("Sign in").
+export function sampleIntake(templateSlug: string): IntakeView | null {
+  const template = TEMPLATE_FILES.map((f) => templateFileSchema.safeParse(f)).find((r) => r.success && r.data.slug === templateSlug);
+  if (!template?.success) return null;
+  const t = template.data;
+  const forums = FORUM_FILES.map((f) => forumFileSchema.parse(f)).filter((f) => t.forums.includes(f.slug));
+  return {
+    id: "00000000-0000-4000-8000-000000000001",
+    title: t.title,
+    courseName: "Test course",
+    forums: forums.map((f, i) => ({ id: `00000000-0000-4000-8000-00000000010${i}`, slug: f.slug, name: f.name })),
+    fields: t.spec.fields,
+    aiParts: t.spec.parts.filter((part) => part.kind === "narrative").length,
+    why: [],
+    defaults: {},
+    defaultForumId: null,
+  };
 }

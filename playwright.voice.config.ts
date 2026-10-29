@@ -1,8 +1,8 @@
 import { defineConfig, devices } from "@playwright/test";
 
-// The voice-mode conversation test (tests/voice): a pretend microphone and pretend answers and
-// audio, against the test-only page /test-pages/voice (LAWDECK_TEST_PAGES=1, never on the live
-// site). Run `npm run build` first.
+// Tests on test-only pages (tests/voice): the voice-mode conversation, with a pretend microphone
+// and pretend answers and audio, and the drafting form. Pages under /test-pages exist only with
+// LAWDECK_TEST_PAGES=1, never on the live site. Run `npm run build` first.
 const executablePath = process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined;
 const PORT = 3120;
 
