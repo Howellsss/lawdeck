@@ -9,7 +9,7 @@ import { SidebarContext } from "./sidebarContext";
 
 const MAIN_LINKS: { href: string; label: string; icon: IconName }[] = [
   { href: "/courses", label: "Courses", icon: "book" },
-  { href: "/practice", label: "Practice", icon: "cards" },
+  { href: "/practice", label: "MCQ", icon: "cards" },
   { href: "/briefs", label: "Briefs", icon: "bookmark" },
   { href: "/projects", label: "Projects", icon: "folder" },
   { href: "/documents", label: "Documents", icon: "document" },
