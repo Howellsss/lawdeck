@@ -19,7 +19,7 @@ export default function InvitePage() {
         </div>
       ) : (
         <p role="alert" className="text-center text-sm text-warning">
-          Google sign-in isn’t switched on here yet. Please try again on lawdeck.vercel.app.
+          Google sign-in isn’t switched on here yet. Please try again on mylawdeck.com.
         </p>
       )}
     </>

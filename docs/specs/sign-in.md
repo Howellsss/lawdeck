@@ -26,7 +26,7 @@ Rules: Engineering Rules C-01 to C-04; PRD AC-01; System Design §2 (Supabase Au
 
 ## Supabase settings the founder sets (in the Supabase dashboard)
 
-1. **URL settings**: Site URL = the live address (e.g. `https://lawdeck.vercel.app`). Add `http://localhost:3000/**` and the Vercel preview addresses to the allowed redirect list.
+1. **URL settings**: Site URL = the live address, `https://mylawdeck.com` (also allow `https://www.mylawdeck.com/**` and `https://lawdeck.vercel.app/**`). Add `http://localhost:3000/**` and the Vercel preview addresses to the allowed redirect list.
 2. **Email sign-in**: on, with "confirm email" on. Minimum password length 10.
 3. **Email templates** (Confirm signup, Reset password). Supabase only allows editing these once a custom email service (SMTP) is connected, so this waits for that. When possible, point the link at Lawdeck's confirm page so it works on any device:
    - Confirm signup: `{{ .SiteURL }}/auth/confirm?token_hash={{ .TokenHash }}&type=email&next=/`

@@ -97,8 +97,8 @@ Tests: `tests/unit/driveImport.test.ts` (10 checks).
 ### Founder steps for the Drive import (Google Cloud, same project as Google sign-in)
 
 1. APIs & Services > Library: enable **Google Picker API** and **Google Drive API**.
-2. APIs & Services > Credentials > Create credentials > API key. Restrict it: Websites `https://lawdeck.vercel.app/*`; APIs: Google Picker API. Copy it.
-3. Credentials > the OAuth "Web client" used for sign-in: add `https://lawdeck.vercel.app` under Authorised JavaScript origins. Copy its Client ID.
+2. APIs & Services > Credentials > Create credentials > API key. Restrict it: Websites `https://mylawdeck.com/*` and `https://lawdeck.vercel.app/*`; APIs: Google Picker API. Copy it.
+3. Credentials > the OAuth "Web client" used for sign-in: add `https://mylawdeck.com` (and `https://lawdeck.vercel.app`) under Authorised JavaScript origins. Copy its Client ID.
 4. OAuth consent screen (Google Auth Platform) > Data access > Add scopes: `.../auth/drive.file`.
 5. Dashboard > Project info: copy the Project number.
 6. Vercel > Environment Variables (Production and Preview): `NEXT_PUBLIC_GOOGLE_CLIENT_ID`, `NEXT_PUBLIC_GOOGLE_PICKER_API_KEY`, `NEXT_PUBLIC_GOOGLE_APP_ID`. Then redeploy.
