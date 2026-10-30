@@ -38,6 +38,14 @@ describe("one address for the live site", () => {
     expect(canonicalRedirect(visit("https://mylawdeck.com/courses"))).toBeNull();
   });
 
+  it("never sends a visitor to another website, whatever the path", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("SITE_URL", "https://mylawdeck.com");
+    const request = visit("https://lawdeck.vercel.app/x");
+    Object.defineProperty(request.nextUrl, "pathname", { value: "//evil.example/steal" });
+    expect(canonicalRedirect(request)?.host).toBe("mylawdeck.com");
+  });
+
   it("never moves preview copies or local runs", () => {
     vi.stubEnv("SITE_URL", "https://mylawdeck.com");
     vi.stubEnv("VERCEL_ENV", "preview");

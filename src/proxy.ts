@@ -52,7 +52,12 @@ export function canonicalRedirect(request: NextRequest): URL | null {
   }
   const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? request.nextUrl.host;
   if (!host || host === site.host) return null;
-  return new URL(`${request.nextUrl.pathname}${request.nextUrl.search}`, site.origin);
+  // The path is set on a URL that already has Lawdeck's address, so a path such as "//other.site"
+  // can never send the visitor to another website.
+  const target = new URL(site.origin);
+  target.pathname = request.nextUrl.pathname;
+  target.search = request.nextUrl.search;
+  return target;
 }
 
 export function signInToFinish(request: NextRequest): URL | null {
