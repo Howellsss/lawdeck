@@ -9,6 +9,12 @@ export async function proxy(request: NextRequest) {
   const key = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY;
   if (!url || !key) return NextResponse.next({ request });
 
+  // The live site has one address (SITE_URL, mylawdeck.com). Visits to any other address of the
+  // live deployment (lawdeck.vercel.app) move there with the same page and details, so sign-in
+  // always finishes on the address it started from (founder, 2026-10-30: "no more vercel").
+  const home = canonicalRedirect(request);
+  if (home) return NextResponse.redirect(home, 308);
+
   // Google sign-in sometimes comes back to a page other than /auth/callback (Supabase sends the
   // student to its Site URL when the return address is not on its allowed list), carrying the
   // one-time code. Hand it to the callback, which checks it, so the student is signed in instead
@@ -34,6 +40,19 @@ export async function proxy(request: NextRequest) {
   // Renews the session if needed. Must run before anything else uses it.
   await supabase.auth.getClaims();
   return response;
+}
+
+export function canonicalRedirect(request: NextRequest): URL | null {
+  if (process.env.VERCEL_ENV !== "production" || !process.env.SITE_URL) return null;
+  let site: URL;
+  try {
+    site = new URL(process.env.SITE_URL);
+  } catch {
+    return null;
+  }
+  const host = request.headers.get("x-forwarded-host") ?? request.headers.get("host") ?? request.nextUrl.host;
+  if (!host || host === site.host) return null;
+  return new URL(`${request.nextUrl.pathname}${request.nextUrl.search}`, site.origin);
 }
 
 export function signInToFinish(request: NextRequest): URL | null {

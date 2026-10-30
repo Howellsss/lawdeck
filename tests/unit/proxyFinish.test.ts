@@ -1,6 +1,6 @@
 import { NextRequest } from "next/server";
-import { describe, expect, it } from "vitest";
-import { signInToFinish } from "@/proxy";
+import { afterEach, describe, expect, it, vi } from "vitest";
+import { canonicalRedirect, signInToFinish } from "@/proxy";
 
 // Google sign-in that lands on another page with its one-time code is finished by the callback,
 // instead of leaving the student signed out (founder, 2026-10-30: "it gets in and requires me to
@@ -23,5 +23,26 @@ describe("finishing Google sign-in from any page", () => {
     expect(signInToFinish(new NextRequest("https://mylawdeck.com/auth/callback?code=x"))).toBeNull();
     expect(signInToFinish(new NextRequest("https://mylawdeck.com/api/chats/1/answer?code=x"))).toBeNull();
     expect(signInToFinish(new NextRequest("https://mylawdeck.com/courses"))).toBeNull();
+  });
+});
+
+describe("one address for the live site", () => {
+  afterEach(() => vi.unstubAllEnvs());
+  const visit = (url: string) => new NextRequest(url, { headers: { host: new URL(url).host } });
+
+  it("moves visits to the old live address to mylawdeck.com, keeping the page and code", () => {
+    vi.stubEnv("VERCEL_ENV", "production");
+    vi.stubEnv("SITE_URL", "https://mylawdeck.com");
+    expect(canonicalRedirect(visit("https://lawdeck.vercel.app/?code=abc"))?.href).toBe("https://mylawdeck.com/?code=abc");
+    expect(canonicalRedirect(visit("https://lawdeck.vercel.app/courses/civil"))?.href).toBe("https://mylawdeck.com/courses/civil");
+    expect(canonicalRedirect(visit("https://mylawdeck.com/courses"))).toBeNull();
+  });
+
+  it("never moves preview copies or local runs", () => {
+    vi.stubEnv("SITE_URL", "https://mylawdeck.com");
+    vi.stubEnv("VERCEL_ENV", "preview");
+    expect(canonicalRedirect(visit("https://lawdeck-git-x.vercel.app/"))).toBeNull();
+    vi.stubEnv("VERCEL_ENV", "");
+    expect(canonicalRedirect(visit("http://localhost:3000/"))).toBeNull();
   });
 });
