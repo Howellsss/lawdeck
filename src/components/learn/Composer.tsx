@@ -22,7 +22,7 @@ const SHORTCUTS: {
 }[] = [
   { label: "Learn", icon: "book", mode: "Learn", starter: "" },
   { label: "Draft", icon: "pen", mode: "Draft", starter: "Draft a " },
-  { label: "Practice", icon: "check", mode: "Learn", starter: "Quiz me on " },
+  { label: "MCQ", icon: "check", mode: "Learn", starter: "Give me multiple-choice questions on " },
   {
     label: "Brief a case",
     icon: "scale",

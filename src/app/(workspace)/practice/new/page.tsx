@@ -7,9 +7,9 @@ import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { StateMessage } from "@/components/ui/StateMessage";
 import { getPracticeTopic } from "@/server/db/practice";
 
-export const metadata: Metadata = { title: "New practice set · Lawdeck" };
+export const metadata: Metadata = { title: "New MCQ set · Lawdeck" };
 
-// Make a practice set on one topic (PRD LN-06). Reached from "Practise" on a course page.
+// Make multiple-choice questions on one topic (PRD LN-06). Reached from "MCQ" on a course page.
 export default function NewPracticePage({ searchParams }: PageProps<"/practice/new">) {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
@@ -27,7 +27,7 @@ async function NewSet({ searchParams }: Pick<PageProps<"/practice/new">, "search
   if (!result.data) {
     return (
       <StateMessage title="Choose a topic first" action={{ label: "Go to Courses", href: "/courses" }}>
-        Open a course and choose <strong>Practise</strong> next to the topic you want questions on.
+        Open a course and choose <strong>MCQ</strong> next to the topic you want questions on.
       </StateMessage>
     );
   }
@@ -40,8 +40,8 @@ async function NewSet({ searchParams }: Pick<PageProps<"/practice/new">, "search
             {topic.courseName}
           </Link>
         </p>
-        <h1 className="font-serif text-3xl font-normal text-greeting">Practise: {topic.name}</h1>
-        <p className="text-muted">Lawdeck writes questions from approved course material on this topic, with the sources for every answer.</p>
+        <h1 className="font-serif text-3xl font-normal text-greeting">MCQ: {topic.name}</h1>
+        <p className="text-muted">Lawdeck writes multiple-choice questions from approved course material on this topic, with the sources for every answer.</p>
       </div>
       <NewPracticeForm topicId={topic.id} />
     </>

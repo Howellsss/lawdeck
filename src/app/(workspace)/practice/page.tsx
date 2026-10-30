@@ -26,7 +26,7 @@ async function Sets() {
   return (
     <>
       <p className="text-muted">
-        To make new questions or flashcards, open a course in <Link href="/courses">Courses</Link> and choose <strong>Practise</strong> next to a
+        To make multiple-choice questions, open a course in <Link href="/courses">Courses</Link> and choose <strong>MCQ</strong> next to a
         topic. To have an exam-style answer marked, use <Link href="/practice/mark">Mark my answer</Link>.
       </p>
       {result.data.length === 0 ? (
