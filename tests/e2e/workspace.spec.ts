@@ -191,7 +191,7 @@ test("The pilot page is hidden from visitors", async ({ page }) => {
 });
 
 test("The users dashboard is hidden from visitors", async ({ page }) => {
-  for (const path of ["/admin/users", "/admin/users?q=a&payment=paid", "/admin/users/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a"]) {
+  for (const path of ["/admin/users", "/admin/users?q=a&payment=paid", "/admin/users/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a", "/admin/users/usage", "/admin/users/usage?days=7"]) {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
     await expect(page.getByRole("table")).toHaveCount(0);
