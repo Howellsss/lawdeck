@@ -6,7 +6,7 @@ import { safeNextPath } from "@/lib/safeNextPath";
 import { emailOnlySchema, resetPasswordSchema, signInSchema, signUpSchema } from "@/schemas/auth";
 import { getSupabaseConfig, isGoogleSignInEnabled } from "./config";
 import { GENERIC_AUTH_ERROR, NOT_CONFIGURED_ERROR, messageForAuthError } from "./errors";
-import { siteOrigin } from "./origin";
+import { requestOrigin, siteOrigin } from "./origin";
 import { recordAttempt, waitMessage, waitSeconds } from "./limits";
 import { getCurrentAccount } from "./session";
 import { createSupabaseServerClient } from "./supabase";
@@ -160,7 +160,7 @@ export async function signInWithGoogle(_prev: AuthFormState, formData: FormData)
   const supabase = await createSupabaseServerClient();
   const { data, error } = await supabase.auth.signInWithOAuth({
     provider: "google",
-    options: { redirectTo: `${await siteOrigin()}/auth/callback?next=${encodeURIComponent(next)}` },
+    options: { redirectTo: `${await requestOrigin()}/auth/callback?next=${encodeURIComponent(next)}` },
   });
   if (error || !data.url) {
     logAuthFailure("signInWithGoogle", error?.code);

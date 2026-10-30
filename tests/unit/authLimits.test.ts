@@ -14,7 +14,7 @@ vi.mock("next/headers", () => ({
   headers: async () => new Headers({ "x-forwarded-for": "203.0.113.7, 10.0.0.1" }),
 }));
 vi.mock("@/server/auth/config", () => ({ getSupabaseConfig: () => ({ url: "x", key: "y" }), isGoogleSignInEnabled: () => false }));
-vi.mock("@/server/auth/origin", () => ({ siteOrigin: async () => "https://lawdeck.test" }));
+vi.mock("@/server/auth/origin", () => ({ siteOrigin: async () => "https://lawdeck.test", requestOrigin: async () => "https://lawdeck.test" }));
 vi.mock("@/server/auth/supabase", () => ({
   createSupabaseServerClient: async () => ({ rpc, auth: { signInWithPassword, resetPasswordForEmail } }),
 }));
