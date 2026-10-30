@@ -1,6 +1,7 @@
 # Lawdeck — rules for AI coding tools
 
 Lawdeck is an AI study and drafting workspace for Nigerian Law School students.
+Live address: https://mylawdeck.com (founder, 2026-10-30; lawdeck.vercel.app still works but is not shared).
 Source documents in `docs/`: PRD v2.0, Engineering Rules v1.0, System Design v1.0, Build Phases v1.1, AI Cost Model. Progress log: `docs/progress.md`.
 If a request conflicts with these rules, say so before writing code.
 This project uses a recent Next.js with breaking changes: read `AGENTS.md` and the guides in `node_modules/next/dist/docs/` before writing Next.js code.
