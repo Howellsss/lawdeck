@@ -992,6 +992,36 @@ export type Database = {
         }[];
       };
       admin_user_detail: { Args: { person: string }; Returns: { metric: string; value: string | null }[] };
+      admin_usage_ranking: {
+        Args: { days?: number };
+        Returns: {
+          id: string;
+          email: string;
+          full_name: string | null;
+          role: "student" | "reviewer" | "admin";
+          calls: number;
+          questions: number;
+          cost_usd: number;
+          last_active_at: string | null;
+        }[];
+      };
+      admin_user_usage: {
+        Args: { person: string };
+        Returns: {
+          kind: string;
+          calls_month: number;
+          cost_month: number;
+          calls_30d: number;
+          cost_30d: number;
+          calls_total: number;
+          cost_total: number;
+        }[];
+      };
+      admin_user_usage_daily: { Args: { person: string; days?: number }; Returns: { day: string; calls: number; cost_usd: number }[] };
+      admin_user_courses: {
+        Args: { person: string };
+        Returns: { course: string; chats: number; questions: number; last_asked_at: string | null }[];
+      };
       record_download: { Args: { kind: "document_docx" | "study_export" }; Returns: undefined };
       unusual_activity: { Args: { minutes?: number }; Returns: { metric: string; value: number }[] };
       record_ai_usage: {

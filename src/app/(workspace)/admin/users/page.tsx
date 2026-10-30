@@ -41,6 +41,9 @@ async function Users({ searchParams }: Pick<PageProps<"/admin/users">, "searchPa
       <div className="flex flex-col gap-1">
         <h1 className="font-serif text-3xl font-normal text-greeting">Users</h1>
         <p className="text-muted">Who is joining, what plan they are on, whether they pay, and who is using Lawdeck.</p>
+        <p>
+          <Link href="/admin/users/usage">Usage and cost per person</Link>
+        </p>
       </div>
       <UsersOverview data={overview} />
       <section aria-labelledby="people-heading" className="flex flex-col gap-3 border-t border-line pt-6">
