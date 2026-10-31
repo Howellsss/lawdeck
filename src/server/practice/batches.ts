@@ -5,7 +5,7 @@ import type { PracticeReply } from "@/schemas/practice";
 // own share of the passages (dealt out in turn), so batches cover different points and do not
 // repeat each other. The model, its settings and the instructions are unchanged.
 
-export const QUESTIONS_PER_BATCH = 3;
+export const QUESTIONS_PER_BATCH = 2;
 
 export function planBatches<T>(hits: T[], count: number, perBatch = QUESTIONS_PER_BATCH): { hits: T[]; count: number }[] {
   const batches = Math.max(1, Math.min(Math.ceil(count / perBatch), hits.length));

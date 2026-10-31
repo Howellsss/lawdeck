@@ -5,6 +5,7 @@ import { AppShell } from "@/components/shell/AppShell";
 import { RecentsPlaceholder } from "@/components/shell/RecentsList";
 import { RecentsSlot } from "@/components/shell/RecentsSlot";
 import { StaffNavSlot } from "@/components/shell/StaffNavSlot";
+import { VoiceSlot } from "@/components/shell/VoiceSlot";
 
 export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
   return (
@@ -18,6 +19,11 @@ export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
       staffNav={
         <Suspense fallback={null}>
           <StaffNavSlot />
+        </Suspense>
+      }
+      voice={
+        <Suspense fallback={null}>
+          <VoiceSlot />
         </Suspense>
       }
       recents={
