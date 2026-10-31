@@ -12,6 +12,7 @@ import { ALLOWANCE_UNAVAILABLE, getAllowance, hasQuestionsLeft } from "@/server/
 import { searchUnsure } from "@/server/learn/ask";
 import { filterContextFor } from "@/server/learn/filterContext";
 import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
+import { mergeReplies, planBatches } from "./batches";
 import { cleanPracticeItems, type CleanItem } from "./clean";
 
 type Db = SupabaseClient<Database>;
@@ -48,14 +49,28 @@ export async function createPracticeSet(db: Db, userId: string, input: NewPracti
   if (found.hits.length === 0) return { ok: false, message: NOT_ENOUGH_FOR_PRACTICE };
 
   const hits = found.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
-  const made = await makePracticeQuestions({
-    passages: hits.map(toPassage),
-    topic: topic.data.name,
-    kind: input.kind,
-    count: input.count,
-    userId,
-  });
-  if (!made.ok) return { ok: false, message: FAILURES[made.reason] };
+  // Written as small batches at the same time, each from its own share of the passages (batches.ts).
+  const topicName = topic.data.name;
+  const results = await Promise.all(
+    planBatches(hits, input.count).map((batch) =>
+      makePracticeQuestions({ passages: batch.hits.map(toPassage), topic: topicName, kind: input.kind, count: batch.count, userId }),
+    ),
+  );
+  const done = results.filter((result) => result.ok);
+  if (done.length === 0) {
+    const failed = results.find((result) => !result.ok);
+    return { ok: false, message: FAILURES[failed && !failed.ok ? failed.reason : "malformed"] };
+  }
+  const made = {
+    reply: mergeReplies(done.map((result) => result.reply)),
+    model: done[0].model,
+    costUsd: done.reduce((sum, result) => sum + (result.costUsd ?? 0), 0),
+    usage: {
+      tokensIn: done.reduce((sum, result) => sum + result.usage.tokensIn, 0),
+      tokensOut: done.reduce((sum, result) => sum + result.usage.tokensOut, 0),
+      ms: Math.max(...done.map((result) => result.usage.ms)),
+    },
+  };
 
   const context = await filterContextFor(db, hits, topic.data.course_id);
   const { items, dropped } = await cleanPracticeItems(made.reply, input.kind, input.count, context);
