@@ -8,9 +8,9 @@ import { useSidebar } from "./sidebarContext";
 
 const row = "flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill";
 
-// Bottom of the sidebar: "Sign in" for visitors; the student's email (linking to their Account page)
-// and "Sign out" once signed in.
-export function AccountButton({ account }: { account: Account | null }) {
+// Bottom of the sidebar: "Sign in" for visitors; once signed in, the student's name and email
+// (linking to their Account page, where the name can be changed) and "Sign out".
+export function AccountButton({ account, name = null }: { account: Account | null; name?: string | null }) {
   const { collapsed, onNavigate } = useSidebar();
   const label = (text: string) => <span className={collapsed ? "sr-only" : "truncate"}>{text}</span>;
 
@@ -28,11 +28,18 @@ export function AccountButton({ account }: { account: Account | null }) {
       <Link
         href="/account"
         onClick={onNavigate}
-        title="Account"
+        title="Account: your name, voice and details"
         className={`${row} min-w-0 flex-1 px-2 ${collapsed ? "justify-center" : ""}`}
       >
-        <Avatar letter={account.email.charAt(0).toUpperCase() || "L"} />
-        {label(account.email)}
+        <Avatar letter={(name ?? account.email).charAt(0).toUpperCase() || "L"} />
+        {name ? (
+          <span className={collapsed ? "sr-only" : "flex min-w-0 flex-col leading-tight"}>
+            <span className="truncate">{name}</span>
+            <span className="truncate text-xs text-muted">{account.email}</span>
+          </span>
+        ) : (
+          label(account.email)
+        )}
       </Link>
       <form action={signOut}>
         <button
