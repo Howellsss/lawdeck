@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { signInMethodLabel, timeAgo } from "@/lib/adminUsers";
+import { formatNaira, formatUsd } from "@/lib/adminUsage";
 import { formatWat } from "@/lib/dates";
 import type { UserRow } from "@/server/db/adminUsers";
 import { AccessButton } from "./AccessButton";
@@ -10,12 +11,12 @@ function When({ value, now, empty }: { value: string | null; now: Date; empty: s
   return <time dateTime={value} title={formatWat(value)}>{timeAgo(value, now) ?? formatWat(value)}</time>;
 }
 
-// Admin: the people list, newest first. Names link to each person's details.
+// Admin: the people list, in the chosen order. Names link to each person's full profile.
 export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date; filtered: boolean }) {
   return (
     <div className="overflow-x-auto rounded-2xl border border-line">
-      <table className="w-full min-w-[880px] text-left text-sm">
-        <caption className="sr-only">People, newest first</caption>
+      <table className="w-full min-w-[980px] text-left text-sm">
+        <caption className="sr-only">People</caption>
         <thead className="bg-surface text-muted">
           <tr>
             <th scope="col" className="px-3 py-2 font-medium">Person</th>
@@ -24,6 +25,7 @@ export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date;
             <th scope="col" className="px-3 py-2 font-medium">Plan</th>
             <th scope="col" className="px-3 py-2 font-medium">Payment</th>
             <th scope="col" className="px-3 py-2 font-medium">Questions this month</th>
+            <th scope="col" className="px-3 py-2 font-medium">AI cost this month</th>
             <th scope="col" className="px-3 py-2 font-medium">Last active</th>
             <th scope="col" className="px-3 py-2 font-medium">Signed up with</th>
           </tr>
@@ -31,7 +33,7 @@ export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date;
         <tbody className="divide-y divide-line">
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={8} className="px-3 py-6 text-center text-muted">
+              <td colSpan={9} className="px-3 py-6 text-center text-muted">
                 {filtered ? "Nobody matches. Try other words or clear the filters." : "Nobody has signed up yet."}
               </td>
             </tr>
@@ -59,6 +61,10 @@ export function UserTable({ rows, now, filtered }: { rows: UserRow[]; now: Date;
                   {row.payment === "paid" && row.paidUntil && <span className="block text-xs text-muted">until {formatWat(row.paidUntil)}</span>}
                 </td>
                 <td className="px-3 py-2">{row.questionsThisMonth}</td>
+                <td className="whitespace-nowrap px-3 py-2">
+                  {formatUsd(row.costThisMonth)}
+                  <span className="block text-xs text-muted">{formatNaira(row.costThisMonth)}</span>
+                </td>
                 <td className="whitespace-nowrap px-3 py-2"><When value={row.lastActiveAt} now={now} empty="Not yet" /></td>
                 <td className="px-3 py-2">
                   {signInMethodLabel(row.signInMethod)}

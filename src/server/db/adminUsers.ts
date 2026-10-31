@@ -27,6 +27,7 @@ export type UserRow = {
   paidUntil: string | null;
   pilotAccess: boolean;
   questionsThisMonth: number;
+  costThisMonth: number;
   lastActiveAt: string | null;
 };
 
@@ -52,7 +53,7 @@ export async function getUsersOverview(): Promise<UsersOverview | null> {
   return { counts, plans, signups: (signups.data ?? []).map((row) => ({ day: row.day, signups: Number(row.signups) })) };
 }
 
-// One page of people, newest first, or null for non-admins.
+// One page of people in the chosen order (newest first by default), or null for non-admins.
 export async function listUsers(filter: UserFilter): Promise<UsersPage | null> {
   if ((await getStaffRole()) !== "admin") return null;
   const supabase = await createSupabaseServerClient();
@@ -63,6 +64,7 @@ export async function listUsers(filter: UserFilter): Promise<UsersPage | null> {
       payment: filter.payment,
       page_size: USERS_PAGE_SIZE,
       page_offset: (filter.page - 1) * USERS_PAGE_SIZE,
+      sort: filter.sort,
     }),
     supabase.from("plans").select("name").order("name"),
   ]);
@@ -89,6 +91,7 @@ export async function listUsers(filter: UserFilter): Promise<UsersPage | null> {
       paidUntil: row.paid_until,
       pilotAccess: row.pilot_access,
       questionsThisMonth: Number(row.questions_this_month),
+      costThisMonth: Number(row.cost_this_month),
       lastActiveAt: row.last_active_at,
     })),
     total,

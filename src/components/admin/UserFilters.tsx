@@ -1,14 +1,14 @@
 import Link from "next/link";
 import { compactPrimaryButton } from "@/components/ui/buttons";
-import { PAYMENT_FILTER_LABELS } from "@/lib/adminUsers";
-import { PAYMENT_FILTERS, type UserFilter } from "@/schemas/adminUsers";
+import { PAYMENT_FILTER_LABELS, USER_SORT_LABELS } from "@/lib/adminUsers";
+import { PAYMENT_FILTERS, USER_SORTS, type UserFilter } from "@/schemas/adminUsers";
 
 const field = "h-11 rounded-full border border-line bg-sidebar px-4 text-[15px] text-ink";
 
-// Search and filters for the people list. A plain form that changes the page address, so it
+// Search, filters and order for the people list. A plain form that changes the page address, so it
 // works without JavaScript and a filtered list can be bookmarked.
 export function UserFilters({ filter, planNames }: { filter: UserFilter; planNames: string[] }) {
-  const filtered = Boolean(filter.q || filter.plan || filter.payment);
+  const filtered = Boolean(filter.q || filter.plan || filter.payment || filter.sort !== "newest");
   return (
     <form action="/admin/users" method="get" role="search" className="flex flex-col gap-3 sm:flex-row sm:flex-wrap sm:items-end">
       <div className="flex min-w-0 flex-1 flex-col gap-1">
@@ -30,6 +30,14 @@ export function UserFilters({ filter, planNames }: { filter: UserFilter; planNam
           <option value="">Anyone</option>
           {PAYMENT_FILTERS.map((value) => (
             <option key={value} value={value}>{PAYMENT_FILTER_LABELS[value]}</option>
+          ))}
+        </select>
+      </div>
+      <div className="flex flex-col gap-1">
+        <label htmlFor="users-sort" className="px-1 text-sm font-medium">Order</label>
+        <select id="users-sort" name="sort" defaultValue={filter.sort} className={field}>
+          {USER_SORTS.map((value) => (
+            <option key={value} value={value}>{USER_SORT_LABELS[value]}</option>
           ))}
         </select>
       </div>

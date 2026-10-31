@@ -972,7 +972,14 @@ export type Database = {
       admin_overview: { Args: Record<string, never>; Returns: { metric: string; value: number }[] };
       admin_signups_by_day: { Args: { days?: number }; Returns: { day: string; signups: number }[] };
       admin_users: {
-        Args: { search?: string | null; plan_name?: string | null; payment?: "paid" | "unpaid" | "past_due" | null; page_size?: number; page_offset?: number };
+        Args: {
+          search?: string | null;
+          plan_name?: string | null;
+          payment?: "paid" | "unpaid" | "past_due" | null;
+          page_size?: number;
+          page_offset?: number;
+          sort?: "newest" | "cost" | "questions" | "active";
+        };
         Returns: {
           id: string;
           email: string | null;
@@ -987,6 +994,7 @@ export type Database = {
           paid_until: string | null;
           pilot_access: boolean;
           questions_this_month: number;
+          cost_this_month: number;
           last_active_at: string | null;
           total_count: number;
         }[];
