@@ -1,5 +1,6 @@
 import { z } from "@/lib/zod";
 import { PASSWORD_MAX, PASSWORD_MIN } from "@/lib/passwordRules";
+import { NAME_MAX } from "@/schemas/profile";
 
 export const emailSchema = z
   .string({ error: "Enter your email address." })
@@ -21,7 +22,14 @@ const existingPasswordSchema = z
   .max(PASSWORD_MAX, { error: "That password is too long." });
 
 export const signInSchema = z.object({ email: emailSchema, password: existingPasswordSchema });
-export const signUpSchema = z.object({ email: emailSchema, password: newPasswordSchema });
+// The name Lawdeck greets the student by (founder, 2026-10-31: a student who signed up by email
+// was greeted without her name). Only the greeting and the admin list use it; never sent to the AI.
+export const signUpNameSchema = z
+  .string({ error: "Enter your name." })
+  .transform((value) => value.replace(/\s+/g, " ").trim())
+  .pipe(z.string().min(1, { error: "Enter your name." }).max(NAME_MAX, { error: `Use ${NAME_MAX} characters or fewer.` }));
+
+export const signUpSchema = z.object({ name: signUpNameSchema, email: emailSchema, password: newPasswordSchema });
 export const emailOnlySchema = z.object({ email: emailSchema });
 export const resetPasswordSchema = z.object({ password: newPasswordSchema });
 
