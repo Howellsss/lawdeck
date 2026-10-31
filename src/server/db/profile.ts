@@ -19,18 +19,24 @@ export async function getOwnName(): Promise<string | null> {
   return data?.full_name?.trim() || null;
 }
 
-// First name for "Good morning, …": the Account page name, else the name Google gave at sign-in.
-export async function getGreetingName(): Promise<string | null> {
+// The person's full name: the one saved on the Account page, else the one given at sign-up
+// (Google's, or typed on the sign-up form). Shown on the Account page so it can be changed there.
+export async function getFullName(): Promise<string | null> {
   const own = await getOwnName();
-  if (own) return firstName(own);
+  if (own) return own;
   const account = await getCurrentAccount();
   if (!account) return null;
   const supabase = await createSupabaseServerClient();
   const { data } = await supabase.auth.getClaims();
   const meta = data?.claims?.user_metadata;
-  const fromGoogle =
+  const fromSignUp =
     meta && typeof meta === "object"
       ? [(meta as Record<string, unknown>).full_name, (meta as Record<string, unknown>).name].find((v) => typeof v === "string")
       : undefined;
-  return firstName(typeof fromGoogle === "string" ? fromGoogle : null);
+  return typeof fromSignUp === "string" && fromSignUp.trim() ? fromSignUp.trim().slice(0, 80) : null;
+}
+
+// First name for "Good morning, …".
+export async function getGreetingName(): Promise<string | null> {
+  return firstName(await getFullName());
 }

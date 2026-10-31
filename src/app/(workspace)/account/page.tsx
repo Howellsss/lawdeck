@@ -8,7 +8,7 @@ import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { speechConfigured } from "@/server/ai/speech";
 import { getCurrentAccount } from "@/server/auth/session";
-import { getOwnName } from "@/server/db/profile";
+import { getFullName } from "@/server/db/profile";
 import { getPilotStatus } from "@/server/db/pilot";
 
 export const metadata: Metadata = { title: "Account · Lawdeck" };
@@ -27,7 +27,7 @@ export default function AccountPage() {
 async function Account() {
   const account = await getCurrentAccount();
   if (!account) return <SignInPrompt level={1} what="account" returnTo="/account" />;
-  const name = await getOwnName();
+  const name = await getFullName();
   const pilot = await getPilotStatus().catch(() => null);
   return (
     <>

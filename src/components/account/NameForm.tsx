@@ -4,7 +4,8 @@ import { useActionState } from "react";
 import { compactPrimaryButton } from "@/components/ui/buttons";
 import { saveOwnName, type NameState } from "@/server/account/nameActions";
 
-// "Your name": used only to greet you ("Good morning, Ada").
+// "Your name": greets you ("Good morning, Ada") and shows in the side menu. Starts with the name
+// already in use (saved here, or given at sign-up), so it can simply be changed (founder, 2026-10-31).
 export function NameForm({ name }: { name: string | null }) {
   const [state, action, pending] = useActionState(saveOwnName, { status: "idle", name: name ?? "" } as NameState);
   return (
@@ -22,7 +23,7 @@ export function NameForm({ name }: { name: string | null }) {
         />
       </label>
       <p id="name-note" className="text-sm text-muted">
-        Only used to greet you on the home page. Leave it empty for no name.
+        Lawdeck greets you by your first name and shows your name in the side menu. Change it here at any time.
       </p>
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={pending} className={compactPrimaryButton}>
