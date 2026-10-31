@@ -71,7 +71,7 @@ export function VoicePicker() {
           {error}
         </p>
       )}
-      <p className="text-sm text-muted">Your choice is saved on this device. You can also change it in voice mode or beside Read.</p>
+      <p className="text-sm text-muted">Your choice is saved on this device. You can also change it in the side menu, in voice mode or beside Read.</p>
     </fieldset>
   );
 }

@@ -105,10 +105,10 @@ describe("making a practice set", () => {
     const result = await createPracticeSet(fakeDb(), "u1", { ...input, count: 6 });
     expect(result).toMatchObject({ ok: true });
     const calls = makePracticeQuestions.mock.calls.map(([call]) => call as { passages: { label: number }[]; count: number });
-    expect(calls.map((call) => call.count)).toEqual([3, 3]);
-    expect(calls.map((call) => call.passages.map((p) => p.label))).toEqual([[1, 3], [2, 4]]);
+    expect(calls.map((call) => call.count)).toEqual([2, 2, 2]);
+    expect(calls.map((call) => call.passages.map((p) => p.label))).toEqual([[1, 4], [2], [3]]);
     expect(recordUsage).toHaveBeenCalledTimes(1);
-    expect(recordUsage.mock.calls[0][0]).toMatchObject({ kind: "practice", costUsd: 0.04, tokensIn: 20, tokensOut: 40, ms: 1000 });
+    expect(recordUsage.mock.calls[0][0]).toMatchObject({ kind: "practice", costUsd: 0.06, tokensIn: 30, tokensOut: 60, ms: 1000 });
   });
 
   it("keeps the questions from batches that worked when another batch fails", async () => {
