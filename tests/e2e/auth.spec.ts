@@ -58,6 +58,16 @@ test("create account checks the password length on the server", async ({ page })
   await expect(page.getByText("Use at least 10 characters.")).toBeVisible();
 });
 
+test("create account asks for a name, so the greeting can use it", async ({ page }) => {
+  await page.goto("/sign-up");
+  await expect(page.getByLabel("Your name")).toBeVisible();
+  await page.getByLabel("Email address").fill("ada@example.com");
+  await page.getByLabel("Password", { exact: true }).fill("a long enough password");
+  await page.getByRole("button", { name: "Create account" }).click();
+  await expect(page.getByText("Enter your name.")).toBeVisible();
+  await expect(page.getByLabel("Email address")).toHaveValue("ada@example.com");
+});
+
 test("forgot password checks the email", async ({ page }) => {
   await page.goto("/forgot-password");
   await page.getByRole("button", { name: "Send reset link" }).click();

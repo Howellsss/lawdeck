@@ -2,6 +2,7 @@ import { Suspense } from "react";
 import { Composer } from "@/components/learn/Composer";
 import { Greeting } from "@/components/learn/Greeting";
 import { NamedGreeting } from "@/components/learn/NamedGreeting";
+import { NamePrompt } from "@/components/learn/NamePrompt";
 import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { PilotHomeCard } from "@/components/pilot/PilotHomeCard";
 import { BrandMark } from "@/components/ui/BrandMark";
@@ -27,6 +28,9 @@ export default function HomePage() {
         </Suspense>
         <Suspense fallback={null}>
           <PilotHomeCard />
+        </Suspense>
+        <Suspense fallback={null}>
+          <NamePrompt />
         </Suspense>
       </div>
     </div>

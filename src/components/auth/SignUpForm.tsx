@@ -26,6 +26,16 @@ export function SignUpForm() {
     <form action={formAction} noValidate className="flex w-full flex-col gap-4">
       <FormAlert message={state.message} />
       <TextField
+        label="Your name"
+        name="name"
+        autoComplete="name"
+        required
+        maxLength={80}
+        hint="Lawdeck greets you by your first name."
+        defaultValue={state.name}
+        error={state.fieldErrors?.name}
+      />
+      <TextField
         label="Email address"
         name="email"
         type="email"

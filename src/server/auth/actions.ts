@@ -17,6 +17,7 @@ export type AuthFormState = {
   fieldErrors?: FieldErrors;
   // Echoed back so the form keeps what the student typed. Never a password.
   email?: string;
+  name?: string;
 };
 
 const notConfigured: AuthFormState = { status: "error", message: NOT_CONFIGURED_ERROR };
@@ -62,20 +63,24 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
 
 export async function signUp(_prev: AuthFormState, formData: FormData): Promise<AuthFormState> {
   const email = emailFrom(formData);
-  const parsed = signUpSchema.safeParse({ email, password: formData.get("password") });
-  if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email };
-  if (!getSupabaseConfig()) return { ...notConfigured, email };
+  const rawName = formData.get("name");
+  const name = typeof rawName === "string" ? rawName.slice(0, 200) : "";
+  const parsed = signUpSchema.safeParse({ name, email, password: formData.get("password") });
+  if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email, name };
+  if (!getSupabaseConfig()) return { ...notConfigured, email, name };
   const limited = await limit("sign_up", parsed.data.email, email);
-  if (limited) return limited;
+  if (limited) return { ...limited, name };
 
   const supabase = await createSupabaseServerClient();
+  // The name is kept with the account (like Google's), for the greeting and the admin list.
   const { data, error } = await supabase.auth.signUp({
-    ...parsed.data,
-    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/` },
+    email: parsed.data.email,
+    password: parsed.data.password,
+    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/`, data: { full_name: parsed.data.name } },
   });
   if (error) {
     logAuthFailure("signUp", error.code);
-    return { status: "error", message: messageForAuthError(error.code), email };
+    return { status: "error", message: messageForAuthError(error.code), email, name };
   }
   // If email confirmation is switched off in Supabase, the student is signed in straight away.
   if (data.session) redirect("/");
