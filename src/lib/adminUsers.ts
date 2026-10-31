@@ -1,4 +1,4 @@
-import type { PaymentFilter, UserFilter } from "@/schemas/adminUsers";
+import type { PaymentFilter, UserFilter, UserSort } from "@/schemas/adminUsers";
 
 // Words shown on the admin Users dashboard (migration 34).
 
@@ -29,6 +29,7 @@ export function usersHref(filter: Partial<UserFilter>): string {
   if (filter.q) params.set("q", filter.q);
   if (filter.plan) params.set("plan", filter.plan);
   if (filter.payment) params.set("payment", filter.payment);
+  if (filter.sort && filter.sort !== "newest") params.set("sort", filter.sort);
   if (filter.page && filter.page > 1) params.set("page", String(filter.page));
   const query = params.toString();
   return query ? `/admin/users?${query}` : "/admin/users";
@@ -49,3 +50,10 @@ export function timeAgo(value: string | null, now: Date = new Date()): string | 
   if (days < 30) return `${days} days ago`;
   return null;
 }
+
+export const USER_SORT_LABELS: Record<UserSort, string> = {
+  newest: "Newest first",
+  cost: "Highest AI cost this month",
+  questions: "Most questions this month",
+  active: "Most recently active",
+};

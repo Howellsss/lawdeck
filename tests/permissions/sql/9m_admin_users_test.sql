@@ -78,6 +78,11 @@ select test.check((select count(*) from public.admin_users('adminusers', payment
 select test.check((select count(*) from public.admin_users('adminusers', payment => 'unpaid')) = 4, 'the unpaid filter includes past due and never paid');
 select test.check((select count(*) from public.admin_users('adminusers', payment => 'past_due')) = 1, 'the past-due filter works');
 select test.check((select questions_this_month from public.admin_users('ada.adminusers')) = 2, 'questions this month are counted');
+select test.check((select cost_this_month from public.admin_users('ada.adminusers')) = 0.05, 'AI cost this month is added up per person (migration 42)');
+select test.check((select cost_this_month from public.admin_users('bayo.adminusers')) = 0, 'people with no use cost nothing');
+select test.check((select email from public.admin_users('adminusers', sort => 'cost') limit 1) = 'ada.adminusers@test.invalid', 'sorting by cost puts the highest spender first');
+select test.check((select email from public.admin_users('adminusers', sort => 'questions') limit 1) = 'ada.adminusers@test.invalid', 'sorting by questions puts the most questions first');
+select test.check((select email from public.admin_users('adminusers', sort => 'active') limit 1) = 'ada.adminusers@test.invalid', 'sorting by activity puts the most recently active first');
 select test.check((select last_active_at is not null from public.admin_users('ada.adminusers')), 'the last activity is shown');
 -- Bad inputs stop with "invalid value" (22023).
 do $$
@@ -86,6 +91,8 @@ begin
   exception when invalid_parameter_value then raise notice 'ok - pages are at most 100 people'; end;
   begin perform * from public.admin_users(payment => 'free'); raise exception 'FAILED: unknown payment filters are refused';
   exception when invalid_parameter_value then raise notice 'ok - unknown payment filters are refused'; end;
+  begin perform * from public.admin_users(sort => 'random'); raise exception 'FAILED: unknown sorts are refused';
+  exception when invalid_parameter_value then raise notice 'ok - unknown sorts are refused'; end;
   begin perform * from public.admin_signups_by_day(1000); raise exception 'FAILED: the chart covers at most a year';
   exception when invalid_parameter_value then raise notice 'ok - the chart covers at most a year'; end;
 end;

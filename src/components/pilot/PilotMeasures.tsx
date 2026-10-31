@@ -31,7 +31,7 @@ export function PilotMeasures({ data }: { data: PilotDashboard }) {
         <li className="rounded-2xl border border-line bg-surface px-4 py-3">
           <p className="text-sm text-muted">Would pay {summary.price_ngn ? `₦${summary.price_ngn.toLocaleString("en-NG")}` : "the tested price"} (target 15%)</p>
           <p className={`text-2xl ${yesShare === null ? "" : yesShare >= 15 ? "text-success" : "text-warning"}`}>{yesShare === null ? "No answers" : `${yesShare}%`}</p>
-          <p className="text-sm text-muted">{answers ? `${summary.price_yes ?? 0} yes, ${summary.price_maybe ?? 0} maybe, ${summary.price_no ?? 0} no` : "Open the price question below"}</p>
+          <p className="text-sm text-muted">{answers ? `${summary.price_yes ?? 0} yes, ${summary.price_maybe ?? 0} maybe, ${summary.price_no ?? 0} no` : "Open the price question on the Pilot page"}</p>
         </li>
         <li className="rounded-2xl border border-line bg-surface px-4 py-3">
           <p className="text-sm text-muted">Open problem reports</p>

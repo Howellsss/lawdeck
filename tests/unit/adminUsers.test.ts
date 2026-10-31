@@ -6,19 +6,27 @@ import { userFilterSchema } from "@/schemas/adminUsers";
 
 describe("the people filters", () => {
   it("read the page address, tidying the search words", () => {
-    expect(userFilterSchema.parse({ q: "  ada   obi ", plan: "Free", payment: "paid", page: "3" })).toEqual({ q: "ada obi", plan: "Free", payment: "paid", page: 3 });
+    expect(userFilterSchema.parse({ q: "  ada   obi ", plan: "Free", payment: "paid", page: "3" })).toEqual({ q: "ada obi", plan: "Free", payment: "paid", sort: "newest", page: 3 });
   });
 
   it("fall back to no filter when the address has something unexpected", () => {
-    expect(userFilterSchema.parse({ q: "x".repeat(101), payment: "free", page: "-2" })).toEqual({ q: null, plan: null, payment: null, page: 1 });
-    expect(userFilterSchema.parse({})).toEqual({ q: null, plan: null, payment: null, page: 1 });
-    expect(userFilterSchema.parse({ q: ["first", "second"], page: "abc" })).toEqual({ q: "first", plan: null, payment: null, page: 1 });
+    expect(userFilterSchema.parse({ q: "x".repeat(101), payment: "free", page: "-2" })).toEqual({ q: null, plan: null, payment: null, sort: "newest", page: 1 });
+    expect(userFilterSchema.parse({})).toEqual({ q: null, plan: null, payment: null, sort: "newest", page: 1 });
+    expect(userFilterSchema.parse({ q: ["first", "second"], page: "abc" })).toEqual({ q: "first", plan: null, payment: null, sort: "newest", page: 1 });
+    expect(userFilterSchema.parse({ sort: "random" }).sort).toBe("newest");
   });
 
   it("make addresses that keep the filters and leave out empty ones", () => {
     expect(usersHref({})).toBe("/admin/users");
     expect(usersHref({ q: "ada obi", plan: null, payment: "unpaid", page: 2 })).toBe("/admin/users?q=ada+obi&payment=unpaid&page=2");
     expect(usersHref({ q: null, page: 1 })).toBe("/admin/users");
+  });
+
+  it("order the list by cost, questions or activity, and keep the order in addresses (migration 42)", () => {
+    expect(userFilterSchema.parse({ sort: "cost" }).sort).toBe("cost");
+    expect(userFilterSchema.parse({ sort: ["questions"] }).sort).toBe("questions");
+    expect(usersHref({ sort: "cost", page: 2 })).toBe("/admin/users?sort=cost&page=2");
+    expect(usersHref({ sort: "newest" })).toBe("/admin/users");
   });
 });
 

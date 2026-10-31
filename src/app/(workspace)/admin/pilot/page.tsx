@@ -1,10 +1,10 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { InviteCreateForm } from "@/components/pilot/InviteCreateForm";
 import { InviteLinkCopy } from "@/components/pilot/InviteLinkCopy";
 import { InviteList } from "@/components/pilot/InviteList";
-import { PilotMeasures } from "@/components/pilot/PilotMeasures";
 import { PilotSettingsForm } from "@/components/pilot/PilotSettingsForm";
 import { RegisteredEmailForm } from "@/components/pilot/RegisteredEmailForm";
 import { RegisteredEmailList } from "@/components/pilot/RegisteredEmailList";
@@ -14,8 +14,9 @@ import { getPilotDashboard } from "@/server/db/pilot";
 
 export const metadata: Metadata = { title: "Pilot · Lawdeck" };
 
-// The closed pilot (Phase 8), for admins only: the weekly review and measures, invite codes, and the
-// invite-only and price-question settings. Everyone else gets "page not found".
+// The closed pilot's tools (Phase 8), for admins only: registered emails, invite codes, the
+// invite-only and price-question settings, and limits. The weekly measures moved to the Users
+// dashboard (founder, 2026-10-31). Everyone else gets "page not found".
 export default function PilotPage() {
   return (
     <div className="mx-auto flex w-full max-w-6xl flex-col gap-8 px-4 py-10 lg:px-8">
@@ -33,12 +34,11 @@ async function Pilot() {
     <>
       <div className="flex flex-col gap-1">
         <h1 className="font-serif text-3xl font-normal text-greeting">Pilot</h1>
-        <p className="text-muted">The weekly review: how the pilot is going, what it costs, and what students say. Counts only, never names.</p>
+        <p className="text-muted">
+          The pilot&apos;s tools: registered emails, invite codes, settings and limits. Student numbers, usage and costs are all on{" "}
+          <Link href="/admin/users">Users</Link>.
+        </p>
       </div>
-      <section aria-labelledby="measures-heading" className="flex flex-col gap-3">
-        <h2 id="measures-heading" className="text-lg font-medium">This week and the last 6 weeks</h2>
-        <PilotMeasures data={data} />
-      </section>
       <section aria-labelledby="emails-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="emails-heading" className="text-lg font-medium">Registered emails</h2>
         <p className="text-sm text-muted">

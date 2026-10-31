@@ -8,6 +8,10 @@ export type PaymentFilter = (typeof PAYMENT_FILTERS)[number];
 
 export const USERS_PAGE_SIZE = 50;
 
+// How the people list is ordered (migration 42).
+export const USER_SORTS = ["newest", "cost", "questions", "active"] as const;
+export type UserSort = (typeof USER_SORTS)[number];
+
 const firstValue = (value: unknown) => (Array.isArray(value) ? value[0] : value);
 const optionalText = (max: number) =>
   z.preprocess(
@@ -24,6 +28,7 @@ export const userFilterSchema = z.object({
   q: optionalText(100),
   plan: optionalText(60),
   payment: z.preprocess(firstValue, z.enum(PAYMENT_FILTERS).nullable().catch(null)),
+  sort: z.preprocess(firstValue, z.enum(USER_SORTS).catch("newest")),
   page: z.preprocess(firstValue, z.coerce.number().int().min(1).max(10_000).catch(1)),
 });
 export type UserFilter = z.infer<typeof userFilterSchema>;
