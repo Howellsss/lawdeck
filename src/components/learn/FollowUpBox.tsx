@@ -14,6 +14,8 @@ export function FollowUpBox({
   onAsk,
   onStop,
   talkButton,
+  attach,
+  attachBusy = false,
 }: {
   busy: boolean;
   level: AnswerLevel;
@@ -23,13 +25,16 @@ export function FollowUpBox({
   onStop?: () => void;
   // Starts voice mode, when Lawdeck's voice is set up.
   talkButton?: ReactNode;
+  // The + button to attach a file (PRD WS-02), and whether it is still uploading or reading.
+  attach?: ReactNode;
+  attachBusy?: boolean;
 }) {
   const [text, setText] = useState("");
   const [voiceError, setVoiceError] = useState<string | null>(null);
 
   function submit(event: FormEvent) {
     event.preventDefault();
-    if (busy || !text.trim()) return;
+    if (busy || attachBusy || !text.trim()) return;
     onAsk(text.trim());
     setText("");
   }
@@ -61,7 +66,7 @@ export function FollowUpBox({
       </fieldset>
       <form
         onSubmit={submit}
-        className="flex items-end gap-2 rounded-3xl border border-line bg-surface p-2 has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
+        className="flex flex-wrap items-end gap-2 rounded-3xl border border-line bg-surface p-2 has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
       >
         <label htmlFor="follow-up" className="sr-only">
           Ask a follow-up question
@@ -78,6 +83,7 @@ export function FollowUpBox({
           placeholder="Ask a follow-up question"
           className="min-w-0 flex-1 resize-none bg-transparent px-3 py-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
         />
+        {attach}
         {talkButton}
         <VoiceButton
           disabled={busy}
@@ -100,7 +106,7 @@ export function FollowUpBox({
         ) : (
           <button
             type="submit"
-            disabled={busy || !text.trim()}
+            disabled={busy || attachBusy || !text.trim()}
             aria-label="Send"
             className="flex size-11 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:opacity-40"
           >

@@ -3,11 +3,13 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { useRightPanel } from "@/components/shell/panelContext";
+import { AttachFile } from "@/components/uploads/AttachFile";
 import { formatWat } from "@/lib/dates";
 import type { AnswerLevel } from "@/prompts/explain";
 import type { ChatMessage, ChatSource } from "@/server/db/workspace";
 import { AnswerCard } from "./AnswerCard";
 import { AnswerText } from "./AnswerText";
+import { setChatUsesUploads } from "@/server/learn/actions";
 import { askQuestion, takePendingQuestion } from "./askStream";
 import { FollowUpBox } from "./FollowUpBox";
 import { SearchStatus } from "./SearchStatus";
@@ -48,6 +50,7 @@ export function ChatThread({
   const [busy, setBusy] = useState(false);
   const [level, setLevel] = useState<AnswerLevel>("exam");
   const [voiceNote, setVoiceNote] = useState<string | null>(null);
+  const [attaching, setAttaching] = useState(false);
   const started = useRef(false);
   const stopper = useRef<AbortController | null>(null);
   const panel = useRightPanel();
@@ -215,6 +218,14 @@ export function ChatThread({
       )}
       <FollowUpBox
         busy={busy}
+        attachBusy={attaching}
+        attach={
+          <AttachFile
+            onBusyChange={setAttaching}
+            // A file attached here is meant for this chat: make sure the chat uses uploads.
+            onReady={() => void setChatUsesUploads(chatId, true).then(() => router.refresh())}
+          />
+        }
         talkButton={
           voice ? (
             <VoiceMode

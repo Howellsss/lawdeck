@@ -224,3 +224,12 @@ test("The phone menu scrolls, so every link and the account row can be reached",
   // The account row stays pinned at the bottom of the menu.
   await expect(menu.getByRole("link", { name: "Sign in" })).toBeInViewport();
 });
+
+test("The question box's + button attaches a file, and asks visitors to sign in first", async ({ page }) => {
+  await page.goto("/");
+  await expect(page.getByText("arrives in a later build")).toHaveCount(0);
+  const chooser = page.waitForEvent("filechooser");
+  await page.getByRole("button", { name: "Attach a file" }).click();
+  await (await chooser).setFiles({ name: "notes.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.7 made-up") });
+  await expect(page.getByRole("alert").filter({ hasText: "notes.pdf" })).toContainText("Sign in");
+});

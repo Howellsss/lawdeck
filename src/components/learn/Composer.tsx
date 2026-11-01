@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useRef, useState, type FormEvent } from "react";
+import { AttachFile } from "@/components/uploads/AttachFile";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { COURSES } from "@/lib/courses";
 import { openDraft } from "@/server/drafting/actions";
@@ -46,6 +47,8 @@ export function Composer({ voice = false }: { voice?: boolean }) {
   const [needsSignIn, setNeedsSignIn] = useState(false);
   const [routedToDraft, setRoutedToDraft] = useState(false);
   const [busy, setBusy] = useState(false);
+  // A file attached with + is uploading or being read: the question waits for it.
+  const [attaching, setAttaching] = useState(false);
   // After voice mode: the saved conversation, and why it stopped if it did not end normally.
   const [voiceDone, setVoiceDone] = useState<{ chatId: string | null; note: string | null } | null>(null);
   const inputRef = useRef<HTMLTextAreaElement>(null);
@@ -53,7 +56,7 @@ export function Composer({ voice = false }: { voice?: boolean }) {
   async function submit(event: FormEvent, asMode: Mode = mode) {
     event.preventDefault();
     const question = text.trim();
-    if (!question || busy) return;
+    if (!question || busy || attaching) return;
     setRoutedToDraft(false);
     setBusy(true);
     setNotice(null);
@@ -123,19 +126,8 @@ export function Composer({ voice = false }: { voice?: boolean }) {
           placeholder="What are we working on?"
           className="resize-none bg-transparent px-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted sm:text-[17px]"
         />
-        <div className="flex min-w-0 items-center gap-1 sm:gap-1.5">
-          <button
-            type="button"
-            aria-label="Attach a file"
-            onClick={() =>
-              setNotice(
-                "Uploading your own files arrives in a later build (Phase 6).",
-              )
-            }
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-pill text-ink sm:size-10"
-          >
-            <Icon name="plus" size={17} />
-          </button>
+        <div className="flex min-w-0 flex-wrap items-center gap-1 sm:gap-1.5">
+          <AttachFile compact onBusyChange={setAttaching} onReady={() => inputRef.current?.focus()} />
           <Picker
             label="Mode"
             value={mode}
@@ -171,7 +163,7 @@ export function Composer({ voice = false }: { voice?: boolean }) {
           <button
             type="submit"
             aria-label="Send"
-            disabled={!text.trim() || busy}
+            disabled={!text.trim() || busy || attaching}
             className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted sm:size-10"
           >
             <Icon name="arrowUp" size={17} />
