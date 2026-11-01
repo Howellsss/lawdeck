@@ -1,15 +1,9 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { uploadFile } from "@/components/library/uploadFile";
 import { compactPrimaryButton } from "@/components/ui/buttons";
-import {
-  kindFromFileName,
-  LIBRARY_ACCEPT,
-  LIBRARY_MAX_BYTES,
-} from "@/lib/libraryFiles";
-import { finishUpload, startUpload } from "@/server/uploads/actions";
-import { readUploadUntilDone } from "./readUpload";
+import { LIBRARY_ACCEPT } from "@/lib/libraryFiles";
+import { uploadAndRead } from "./uploadAndRead";
 
 type Status = { tone: "warning" | "success"; message: string } | null;
 
@@ -36,48 +30,18 @@ export function UploadPicker({
         tone: "warning",
         message: "Choose a file to upload.",
       });
-    if (file.size > LIBRARY_MAX_BYTES)
-      return setStatus({
-        tone: "warning",
-        message: "Files must be 25 MB or smaller.",
-      });
-    const kind = kindFromFileName(file.name);
-    if (!kind)
-      return setStatus({
-        tone: "warning",
-        message: "Upload a PDF, Word (DOCX), PNG or JPEG file.",
-      });
-
-    const details = { fileName: file.name, size: file.size, kind };
     setProgress(0);
-    const started = await startUpload(details);
-    if (!started.ok) {
-      setProgress(null);
-      return setStatus({ tone: "warning", message: started.message });
-    }
-    try {
-      await uploadFile(started.signedUrl, file, apiKey, setProgress);
-    } catch {
-      setProgress(null);
-      return setStatus({
-        tone: "warning",
-        message: "The upload stopped. Check your connection and try again.",
-      });
-    }
-    const finished = await finishUpload({ ...details, path: started.path });
+    const result = await uploadAndRead(file, apiKey, (text) => {
+      if (text.startsWith("Uploading")) setProgress(Number(text.replace(/\D/g, "")) || 0);
+      else {
+        setProgress(null);
+        setReading(text);
+      }
+    });
     setProgress(null);
-    if (!finished.ok)
-      return setStatus({ tone: "warning", message: finished.message });
-    formRef.current?.reset();
-    // Read it straight away, so it can be searched.
-    setReading("Reading…");
-    const read = await readUploadUntilDone(finished.id, setReading);
     setReading(null);
-    if (!read.ok)
-      return setStatus({
-        tone: "warning",
-        message: `“${file.name}” is uploaded, but reading stopped: ${read.message}`,
-      });
+    if (!result.ok) return setStatus({ tone: "warning", message: result.message });
+    formRef.current?.reset();
     setStatus({
       tone: "success",
       message: `“${file.name}” is ready. Lawdeck can now use it when you ask questions.`,

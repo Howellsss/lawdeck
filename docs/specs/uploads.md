@@ -72,3 +72,11 @@ Tested in `tests/permissions/sql/9g_reading_uploads_test.sql` (30 checks) and `t
 - **Citation check unchanged:** an authority found only in a student's notes, and not in the library or a recognised statute, is still removed (CLAUDE.md).
 - **Switch:** the **Use my uploads** switch shows on a chat once the student has a Ready file, and is saved per chat (on by default).
 - **Tests:** `tests/permissions/sql/9h_answers_from_uploads_test.sql` (12 checks) and `tests/unit/answersFromUploads.test.ts`.
+
+
+## Attach from the question box (PRD WS-02, 2026-11-01)
+- The + button in the home question box and in a chat's follow-up box attaches a PDF, Word (DOCX), PNG or JPEG file, up to 25 MB.
+- The file goes into the student's private uploads (exactly as on My uploads: `src/components/uploads/uploadAndRead.ts` is shared), is checked for its real type, then read. A line under the box shows "Uploading… n%", then "Reading… n of m pages", then "Ready".
+- Before a student's first upload, the upload notice appears in place; after "I understand" the file carries on.
+- The question waits (Send is off) until the file is ready. In a chat, attaching a file switches "Use my uploads" on for that chat.
+- Answers then use the file's passages, labelled "From your uploads". Tests: `tests/unit/uploadAndRead.test.ts`, browser test in `tests/e2e/workspace.spec.ts`.

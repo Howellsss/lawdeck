@@ -5,7 +5,7 @@ import { compactPrimaryButton } from "@/components/ui/buttons";
 import { acceptUploadNotice } from "@/server/uploads/actions";
 
 // Shown before a student's first upload and accepted once (PRD UP-06, Appendix C).
-export function UploadNotice() {
+export function UploadNotice({ onAccepted }: { onAccepted?: () => void } = {}) {
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string>();
 
@@ -15,6 +15,7 @@ export function UploadNotice() {
     const result = await acceptUploadNotice();
     setBusy(false);
     if (!result.ok) setMessage(result.message);
+    else onAccepted?.();
   }
 
   return (
