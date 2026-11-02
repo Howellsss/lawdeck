@@ -94,7 +94,9 @@ Tests: `tests/permissions/sql/40_library_search_test.sql` (15 checks), `tests/un
 
 - The picker opens only on Lawdeck's live address (SITE_URL, else mylawdeck.com) or on a developer's own computer (`src/lib/driveOrigin.ts`). On any other address (a test preview) the Library shows "Google Drive import works only on Lawdeck's main address" with a link there, instead of Google's "Access blocked: origin_mismatch" page (founder, 2026-11-02).
 
-Tests: `tests/unit/driveImport.test.ts` (12 checks).
+- If Google signs the admin in but never shows its picker window (a Google Cloud setting: Picker API off, or the API key not allowing the website or the Picker API), Google leaves only a grey cover over the page. Lawdeck removes it after 20 seconds (Escape closes it at once) and says what to check (founder, 2026-11-02: "I get stuck here").
+
+Tests: `tests/unit/driveImport.test.ts` (12 checks), `tests/unit/drivePicker.test.ts` (4 checks).
 
 ### Founder steps for the Drive import (Google Cloud, same project as Google sign-in)
 
