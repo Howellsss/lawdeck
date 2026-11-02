@@ -24,8 +24,8 @@ voices) and that students choose the voice.
   English female (Sonia, default) or male (Ryan), American English female (Ava) or male (Andrew),
   Nigerian English female (Ezinne) or male (Abeo) (founder, 2026-10-29: "a balanced English accent
   that pronounces clear"; Azure has only these two Nigerian English voices).
-  The same choice is also a small Voice menu beside Read and at the top of voice mode
-  (founder, 2026-10-29); one choice per device, used from the next Read or spoken reply.
+  This is the only place to choose it (founder, 2026-11-02: "the voice AI selection ... should only
+  remain in the settings"); one choice per device, used from the next Read or spoken reply.
 
 ## How names and legal shorthand are read
 - Nigerian English voices say most Nigerian names properly.
