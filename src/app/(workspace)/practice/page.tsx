@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
+import { DeleteSetButton } from "@/components/practice/DeleteSetButton";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { formatWat } from "@/lib/dates";
@@ -36,13 +37,18 @@ async function Sets() {
       ) : (
         <ul aria-label="Your MCQ sets" className="flex flex-col divide-y divide-line rounded-2xl border border-line bg-surface">
           {result.data.map((set) => (
-            <li key={set.id} className="flex flex-col gap-1 px-4 py-3">
-              <Link href={`/practice/${set.id}`} className="break-words font-medium">
-                {set.title}
-              </Link>
-              <span className="text-sm text-muted">
-                {formatWat(set.createdAt)} · {set.answered} of {set.questions} {set.kind === "flashcards" ? "known" : "answered"}
-              </span>
+            <li key={set.id} className="flex flex-col gap-2 px-4 py-3">
+              <div className="flex flex-col gap-1">
+                <Link href={`/practice/${set.id}`} className="break-words font-medium">
+                  {set.title}
+                </Link>
+                <span className="text-sm text-muted">
+                  {formatWat(set.createdAt)} · {set.answered} of {set.questions} {set.kind === "flashcards" ? "known" : "answered"}
+                </span>
+              </div>
+              <div>
+                <DeleteSetButton id={set.id} title={set.title} />
+              </div>
             </li>
           ))}
         </ul>

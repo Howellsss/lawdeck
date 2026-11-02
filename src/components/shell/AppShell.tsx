@@ -17,13 +17,11 @@ export function AppShell({
   account,
   recents,
   staffNav,
-  voice,
 }: {
   children: ReactNode;
   account?: ReactNode;
   recents?: ReactNode;
   staffNav?: ReactNode;
-  voice?: ReactNode;
 }) {
   const [collapsed, setCollapsed] = useState(false);
   const [drawerOpen, setDrawerOpen] = useState(false);
@@ -53,7 +51,6 @@ export function AppShell({
               account={account}
               recents={recents}
               staffNav={staffNav}
-              voice={voice}
             />
           </div>
         </div>
@@ -72,7 +69,6 @@ export function AppShell({
                 account={account}
                 recents={recents}
                 staffNav={staffNav}
-              voice={voice}
                 closeButton={
                   <button
                     ref={drawerCloseRef}

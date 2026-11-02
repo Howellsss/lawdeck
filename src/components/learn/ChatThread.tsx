@@ -216,34 +216,38 @@ export function ChatThread({
           {voiceNote}
         </p>
       )}
-      <FollowUpBox
-        busy={busy}
-        attachBusy={attaching}
-        attach={
-          <AttachFile
-            onBusyChange={setAttaching}
-            // A file attached here is meant for this chat: make sure the chat uses uploads.
-            onReady={() => void setChatUsesUploads(chatId, true).then(() => router.refresh())}
-          />
-        }
-        talkButton={
-          voice ? (
-            <VoiceMode
-              disabled={busy}
-              chatFor={async () => ({ ok: true, id: chatId })}
-              onEnded={(_chat, note) => {
-                setVoiceNote(note);
-                // The spoken conversation was saved: show it in this chat.
-                router.refresh();
-              }}
+      {/* The question box stays pinned to the bottom of the screen while answers are written
+          (founder, 2026-11-02: "it should be fixed at the bottom"). */}
+      <div className="sticky bottom-0 z-10 -mx-1 bg-paper px-1 pb-[max(1rem,env(safe-area-inset-bottom))] pt-2">
+        <FollowUpBox
+          busy={busy}
+          attachBusy={attaching}
+          attach={
+            <AttachFile
+              onBusyChange={setAttaching}
+              // A file attached here is meant for this chat: make sure the chat uses uploads.
+              onReady={() => void setChatUsesUploads(chatId, true).then(() => router.refresh())}
             />
-          ) : undefined
-        }
-        level={level}
-        onLevel={setLevel}
-        onAsk={(question) => void ask(question, level)}
-        onStop={stop}
-      />
+          }
+          talkButton={
+            voice ? (
+              <VoiceMode
+                disabled={busy}
+                chatFor={async () => ({ ok: true, id: chatId })}
+                onEnded={(_chat, note) => {
+                  setVoiceNote(note);
+                  // The spoken conversation was saved: show it in this chat.
+                  router.refresh();
+                }}
+              />
+            ) : undefined
+          }
+          level={level}
+          onLevel={setLevel}
+          onAsk={(question) => void ask(question, level)}
+          onStop={stop}
+        />
+      </div>
     </div>
   );
 }

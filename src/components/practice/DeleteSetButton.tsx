@@ -6,7 +6,9 @@ import { compactWarningButton } from "@/components/ui/buttons";
 import { deletePracticeSet } from "@/server/practice/actions";
 
 // Deletes a practice set, with its questions and answers, after a confirmation.
-export function DeleteSetButton({ id }: { id: string }) {
+// On the set's own page it says "Delete this set"; in the MCQ list (founder, 2026-11-02: "students
+// should be able to delete their MCQ") it is a short "Delete" named after the set for screen readers.
+export function DeleteSetButton({ id, title }: { id: string; title?: string }) {
   const router = useRouter();
   const [confirming, setConfirming] = useState(false);
   const [busy, setBusy] = useState(false);
@@ -26,8 +28,13 @@ export function DeleteSetButton({ id }: { id: string }) {
 
   if (!confirming) {
     return (
-      <button type="button" onClick={() => setConfirming(true)} className={compactWarningButton}>
-        Delete this set
+      <button
+        type="button"
+        onClick={() => setConfirming(true)}
+        aria-label={title ? `Delete ${title}` : undefined}
+        className={compactWarningButton}
+      >
+        {title ? "Delete" : "Delete this set"}
       </button>
     );
   }
