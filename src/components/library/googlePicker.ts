@@ -25,7 +25,7 @@ type PickerBuilder = {
   setAppId(id: string): PickerBuilder;
   setTitle(title: string): PickerBuilder;
   setCallback(callback: (data: PickerData) => void): PickerBuilder;
-  build(): { setVisible(visible: boolean): void };
+  build(): { setVisible(visible: boolean): void; dispose(): void };
 };
 type GoogleGlobal = {
   accounts: {
@@ -49,7 +49,7 @@ type GoogleGlobal = {
     ViewId: { DOCS: unknown };
     DocsViewMode: { LIST: unknown };
     Feature: { MULTISELECT_ENABLED: unknown };
-    Action: { PICKED: string; CANCEL: string };
+    Action: { PICKED: string; CANCEL: string; LOADED?: string };
   };
 };
 type GapiGlobal = { load(name: string, callback: () => void): void };
@@ -89,17 +89,43 @@ function requestToken(google: GoogleGlobal, clientId: string): Promise<string> {
   });
 }
 
+// How long Google gets to show its picker window. If Google refuses to show it (usually a setting
+// in Google Cloud), it leaves only its grey cover over the page (founder, 2026-11-02: "I get stuck
+// here"), so the cover is removed and the admin is told what to check.
+export const PICKER_SHOW_LIMIT_MS = 20_000;
+
 // Opens the picker. Resolves with the token and the files picked (an empty list if cancelled).
+// Rejects with "picker_not_shown" if Google did not show its window in time.
 export async function pickDriveFiles(config: PickerConfig): Promise<{ token: string; files: PickedFile[] }> {
   const google = await loadGoogle();
   const token = await requestToken(google, config.clientId);
-  return new Promise((resolve) => {
+  return new Promise((resolve, reject) => {
+    let shown = false;
+    let finished = false;
+    const loaded = google.picker.Action.LOADED ?? "loaded";
+    // Escape always closes the picker, even if Google's window never appeared.
+    const onKey = (event: KeyboardEvent) => {
+      if (event.key === "Escape") finish(() => resolve({ token, files: [] }));
+    };
+    const timer = window.setTimeout(() => {
+      if (!shown) finish(() => reject(new Error("picker_not_shown")));
+    }, PICKER_SHOW_LIMIT_MS);
+    function finish(done: () => void) {
+      if (finished) return;
+      finished = true;
+      window.clearTimeout(timer);
+      document.removeEventListener("keydown", onKey);
+      picker.setVisible(false);
+      picker.dispose();
+      done();
+    }
+    document.addEventListener("keydown", onKey);
     const view = new google.picker.DocsView(google.picker.ViewId.DOCS);
     view.setMimeTypes(ACCEPTED_TYPES);
     view.setIncludeFolders(true);
     view.setSelectFolderEnabled(false);
     view.setMode(google.picker.DocsViewMode.LIST);
-    new google.picker.PickerBuilder()
+    const picker = new google.picker.PickerBuilder()
       .addView(view)
       .enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
       .setOAuthToken(token)
@@ -107,16 +133,18 @@ export async function pickDriveFiles(config: PickerConfig): Promise<{ token: str
       .setAppId(config.appId)
       .setTitle("Choose library files")
       .setCallback((data) => {
-        if (data.action === google.picker.Action.PICKED) {
-          resolve({
-            token,
-            files: (data.docs ?? []).map((doc) => ({ id: doc.id, name: doc.name, sizeBytes: Number(doc.sizeBytes ?? 0) })),
-          });
+        if (data.action === loaded) {
+          shown = true;
+        } else if (data.action === google.picker.Action.PICKED) {
+          const files = (data.docs ?? []).map((doc) => ({ id: doc.id, name: doc.name, sizeBytes: Number(doc.sizeBytes ?? 0) }));
+          finish(() => resolve({ token, files }));
         } else if (data.action === google.picker.Action.CANCEL) {
-          resolve({ token, files: [] });
+          finish(() => resolve({ token, files: [] }));
+        } else if (data.action === "error") {
+          finish(() => reject(new Error("picker_not_shown")));
         }
       })
-      .build()
-      .setVisible(true);
+      .build();
+    picker.setVisible(true);
   });
 }

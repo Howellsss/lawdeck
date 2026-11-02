@@ -49,8 +49,14 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
           status: "ready",
         })),
       );
-    } catch {
-      setNotice({ tone: "warning", message: "Google Drive did not open. Allow pop-ups for this site, then try again." });
+    } catch (error) {
+      setNotice({
+        tone: "warning",
+        message:
+          error instanceof Error && error.message === "picker_not_shown"
+            ? "Google signed you in but did not show its file picker. In Google Cloud, check that the Google Picker API is switched on and that the picker's API key allows this website and the Google Picker API, then try again."
+            : "Google Drive did not open. Allow pop-ups for this site, then try again.",
+      });
     }
   }
 
