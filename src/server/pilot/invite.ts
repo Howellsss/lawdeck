@@ -5,7 +5,7 @@ import type { Database } from "@/server/db/types";
 
 // The invite link (migration 36): gives a registered person access when they sign in with Google.
 // "error" means the database could not be asked (for example before migration 36 is in).
-export type InviteClaim = "open" | "ok" | "use_google" | "not_registered" | "error";
+export type InviteClaim = "open" | "ok" | "use_google" | "not_registered" | "ended" | "error";
 
 export async function claimPilotInvite(db?: SupabaseClient<Database>): Promise<InviteClaim> {
   const supabase = db ?? (await createSupabaseServerClient());

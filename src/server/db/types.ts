@@ -960,12 +960,14 @@ export type Database = {
       };
       has_pilot_access: { Args: Record<string, never>; Returns: boolean };
       redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
-      set_pilot_access: { Args: { person: string; allow: boolean }; Returns: "ok" | "not_found" };
+      set_pilot_access: { Args: { person: string; allow: boolean; days?: number | null }; Returns: "ok" | "not_found" };
       // Registered emails and the invite link (migration 36). The first three are admins only.
-      add_pilot_emails: { Args: { emails: string[] }; Returns: number };
+      add_pilot_emails: { Args: { emails: string[]; days?: number | null }; Returns: number };
       remove_pilot_email: { Args: { entry: string }; Returns: "ok" | "not_found" };
-      pilot_email_list: { Args: Record<string, never>; Returns: { id: string; email: string; created_at: string; joined: boolean }[] };
-      claim_pilot_invite: { Args: Record<string, never>; Returns: "open" | "ok" | "use_google" | "not_registered" };
+      pilot_email_list: { Args: Record<string, never>; Returns: { id: string; email: string; created_at: string; joined: boolean; access_days: number | null; access_until: string | null }[] };
+      claim_pilot_invite: { Args: Record<string, never>; Returns: "open" | "ok" | "use_google" | "not_registered" | "ended" };
+      // When the signed-in person's access ends (migration 43); null = no end.
+      own_access_until: { Args: Record<string, never>; Returns: string | null };
       pilot_metrics: { Args: { weeks?: number }; Returns: { week_start: string; metric: string; value: number }[] };
       pilot_summary: { Args: Record<string, never>; Returns: { metric: string; value: number | null }[] };
       // The admin Users dashboard (migration 34). Admins only.

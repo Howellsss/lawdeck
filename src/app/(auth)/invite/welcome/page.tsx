@@ -41,6 +41,20 @@ async function InviteResult() {
     );
   }
 
+  if (claim === "ended") {
+    return (
+      <>
+        <AuthHero title="Your test access has ended">
+          Thank you for testing Lawdeck. Your access as {account.email} was for a set number of days and has now ended. Ask the person
+          who invited you if you would like more time.
+        </AuthHero>
+        <Link href="/" className={`${secondaryButton} w-full`}>
+          Go to Lawdeck
+        </Link>
+      </>
+    );
+  }
+
   if (claim === "error") {
     return (
       <>

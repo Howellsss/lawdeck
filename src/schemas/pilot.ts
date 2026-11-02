@@ -40,7 +40,22 @@ export const priceAnswerSchema = z.enum(["yes", "maybe", "no"]);
 export const inviteIdSchema = z.uuid();
 
 // Giving or removing someone's access from the Users page (migration 35).
-export const pilotAccessSchema = z.object({ person: z.uuid(), allow: z.boolean() });
+export const pilotAccessSchema = z.object({ person: z.uuid(), allow: z.boolean(), days: z.number().int().min(1).max(90).nullable().default(null) });
+
+// How long access lasts (migration 43): empty for no end, else 1–90 days.
+export const ACCESS_DAYS_MAX = 90;
+export const accessDaysSchema = z
+  .string()
+  .trim()
+  .transform((value) => (value === "" ? null : Number(value)))
+  .pipe(
+    z
+      .number({ error: `Days must be a whole number from 1 to ${ACCESS_DAYS_MAX}.` })
+      .int({ error: `Days must be a whole number from 1 to ${ACCESS_DAYS_MAX}.` })
+      .min(1, { error: `Days must be a whole number from 1 to ${ACCESS_DAYS_MAX}.` })
+      .max(ACCESS_DAYS_MAX, { error: `Days must be a whole number from 1 to ${ACCESS_DAYS_MAX}.` })
+      .nullable(),
+  );
 
 // Limits for a public test (migration 35). Each box may be left empty for "no extra limit".
 function optionalWhole(label: string, min: number, max: number) {

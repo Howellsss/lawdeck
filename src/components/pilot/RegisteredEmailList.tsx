@@ -33,6 +33,8 @@ export function RegisteredEmailList({ emails }: { emails: PilotEmailRow[] }) {
               <span className="break-all">{entry.email}</span>
               <span className="text-sm text-muted">
                 {entry.joined ? <span className="text-success">Joined</span> : "Not joined yet"} · added {formatWat(entry.createdAt)}
+                {" · "}
+                <AccessEnd entry={entry} />
               </span>
             </div>
             {confirming === entry.id ? (
@@ -59,4 +61,16 @@ export function RegisteredEmailList({ emails }: { emails: PilotEmailRow[] }) {
       )}
     </div>
   );
+}
+
+// When this person's access ends: counted from when they first get in (migration 43).
+function AccessEnd({ entry }: { entry: PilotEmailRow }) {
+  if (entry.accessUntil) {
+    // Shown as the page is drawn; a stale "ends" only lasts until the next refresh.
+    // eslint-disable-next-line react-hooks/purity
+    const ended = new Date(entry.accessUntil).getTime() <= Date.now();
+    return ended ? <span className="text-warning">access ended {formatWat(entry.accessUntil)}</span> : <>access ends {formatWat(entry.accessUntil)}</>;
+  }
+  if (entry.accessDays) return <>access for {entry.accessDays} day{entry.accessDays === 1 ? "" : "s"} once they join</>;
+  return <>no end date</>;
 }

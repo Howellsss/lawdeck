@@ -51,7 +51,9 @@ export type UsageLimits = {
   monthlyScanPageCap: number | null;
 };
 
-export type PilotEmailRow = { id: string; email: string; createdAt: string; joined: boolean };
+// accessDays: how long access lasts for this email (null = no end); accessUntil: when that
+// person's access ends, once they have got in (migration 43).
+export type PilotEmailRow = { id: string; email: string; createdAt: string; joined: boolean; accessDays: number | null; accessUntil: string | null };
 
 export type PilotDashboard = {
   // Null until migration 36 is in the database (the rest of the page still works).
@@ -94,7 +96,7 @@ export async function getPilotDashboard(): Promise<PilotDashboard | null> {
     byWeek.set(row.week_start, counts);
   }
   return {
-    emails: emails.error ? null : (emails.data ?? []).map((e) => ({ id: e.id, email: e.email, createdAt: e.created_at, joined: e.joined })),
+    emails: emails.error ? null : (emails.data ?? []).map((e) => ({ id: e.id, email: e.email, createdAt: e.created_at, joined: e.joined, accessDays: e.access_days ?? null, accessUntil: e.access_until ?? null })),
     settings: { inviteOnly: settings.data.invite_only, priceNgn: settings.data.price_ngn, priceQuestionOpen: settings.data.price_question_open },
     limits: {
       burstLimit: settings.data.burst_limit,
