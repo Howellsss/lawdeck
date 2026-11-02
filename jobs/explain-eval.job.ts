@@ -17,7 +17,7 @@ import { EXPLAIN_MODELS, type ExplainModel } from "@/server/ai/models";
 import { createAdminClient } from "@/server/db/admin";
 import { composeAnswer } from "@/server/learn/ask";
 import { redactPersonalData } from "@/server/learn/redact";
-import { searchLibrary, type SearchHit } from "@/server/retrieval/search";
+import { searchForQuestion, searchLibrary, type SearchHit } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 
 const FILE = "tests/eval/explain/civil-litigation.json";
@@ -116,7 +116,17 @@ it("runs the answer quality test and saves it for the legal reviewer", { timeout
     const smallTalk = c.level === "talk" && isSmallTalk(question);
     const found = smallTalk
       ? { ok: true as const, hits: [] as SearchHit[] }
-      : await searchLibrary({ question: searchText, courseId: course.data.id, includePending: false, results, db });
+      : c.level === "talk"
+        ? await searchLibrary({ question: searchText, courseId: course.data.id, includePending: false, results, db })
+        : // As in the app: problem questions are also searched issue by issue.
+          await searchForQuestion({
+            question: searchText,
+            courseId: course.data.id,
+            includePending: false,
+            useUploads: false,
+            db,
+            recordUsage: false,
+          });
     if (!found.ok) error = `search failed: ${found.message}`;
     else if (found.hits.length === 0 && !smallTalk) error = "the library search found nothing";
     else {

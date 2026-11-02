@@ -15,7 +15,7 @@ import { MODELS, type ExplainModel } from "@/server/ai/models";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
-import { searchForAnswer, type SearchHit, type SearchResult } from "@/server/retrieval/search";
+import { searchForAnswer, searchForQuestion, type SearchHit, type SearchResult } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 import { limitReachedMessage } from "@/lib/allowance";
 import { isSmallTalk } from "@/lib/smallTalk";
@@ -139,13 +139,22 @@ export async function answerQuestion(input: {
       : null,
     smallTalk
       ? ({ ok: true, hits: [], meaningUsed: true, reranked: false } satisfies SearchResult)
-      : searchForAnswer({
-          question: searchText,
-          courseId: chat.data.course_id,
-          includePending: false,
-          useUploads: chat.data.use_uploads,
-          results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
-        }),
+      : input.level === "talk"
+        ? // Voice mode stays one quick search, so the reply starts fast.
+          searchForAnswer({
+            question: searchText,
+            courseId: chat.data.course_id,
+            includePending: false,
+            useUploads: chat.data.use_uploads,
+            results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
+          })
+        : // A problem question is also searched issue by issue (founder, 2026-11-02).
+          searchForQuestion({
+            question: searchText,
+            courseId: chat.data.course_id,
+            includePending: false,
+            useUploads: chat.data.use_uploads,
+          }),
     input.level === "talk" && input.voice && speechConfigured() ? dailyLimit(0) : null,
   ]);
   if (asked.error)
@@ -405,7 +414,10 @@ export function historyTurns(
         : textOf(row.content).replace(/\[S\d+\]/g, "")
       ).trim(),
     }))
-    .filter((turn) => turn.text);
+    .filter((turn) => turn.text)
+    // An earlier "not enough in the library" reply is left out, so asking again is answered
+    // afresh from the new search instead of repeating it (founder, 2026-11-02).
+    .filter((turn) => !(turn.role === "assistant" && turn.text.startsWith(NOT_ENOUGH_HEADING)));
   // Claude needs the conversation to start with the student and alternate.
   while (turns.length && turns[0].role !== "user") turns.shift();
   const alternating: ExplainTurn[] = [];
