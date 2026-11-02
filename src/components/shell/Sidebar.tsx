@@ -29,10 +29,9 @@ type SidebarProps = {
   // The Library link for reviewers and admins (see StaffNavSlot).
   staffNav?: React.ReactNode;
   // The reading voice choice for signed-in people (see VoiceSlot).
-  voice?: React.ReactNode;
 };
 
-export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav, voice }: SidebarProps) {
+export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav }: SidebarProps) {
   const itemClass = (active: boolean) =>
     `flex h-10 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
       active ? "bg-pill font-medium" : ""
@@ -89,7 +88,6 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
           {recents}
         </div>
 
-        {!collapsed && voice}
         <div className={`flex shrink-0 items-center gap-2 border-t border-line pt-3 ${collapsed ? "flex-col" : ""}`}>
           {account}
           <ThemeToggle />
