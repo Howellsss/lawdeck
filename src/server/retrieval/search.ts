@@ -1,5 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
+import { isScenario } from "@/prompts/explain";
+import { listIssues } from "@/server/ai/issues";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import type { Database, SourceKind } from "@/server/db/types";
 import { passageSearchText } from "./indexJob";
@@ -8,7 +10,12 @@ import { embedTexts, toVectorText } from "./voyage";
 import {
   EMBEDDING_MODEL,
   RERANK_MODEL,
+  ISSUE_RERANK_TIMEOUT_MS,
+  ISSUE_SEARCH_RESULTS,
   RERANK_TIMEOUT_MS,
+  SCENARIO_MAX_PASSAGES,
+  SCENARIO_RERANK_TIMEOUT_MS,
+  SCENARIO_SEARCH_RESULTS,
   SEARCH_CANDIDATES,
   SEARCH_RESULTS,
 } from "./settings";
@@ -69,6 +76,9 @@ export async function searchForAnswer(input: {
   useUploads: boolean;
   // How many passages to return; problem questions ask for more (SCENARIO_SEARCH_RESULTS).
   results?: number;
+  // How long the re-ranker gets, and whether it gets a second try (problem questions).
+  rerankTimeoutMs?: number;
+  retryRerank?: boolean;
   db?: Db;
 }): Promise<SearchResult> {
   const embedded = await embedTexts(
@@ -86,16 +96,17 @@ export async function searchForAnswer(input: {
     : [];
   const candidates = [...library.rows, ...uploads];
   // Library and upload text is content, never instructions: the re-ranker only scores it.
-  const reranked =
-    candidates.length > 1
-      ? await rerankTexts(
-          input.question,
-          candidates.map((row) => passageSearchText(row.heading, row.text)),
-          RERANK_MODEL,
-          "search",
-          RERANK_TIMEOUT_MS,
-        )
-      : null;
+  const rerank = () =>
+    rerankTexts(
+      input.question,
+      candidates.map((row) => passageSearchText(row.heading, row.text)),
+      RERANK_MODEL,
+      "search",
+      input.rerankTimeoutMs ?? RERANK_TIMEOUT_MS,
+    );
+  let reranked = candidates.length > 1 ? await rerank() : null;
+  // One more try only when Voyage said it was busy (a timeout has already cost its time).
+  if (reranked && !reranked.ok && reranked.reason === "busy" && input.retryRerank) reranked = await rerank();
   const ordered = reranked?.ok
     ? reranked.order.map((index) => candidates[index])
     : interleave(library.rows, uploads);
@@ -105,6 +116,57 @@ export async function searchForAnswer(input: {
     reranked: reranked?.ok ?? false,
     hits: ordered.slice(0, input.results ?? SEARCH_RESULTS),
   };
+}
+
+// The search behind a student's question. A problem question (a scenario) is searched as a whole
+// and issue by issue (founder, 2026-11-02), so the answer has passages for every issue; anything
+// else is one search, as before. If listing the issues or an issue's search fails, the answer
+// still has the whole question's passages.
+export async function searchForQuestion(input: {
+  question: string;
+  courseId: string | null;
+  includePending: boolean;
+  useUploads: boolean;
+  db?: Db;
+  // False in the answer test (a marked admin job): no signed-in person to record usage for.
+  recordUsage?: boolean;
+}): Promise<SearchResult> {
+  if (!isScenario(input.question)) return searchForAnswer({ ...input, results: SEARCH_RESULTS });
+  const [whole, issues] = await Promise.all([
+    searchForAnswer({ ...input, results: SCENARIO_SEARCH_RESULTS, rerankTimeoutMs: SCENARIO_RERANK_TIMEOUT_MS, retryRerank: true }),
+    listIssues(input.question, input.recordUsage ?? true),
+  ]);
+  if (!whole.ok || issues.length === 0) return whole;
+  const perIssue = await Promise.all(
+    issues.map((issue) =>
+      searchForAnswer({ ...input, question: issue, results: ISSUE_SEARCH_RESULTS, rerankTimeoutMs: ISSUE_RERANK_TIMEOUT_MS }),
+    ),
+  );
+  const found = perIssue.filter((result): result is Extract<SearchResult, { ok: true }> => result.ok);
+  return {
+    ok: true,
+    meaningUsed: whole.meaningUsed,
+    reranked: whole.reranked,
+    hits: mergeHits(whole.hits, found.map((result) => result.hits), SCENARIO_MAX_PASSAGES),
+  };
+}
+
+// The whole question's best passages first (its top 8), then each issue's passages in turn, so
+// every issue is represented; no passage twice, at most `max`.
+export function mergeHits(whole: SearchHit[], issues: SearchHit[][], max: number): SearchHit[] {
+  const seen = new Set<string>();
+  const merged: SearchHit[] = [];
+  const add = (hit: SearchHit | undefined) => {
+    if (!hit || seen.has(hit.passageId) || merged.length >= max) return;
+    seen.add(hit.passageId);
+    merged.push(hit);
+  };
+  const lead = Math.min(whole.length, SEARCH_RESULTS);
+  whole.slice(0, lead).forEach(add);
+  const longest = Math.max(0, ...issues.map((hits) => hits.length));
+  for (let i = 0; i < longest; i++) for (const hits of issues) add(hits[i]);
+  whole.slice(lead).forEach(add);
+  return merged;
 }
 
 // The database's word search takes at most 2,000 characters (migrations 7 and 26). A longer

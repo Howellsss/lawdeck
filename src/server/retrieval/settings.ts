@@ -44,3 +44,15 @@ export type RerankModel = keyof typeof RERANK_MODELS;
 // how long a search waits for it before falling back to the combined ranking.
 export const RERANK_MODEL: RerankModel = "rerank-2.5";
 export const RERANK_TIMEOUT_MS = 5_000;
+
+// Problem questions (founder, 2026-11-02: a civil litigation problem question was answered only in
+// part). The whole question is searched as before, and each issue Claude lists (prompts/issues.ts)
+// is searched on its own, so every issue gets passages. The re-ranker gets longer for these
+// (and, if Voyage is busy, one more try for the whole question), because a long question with 30
+// candidates can take longer than 5 seconds.
+export const SCENARIO_RERANK_TIMEOUT_MS = 12_000;
+export const ISSUE_RERANK_TIMEOUT_MS = 8_000;
+// Passages kept from each issue's own search.
+export const ISSUE_SEARCH_RESULTS = 5;
+// The most passages a problem-question answer is given.
+export const SCENARIO_MAX_PASSAGES = 20;
