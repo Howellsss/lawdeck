@@ -3,7 +3,7 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import type { Database } from "@/server/db/types";
 
-// The invite link (migration 36): gives a registered person access when they sign in with Google.
+// Gives a registered person access when they sign in with Google or a confirmed email (migrations 36, 44).
 // "error" means the database could not be asked (for example before migration 36 is in).
 export type InviteClaim = "open" | "ok" | "use_google" | "not_registered" | "ended" | "error";
 

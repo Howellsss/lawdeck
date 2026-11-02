@@ -42,9 +42,9 @@ async function Pilot() {
       <section aria-labelledby="emails-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="emails-heading" className="text-lg font-medium">Registered emails</h2>
         <p className="text-sm text-muted">
-          Register each tester’s email, then send them the invite link. When they continue with Google using a registered email,
-          they are in. Anyone else who opens the link is told their email is not registered. Works while Invite only is ticked
-          below.
+          Register each tester’s email. When they sign in with that email (Google, or an email sign-up they have confirmed),
+          they are in straight away; the invite link is optional. Anyone else is told their email is not registered. Works while
+          Invite only is ticked below.
         </p>
         {data.emails === null ? (
           <p role="alert" className="text-sm text-warning">

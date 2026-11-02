@@ -62,7 +62,8 @@ describe("sign-in", () => {
 
   it("does not count a correct password", async () => {
     await expect(signIn({ status: "idle" }, login)).rejects.toThrow("redirect:");
-    expect(rpc.mock.calls.map((c) => c[0])).toEqual(["auth_wait_seconds"]);
+    // A correct password is not counted; a registered tester is given access (migration 44).
+    expect(rpc.mock.calls.map((c) => c[0])).toEqual(["auth_wait_seconds", "claim_pilot_invite"]);
   });
 
   it("still lets people sign in if the limit check itself fails (Supabase's limits remain)", async () => {

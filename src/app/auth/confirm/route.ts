@@ -1,3 +1,4 @@
+import { claimPilotInvite } from "@/server/pilot/invite";
 import { type NextRequest, NextResponse } from "next/server";
 import { safeNextPath } from "@/lib/safeNextPath";
 import { emailLinkTypeSchema } from "@/schemas/auth";
@@ -32,6 +33,10 @@ export async function GET(request: NextRequest) {
     if (error) console.warn("auth link failed", { kind: "code", code: error.code ?? "unknown" });
   }
 
-  if (ok) return NextResponse.redirect(new URL(next, request.url));
+  if (ok) {
+    // Confirming a registered email gives access at once (migration 44).
+    await claimPilotInvite(supabase);
+    return NextResponse.redirect(new URL(next, request.url));
+  }
   return NextResponse.redirect(new URL(`/sign-in?error=${reason}`, request.url));
 }
