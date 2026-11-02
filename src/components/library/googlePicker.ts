@@ -1,7 +1,8 @@
 // Google's own file picker, loaded from Google's servers only when an admin clicks
 // "Import from Google Drive". Lawdeck asks only for "drive.file" access: the files picked.
 
-export type PickerConfig = { clientId: string; apiKey: string; appId: string };
+// liveOrigin: the only address Google allows the picker on (see src/lib/driveOrigin.ts).
+export type PickerConfig = { clientId: string; apiKey: string; appId: string; liveOrigin: string };
 export type PickedFile = { id: string; name: string; sizeBytes: number };
 
 const DRIVE_FILE_SCOPE = "https://www.googleapis.com/auth/drive.file";

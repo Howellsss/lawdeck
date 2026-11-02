@@ -92,7 +92,9 @@ Tests: `tests/permissions/sql/40_library_search_test.sql` (15 checks), `tests/un
 - The server fetches each file (`src/server/library/drive.ts`), with the same checks as an upload: admin role, details, real file type, 25 MB limit (the download stops as soon as it passes 25 MB). Google Docs/Sheets/Slides are refused. A file already in the course (same name and size) is skipped. It is stored in the private library store, recorded "awaiting review", then read and indexed like an upload.
 - Google's scripts (`accounts.google.com/gsi/client`, `apis.google.com/js/api.js`) load only when an admin clicks the button (approved by the founder, 2026-10-21).
 
-Tests: `tests/unit/driveImport.test.ts` (10 checks).
+- The picker opens only on Lawdeck's live address (SITE_URL, else mylawdeck.com) or on a developer's own computer (`src/lib/driveOrigin.ts`). On any other address (a test preview) the Library shows "Google Drive import works only on Lawdeck's main address" with a link there, instead of Google's "Access blocked: origin_mismatch" page (founder, 2026-11-02).
+
+Tests: `tests/unit/driveImport.test.ts` (12 checks).
 
 ### Founder steps for the Drive import (Google Cloud, same project as Google sign-in)
 

@@ -192,3 +192,25 @@ describe("fetching from Google Drive", () => {
     if (!file.ok) expect(file.message).toContain("Google access has ended");
   });
 });
+
+describe("Drive picker only on the live address (no Google origin_mismatch page)", () => {
+  it("reads the live address from SITE_URL as an origin", async () => {
+    const { liveOrigin } = await import("@/lib/driveOrigin");
+    expect(liveOrigin("https://mylawdeck.com/")).toBe("https://mylawdeck.com");
+    expect(liveOrigin("https://mylawdeck.com/some/path")).toBe("https://mylawdeck.com");
+    // Test previews may have no SITE_URL: the live address is assumed.
+    expect(liveOrigin(undefined)).toBe("https://mylawdeck.com");
+    expect(liveOrigin("not a url")).toBe("https://mylawdeck.com");
+  });
+
+  it("opens the picker on the live address only", async () => {
+    const { driveWorksHere } = await import("@/lib/driveOrigin");
+    expect(driveWorksHere("https://mylawdeck.com", "https://mylawdeck.com")).toBe(true);
+    expect(driveWorksHere("https://lawdeck-git-fix-x-howells1.vercel.app", "https://mylawdeck.com")).toBe(false);
+    expect(driveWorksHere("https://lawdeck.vercel.app", "https://mylawdeck.com")).toBe(false);
+    expect(driveWorksHere("https://www.mylawdeck.com", "https://mylawdeck.com")).toBe(false);
+    // The developer's own computer is allowed.
+    expect(driveWorksHere("http://localhost:3000", "https://mylawdeck.com")).toBe(true);
+    expect(driveWorksHere("not a url", "https://mylawdeck.com")).toBe(false);
+  });
+});
