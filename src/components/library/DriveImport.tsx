@@ -1,10 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useSyncExternalStore } from "react";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { TextField } from "@/components/ui/TextField";
 import { compactPrimaryButton, compactSecondaryButton } from "@/components/ui/buttons";
+import { driveWorksHere } from "@/lib/driveOrigin";
 import { guessCourse, guessYear, titleFromFileName } from "@/lib/driveGuess";
 import { importFromDrive } from "@/server/library/driveActions";
 import { DriveFileRow, type DriveRow } from "./DriveFileRow";
@@ -12,6 +13,10 @@ import { pickDriveFiles, type PickerConfig } from "./googlePicker";
 import { readAndIndex } from "./readItem";
 
 type Courses = { id: string; name: string }[];
+
+// The page's own address, read in the browser (null while the page is first drawn on the server).
+const noChange = () => () => {};
+const pageOrigin = () => window.location.origin;
 
 // Admins pick several files in Google Drive, check the suggested details, and import them.
 // Each file is fetched by the server, checked like an upload, then read and indexed.
@@ -21,6 +26,8 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
   const [rows, setRows] = useState<DriveRow[]>([]);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ tone: "warning" | "success"; message: string } | null>(null);
+  const origin = useSyncExternalStore(noChange, pageOrigin, () => null);
+  const elsewhere = origin !== null && !driveWorksHere(origin, config.liveOrigin);
 
   const update = (index: number, change: Partial<DriveRow>) =>
     setRows((current) => current.map((row, i) => (i === index ? { ...row, ...change } : row)));
@@ -104,11 +111,19 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
         choose, and only for about an hour.
       </p>
       <FormAlert message={notice?.message} tone={notice?.tone} />
-      <div>
-        <button type="button" onClick={choose} disabled={busy} className={compactSecondaryButton}>
-          {rows.length ? "Choose different files" : "Choose files in Google Drive"}
-        </button>
-      </div>
+      {elsewhere ? (
+        // Google would block the picker on this address, so send the admin to the live one instead.
+        <p className="text-sm">
+          Google Drive import works only on Lawdeck&rsquo;s main address.{" "}
+          <a href={`${config.liveOrigin}/admin/library`}>Open the Library on {new URL(config.liveOrigin).host}</a>
+        </p>
+      ) : (
+        <div>
+          <button type="button" onClick={choose} disabled={busy || origin === null} className={compactSecondaryButton}>
+            {rows.length ? "Choose different files" : "Choose files in Google Drive"}
+          </button>
+        </div>
+      )}
       {rows.length > 0 && (
         <form onSubmit={importAll} noValidate className="flex flex-col gap-4">
           <ul aria-label="Files to import" className="flex flex-col divide-y divide-line rounded-2xl border border-line">
