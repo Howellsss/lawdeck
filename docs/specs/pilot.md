@@ -48,3 +48,10 @@ These are founder documents, not part of the code: the price interview guide, th
 - **The end is checked on every request** (`has_pilot_access()` compares `profiles.pilot_access_until` with now), so access stops at that moment: no scheduled job.
 - **Students** see "test access until …" under the question box, and afterwards "Your test access ended on …"; the invite page says "Your test access has ended".
 - Tests: `tests/permissions/sql/9s_access_end_test.sql`, `tests/unit/accessEnd.test.ts`.
+
+## Registered email, any sign-in (migration 44, founder 2026-11-02)
+
+- "So long as their emails have been added, they should get express access." A registered email now gets access with Google **or** an email sign-up whose email is confirmed (`email_verified()`: Google, or `email_confirmed_at` set). An unconfirmed email still does not count.
+- Access is claimed at Google sign-in, email sign-in, the email confirmation link, the invite page, and whenever a signed-in student with no access opens a page showing their questions (`getAllowance`), so someone registered after they signed up gets in on their next page load.
+- Relies on Supabase "Confirm email" staying on (docs/specs/sign-in.md).
+- Tests: `tests/permissions/sql/9t_registered_email_access_test.sql`, `tests/unit/allowanceClaim.test.ts`.

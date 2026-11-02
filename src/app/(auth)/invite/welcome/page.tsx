@@ -31,8 +31,9 @@ async function InviteResult() {
   if (claim === "use_google") {
     return (
       <>
-        <AuthHero title="Continue with Google">
-          Your email is registered. To join, continue with Google using {account.email}.
+        <AuthHero title="Confirm your email">
+          Your email is registered. Open the confirmation link we emailed to {account.email}, or continue with Google using that
+          email.
         </AuthHero>
         <div className="flex w-full flex-col gap-4">
           <GoogleButton next="/invite/welcome" />

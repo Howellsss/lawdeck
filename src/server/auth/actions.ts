@@ -1,5 +1,6 @@
 "use server";
 
+import { claimPilotInvite } from "@/server/pilot/invite";
 import { redirect } from "next/navigation";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { safeNextPath } from "@/lib/safeNextPath";
@@ -58,6 +59,8 @@ export async function signIn(_prev: AuthFormState, formData: FormData): Promise<
     if (error.code === "invalid_credentials") await recordAttempt("sign_in_failed", parsed.data.email);
     return { status: "error", message: messageForAuthError(error.code), email };
   }
+  // A registered tester gets access with an email sign-in too (migration 44).
+  await claimPilotInvite(supabase);
   redirect(safeNextPath(formData.get("next")));
 }
 
