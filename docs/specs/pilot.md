@@ -41,3 +41,10 @@ These are founder documents, not part of the code: the price interview guide, th
 - Database: `tests/permissions/sql/9i_closed_pilot_test.sql` (33 checks).
 - Unit: `tests/unit/pilot.test.ts`.
 - Browser: the pilot page and the invite form are hidden from visitors.
+
+## Access that ends by itself (migration 43, founder 2026-11-02)
+- **Registering emails with days:** on Admin → Pilot, "Access for (days)" (1–90, empty for no end) is stored with each email. A person's days start when they first get in (or straight away if they had already signed in with Google). Registering an email again renews it for the new number of days.
+- **Giving access from Users:** `set_pilot_access(person, allow, days)` takes the same optional days.
+- **The end is checked on every request** (`has_pilot_access()` compares `profiles.pilot_access_until` with now), so access stops at that moment: no scheduled job.
+- **Students** see "test access until …" under the question box, and afterwards "Your test access ended on …"; the invite page says "Your test access has ended".
+- Tests: `tests/permissions/sql/9s_access_end_test.sql`, `tests/unit/accessEnd.test.ts`.

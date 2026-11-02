@@ -11,6 +11,7 @@ import {
   pilotEmailIdSchema,
   pilotSettingsSchema,
   priceAnswerSchema,
+  accessDaysSchema,
   registerEmailsSchema,
   usageLimitsSchema,
 } from "@/schemas/pilot";
@@ -129,12 +130,12 @@ export async function disableInvite(id: string): Promise<PilotResult> {
 
 // Gives or removes one person's access from the Users page (migration 35); the same access an
 // invite code gives. The database checks the admin role again and records it in the audit log.
-export async function setPilotAccess(input: { person: string; allow: boolean }): Promise<PilotResult> {
+export async function setPilotAccess(input: { person: string; allow: boolean; days?: number | null }): Promise<PilotResult> {
   const parsed = pilotAccessSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: "That person could not be found." };
   if ((await getStaffRole()) !== "admin") return { ok: false, message: NOT_ADMIN };
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("set_pilot_access", { person: parsed.data.person, allow: parsed.data.allow });
+  const { data, error } = await supabase.rpc("set_pilot_access", { person: parsed.data.person, allow: parsed.data.allow, days: parsed.data.days });
   if (error) {
     logFailure("setPilotAccess", error.code);
     return { ok: false, message: NOT_SAVED };
@@ -175,20 +176,26 @@ export async function saveUsageLimits(input: {
 
 // Registers testers' emails on the Pilot page (migration 36). A registered person who signs in
 // with Google through the invite link gets access; the database checks the admin role again.
-export async function addPilotEmails(text: string): Promise<PilotResult> {
+// days: how long their access lasts once they get in ("" for no end; migration 43). Registering an
+// email again renews it for the new number of days.
+export async function addPilotEmails(text: string, days = ""): Promise<PilotResult> {
   const parsed = registerEmailsSchema.safeParse(text);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Check the emails." };
+  const lasting = accessDaysSchema.safeParse(days);
+  if (!lasting.success) return { ok: false, message: lasting.error.issues[0]?.message ?? "Check the number of days." };
   if ((await getStaffRole()) !== "admin") return { ok: false, message: NOT_ADMIN };
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase.rpc("add_pilot_emails", { emails: parsed.data });
+  const { data, error } = await supabase.rpc("add_pilot_emails", { emails: parsed.data, days: lasting.data });
   if (error) {
     logFailure("addPilotEmails", error.code);
     return { ok: false, message: NOT_SAVED };
   }
   refresh();
   const already = parsed.data.length - data;
-  const added = data === 1 ? "1 email registered." : `${data} emails registered.`;
-  return { ok: true, message: already > 0 ? `${added} ${already} ${already === 1 ? "was" : "were"} already on the list.` : added };
+  const added = data === 1 ? "1 email registered" : `${data} emails registered`;
+  const lastingText = lasting.data ? `, with access for ${lasting.data} day${lasting.data === 1 ? "" : "s"} from when each person first gets in` : "";
+  const renewed = already > 0 ? ` ${already} already on the list ${already === 1 ? "was" : "were"} renewed.` : "";
+  return { ok: true, message: `${added}${lastingText}.${renewed}` };
 }
 
 // Removes a registered email; the access it gave goes with it.
