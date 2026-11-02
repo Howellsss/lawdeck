@@ -113,8 +113,9 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
         Import from Google Drive
       </h2>
       <p className="text-sm text-muted">
-        Choose several files at once (PDF, Word, PNG or JPEG, up to 25 MB each). Lawdeck can open only the files you
-        choose, and only for about an hour.
+        Choose several files at once (PDF, Word, PNG or JPEG, up to 25 MB each): in Google&rsquo;s window, hold{" "}
+        <kbd>Cmd</kbd> (Mac) or <kbd>Ctrl</kbd> (Windows) and click each file, or hold <kbd>Shift</kbd> to pick a run of
+        files, then click <strong>Select</strong>. Lawdeck can open only the files you choose, and only for about an hour.
       </p>
       <FormAlert message={notice?.message} tone={notice?.tone} />
       {elsewhere ? (
