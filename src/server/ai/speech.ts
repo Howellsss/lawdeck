@@ -57,7 +57,9 @@ export async function synthesizeSpeech(text: string, voice: Voice, record = true
       headers: {
         "Ocp-Apim-Subscription-Key": key,
         "Content-Type": "application/ssml+xml",
-        "X-Microsoft-OutputFormat": "audio-24khz-48kbitrate-mono-mp3",
+        // 48 kHz, 96 kbps: clearer than the 48 kbps used before (founder, 2026-11-02: "very clear and
+        // pristine"). Azure charges by characters, not quality; a minute is about 0.7 MB of data.
+        "X-Microsoft-OutputFormat": "audio-48khz-96kbitrate-mono-mp3",
         "User-Agent": "Lawdeck",
       },
       body: speechSsml(text, voiceName, PRONUNCIATIONS),

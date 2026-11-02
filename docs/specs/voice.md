@@ -27,6 +27,8 @@ voices) and that students choose the voice.
   This is the only place to choose it (founder, 2026-11-02: "the voice AI selection ... should only
   remain in the settings"); one choice per device, used from the next Read or spoken reply.
 
+- **Sound quality:** Azure sends 48 kHz, 96 kbps mono MP3 (was 24 kHz, 48 kbps; founder, 2026-11-02, wanted clearer voices). Same price (Azure charges by characters); about 0.7 MB of data per minute of speech.
+
 ## How names and legal shorthand are read
 - Nigerian English voices say most Nigerian names properly.
 - `src/templates/pronunciations.json`: names the voice says wrongly, with a respelling. Found by
