@@ -1,7 +1,7 @@
 // The "on request" test (docs/specs/remembrance.md, Phase 2c): on the made-up lesson, "Another
 // memory aid" for the five conditions and "Tell it another way" for an everyday and a case story,
 // written by Sonnet with the real instructions, then checked: the new aid keeps all five
-// conditions (Lawdeck's own rule too); the everyday story is set in Nigeria; the case story stays
+// conditions, each in its exact wording (Lawdeck also restores the wording itself); the everyday story is set in Nigeria; the case story stays
 // with the same case and adds no number the library does not give; no case outside the lesson.
 // About 3 cents a run. Needs ANTHROPIC_API_KEY. Only results are printed, never the text.
 import { appendFileSync, readFileSync } from "node:fs";
@@ -71,7 +71,7 @@ describe("on request test", () => {
     const checks: [string, boolean][] = [
       ["another aid was made", Boolean(newAid) && aid.reply.found],
       ["it keeps exactly the same number of points (Lawdeck's rule)", Boolean(newAid) && keepsAllPoints(original, newAid!)],
-      ["all five conditions are in it", fixture.elements.every((e) => aidText.includes(e))],
+      ["each point keeps its exact wording", Boolean(newAid) && newAid!.items.every((item, i) => item.meaning.trim() === original.items[i]?.meaning)],
       ["it is a different device", Boolean(newAid) && newAid!.device.trim().toLowerCase() !== original.device.toLowerCase()],
       ["the everyday story stays an everyday story", Boolean(story) && sameStory(everyday, story!)],
       ["it is set in Nigeria", NIGERIA.test(text(story))],

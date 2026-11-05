@@ -108,14 +108,22 @@ export async function anotherAid(input: { aidId: string }): Promise<{ ok: true; 
   if (!result.ok) return { ok: false, message: FAILURES[result.reason] };
   const made = result.reply.memory_aids[0];
   if (!result.reply.found || !made || !keepsAllPoints(original, made)) return { ok: false, message: NOT_KEPT };
-  const texts = await checked(db, source.courseId, [made.title, made.device, made.explanation, ...made.items.map((i) => i.meaning)]);
+  const texts = await checked(db, source.courseId, [made.device, made.explanation]);
   if (!texts) return { ok: false, message: NOT_KEPT };
   await countIt(result);
-  const [title, device, explanation, ...meanings] = texts;
+  const [device, explanation] = texts;
+  // Each point keeps the reviewed wording of the original aid, whatever came back: only the
+  // device and its keys are new, so a new aid can never change the law it summarises.
   return {
     ok: true,
     topicId: source.topicId,
-    aid: { kind: made.kind, title: title || original.title, device: device ?? made.device, items: made.items.map((item, i) => ({ key: item.key, meaning: meanings[i] ?? item.meaning })), explanation: explanation || null },
+    aid: {
+      kind: made.kind,
+      title: original.title,
+      device: device || made.device,
+      items: made.items.map((item, i) => ({ key: item.key, meaning: original.items[i]?.meaning ?? item.meaning })),
+      explanation: explanation || null,
+    },
   };
 }
 
