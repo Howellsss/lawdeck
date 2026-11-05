@@ -6,7 +6,7 @@ import type { Account } from "@/server/auth/session";
 import { signOut } from "@/server/auth/actions";
 import { useSidebar } from "./sidebarContext";
 
-const row = "flex h-11 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill";
+const row = "flex h-11 items-center gap-2.5 rounded-lg px-2 text-[14px] no-underline hover:bg-pill";
 
 // Bottom of the sidebar: "Sign in" for visitors; once signed in, the student's name and email
 // (linking to their Account page, where the name can be changed) and "Sign out".
@@ -35,7 +35,7 @@ export function AccountButton({ account, name = null }: { account: Account | nul
         {name ? (
           <span className={collapsed ? "sr-only" : "flex min-w-0 flex-col leading-tight"}>
             <span className="truncate">{name}</span>
-            <span className="truncate text-xs text-muted">{account.email}</span>
+            <span className="truncate text-[12px] text-muted">{account.email}</span>
           </span>
         ) : (
           label(account.email)

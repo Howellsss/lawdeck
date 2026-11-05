@@ -32,8 +32,10 @@ const SHORTCUTS: {
   },
 ];
 
+// The course and mode choices sit under the box as quiet text, like a setting rather than a
+// button (founder, 2026-11-05: Claude's calm layout, in Lawdeck's own colours).
 const selectClass =
-  "h-9 w-full min-w-0 truncate appearance-none rounded-full border-0 bg-pill pl-3 pr-7 text-[14px] text-ink outline-offset-2 cursor-pointer sm:h-10 sm:text-[15px]";
+  "h-8 max-w-full min-w-0 truncate appearance-none rounded-lg border-0 bg-transparent pl-2 pr-6 text-[13.5px] text-muted outline-offset-2 cursor-pointer [field-sizing:content] hover:bg-pill hover:text-ink";
 
 // The input-first composer (PRD 4.3). A Learn question starts a chat and opens it; the chat
 // page asks the question and streams the answer. A drafting request (Draft mode, or Auto mode
@@ -105,11 +107,11 @@ export function Composer({ voice = false }: { voice?: boolean }) {
   }
 
   return (
-    <div className="flex w-full max-w-5xl flex-col gap-4">
+    <div className="flex w-full max-w-[44rem] flex-col gap-3">
       <form
         onSubmit={(event) => void submit(event)}
         // The box outlines itself while the student types (visible keyboard focus, WCAG 2.4.7).
-        className="flex flex-col gap-2 rounded-3xl border border-line bg-surface px-2.5 pb-2.5 pt-3 shadow-[0_8px_28px_rgba(0,0,0,0.12)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
+        className="flex flex-col gap-1.5 rounded-[22px] border border-line bg-surface px-2.5 pb-2.5 pt-3.5 shadow-[0_4px_20px_rgba(0,0,0,0.08)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
       >
         <label htmlFor="composer" className="sr-only">
           What are we working on?
@@ -124,26 +126,10 @@ export function Composer({ voice = false }: { voice?: boolean }) {
             if (event.key === "Enter" && !event.shiftKey) void submit(event);
           }}
           placeholder="What are we working on?"
-          className="resize-none bg-transparent px-2 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted sm:text-[17px]"
+          className="resize-none bg-transparent px-2.5 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
         />
         <div className="flex min-w-0 flex-wrap items-center gap-1 sm:gap-1.5">
           <AttachFile compact onBusyChange={setAttaching} onReady={() => inputRef.current?.focus()} />
-          <Picker
-            label="Mode"
-            value={mode}
-            onChange={(value) => setMode(value as Mode)}
-            options={MODES.map((m) => [m, m])}
-          />
-          <Picker
-            label="Course"
-            grow
-            value={course}
-            onChange={setCourse}
-            options={[
-              ["all", "All courses"],
-              ...COURSES.map((c): [string, string] => [c.slug, c.name]),
-            ]}
-          />
           <span className="ml-auto" />
           {voice && (
             <VoiceMode
@@ -164,12 +150,30 @@ export function Composer({ voice = false }: { voice?: boolean }) {
             type="submit"
             aria-label="Send"
             disabled={!text.trim() || busy || attaching}
-            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted sm:size-10"
+            className="flex size-9 shrink-0 items-center justify-center rounded-full bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
           >
             <Icon name="arrowUp" size={17} />
           </button>
         </div>
       </form>
+      <div className="-mt-1 flex items-center justify-between gap-2 px-1">
+        <Picker
+          label="Course"
+          grow
+          value={course}
+          onChange={setCourse}
+          options={[
+            ["all", "All courses"],
+            ...COURSES.map((c): [string, string] => [c.slug, c.name]),
+          ]}
+        />
+        <Picker
+          label="Mode"
+          value={mode}
+          onChange={(value) => setMode(value as Mode)}
+          options={MODES.map((m) => [m, m])}
+        />
+      </div>
 
       {voiceDone && (
         <p role="status" className="rounded-xl border border-line bg-surface px-4 py-3 text-sm text-muted">
@@ -211,15 +215,15 @@ export function Composer({ voice = false }: { voice?: boolean }) {
         </div>
       )}
 
-      <div className="hidden flex-wrap justify-center gap-2 lg:flex">
+      <div className="hidden flex-wrap justify-center gap-2 pt-1 lg:flex">
         {SHORTCUTS.map((shortcut) => (
           <button
             key={shortcut.label}
             type="button"
             onClick={() => applyShortcut(shortcut)}
-            className="flex h-11 items-center gap-2 rounded-xl border border-line px-4 text-[15px] text-ink hover:bg-pill"
+            className="flex h-9 items-center gap-2 rounded-lg border border-line px-3.5 text-[14px] text-ink/90 hover:bg-pill hover:text-ink"
           >
-            <Icon name={shortcut.icon} size={18} />
+            <Icon name={shortcut.icon} size={16} className="text-muted" />
             {shortcut.label}
           </button>
         ))}
@@ -238,7 +242,7 @@ function Picker(props: {
 }) {
   const id = `picker-${props.label.toLowerCase()}`;
   return (
-    <div className={`relative min-w-0 ${props.grow ? "max-w-[12rem] flex-1" : "shrink-0"}`}>
+    <div className={`relative min-w-0 ${props.grow ? "max-w-[15rem]" : "shrink-0"}`}>
       <label htmlFor={id} className="sr-only">
         {props.label}
       </label>
@@ -256,8 +260,8 @@ function Picker(props: {
       </select>
       <Icon
         name="chevronDown"
-        size={14}
-        className="pointer-events-none absolute right-2 top-1/2 -translate-y-1/2 text-muted"
+        size={13}
+        className="pointer-events-none absolute right-1.5 top-1/2 -translate-y-1/2 text-muted"
       />
     </div>
   );
