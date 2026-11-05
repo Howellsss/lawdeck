@@ -95,3 +95,21 @@ learning record is its owner's alone (staff do not read them); one session per t
 - Tests: `tests/unit/revision.test.ts`; `tests/voice/lesson.spec.ts` (test-only lesson page: highlight
   modes, mark caps, no answer shown before trying, no sideways scroll at 360 px and desktop); e2e:
   `/study/[id]` asks visitors to sign in; the test page does not exist on the live configuration.
+
+## Study Diary (Phase 1c)
+- Side menu: **Study Diary** (`/diary`). Nothing is stored for the diary itself: it is assembled from
+  `study_sessions`, `recall_attempts`, `review_items`, the lessons' authorities and `diary_notes`
+  (`src/server/db/diary.ts`), so it always matches recall and revision.
+- Dashboard: topics studied, topics completed, time studying, recall accuracy (answers only, never
+  time; labelled "not a prediction of exam results"), points due for revision now, and upcoming
+  revision by topic.
+- Timeline: newest day first; each entry shows course, minutes, recalled out of answered, completed,
+  and revision status. Filters (in the address, plain form): course, topic, from/to dates, case or
+  statute name, revision status (`src/lib/diaryFilter.ts`).
+- Entry (`/diary/[sessionId]`): what I studied (sections, important concepts), authorities (with
+  principle and library source), remembrance tools (Phase 2 adds memory aids), recall performance
+  (each question and how it went), what to revisit (missed points and the topic's revision schedule),
+  and **My notes** (one note per topic, saved; `saveDiaryNote`).
+- Tests: `tests/unit/diaryFilter.test.ts`; `tests/voice/diary.spec.ts` (layout at 360 px and desktop);
+  e2e: `/diary` and entries ask visitors to sign in; the test page does not exist on the live
+  configuration. Privacy: covered by the database tests (every record is its owner's alone).
