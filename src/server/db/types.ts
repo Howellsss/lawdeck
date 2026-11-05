@@ -776,6 +776,24 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      // Memory aids a student saved (migration 49): a copy, filled in by the database from the aid.
+      saved_memory_aids: {
+        Row: {
+          id: string;
+          owner_id: string;
+          aid_id: string | null;
+          topic_id: string;
+          kind: "acronym" | "phrase" | "association" | "pattern";
+          title: string;
+          device: string;
+          items: Json;
+          explanation: string | null;
+          created_at: string;
+        };
+        Insert: { aid_id: string };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       study_sessions: {
         Row: {
           id: string;

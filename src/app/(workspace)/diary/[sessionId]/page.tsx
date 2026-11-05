@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { DiaryNote } from "@/components/diary/DiaryNote";
+import { SavedAids } from "@/components/study/SavedAids";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { formatWat } from "@/lib/dates";
@@ -32,7 +33,7 @@ async function Entry({ params }: { params: Promise<{ sessionId: string }> }) {
   const result = await getDiaryEntry(id.data);
   if (result.status === "signed-out") return <SignInPrompt what="study diary" returnTo={`/diary/${id.data}`} />;
   if (!result.data) notFound();
-  const { summary, subtopics, keyPoints, authorities, attempts, revisit, upcomingReviews, note } = result.data;
+  const { summary, subtopics, keyPoints, authorities, attempts, revisit, upcomingReviews, note, savedAids } = result.data;
   const correct = attempts.filter((a) => a.outcome === "correct").length;
   const count = (o: keyof typeof OUTCOME) => attempts.filter((a) => a.outcome === o).length;
   return (
@@ -81,7 +82,11 @@ async function Entry({ params }: { params: Promise<{ sessionId: string }> }) {
       </Section>
 
       <Section title="My remembrance tools">
-        <Muted>The recall questions you answered are below. Memory aids (acronyms, mnemonics and case stories) arrive in the next phase.</Muted>
+        {savedAids.length === 0 ? (
+          <Muted>No memory aids saved for this topic yet. Press &ldquo;Save&rdquo; on an aid while you study it to keep it here.</Muted>
+        ) : (
+          <SavedAids aids={savedAids} open />
+        )}
       </Section>
 
       <Section title="My recall performance">

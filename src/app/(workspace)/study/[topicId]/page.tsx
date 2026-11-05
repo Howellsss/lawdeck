@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { BeforeYouMoveOn } from "@/components/study/BeforeYouMoveOn";
 import { BulkApprovedNote } from "@/components/study/BulkApprovedNote";
 import { LessonReader } from "@/components/study/LessonReader";
+import { SavedAids } from "@/components/study/SavedAids";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { topicIdSchema } from "@/schemas/lesson";
@@ -43,6 +44,7 @@ async function Study({ params }: { params: Promise<{ topicId: string }> }) {
         <BeforeYouMoveOn compact />
       </Suspense>
       {data.lesson?.bulkApproved && <BulkApprovedNote lessonId={data.lesson.id} />}
+      <SavedAids aids={data.savedAids} />
       {data.lesson ? (
         <LessonReader data={{ ...data, lesson: data.lesson }} />
       ) : (
