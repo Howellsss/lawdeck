@@ -158,7 +158,7 @@ learning record is its owner's alone (staff do not read them); one session per t
   or rules change): a made-up lesson, checked for an aid with all five conditions, acronyms
   spelled by their items, no case story without library facts, no number or case the material
   does not give, an everyday Nigerian story, and the limits.
-- **Next (2b):** students see them in the lesson (aid cards after their section, "Read it as a
+- **2b** (below): students see them in the lesson, save the ones they like, and saved aids appear in the Study Diary.
   story"), save the ones they like, and saved aids appear in the Study Diary.
 
 ## Keeping lessons up to date (founder, 2026-11-05)
@@ -175,3 +175,15 @@ learning record is its owner's alone (staff do not read them); one session per t
   from (top 14, no re-ranking), and marks them (`new_material_at`). Admin → Lessons shows "new
   library material" on those topics and an "Update N lessons with new library material" panel.
   Nothing is rewritten automatically: each update costs money and needs review.
+
+## Memory aids and stories for students (Phase 2b)
+- **In the lesson:** after each section, its memory aid (with every letter or word explained and a
+  "Save" button) and "Read it as a story: …" buttons. Stories open on request; everyday stories
+  are labelled "Illustration, not a real case", case stories name the case. A story's quick
+  question is marked on the server after the student chooses (the right answer is not sent
+  before). Aids and stories show whether or not questions while reading are on.
+- **Saved aids (migration 49, `saved_memory_aids`):** each student's own; the database copies the
+  aid (only one the student can read), so saved aids survive lesson updates. At most 500. Shown
+  as "Your saved memory aids" on the topic and under "My remembrance tools" in the Study Diary
+  entry; removable from either.
+- **Next (2c):** "Another memory aid" and "Tell it another way" on request (one question each).

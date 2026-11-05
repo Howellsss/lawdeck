@@ -9,6 +9,7 @@ import type { StudyLesson } from "@/server/db/study";
 import { completeStudySession, openStudySession, saveStudyProgress } from "@/server/study/actions";
 import { AuthorityCard } from "./AuthorityCard";
 import { RecallCard } from "./RecallCard";
+import { SectionExtras } from "./SectionExtras";
 import { TopicTest } from "./TopicTest";
 
 const RECALL_KEY = "lawdeck-recall";
@@ -94,6 +95,7 @@ export function LessonReader({ data }: { data: StudyLesson & { lesson: NonNullab
     if (authority) panel.open({ title: authority.kind === "case" ? "Case" : "Statute", body: <AuthorityCard authority={authority} sources={data.lesson.content.sources} /> });
   };
 
+  const authorityNames = new Map(data.authorities.map((a) => [a.key, a.name]));
   const shownUpTo = recall ? upTo : sections - 1;
   const pendingHere = (index: number) => reading.filter((c) => c.afterSection === index && !answered.has(c.id));
   const finishedReading = shownUpTo >= sections - 1 && (!recall || pendingHere(sections - 1).length === 0);
@@ -120,11 +122,13 @@ export function LessonReader({ data }: { data: StudyLesson & { lesson: NonNullab
           upTo={shownUpTo}
           onAuthority={openAuthority}
           after={(index) => {
-            if (!recall) return null;
+            const extras = <SectionExtras index={index} aids={data.aids} stories={data.stories} authorityNames={authorityNames} />;
+            if (!recall) return extras;
             const here = reading.filter((c) => c.afterSection === index);
             const waiting = pendingHere(index);
             return (
               <div className="flex flex-col gap-3">
+                {extras}
                 {here.map((checkpoint) => (
                   <RecallCard
                     key={checkpoint.id}

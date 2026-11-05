@@ -2,6 +2,7 @@ import "server-only";
 import { lessonContentSchema } from "@/schemas/lesson";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { toSavedAid, type SavedAid } from "./study";
 import type { Loaded } from "./workspace";
 
 // The Study Diary (docs/specs/remembrance.md, Phase 1c). Nothing is stored for the diary itself:
@@ -128,6 +129,8 @@ export type DiaryEntry = {
   revisit: string[];
   upcomingReviews: { keyPoint: string; dueAt: string }[];
   note: string;
+  // The memory aids the student saved for this topic (Phase 2b).
+  savedAids: SavedAid[];
 };
 
 // One diary entry in full (founder's brief, 20 A–F).
@@ -139,13 +142,14 @@ export async function getDiaryEntry(sessionId: string): Promise<Loaded<DiaryEntr
   const db: Db = await createSupabaseServerClient();
   const session = await db.from("study_sessions").select("lesson_id").eq("id", sessionId).single();
   const lessonId = session.data?.lesson_id ?? null;
-  const [lesson, checkpoints, authorities, attempts, reviews, note] = await Promise.all([
+  const [lesson, checkpoints, authorities, attempts, reviews, note, saved] = await Promise.all([
     lessonId ? db.from("topic_lessons").select("content").eq("id", lessonId).maybeSingle() : Promise.resolve({ data: null }),
     lessonId ? db.from("lesson_checkpoints").select("id, key_point").eq("lesson_id", lessonId) : empty<{ id: string; key_point: string }>(),
     lessonId ? db.from("lesson_authorities").select("key, kind, name, citation, principle, sources").eq("lesson_id", lessonId).order("name") : empty<never>(),
     db.from("recall_attempts").select("prompt, key_point, outcome, context, created_at").eq("session_id", sessionId).order("created_at"),
     db.from("review_items").select("checkpoint_id, due_at, last_outcome").eq("topic_id", summary.topicId).order("due_at"),
     db.from("diary_notes").select("body").eq("topic_id", summary.topicId).maybeSingle(),
+    db.from("saved_memory_aids").select("id, aid_id, kind, title, device, items, explanation").eq("topic_id", summary.topicId).order("created_at"),
   ]);
   const content = lesson.data ? lessonContentSchema.safeParse(lesson.data.content) : null;
   const sources = content?.success ? content.data.sources : [];
@@ -176,6 +180,7 @@ export async function getDiaryEntry(sessionId: string): Promise<Loaded<DiaryEntr
         .filter((r) => r.keyPoint)
         .slice(0, 20),
       note: note.data?.body ?? "",
+      savedAids: (saved.data ?? []).map(toSavedAid),
     },
   };
 }
