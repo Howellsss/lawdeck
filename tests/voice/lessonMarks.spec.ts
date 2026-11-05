@@ -21,7 +21,8 @@ for (const width of [360, 1200]) {
 test("selecting words measures them exactly, even across one of Lawdeck's highlights, and saving needs an account", async ({ page }) => {
   await page.goto("/test-pages/lesson-marks");
   // Select "wombat summons suits" programmatically: it starts inside the definition highlight.
-  await page.evaluate(() => {
+  // Retried until the page has started (the selection listener attaches once it is interactive).
+  const select = () => page.evaluate(() => {
     const pieces = [...document.querySelectorAll<HTMLElement>("[data-paragraph] [data-o]")];
     const first = pieces.find((p) => p.textContent?.includes("wombat summons"))!;
     const after = pieces.find((p) => Number(p.dataset.o) === 16)!;
@@ -32,7 +33,10 @@ test("selecting words measures them exactly, even across one of Lawdeck's highli
     sel.removeAllRanges();
     sel.addRange(range);
   });
-  await expect(page.getByTestId("pending")).toHaveText("2-22:wombat summons suits");
+  await expect(async () => {
+    await select();
+    await expect(page.getByTestId("pending")).toHaveText("2-22:wombat summons suits", { timeout: 1000 });
+  }).toPass({ timeout: 15_000 });
   const bar = page.getByRole("dialog", { name: "Mark these words" });
   await bar.getByRole("button", { name: "Highlight" }).click();
   await expect(bar.getByRole("alert")).toHaveText("Sign in to mark lessons.");
