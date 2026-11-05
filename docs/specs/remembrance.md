@@ -146,7 +146,7 @@ learning record is its owner's alone (staff do not read them); one session per t
   the lesson, so writing them never sends an approved lesson back to review. Students read them
   only when both the set and its lesson are approved (`lesson_extras_readable`). Removing an aid or
   story sends the set back to review; a change to the lesson's wording does too.
-- **Writing** (`src/server/lessons/extras.ts`, prompt `extras-v1`, Opus): from the lesson, its
+- **Writing** (`src/server/lessons/extras.ts`, prompt `extras-v2`, Opus): from the lesson, its
   authority cards and the same library passages. Lawdeck's own limits (`src/lib/extrasRules.ts`):
   one aid per section, at most 4 aids and 3 stories; an acronym is kept only if its items spell
   it; a case story only for an authority whose facts the library gives; then the citation check
