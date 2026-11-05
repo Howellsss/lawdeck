@@ -5,6 +5,7 @@ import { NamedGreeting } from "@/components/learn/NamedGreeting";
 import { NamePrompt } from "@/components/learn/NamePrompt";
 import { QuestionAllowance } from "@/components/learn/QuestionAllowance";
 import { PilotHomeCard } from "@/components/pilot/PilotHomeCard";
+import { BeforeYouMoveOn } from "@/components/study/BeforeYouMoveOn";
 import { BrandMark } from "@/components/ui/BrandMark";
 import { speechConfigured } from "@/server/ai/speech";
 
@@ -25,6 +26,9 @@ export default function HomePage() {
         <Composer voice={speechConfigured()} />
         <Suspense fallback={null}>
           <QuestionAllowance />
+        </Suspense>
+        <Suspense fallback={null}>
+          <BeforeYouMoveOn />
         </Suspense>
         <Suspense fallback={null}>
           <PilotHomeCard />
