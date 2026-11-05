@@ -37,6 +37,11 @@ async function Overview() {
       .filter((topic) => topic.lesson && !topic.extras)
       .map((topic) => ({ id: topic.id, name: topic.name, courseId: course.id, courseName: course.name })),
   );
+  const withNewMaterial = overview.courses.flatMap((course) =>
+    course.topics
+      .filter((topic) => topic.lesson?.newMaterial)
+      .map((topic) => ({ id: topic.id, name: topic.name, courseId: course.id, courseName: course.name })),
+  );
   const courseList = overview.courses.map((c) => ({ id: c.id, name: c.name }));
   return (
     <>
@@ -49,6 +54,7 @@ async function Overview() {
         {all.length} topics · {approved} approved · {waiting} awaiting review · {all.length - all.filter((t) => t.lesson).length} not written yet
       </p>
       <BulkWriteLessons topics={missing} courses={courseList} />
+      {withNewMaterial.length > 0 && <BulkWriteLessons topics={withNewMaterial} courses={courseList} kind="update" />}
       {all.some((t) => t.lesson) && <BulkWriteLessons topics={missingExtras} courses={courseList} kind="extras" />}
       {overview.courses.map((course) => (
         <section key={course.id} aria-labelledby={`course-${course.id}`} className="flex flex-col gap-2">
@@ -89,6 +95,8 @@ async function Overview() {
                     {topic.lesson
                       ? `${REVIEW_STATUS_LABELS[topic.lesson.status]}${topic.lesson.bulkApproved ? " with course" : ""} · version ${topic.lesson.version} · ${formatWat(topic.lesson.updatedAt)}`
                       : "Not written yet"}
+                    {topic.lesson?.approvedBehind ? " · students read the approved version meanwhile" : ""}
+                    {topic.lesson?.newMaterial ? " · new library material" : ""}
                     {topic.extras
                       ? ` · memory aids ${REVIEW_STATUS_LABELS[topic.extras.status].toLowerCase()}${topic.extras.bulkApproved ? " with course" : ""}`
                       : topic.lesson

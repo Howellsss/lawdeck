@@ -160,3 +160,18 @@ learning record is its owner's alone (staff do not read them); one session per t
   does not give, an everyday Nigerian story, and the limits.
 - **Next (2b):** students see them in the lesson (aid cards after their section, "Read it as a
   story"), save the ones they like, and saved aids appear in the Study Diary.
+
+## Keeping lessons up to date (founder, 2026-11-05)
+- **One process:** writing a lesson (single or bulk) writes its memory aids and stories straight
+  after (bulk: "Also write each lesson's memory aids and stories", on by default; the cost shown
+  includes them). If the aids fail, the lesson stays written and the reason is listed.
+- **Versions (migration 48):** writing a lesson that is already approved adds a new version
+  beside it. Students keep reading the approved version until a reviewer approves the new one;
+  the database then withdraws the old one (`replaced_by`) and ends students' revision of its
+  questions (revision restarts with the new questions). At most one approved and one working
+  version per topic. Replaced versions are kept for the Study Diary.
+- **New library material:** when a reviewer approves a library item, Lawdeck checks (after the
+  page has answered) which topics' lessons it is about, using the same search lessons are written
+  from (top 14, no re-ranking), and marks them (`new_material_at`). Admin → Lessons shows "new
+  library material" on those topics and an "Update N lessons with new library material" panel.
+  Nothing is rewritten automatically: each update costs money and needs review.

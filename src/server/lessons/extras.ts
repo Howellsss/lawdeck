@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { selectAids, selectStories } from "@/lib/extrasRules";
+import { currentVersion } from "@/lib/lessonVersions";
 import { EXTRAS_PROMPT_VERSION } from "@/prompts/extras";
 import { lessonContentSchema } from "@/schemas/lesson";
 import { writeExtras } from "@/server/ai/extras";
@@ -30,12 +31,14 @@ const FAILURES = {
 export async function generateExtras(db: Db, topicId: string): Promise<GenerateExtrasResult> {
   const topic = await db.from("topics").select("id, name, course_id").eq("id", topicId).maybeSingle();
   if (topic.error || !topic.data) return { ok: false, message: "That topic could not be found." };
-  const lesson = await db.from("topic_lessons").select("id, content").eq("topic_id", topicId).maybeSingle();
-  const content = lesson.data ? lessonContentSchema.safeParse(lesson.data.content) : null;
-  if (lesson.error || !lesson.data || !content?.success || content.data.sections.length === 0) {
+  // The version being worked on if there is one (its aids are reviewed with it), else the approved one.
+  const versions = await db.from("topic_lessons").select("id, status, replaced_by, content").eq("topic_id", topicId).is("replaced_by", null);
+  const lesson = currentVersion(versions.data ?? []);
+  const content = lesson ? lessonContentSchema.safeParse(lesson.content) : null;
+  if (versions.error || !lesson || !content?.success || content.data.sections.length === 0) {
     return { ok: false, message: "Write this topic's lesson first: memory aids are made from it." };
   }
-  const lessonId = lesson.data.id;
+  const lessonId = lesson.id;
 
   const ids = content.data.sources.map((s) => s.passageId);
   const [authorities, passages] = await Promise.all([

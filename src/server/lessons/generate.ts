@@ -82,16 +82,19 @@ export async function generateLesson(db: Db, topicId: string): Promise<GenerateL
     prompt_version: LESSON_PROMPT_VERSION,
   };
 
-  // One lesson per topic: rewrite it in place, or add it.
-  const existing = await db.from("topic_lessons").select("id").eq("topic_id", topicId).maybeSingle();
+  // Rewrite the version being worked on, if there is one. Otherwise add a new version: beside an
+  // approved one, students keep reading the approved version until this one is approved (migration 48).
+  const versions = await db.from("topic_lessons").select("id, status, replaced_by").eq("topic_id", topicId).is("replaced_by", null);
+  if (versions.error) return saveFailed("versions", versions.error.code);
+  const working = versions.data.find((v) => v.status !== "approved");
   let lessonId: string;
-  if (existing.data) {
+  if (working) {
     const updated = await db
       .from("topic_lessons")
-      .update({ ...lessonFields, status: "pending", review_note: null })
-      .eq("id", existing.data.id);
+      .update({ ...lessonFields, status: "pending", review_note: null, new_material_at: null })
+      .eq("id", working.id);
     if (updated.error) return saveFailed("update", updated.error.code);
-    lessonId = existing.data.id;
+    lessonId = working.id;
     const [gone, goneAuthorities] = await Promise.all([
       db.from("lesson_checkpoints").delete().eq("lesson_id", lessonId),
       db.from("lesson_authorities").delete().eq("lesson_id", lessonId),

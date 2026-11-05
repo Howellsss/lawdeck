@@ -16,7 +16,7 @@ export function GenerateLessonButton({ topicId, hasLesson, kind = "lesson" }: { 
   async function generate() {
     const ask = extras
       ? "Rewrite the memory aids and stories? Their current versions are replaced and go back to review."
-      : "Rewrite this lesson? Its questions are replaced, and students' revision for this topic starts again.";
+      : "Write a new version of this lesson, with its memory aids and stories? If it is approved, students keep reading the current version until you approve the new one; then their revision of this topic starts again.";
     if (hasLesson && !window.confirm(ask)) return;
     setBusy(true);
     setNotice(null);
@@ -37,10 +37,22 @@ export function GenerateLessonButton({ topicId, hasLesson, kind = "lesson" }: { 
         router.refresh();
       } else {
         const removed = result.removed ? ` ${result.removed} item${result.removed === 1 ? " was" : "s were"} left out because the library could not confirm ${result.removed === 1 ? "it" : "them"}.` : "";
-        setNotice({
-          tone: "success",
-          message: `Written: ${result.sections} sections, ${result.checkpoints} questions and ${result.authorities} authorities, awaiting your review.${removed}`,
-        });
+        const written = `Written: ${result.sections} sections, ${result.checkpoints} questions and ${result.authorities} authorities, awaiting your review.${removed}`;
+        setNotice({ tone: "success", message: `${written} Now writing its memory aids and stories…` });
+        router.refresh();
+        // Then the lesson's memory aids and stories, so one press does both.
+        const aids = await fetch("/api/admin/lessons/extras", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ topicId }),
+        })
+          .then((r) => r.json() as Promise<{ ok: true; aids: number; stories: number } | { ok: false; message: string }>)
+          .catch(() => ({ ok: false as const, message: "The connection was lost." }));
+        setNotice(
+          aids.ok
+            ? { tone: "success", message: `${written} Memory aids: ${aids.aids}, stories: ${aids.stories}.` }
+            : { tone: "warning", message: `${written} Its memory aids were not written: ${aids.message} Use “Write memory aids and stories” below.` },
+        );
         router.refresh();
       }
     } catch {
@@ -53,18 +65,20 @@ export function GenerateLessonButton({ topicId, hasLesson, kind = "lesson" }: { 
     <div className="flex flex-col items-start gap-3">
       <button type="button" onClick={() => void generate()} disabled={busy} className={hasLesson ? compactSecondaryButton : compactPrimaryButton}>
         {busy
-          ? "Writing… (about 2–4 minutes)"
+          ? extras
+            ? "Writing… (about 1–3 minutes)"
+            : "Writing… (about 3–7 minutes with its memory aids)"
           : extras
             ? hasLesson
               ? "Rewrite the memory aids and stories"
               : "Write memory aids and stories"
             : hasLesson
-              ? "Rewrite from the library"
+              ? "Write a new version from the library"
               : "Write the lesson from the library"}
       </button>
       {busy && (
         <p role="status" className="text-sm text-muted">
-          Lawdeck is {extras ? "writing memory aids and stories from the lesson" : "reading the library and writing the lesson"}. Keep this page open.
+          Lawdeck is {extras ? "writing memory aids and stories from the lesson" : "reading the library and writing the lesson, then its memory aids"}. Keep this page open.
         </p>
       )}
       <FormAlert message={notice?.message} tone={notice?.tone} />
