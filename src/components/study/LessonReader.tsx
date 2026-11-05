@@ -7,10 +7,13 @@ import { useRightPanel } from "@/components/shell/panelContext";
 import { compactPrimaryButton } from "@/components/ui/buttons";
 import type { StudyLesson } from "@/server/db/study";
 import { completeStudySession, openStudySession, saveStudyProgress } from "@/server/study/actions";
+import { AnnotationBar } from "./AnnotationBar";
 import { AuthorityCard } from "./AuthorityCard";
+import { EarlierNotes } from "./EarlierNotes";
 import { RecallCard } from "./RecallCard";
 import { SectionExtras } from "./SectionExtras";
 import { TopicTest } from "./TopicTest";
+import { useAnnotations } from "./useAnnotations";
 
 const RECALL_KEY = "lawdeck-recall";
 const SAVE_EVERY_MS = 60_000;
@@ -43,6 +46,9 @@ export function LessonReader({ data }: { data: StudyLesson & { lesson: NonNullab
   const [testing, setTesting] = useState(false);
   const [notice, setNotice] = useState<string>();
   const activeSince = useRef(0);
+  // The student's own marks and notes (Phase 3a): select words in the lesson to mark them.
+  const textArea = useRef<HTMLDivElement>(null);
+  const marks = useAnnotations(textArea, { topicId: data.topic.id, lessonId: data.lesson.id, content: data.lesson.content, initial: data.annotations });
   const upToRef = useRef(0);
   useEffect(() => {
     upToRef.current = upTo;
@@ -116,11 +122,15 @@ export function LessonReader({ data }: { data: StudyLesson & { lesson: NonNullab
           {notice}
         </p>
       )}
+      <p className="text-sm text-muted">Select any words to highlight, circle or underline them, or to add your own note.</p>
+      <div ref={textArea}>
       <HighlightFrame>
         <LessonBody
           content={data.lesson.content}
           upTo={shownUpTo}
           onAuthority={openAuthority}
+          annotations={marks.placed}
+          onAnnotation={marks.edit}
           after={(index) => {
             const extras = <SectionExtras index={index} aids={data.aids} stories={data.stories} authorityNames={authorityNames} />;
             if (!recall) return extras;
@@ -153,6 +163,18 @@ export function LessonReader({ data }: { data: StudyLesson & { lesson: NonNullab
           }}
         />
       </HighlightFrame>
+      </div>
+      <EarlierNotes notes={marks.earlier} onRemove={marks.remove} />
+      <AnnotationBar
+        key={marks.editing?.id ?? (marks.pending ? `${marks.pending.section}-${marks.pending.paragraph}-${marks.pending.start}` : "none")}
+        pending={marks.pending}
+        editing={marks.editing}
+        error={marks.error}
+        onAdd={marks.add}
+        onChange={marks.change}
+        onRemove={marks.remove}
+        onClose={marks.close}
+      />
       {finishedReading && !testing && (
         <div className="flex flex-col items-start gap-2 rounded-2xl border border-line bg-surface p-4">
           <p className="font-medium">You&rsquo;ve reached the end of the lesson.</p>

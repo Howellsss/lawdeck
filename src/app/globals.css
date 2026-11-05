@@ -219,3 +219,23 @@ body {
 [data-highlights="off"] .mark { padding: 0; }
 .mark-symbol { color: var(--hl); font-size: 0.8em; margin-right: 0.3em; }
 [data-highlights="off"] .mark-symbol { display: none; }
+
+/* Students' own marks (Phase 3a; founder, 2026-11-05: one look for all of them, option B). Ink,
+   not a colour, with a dashed line, so they never look like Lawdeck's highlights; shown in every
+   highlight view. */
+.ann {
+  border-radius: 3px;
+  cursor: pointer;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.ann-highlight { background: color-mix(in srgb, var(--color-ink) 12%, transparent); outline: 1px dashed color-mix(in srgb, var(--color-ink) 60%, transparent); }
+.ann-underline { border-bottom: 2px dashed var(--color-ink); }
+.ann-circle { border: 1.5px dashed var(--color-ink); border-radius: 999px; padding: 0 4px; }
+.ann-note {
+  font-size: 0.75em;
+  vertical-align: super;
+  margin-left: 2px;
+  color: var(--color-ink);
+  cursor: pointer;
+}

@@ -201,3 +201,18 @@ learning record is its owner's alone (staff do not read them); one session per t
 - **Saving:** an aid made for the student can be saved, marked "Made for you" (migration 50:
   `made_for_me`; an aid from a lesson is still copied from the aid itself).
 - **Test:** `tests/eval/again.eval.ts` (in the "Memory aids test" workflow).
+
+## Students' own marks (Phase 3a)
+- **Marking:** in a lesson, the student selects words (within one paragraph, up to 500
+  characters); a bar at the bottom offers Highlight, Circle, Underline and a note. Tapping a mark
+  (or its ✎ note marker) reopens the bar to change the look, edit the note or remove it. Saved
+  straight away.
+- **Look (founder, 2026-11-05: option B):** one look for all student marks, in ink rather than a
+  colour, always dashed (`.ann-*` in globals.css), so they never look like Lawdeck's highlights.
+  Shown in every highlight view (Full, Quiet, Off).
+- **Data (migration 51, `lesson_annotations`):** each student's own; the place (section, paragraph,
+  characters) and the words themselves, on a lesson the student can read; at most 3,000 a student.
+- **Lesson updates:** a mark is placed where it was if its words are still there, else the same
+  words elsewhere in the lesson (`src/lib/annotations.ts`); if the words are gone, it is listed as
+  "Your marks from an earlier version", never lost.
+- **Next (3b):** Visual Revision Mode, with "my marks" as one of its filters.

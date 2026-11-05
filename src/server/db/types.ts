@@ -776,6 +776,43 @@ export type Database = {
         Update: Record<string, never>;
         Relationships: [];
       };
+      // A student's own marks and notes in a lesson (migration 51).
+      lesson_annotations: {
+        Row: {
+          id: string;
+          owner_id: string;
+          topic_id: string;
+          lesson_id: string | null;
+          section: number;
+          paragraph: number;
+          start_offset: number;
+          end_offset: number;
+          quote: string;
+          style: "highlight" | "circle" | "underline";
+          note: string | null;
+        } & Timestamps;
+        Insert: {
+          topic_id: string;
+          lesson_id: string | null;
+          section: number;
+          paragraph: number;
+          start_offset: number;
+          end_offset: number;
+          quote: string;
+          style: "highlight" | "circle" | "underline";
+          note?: string | null;
+        };
+        Update: {
+          lesson_id?: string | null;
+          section?: number;
+          paragraph?: number;
+          start_offset?: number;
+          end_offset?: number;
+          style?: "highlight" | "circle" | "underline";
+          note?: string | null;
+        };
+        Relationships: [];
+      };
       // Memory aids a student saved (migration 49): a copy, filled in by the database from the aid.
       saved_memory_aids: {
         Row: {
