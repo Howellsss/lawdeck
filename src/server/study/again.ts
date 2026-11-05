@@ -104,10 +104,14 @@ export async function anotherAid(input: { aidId: string }): Promise<{ ok: true; 
   if (!aid.data || !source) return { ok: false, message: "That memory aid could not be found." };
   const original = { afterSection: aid.data.after_section, kind: aid.data.kind, title: aid.data.title, device: aid.data.device, items: pairs(aid.data.items) };
 
-  const result = await writeAgain("aid", AID_AGAIN_SYSTEM, aidAgainRequest(source.lesson, original));
+  // One more try, by Lawdeck itself, if the first one did not keep every point (it is then not
+  // counted as a question either way unless one is delivered).
+  let result = await writeAgain("aid", AID_AGAIN_SYSTEM, aidAgainRequest(source.lesson, original));
+  const keeps = (r: AgainResult) => r.ok && r.reply.found && r.reply.memory_aids[0] !== undefined && keepsAllPoints(original, r.reply.memory_aids[0]);
+  if (result.ok && !keeps(result)) result = await writeAgain("aid", AID_AGAIN_SYSTEM, aidAgainRequest(source.lesson, original));
   if (!result.ok) return { ok: false, message: FAILURES[result.reason] };
   const made = result.reply.memory_aids[0];
-  if (!result.reply.found || !made || !keepsAllPoints(original, made)) return { ok: false, message: NOT_KEPT };
+  if (!made || !keeps(result)) return { ok: false, message: NOT_KEPT };
   const texts = await checked(db, source.courseId, [made.device, made.explanation]);
   if (!texts) return { ok: false, message: NOT_KEPT };
   await countIt(result);
