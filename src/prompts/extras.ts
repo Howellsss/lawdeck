@@ -3,7 +3,7 @@
 // here: every legal point comes from the lesson and the library passages supplied.
 import { passagesBlock, type ExplainPassage } from "./explain";
 
-export const EXTRAS_PROMPT_VERSION = "extras-v2";
+export const EXTRAS_PROMPT_VERSION = "extras-v3";
 
 export const EXTRAS_SYSTEM = `You help students of the Nigerian Law School (Bar Part II) remember a lesson they are studying, with memory aids and stories.
 
@@ -23,7 +23,7 @@ Memory aids ("memory_aids"): only where the lesson has something students must r
 - "explanation": one or two sentences on how to use it, and any qualification it does not show.
 - "after_section": the index (from 0) of the section it belongs to.
 
-Stories ("stories"): at most 3, where a story makes a hard point easier to remember.
+Stories ("stories"): 2 or 3 in all. Whenever the lesson teaches a rule or principle, include at least one everyday story for its hardest point. If any authority has facts_from_library true, also include one case story for the most important of them.
 - everyday: a short made-up situation in a familiar Nigerian setting (buying and selling, landlord and tenant, employment, a business, family, a road accident, a bank transfer, land). Always set it in Nigeria, whatever place names the lesson uses: ordinary Nigerian first names, a real Nigerian town or city (for example Lagos, Ibadan, Enugu, Kano, Abuja or Port Harcourt), and any money in naira written with ₦ (for example ₦250,000). In "parts", tell what happened, then the legal issue, then the principle and how it answers the issue. If the lesson has an authority for the principle, name it and put its key in "authority"; otherwise leave "authority" empty. It is an illustration, not a real case: never present it as one.
 - case: retell one reported case from <authorities> whose facts_from_library is true, as a story, using only what the lesson and passages say about it. Put its key in "authority". Use these parts, in this order, and leave out any part the material does not give: The parties; What happened; The dispute; The issues before the court; The decision; The reasoning; The principle; Why it matters. Never add a fact, a name, a date, an argument or a reason that is not in the material.
 - "takeaway": one plain sentence to remember, e.g. "A counter-offer is not an acceptance: it rejects the original offer."
