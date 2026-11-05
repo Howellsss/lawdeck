@@ -644,6 +644,10 @@ export type Database = {
           review_note: string | null;
           // Approved with its whole course, not yet read in full (migration 46).
           bulk_approved: boolean;
+          // Migration 48: the newer version that replaced this one, and when newly approved
+          // library material about the topic arrived since this version was written.
+          replaced_by: string | null;
+          new_material_at: string | null;
         } & Reviewed &
           Timestamps;
         Insert: { topic_id: string; title: string; content?: Json; model?: string | null; prompt_version?: string | null };
@@ -655,6 +659,7 @@ export type Database = {
           prompt_version?: string | null;
           review_note?: string | null;
           bulk_approved?: boolean;
+          new_material_at?: string | null;
         };
         Relationships: [];
       };

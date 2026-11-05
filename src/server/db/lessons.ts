@@ -1,5 +1,6 @@
 import "server-only";
 import { lessonContentSchema, type LessonContent } from "@/schemas/lesson";
+import { approvedBehind, currentVersion } from "@/lib/lessonVersions";
 import { getStaffRole } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import type { Database } from "./types";
@@ -18,7 +19,17 @@ export type LessonOverview = {
     topics: {
       id: string;
       name: string;
-      lesson: { status: ReviewStatus; version: number; updatedAt: string; bulkApproved: boolean } | null;
+      // The version being worked on, else the approved one (migration 48).
+      lesson: {
+        status: ReviewStatus;
+        version: number;
+        updatedAt: string;
+        bulkApproved: boolean;
+        // Newly approved library material about the topic since this version was written.
+        newMaterial: boolean;
+        // Students are still reading an approved version while this one awaits review.
+        approvedBehind: boolean;
+      } | null;
       // The lesson's memory aids and stories (Phase 2), when written.
       extras: ExtrasState | null;
     }[];
@@ -32,7 +43,7 @@ export async function listLessonOverview(): Promise<LessonOverview | null> {
   const [courses, topics, lessons, extras] = await Promise.all([
     db.from("courses").select("id, name, position").order("position"),
     db.from("topics").select("id, name, course_id, position").order("position"),
-    db.from("topic_lessons").select("id, topic_id, status, version, updated_at, bulk_approved"),
+    db.from("topic_lessons").select("id, topic_id, status, version, updated_at, bulk_approved, replaced_by, new_material_at").is("replaced_by", null),
     db.from("lesson_extras").select("lesson_id, status, bulk_approved"),
   ]);
   if (courses.error || topics.error || lessons.error || extras.error) {
@@ -46,12 +57,22 @@ export async function listLessonOverview(): Promise<LessonOverview | null> {
       topics: topics.data
         .filter((topic) => topic.course_id === course.id)
         .map((topic) => {
-          const lesson = lessons.data.find((l) => l.topic_id === topic.id);
+          const rows = lessons.data.filter((l) => l.topic_id === topic.id);
+          const lesson = currentVersion(rows);
           const set = lesson ? extras.data.find((e) => e.lesson_id === lesson.id) : undefined;
           return {
             id: topic.id,
             name: topic.name,
-            lesson: lesson ? { status: lesson.status, version: lesson.version, updatedAt: lesson.updated_at, bulkApproved: lesson.bulk_approved } : null,
+            lesson: lesson
+              ? {
+                  status: lesson.status,
+                  version: lesson.version,
+                  updatedAt: lesson.updated_at,
+                  bulkApproved: lesson.bulk_approved,
+                  newMaterial: lesson.new_material_at !== null,
+                  approvedBehind: approvedBehind(rows) !== null,
+                }
+              : null,
             extras: set ? { status: set.status, bulkApproved: set.bulk_approved } : null,
           };
         }),
@@ -69,6 +90,9 @@ export type LessonForReview = {
     version: number;
     reviewNote: string | null;
     bulkApproved: boolean;
+    newMaterial: boolean;
+    // The approved version students read while this newer one awaits review (migration 48).
+    approvedBehindVersion: number | null;
     updatedAt: string;
     model: string | null;
     content: LessonContent | null;
@@ -85,11 +109,13 @@ export async function getLessonForReview(topicId: string): Promise<LessonForRevi
   const db = await createSupabaseServerClient();
   const topic = await db.from("topics").select("id, name, course_id").eq("id", topicId).maybeSingle();
   if (topic.error || !topic.data) return null;
-  const [course, lesson] = await Promise.all([
+  const [course, versions] = await Promise.all([
     db.from("courses").select("id, name").eq("id", topic.data.course_id).single(),
-    db.from("topic_lessons").select("*").eq("topic_id", topicId).maybeSingle(),
+    db.from("topic_lessons").select("*").eq("topic_id", topicId).is("replaced_by", null),
   ]);
   if (course.error) return null;
+  const lesson = { data: currentVersion(versions.data ?? []) };
+  const behind = approvedBehind(versions.data ?? []);
   if (!lesson.data) {
     return { topic: { id: topic.data.id, name: topic.data.name }, course: course.data, lesson: null, checkpoints: [], authorities: [], extras: null };
   }
@@ -108,6 +134,8 @@ export async function getLessonForReview(topicId: string): Promise<LessonForRevi
       version: lesson.data.version,
       reviewNote: lesson.data.review_note,
       bulkApproved: lesson.data.bulk_approved,
+      newMaterial: lesson.data.new_material_at !== null,
+      approvedBehindVersion: behind?.version ?? null,
       updatedAt: lesson.data.updated_at,
       model: lesson.data.model,
       content: content.success ? content.data : null,

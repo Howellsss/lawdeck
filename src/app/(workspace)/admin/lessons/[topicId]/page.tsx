@@ -62,6 +62,18 @@ async function Review({ params }: { params: Promise<{ topicId: string }> }) {
             {lesson.model ? ` · written by ${lesson.model}` : ""}
           </p>
         )}
+        {lesson?.approvedBehindVersion && (
+          <p className="text-sm text-muted">
+            This is a new version. Students keep reading the approved version {lesson.approvedBehindVersion} until you approve this one; then it
+            replaces it and their revision of this topic starts again.
+          </p>
+        )}
+        {lesson?.newMaterial && (
+          <p className="text-sm">
+            <span className="text-warning">New library material</span> about this topic has been approved since this version was written. Write a
+            new version to include it.
+          </p>
+        )}
       </div>
 
       <GenerateLessonButton topicId={data.topic.id} hasLesson={Boolean(lesson)} />

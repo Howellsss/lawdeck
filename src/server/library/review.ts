@@ -1,12 +1,14 @@
 "use server";
 
 import { refresh } from "next/cache";
+import { after } from "next/server";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { approvalBlockers, todayInLagos } from "@/lib/reviewRules";
 import { passageCorrectionSchema, reviewDecisionSchema } from "@/schemas/libraryReview";
 import { getStaffRole } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { getLibraryItem } from "@/server/db/library";
+import { markLessonsWithNewMaterial } from "@/server/lessons/newMaterial";
 import { reindexPassage } from "@/server/retrieval/indexJob";
 import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
 
@@ -67,6 +69,15 @@ export async function reviewLibraryItem(input: {
   }
   if (data.length === 0) return { ok: false, message: "That item no longer exists." };
   refresh();
+  // Mark the lessons this new material is about (Admin → Lessons shows "Update N lessons"),
+  // after the page has answered, so approving stays quick.
+  if (decision.status === "approved") {
+    after(async () => {
+      await markLessonsWithNewMaterial(await createSupabaseServerClient(), decision.id).catch((error: unknown) =>
+        console.error("new material check failed", { name: error instanceof Error ? error.name : "unknown" }),
+      );
+    });
+  }
   const words = { approved: "approved", rejected: "rejected", withdrawn: "withdrawn", pending: "sent back to awaiting review" };
   return { ok: true, message: `Saved: the item is ${words[decision.status]}.` };
 }
