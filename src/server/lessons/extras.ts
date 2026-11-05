@@ -14,7 +14,10 @@ export type GenerateExtrasResult = { ok: true; aids: number; stories: number; re
 
 const FAILURES = {
   no_key: "Memory aids are not switched on yet: the Claude key is missing on the server.",
+  no_credit: "Your Anthropic credit has run out, so Claude refused. Top up at console.anthropic.com (Settings → Billing), then try again.",
   busy: "Claude is busy right now. Please try again in a minute.",
+  timeout: "Claude took longer than 4 minutes and was stopped. Please try again.",
+  too_long: "The memory aids came out too long and were cut off. Please try again.",
   refused: "Claude would not write memory aids for this lesson.",
   unavailable: "Lawdeck could not reach Claude, or it took too long. Please try again.",
   malformed: "The memory aids came back incomplete. Please try again.",

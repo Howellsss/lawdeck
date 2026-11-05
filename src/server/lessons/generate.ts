@@ -21,7 +21,10 @@ const SUBTOPIC_RESULTS = 6;
 
 const FAILURES = {
   no_key: "Lessons are not switched on yet: the Claude key is missing on the server.",
+  no_credit: "Your Anthropic credit has run out, so Claude refused. Top up at console.anthropic.com (Settings → Billing), then try again.",
   busy: "Claude is busy right now. Please try again in a minute.",
+  timeout: "Claude took longer than 4½ minutes on this lesson and was stopped. Please try again; writing fewer at once helps.",
+  too_long: "The lesson came out too long and was cut off. Please try again.",
   refused: "Claude would not write this lesson. Check the topic's name and the library material.",
   unavailable: "Lawdeck could not reach Claude, or the lesson took too long. Please try again.",
   malformed: "The lesson came back incomplete. Please try again.",

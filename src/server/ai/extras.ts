@@ -2,8 +2,9 @@ import "server-only";
 import Anthropic from "@anthropic-ai/sdk";
 import type { ExplainPassage } from "@/prompts/explain";
 import { EXTRAS_PROMPT_VERSION, EXTRAS_SCHEMA, EXTRAS_SYSTEM, extrasRequest, type ExtrasLesson } from "@/prompts/extras";
-import { extrasReplySchema, type ExtrasReply } from "@/schemas/extras";
-import { failureDetails, getClaude, MissingKeyError } from "./client";
+import { tidyExtrasJson } from "@/lib/replySalvage";
+import { extrasAidSchema, extrasReplySchema, extrasStorySchema, type ExtrasReply } from "@/schemas/extras";
+import { failureDetails, getClaude, isCreditError, isTimeout, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
 
@@ -12,7 +13,7 @@ const EXTRAS_TIMEOUT_MS = 240_000;
 
 export type ExtrasResult =
   | { ok: true; reply: ExtrasReply; model: string; costUsd: number | null; ms: number }
-  | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable" | "malformed" };
+  | { ok: false; reason: "no_key" | "no_credit" | "busy" | "timeout" | "refused" | "unavailable" | "too_long" | "malformed" };
 
 // Memory aids and stories for one lesson, from the lesson and its library passages. Logs model,
 // tokens, cost and time (rule G-08), never the lesson, passages or reply.
@@ -42,6 +43,7 @@ export async function writeExtras(lesson: ExtrasLesson, passages: ExplainPassage
       stop: message.stop_reason,
     });
     if (message.stop_reason === "refusal") return { ok: false, reason: "refused" };
+    if (message.stop_reason === "max_tokens") return { ok: false, reason: "too_long" };
     const text = message.content.map((block) => (block.type === "text" ? block.text : "")).join("");
     const reply = parseExtrasReply(text);
     if (!reply) {
@@ -52,6 +54,8 @@ export async function writeExtras(lesson: ExtrasLesson, passages: ExplainPassage
   } catch (error) {
     console.error("ai call failed", { job: "lesson_extras", ...failureDetails(error), ms: Date.now() - started });
     if (error instanceof MissingKeyError) return { ok: false, reason: "no_key" };
+    if (isCreditError(error)) return { ok: false, reason: "no_credit" };
+    if (isTimeout(error)) return { ok: false, reason: "timeout" };
     if (error instanceof Anthropic.RateLimitError || error instanceof Anthropic.InternalServerError) return { ok: false, reason: "busy" };
     return { ok: false, reason: "unavailable" };
   }
@@ -59,7 +63,7 @@ export async function writeExtras(lesson: ExtrasLesson, passages: ExplainPassage
 
 export function parseExtrasReply(text: string): ExtrasReply | null {
   try {
-    const parsed = extrasReplySchema.safeParse(JSON.parse(text));
+    const parsed = extrasReplySchema.safeParse(tidyExtrasJson(JSON.parse(text), { aid: extrasAidSchema, story: extrasStorySchema }));
     return parsed.success ? parsed.data : null;
   } catch {
     return null;

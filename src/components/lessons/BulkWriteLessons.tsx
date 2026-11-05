@@ -8,8 +8,9 @@ import { compactPrimaryButton, compactSecondaryButton } from "@/components/ui/bu
 export type MissingTopic = { id: string; name: string; courseId: string; courseName: string };
 type State = "waiting" | "writing" | "done" | "failed";
 
-// Writing several lessons at a time is faster, but more risks the AI provider's rate limit.
-const AT_ONCE = 3;
+// Writing several at a time is faster, but long Opus replies in parallel can hit the account's
+// output-per-minute limit and slow each other past the time limit; two is the safer balance.
+const AT_ONCE = 2;
 // Per lesson, from the AI cost model (docs/specs/remembrance.md): Opus with up to 40 passages.
 const COST_LOW = 0.2;
 const COST_HIGH = 0.5;
