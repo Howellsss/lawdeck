@@ -10,6 +10,8 @@ type Json =
 
 type Timestamps = { created_at: string; updated_at: string };
 
+type RecallOutcome = "correct" | "partly" | "incorrect" | "skipped";
+
 type KbItemType =
   | "course_material"
   | "note"
@@ -629,6 +631,169 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Migration 45: the remembrance and retention system (docs/specs/remembrance.md).
+      topic_lessons: {
+        Row: {
+          id: string;
+          topic_id: string;
+          title: string;
+          content: Json;
+          version: number;
+          model: string | null;
+          prompt_version: string | null;
+          review_note: string | null;
+        } & Reviewed &
+          Timestamps;
+        Insert: { topic_id: string; title: string; content?: Json; model?: string | null; prompt_version?: string | null };
+        Update: {
+          title?: string;
+          content?: Json;
+          status?: ReviewStatus;
+          model?: string | null;
+          prompt_version?: string | null;
+          review_note?: string | null;
+        };
+        Relationships: [];
+      };
+      lesson_checkpoints: {
+        Row: {
+          id: string;
+          lesson_id: string;
+          position: number;
+          after_section: number;
+          placement: "reading" | "test";
+          kind: "mcq" | "short" | "open" | "authority" | "statute" | "principle" | "sequence";
+          prompt: string;
+          choices: Json | null;
+          correct_choice: number | null;
+          answer: string;
+          explanation: string | null;
+          key_point: string;
+          sources: Json;
+        };
+        Insert: Omit<Database["public"]["Tables"]["lesson_checkpoints"]["Row"], "id" | "choices" | "correct_choice" | "explanation" | "sources"> & {
+          choices?: Json | null;
+          correct_choice?: number | null;
+          explanation?: string | null;
+          sources?: Json;
+        };
+        Update: Partial<Omit<Database["public"]["Tables"]["lesson_checkpoints"]["Row"], "id" | "lesson_id">>;
+        Relationships: [];
+      };
+      lesson_authorities: {
+        Row: {
+          id: string;
+          lesson_id: string;
+          key: string;
+          kind: "case" | "statute";
+          name: string;
+          citation: string | null;
+          court: string | null;
+          facts: string | null;
+          issue: string | null;
+          decision: string | null;
+          principle: string;
+          facts_from_library: boolean;
+          sources: Json;
+        };
+        Insert: Pick<Database["public"]["Tables"]["lesson_authorities"]["Row"], "lesson_id" | "key" | "kind" | "name" | "principle"> &
+          Partial<Pick<Database["public"]["Tables"]["lesson_authorities"]["Row"], "citation" | "court" | "facts" | "issue" | "decision" | "facts_from_library" | "sources">>;
+        Update: Partial<Omit<Database["public"]["Tables"]["lesson_authorities"]["Row"], "id" | "lesson_id" | "key">>;
+        Relationships: [];
+      };
+      study_sessions: {
+        Row: {
+          id: string;
+          owner_id: string;
+          topic_id: string;
+          lesson_id: string | null;
+          lesson_version: number | null;
+          study_date: string;
+          started_at: string;
+          last_active_at: string;
+          active_seconds: number;
+          sections_read: number;
+          completed_at: string | null;
+        };
+        Insert: { topic_id: string; lesson_id?: string | null; lesson_version?: number | null };
+        Update: {
+          last_active_at?: string;
+          active_seconds?: number;
+          sections_read?: number;
+          completed_at?: string | null;
+          lesson_id?: string | null;
+          lesson_version?: number | null;
+        };
+        Relationships: [];
+      };
+      recall_attempts: {
+        Row: {
+          id: string;
+          owner_id: string;
+          session_id: string | null;
+          topic_id: string;
+          checkpoint_id: string | null;
+          prompt: string;
+          key_point: string;
+          context: "reading" | "test" | "revision";
+          answer: string | null;
+          choice: number | null;
+          outcome: RecallOutcome;
+          created_at: string;
+        };
+        Insert: {
+          session_id?: string | null;
+          topic_id: string;
+          checkpoint_id?: string | null;
+          prompt: string;
+          key_point: string;
+          context: "reading" | "test" | "revision";
+          answer?: string | null;
+          choice?: number | null;
+          outcome: RecallOutcome;
+        };
+        Update: never;
+        Relationships: [];
+      };
+      review_items: {
+        Row: {
+          id: string;
+          owner_id: string;
+          checkpoint_id: string;
+          topic_id: string;
+          due_at: string;
+          interval_days: number;
+          successes: number;
+          lapses: number;
+          last_outcome: RecallOutcome | null;
+          last_reviewed_at: string | null;
+        };
+        Insert: {
+          checkpoint_id: string;
+          topic_id: string;
+          due_at: string;
+          interval_days?: number;
+          successes?: number;
+          lapses?: number;
+          last_outcome?: RecallOutcome | null;
+          last_reviewed_at?: string | null;
+        };
+        Update: {
+          due_at?: string;
+          interval_days?: number;
+          successes?: number;
+          lapses?: number;
+          last_outcome?: RecallOutcome | null;
+          last_reviewed_at?: string | null;
+        };
+        Relationships: [];
+      };
+      diary_notes: {
+        Row: { id: string; owner_id: string; topic_id: string; body: string; updated_at: string };
+        Insert: { topic_id: string; body?: string };
+        Update: { body?: string };
+        Relationships: [];
+      };
       template_forums: {
         Row: { template_id: string; forum_id: string };
         Insert: { template_id: string; forum_id: string };
@@ -968,6 +1133,7 @@ export type Database = {
       claim_pilot_invite: { Args: Record<string, never>; Returns: "open" | "ok" | "use_google" | "not_registered" | "ended" };
       // When the signed-in person's access ends (migration 43); null = no end.
       own_access_until: { Args: Record<string, never>; Returns: string | null };
+      lesson_is_readable: { Args: { lesson: string }; Returns: boolean };
       pilot_metrics: { Args: { weeks?: number }; Returns: { week_start: string; metric: string; value: number }[] };
       pilot_summary: { Args: Record<string, never>; Returns: { metric: string; value: number | null }[] };
       // The admin Users dashboard (migration 34). Admins only.
