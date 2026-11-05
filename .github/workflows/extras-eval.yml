@@ -12,6 +12,10 @@ on:
       - src/server/ai/extras.ts
       - src/schemas/extras.ts
       - src/lib/extrasRules.ts
+      - src/prompts/again.ts
+      - src/server/ai/again.ts
+      - src/lib/againRules.ts
+      - tests/eval/again.eval.ts
       - tests/eval/extras.eval.ts
       - tests/eval/extras/**
 

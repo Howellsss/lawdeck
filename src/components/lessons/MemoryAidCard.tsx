@@ -12,11 +12,16 @@ export const AID_KIND_LABELS = { acronym: "Acronym", phrase: "Memory phrase", as
 
 // One memory aid (docs/specs/remembrance.md, Phase 2): what it helps remember, the device, and what
 // every letter, word or group stands for. Used by reviewers and, in step 2b, by students.
-export function MemoryAidCard({ aid, actions }: { aid: AidView; actions?: ReactNode }) {
+// "Made for you" marks one made on request (Phase 2c), checked against the library but not reviewed.
+export function MemoryAidCard({ aid, actions, madeForYou = false }: { aid: AidView; actions?: ReactNode; madeForYou?: boolean }) {
   return (
-    <section aria-label={`Memory aid: ${aid.title}`} className="flex flex-col gap-2 rounded-2xl border border-line bg-surface p-4">
+    <section
+      aria-label={`${madeForYou ? "Memory aid made for you" : "Memory aid"}: ${aid.title}`}
+      className="flex flex-col gap-2 rounded-2xl border border-line bg-surface p-4"
+    >
       <div className="flex items-start justify-between gap-3">
         <p className="text-xs uppercase tracking-[0.14em] text-muted">
+          {madeForYou ? "Made for you · " : ""}
           {AID_KIND_LABELS[aid.kind]} · {aid.title}
         </p>
         {actions}

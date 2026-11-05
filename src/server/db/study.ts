@@ -54,7 +54,7 @@ export type StudyStory = {
   choices: string[] | null;
 };
 // Every aid the student saved for this topic, including ones from earlier versions of the lesson.
-export type SavedAid = Omit<StudyAid, "id" | "afterSection" | "saved"> & { savedId: string; aidId: string | null };
+export type SavedAid = Omit<StudyAid, "id" | "afterSection" | "saved"> & { savedId: string; aidId: string | null; madeForMe: boolean };
 
 export type StudyLesson = {
   topic: { id: string; name: string };
@@ -68,8 +68,8 @@ export type StudyLesson = {
 };
 
 // A saved aid as the pages show it.
-export function toSavedAid(s: { id: string; aid_id: string | null; kind: SavedAid["kind"]; title: string; device: string; items: unknown; explanation: string | null }): SavedAid {
-  return { savedId: s.id, aidId: s.aid_id, kind: s.kind, title: s.title, device: s.device, items: pairs(s.items), explanation: s.explanation };
+export function toSavedAid(s: { id: string; aid_id: string | null; kind: SavedAid["kind"]; title: string; device: string; items: unknown; explanation: string | null; made_for_me?: boolean }): SavedAid {
+  return { savedId: s.id, aidId: s.aid_id, kind: s.kind, title: s.title, device: s.device, items: pairs(s.items), explanation: s.explanation, madeForMe: Boolean(s.made_for_me) };
 }
 
 type Row = Record<string, unknown>;
@@ -102,7 +102,7 @@ export async function getStudyLesson(topicId: string): Promise<Loaded<StudyLesso
     db.from("lesson_authorities").select("key, kind, name, citation, court, facts, facts_from_library, issue, decision, principle, sources").eq("lesson_id", lesson.data.id),
     // Readable only when approved (row-level security); otherwise the lesson shows without them.
     db.from("lesson_extras").select("id").eq("lesson_id", lesson.data.id).maybeSingle(),
-    db.from("saved_memory_aids").select("id, aid_id, kind, title, device, items, explanation").eq("topic_id", topicId).order("created_at"),
+    db.from("saved_memory_aids").select("id, aid_id, kind, title, device, items, explanation, made_for_me").eq("topic_id", topicId).order("created_at"),
   ]);
   const [aids, stories] = extras.data
     ? await Promise.all([

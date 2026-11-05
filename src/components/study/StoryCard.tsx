@@ -4,6 +4,7 @@ import { useId, useState } from "react";
 import { compactSecondaryButton } from "@/components/ui/buttons";
 import type { StudyStory } from "@/server/db/study";
 import { checkStoryAnswer } from "@/server/study/aids";
+import { AnotherStory } from "./AnotherStory";
 
 type Result = { correct: boolean; correctChoice: number; explanation: string | null };
 
@@ -86,6 +87,7 @@ export function StoryCard({ story, authorityName }: { story: StudyStory; authori
           )}
         </fieldset>
       )}
+      <AnotherStory storyId={story.id} />
     </section>
   );
 }

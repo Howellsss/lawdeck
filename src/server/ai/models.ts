@@ -26,6 +26,9 @@ export const MODELS = {
   // Topic Lessons (docs/specs/remembrance.md): written once per topic and reviewed, so the most
   // careful model is used.
   lessons: "claude-opus-5-5",
+  // "Another memory aid" and "Tell it another way" (Phase 2c): a student is waiting and it is
+  // made from the reviewed lesson, so the explanations model.
+  memoryAids: "claude-sonnet-5-5",
 } as const;
 
 export type AiJob = keyof typeof MODELS;

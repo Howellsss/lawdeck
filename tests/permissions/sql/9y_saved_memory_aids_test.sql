@@ -36,7 +36,10 @@ reset role;
 select test.as_user('a5c49001-0000-0000-0000-000000000001');
 insert into public.saved_memory_aids (aid_id) select id from aid_49;
 select test.check((select device = 'QB' and title = 'Made-up bail conditions' from public.saved_memory_aids), 'a student saves an approved aid, copied from the aid');
-select test.refused($$insert into public.saved_memory_aids (aid_id, device) select id, 'Invented' from aid_49$$, 'students cannot write the copy themselves');
+delete from public.saved_memory_aids;
+insert into public.saved_memory_aids (aid_id, device, title) select id, 'Invented', 'Invented title' from aid_49;
+select test.check((select device = 'QB' and title = 'Made-up bail conditions' and not made_for_me from public.saved_memory_aids),
+  'whatever a student sends, a lesson''s aid is copied from the aid itself');
 reset role;
 
 select test.as_user('a5c49002-0000-0000-0000-000000000002');
@@ -56,3 +59,14 @@ delete from public.saved_memory_aids;
 select test.check((select count(*) from public.saved_memory_aids) = 0, 'a student removes their own saved aid');
 reset role;
 drop table aid_49;
+
+-- Migration 50: an aid made for the student, and the new kind of AI call --------------------
+select test.as_user('a5c49001-0000-0000-0000-000000000001');
+insert into public.saved_memory_aids (topic_id, kind, title, device, items)
+  select id, 'phrase', 'Made-up bail conditions', 'Quiet quokkas bond', '[]' from public.topics where slug = 'quokka-bail-49';
+select test.check((select made_for_me from public.saved_memory_aids where device = 'Quiet quokkas bond'), 'an aid made for the student is saved and marked as such');
+select test.refused($$insert into public.saved_memory_aids (topic_id, kind, title, device)
+  values ('a5c49009-0000-0000-0000-000000000009', 'phrase', 'Nowhere', 'x')$$, 'but only for a topic that exists');
+select public.record_ai_usage('memory_aid', 'claude-sonnet-5-5', 100, 50, 0.001, 900);
+select test.check((select count(*) from public.usage_events where kind = 'memory_aid') = 1, 'a memory aid made on request is recorded');
+reset role;
