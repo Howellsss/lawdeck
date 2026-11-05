@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BeforeYouMoveOn } from "@/components/study/BeforeYouMoveOn";
 import { LessonReader } from "@/components/study/LessonReader";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
@@ -37,6 +38,9 @@ async function Study({ params }: { params: Promise<{ topicId: string }> }) {
         </Link>
         <h1 className="font-serif text-3xl font-normal text-greeting">{data.topic.name}</h1>
       </div>
+      <Suspense fallback={null}>
+        <BeforeYouMoveOn compact />
+      </Suspense>
       {data.lesson ? (
         <LessonReader data={{ ...data, lesson: data.lesson }} />
       ) : (

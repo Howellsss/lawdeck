@@ -113,3 +113,15 @@ learning record is its owner's alone (staff do not read them); one session per t
 - Tests: `tests/unit/diaryFilter.test.ts`; `tests/voice/diary.spec.ts` (layout at 360 px and desktop);
   e2e: `/diary` and entries ask visitors to sign in; the test page does not exist on the live
   configuration. Privacy: covered by the database tests (every record is its owner's alone).
+
+## Before you move on (Phase 1d)
+- When questions are due (`review_items.due_at` passed), the home page and the top of a study
+  page show "Before you move on… Yesterday, you studied {topic}. Let's see what you still
+  remember." with a button to `/revise`. It never blocks: new study is always one click away.
+- `/revise` asks up to 10 due questions (oldest due first), one at a time, with the same recall
+  card as the reader (answer hidden until the student tries). Each answer is saved with context
+  `revision` and reschedules the point: remembered points move to the next step (1, 3, 7, 14, 30,
+  60, 120 days); missed or partly remembered points come back the next day.
+- At the end: how many were remembered, a refresher link to each topic with a missed point, and
+  "Continue to today's study". "Stop here" is always there; unanswered questions stay due.
+- No AI cost: multiple choice is marked by Lawdeck, written answers self-marked.
