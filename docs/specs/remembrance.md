@@ -128,7 +128,7 @@ learning record is its owner's alone (staff do not read them); one session per t
 
 ## Writing and approving many lessons (founder, 2026-11-05)
 - **Write all missing lessons** (Admin → Lessons): for all courses or one, writes every topic that
-  has no lesson, 3 at a time, through the same route as a single lesson. Shows the estimated cost
+  has no lesson, 2 at a time, through the same route as a single lesson. Shows the estimated cost
   (US$0.20–0.50 a lesson) and asks first; lists failures with "Try again". The page stays open
   while it runs. Lessons already written are never rewritten.
 - **Approve all awaiting review** (per course): approves that course's pending lessons and marks

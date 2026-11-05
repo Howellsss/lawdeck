@@ -10,8 +10,17 @@ import {
   OUTLINE_SYSTEM,
   outlineRequest,
 } from "@/prompts/lesson";
-import { lessonReplySchema, type LessonReply } from "@/schemas/lesson";
-import { failureDetails, getClaude, MissingKeyError } from "./client";
+import { tidyLessonJson } from "@/lib/replySalvage";
+import {
+  lessonReplyAuthoritySchema,
+  lessonReplyCheckpointSchema,
+  lessonReplyMarkSchema,
+  lessonReplyParagraphSchema,
+  lessonReplySchema,
+  lessonReplySectionSchema,
+  type LessonReply,
+} from "@/schemas/lesson";
+import { failureDetails, getClaude, isCreditError, isTimeout, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
 
@@ -22,7 +31,7 @@ const OUTLINE_TIMEOUT_MS = 15_000;
 
 export type LessonResult =
   | { ok: true; reply: LessonReply; model: string; costUsd: number | null; ms: number }
-  | { ok: false; reason: "no_key" | "busy" | "refused" | "unavailable" | "malformed" };
+  | { ok: false; reason: "no_key" | "no_credit" | "busy" | "timeout" | "refused" | "unavailable" | "too_long" | "malformed" };
 
 // Search phrases for the topic's subtopics (Haiku), used only to search the library. An empty
 // list means only the topic's own name is searched.
@@ -64,7 +73,7 @@ export async function writeLesson(input: { passages: ExplainPassage[]; course: s
     const stream = getClaude().messages.stream(
       {
         model: MODELS.lessons,
-        max_tokens: 24_000,
+        max_tokens: 32_000,
         output_config: { effort: "medium", format: { type: "json_schema", schema: LESSON_SCHEMA } },
         system: LESSON_SYSTEM,
         messages: [{ role: "user", content: lessonRequest(input) }],
@@ -84,6 +93,7 @@ export async function writeLesson(input: { passages: ExplainPassage[]; course: s
       stop: message.stop_reason,
     });
     if (message.stop_reason === "refusal") return { ok: false, reason: "refused" };
+    if (message.stop_reason === "max_tokens") return { ok: false, reason: "too_long" };
     const text = message.content.map((block) => (block.type === "text" ? block.text : "")).join("");
     const reply = parseLessonReply(text);
     if (!reply) {
@@ -94,6 +104,8 @@ export async function writeLesson(input: { passages: ExplainPassage[]; course: s
   } catch (error) {
     console.error("ai call failed", { job: "lesson", ...failureDetails(error), ms: Date.now() - started });
     if (error instanceof MissingKeyError) return { ok: false, reason: "no_key" };
+    if (isCreditError(error)) return { ok: false, reason: "no_credit" };
+    if (isTimeout(error)) return { ok: false, reason: "timeout" };
     if (error instanceof Anthropic.RateLimitError || error instanceof Anthropic.InternalServerError) return { ok: false, reason: "busy" };
     return { ok: false, reason: "unavailable" };
   }
@@ -101,7 +113,14 @@ export async function writeLesson(input: { passages: ExplainPassage[]; course: s
 
 export function parseLessonReply(text: string): LessonReply | null {
   try {
-    const parsed = lessonReplySchema.safeParse(JSON.parse(text));
+    const tidy = tidyLessonJson(JSON.parse(text), {
+      mark: lessonReplyMarkSchema,
+      paragraph: lessonReplyParagraphSchema,
+      section: lessonReplySectionSchema,
+      authority: lessonReplyAuthoritySchema,
+      checkpoint: lessonReplyCheckpointSchema,
+    });
+    const parsed = lessonReplySchema.safeParse(tidy);
     return parsed.success ? parsed.data : null;
   } catch {
     return null;
