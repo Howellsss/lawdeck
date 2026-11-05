@@ -215,4 +215,15 @@ learning record is its owner's alone (staff do not read them); one session per t
 - **Lesson updates:** a mark is placed where it was if its words are still there, else the same
   words elsewhere in the lesson (`src/lib/annotations.ts`); if the words are gone, it is listed as
   "Your marks from an earlier version", never lost.
-- **Next (3b):** Visual Revision Mode, with "my marks" as one of its filters.
+- **3b** (below): Visual Revision Mode, with "my marks" as one of its filters.
+
+## Visual Revision Mode (Phase 3b)
+- **Where:** "Revise visually: only the key points" on each topic's study page, and "Revise
+  visually" in each Study Diary entry (`/study/<topic>/visual`).
+- **What:** every marked point of the topic in reading order, each shown in its own sentence
+  (`src/lib/visualRevision.ts`): Lawdeck's highlights in their colour and shape, and the student's
+  own marks in their ink look, with their notes.
+- **Filters:** cases, statutes, principles, definitions, exam tips, exceptions, my marks; tick to
+  show or hide, "only" to show one kind. Case and statute names open their card in the side panel;
+  "Read it in the lesson" opens the lesson at that section (`#lesson-section-N`).
+- No AI and no new data: it reads the lesson and the student's marks.
