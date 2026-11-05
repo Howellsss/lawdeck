@@ -140,6 +140,8 @@ export type TopicSummary = {
   slug: string;
   name: string;
   position: number;
+  // An approved lesson the student can study (docs/specs/remembrance.md).
+  hasLesson?: boolean;
 };
 
 // One course and its topics in teaching order, for the course hub (PRD LN-05).
@@ -164,7 +166,15 @@ export async function getCourseHub(
     .order("name")
     .limit(500);
   if (topics.error) failed("topics", topics.error.code);
-  return { status: "ok", data: { course: course.data, topics: topics.data } };
+  // Only approved lessons are visible to students (row-level security); a failed read just hides
+  // the Study button.
+  const lessons = await supabase
+    .from("topic_lessons")
+    .select("topic_id")
+    .eq("status", "approved")
+    .in("topic_id", topics.data.map((topic) => topic.id));
+  const studyable = new Set((lessons.data ?? []).map((lesson) => lesson.topic_id));
+  return { status: "ok", data: { course: course.data, topics: topics.data.map((topic) => ({ ...topic, hasLesson: studyable.has(topic.id) })) } };
 }
 
 export type ChatSource = {

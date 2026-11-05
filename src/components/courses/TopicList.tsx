@@ -1,12 +1,13 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Spinner } from "@/components/ui/Spinner";
 import { openNewChat } from "@/components/learn/openNewChat";
 import type { TopicSummary } from "@/server/db/workspace";
 
-// A course's topics. "Explain" starts a Learn chat in that course ("Explain <topic>"); "MCQ"
+// A course's topics. "Study" opens the topic's approved lesson (docs/specs/remembrance.md); "Explain" starts a Learn chat in that course ("Explain <topic>"); "MCQ"
 // opens multiple-choice questions on the topic (founder, 2026-10-30: was "Practise"). Both
 // show at once that they are working.
 export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: TopicSummary[] }) {
@@ -51,6 +52,12 @@ export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: 
               {topic.name}
             </span>
             <span className="flex shrink-0 flex-wrap justify-end gap-2">
+              {topic.hasLesson && (
+                <Link href={`/study/${topic.id}`} className={`${topicButton} border-ink bg-ink text-on-ink no-underline hover:bg-ink`}>
+                  Study
+                  <span className="sr-only"> {topic.name}</span>
+                </Link>
+              )}
               <button
                 type="button"
                 disabled={busy !== null}
