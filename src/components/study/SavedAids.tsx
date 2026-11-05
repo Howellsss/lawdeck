@@ -11,7 +11,7 @@ export function SavedAids({ aids, open = false }: { aids: SavedAid[]; open?: boo
       <summary className="cursor-pointer text-[15px] font-medium">Your saved memory aids ({aids.length})</summary>
       <div className="mt-3 flex flex-col gap-3">
         {aids.map((aid) => (
-          <MemoryAidCard key={aid.savedId} aid={aid} actions={<RemoveSavedAid savedId={aid.savedId} title={aid.title} />} />
+          <MemoryAidCard key={aid.savedId} aid={aid} madeForYou={aid.madeForMe} actions={<RemoveSavedAid savedId={aid.savedId} title={aid.title} />} />
         ))}
       </div>
     </details>

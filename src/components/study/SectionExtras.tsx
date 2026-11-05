@@ -1,5 +1,6 @@
 import { MemoryAidCard } from "@/components/lessons/MemoryAidCard";
 import type { StudyAid, StudyStory } from "@/server/db/study";
+import { AnotherAid } from "./AnotherAid";
 import { SaveAidButton } from "./SaveAidButton";
 import { StoryCard } from "./StoryCard";
 
@@ -22,7 +23,10 @@ export function SectionExtras({
   return (
     <div className="flex flex-col gap-3">
       {hereAids.map((aid) => (
-        <MemoryAidCard key={aid.id} aid={aid} actions={<SaveAidButton aidId={aid.id} saved={aid.saved} title={aid.title} />} />
+        <div key={aid.id} className="flex flex-col gap-2">
+          <MemoryAidCard aid={aid} actions={<SaveAidButton aidId={aid.id} saved={aid.saved} title={aid.title} />} />
+          <AnotherAid aidId={aid.id} />
+        </div>
       ))}
       {hereStories.map((story) => (
         <StoryCard key={story.id} story={story} authorityName={story.authorityKey ? (authorityNames.get(story.authorityKey) ?? null) : null} />

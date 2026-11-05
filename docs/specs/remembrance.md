@@ -186,4 +186,18 @@ learning record is its owner's alone (staff do not read them); one session per t
   aid (only one the student can read), so saved aids survive lesson updates. At most 500. Shown
   as "Your saved memory aids" on the topic and under "My remembrance tools" in the Study Diary
   entry; removable from either.
-- **Next (2c):** "Another memory aid" and "Tell it another way" on request (one question each).
+- **2c** (below): "Another memory aid" and "Tell it another way" on request.
+
+## On request (Phase 2c)
+- **"Another memory aid"** under each aid and **"Tell it another way"** in each open story. Made
+  by Sonnet (`MODELS.memoryAids`, prompt `again-v1`) from the student's approved lesson and its
+  authority cards (students cannot read library passages; the lesson comes from them and was
+  reviewed), then the citation check against the whole library. Lawdeck's own rules
+  (`src/lib/againRules.ts`): the new aid covers exactly the same points (same number, an acronym
+  spelled by its items); a retold story keeps its kind and, for a case, the same case.
+- **One question each** (founder, 2026-11-05): checked before the call, recorded as
+  `memory_aid` (migration 50) only when the result is delivered; a result that fails the checks
+  does not use a question.
+- **Saving:** an aid made for the student can be saved, marked "Made for you" (migration 50:
+  `made_for_me`; an aid from a lesson is still copied from the aid itself).
+- **Test:** `tests/eval/again.eval.ts` (in the "Memory aids test" workflow).

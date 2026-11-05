@@ -28,6 +28,16 @@ for (const width of [360, 1200]) {
   });
 }
 
+test("another memory aid and tell it another way are offered, say they use a question, and need an account", async ({ page }) => {
+  await page.goto("/test-pages/lesson-aids");
+  await page.getByRole("button", { name: "Another memory aid" }).click();
+  await expect(page.getByText("Sign in to ask for another version.")).toBeVisible();
+  await page.getByRole("button", { name: "Read it as a story: Chidi's poultry licence" }).click();
+  const story = page.getByRole("region", { name: "Story: Chidi's poultry licence" });
+  await expect(story.getByRole("button", { name: "Tell it another way" })).toBeVisible();
+  await expect(story.getByText("uses one question")).toBeVisible();
+});
+
 test("saving needs an account: a visitor is told plainly", async ({ page }) => {
   await page.goto("/test-pages/lesson-aids");
   await page.getByRole("button", { name: "Save “Made-up licence conditions” to my memory aids" }).click();

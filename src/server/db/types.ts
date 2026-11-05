@@ -789,8 +789,18 @@ export type Database = {
           items: Json;
           explanation: string | null;
           created_at: string;
+          made_for_me: boolean;
         };
-        Insert: { aid_id: string };
+        // A lesson's aid (copied by the database), or one made for the student (migration 50).
+        Insert: {
+          aid_id?: string;
+          topic_id?: string;
+          kind?: "acronym" | "phrase" | "association" | "pattern";
+          title?: string;
+          device?: string;
+          items?: Json;
+          explanation?: string | null;
+        };
         Update: Record<string, never>;
         Relationships: [];
       };

@@ -24,7 +24,7 @@ async function TestLessonAids() {
     <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10">
       <h1 className="font-serif text-3xl font-normal text-greeting">Wombat licences</h1>
       <SavedAids
-        aids={[{ savedId: id(1), aidId: null, kind: "phrase", title: "Made-up stages", device: "File, inspect, decide", items: [{ key: "File", meaning: "At the registry" }], explanation: null }]}
+        aids={[{ savedId: id(1), aidId: null, madeForMe: false, kind: "phrase", title: "Made-up stages", device: "File, inspect, decide", items: [{ key: "File", meaning: "At the registry" }], explanation: null }]}
       />
       <SectionExtras
         index={0}

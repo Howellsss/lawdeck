@@ -15,7 +15,7 @@ export type GenerateExtrasResult = { ok: true; aids: number; stories: number; re
 
 const FAILURES = {
   no_key: "Memory aids are not switched on yet: the Claude key is missing on the server.",
-  no_credit: "Your Anthropic credit has run out, so Claude refused. Top up at console.anthropic.com (Settings → Billing), then try again.",
+  no_credit: "Anthropic refused: the credit has run out or the monthly spending limit was reached. Top up or raise the limit at console.anthropic.com (Settings → Billing or Limits), then try again.",
   busy: "Claude is busy right now. Please try again in a minute.",
   timeout: "Claude took longer than 4 minutes and was stopped. Please try again.",
   too_long: "The memory aids came out too long and were cut off. Please try again.",

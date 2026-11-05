@@ -149,7 +149,7 @@ export async function getDiaryEntry(sessionId: string): Promise<Loaded<DiaryEntr
     db.from("recall_attempts").select("prompt, key_point, outcome, context, created_at").eq("session_id", sessionId).order("created_at"),
     db.from("review_items").select("checkpoint_id, due_at, last_outcome").eq("topic_id", summary.topicId).order("due_at"),
     db.from("diary_notes").select("body").eq("topic_id", summary.topicId).maybeSingle(),
-    db.from("saved_memory_aids").select("id, aid_id, kind, title, device, items, explanation").eq("topic_id", summary.topicId).order("created_at"),
+    db.from("saved_memory_aids").select("id, aid_id, kind, title, device, items, explanation, made_for_me").eq("topic_id", summary.topicId).order("created_at"),
   ]);
   const content = lesson.data ? lessonContentSchema.safeParse(lesson.data.content) : null;
   const sources = content?.success ? content.data.sources : [];
