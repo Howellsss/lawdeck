@@ -23,6 +23,9 @@ export const MODELS = {
   // Mark my answer (step 4e): Opus, as CLAUDE.md sets for marking (founder, 2026-10-22).
   marking: "claude-opus-5-5",
   documents: "claude-opus-5-5",
+  // Topic Lessons (docs/specs/remembrance.md): written once per topic and reviewed, so the most
+  // careful model is used.
+  lessons: "claude-opus-5-5",
 } as const;
 
 export type AiJob = keyof typeof MODELS;

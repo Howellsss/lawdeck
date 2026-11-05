@@ -23,6 +23,14 @@
   --sheet-line: #e7e5e0;
   /* Dims the page behind the expanded side panel. */
   --overlay: rgba(0, 0, 0, 0.6);
+  /* Smart Highlighting in lessons (founder, 2026-11-05): soft, desaturated, one per category. */
+  --hl-case: #7fa6d9;
+  --hl-principle: #8dbf9a;
+  --hl-statute: #d9c27a;
+  --hl-tip: #b39dd9;
+  --hl-exception: #d99a8d;
+  --hl-definition: #a3a09a;
+  --hl-tint: 22%;
 }
 
 [data-theme="light"] {
@@ -43,6 +51,13 @@
   --sheet-ink: #141414;
   --sheet-line: #e7e5e0;
   --overlay: rgba(20, 20, 20, 0.35);
+  --hl-case: #2f5e9e;
+  --hl-principle: #2f7a4a;
+  --hl-statute: #8a6a12;
+  --hl-tip: #5e3e9e;
+  --hl-exception: #a13a2a;
+  --hl-definition: #6b6b6b;
+  --hl-tint: 14%;
 }
 
 @theme inline {
@@ -179,3 +194,28 @@ body {
 @media (prefers-reduced-motion: reduce) {
   .heartbeat-track, .orbit, .voice-wave-bar, .voice-orb-listening, .voice-orb-thinking { animation: none; }
 }
+
+/* Smart Highlighting (docs/specs/remembrance.md). Text keeps the ink colour; colour lives only in
+   a thin line, a soft tint (in the full view) or a small symbol. Each category also has its own
+   shape, so it reads without colour too: cases circled, principles underlined, statutes
+   highlighted, definitions boxed, exam tips ★, exceptions ⚠. */
+.mark {
+  --hl: var(--hl-definition);
+  border-radius: 3px;
+  padding: 0 2px;
+  box-decoration-break: clone;
+  -webkit-box-decoration-break: clone;
+}
+.mark-case { --hl: var(--hl-case); }
+.mark-principle { --hl: var(--hl-principle); }
+.mark-statute { --hl: var(--hl-statute); }
+.mark-tip { --hl: var(--hl-tip); }
+.mark-exception { --hl: var(--hl-exception); }
+.mark-definition { --hl: var(--hl-definition); }
+[data-highlights="quiet"] .mark { border-bottom: 1.5px solid color-mix(in srgb, var(--hl) 75%, transparent); }
+[data-highlights="full"] .mark { background: color-mix(in srgb, var(--hl) var(--hl-tint), transparent); border-bottom: 1.5px solid var(--hl); }
+[data-highlights="full"] .mark-case { border: 1.5px solid var(--hl); border-radius: 999px; padding: 0 6px; }
+[data-highlights="full"] .mark-definition { border: 1px solid var(--hl); }
+[data-highlights="off"] .mark { padding: 0; }
+.mark-symbol { color: var(--hl); font-size: 0.8em; margin-right: 0.3em; }
+[data-highlights="off"] .mark-symbol { display: none; }

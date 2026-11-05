@@ -1,0 +1,99 @@
+import "server-only";
+import { lessonContentSchema, type LessonContent } from "@/schemas/lesson";
+import { getStaffRole } from "@/server/auth/roles";
+import { createSupabaseServerClient } from "@/server/auth/supabase";
+import type { Database } from "./types";
+
+type ReviewStatus = Database["public"]["Tables"]["topic_lessons"]["Row"]["status"];
+export type Checkpoint = Database["public"]["Tables"]["lesson_checkpoints"]["Row"];
+export type Authority = Database["public"]["Tables"]["lesson_authorities"]["Row"];
+
+export type LessonOverview = {
+  courses: {
+    id: string;
+    name: string;
+    topics: { id: string; name: string; lesson: { status: ReviewStatus; version: number; updatedAt: string } | null }[];
+  }[];
+};
+
+// Admin → Lessons: every course's topics with their lesson's state. Null for non-staff.
+export async function listLessonOverview(): Promise<LessonOverview | null> {
+  if (!(await getStaffRole())) return null;
+  const db = await createSupabaseServerClient();
+  const [courses, topics, lessons] = await Promise.all([
+    db.from("courses").select("id, name, position").order("position"),
+    db.from("topics").select("id, name, course_id, position").order("position"),
+    db.from("topic_lessons").select("topic_id, status, version, updated_at"),
+  ]);
+  if (courses.error || topics.error || lessons.error) {
+    console.error("lesson overview failed", { code: courses.error?.code ?? topics.error?.code ?? lessons.error?.code });
+    throw new Error("lesson overview failed");
+  }
+  return {
+    courses: courses.data.map((course) => ({
+      id: course.id,
+      name: course.name,
+      topics: topics.data
+        .filter((topic) => topic.course_id === course.id)
+        .map((topic) => {
+          const lesson = lessons.data.find((l) => l.topic_id === topic.id);
+          return { id: topic.id, name: topic.name, lesson: lesson ? { status: lesson.status, version: lesson.version, updatedAt: lesson.updated_at } : null };
+        }),
+    })),
+  };
+}
+
+export type LessonForReview = {
+  topic: { id: string; name: string };
+  course: { id: string; name: string };
+  lesson: {
+    id: string;
+    title: string;
+    status: ReviewStatus;
+    version: number;
+    reviewNote: string | null;
+    updatedAt: string;
+    model: string | null;
+    content: LessonContent | null;
+  } | null;
+  checkpoints: Checkpoint[];
+  authorities: Authority[];
+};
+
+// One topic's lesson with its questions and authority cards, for a reviewer. Null for non-staff or
+// an unknown topic.
+export async function getLessonForReview(topicId: string): Promise<LessonForReview | null> {
+  if (!(await getStaffRole())) return null;
+  const db = await createSupabaseServerClient();
+  const topic = await db.from("topics").select("id, name, course_id").eq("id", topicId).maybeSingle();
+  if (topic.error || !topic.data) return null;
+  const [course, lesson] = await Promise.all([
+    db.from("courses").select("id, name").eq("id", topic.data.course_id).single(),
+    db.from("topic_lessons").select("*").eq("topic_id", topicId).maybeSingle(),
+  ]);
+  if (course.error) return null;
+  if (!lesson.data) {
+    return { topic: { id: topic.data.id, name: topic.data.name }, course: course.data, lesson: null, checkpoints: [], authorities: [] };
+  }
+  const [checkpoints, authorities] = await Promise.all([
+    db.from("lesson_checkpoints").select("*").eq("lesson_id", lesson.data.id).order("position"),
+    db.from("lesson_authorities").select("*").eq("lesson_id", lesson.data.id).order("name"),
+  ]);
+  const content = lessonContentSchema.safeParse(lesson.data.content);
+  return {
+    topic: { id: topic.data.id, name: topic.data.name },
+    course: course.data,
+    lesson: {
+      id: lesson.data.id,
+      title: lesson.data.title,
+      status: lesson.data.status,
+      version: lesson.data.version,
+      reviewNote: lesson.data.review_note,
+      updatedAt: lesson.data.updated_at,
+      model: lesson.data.model,
+      content: content.success ? content.data : null,
+    },
+    checkpoints: checkpoints.data ?? [],
+    authorities: authorities.data ?? [],
+  };
+}

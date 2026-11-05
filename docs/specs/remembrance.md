@@ -51,3 +51,22 @@ learning record is its owner's alone (staff do not read them); one session per t
 3. **Phase 3:** Smart Highlighting shown; student annotations; Visual Revision Mode filters.
 4. **Phase 4:** adaptive revision timing; retention dashboard (based on recorded recall only,
    not a guarantee of exam results); personalisation.
+
+## Admin → Lessons (Phase 1a, part 2)
+- `/admin/lessons`: every topic of the five courses with its lesson's state; `/admin/lessons/[topicId]`:
+  the lesson with its highlights (Full / Quiet / Off), the recall questions placed after each section,
+  the end-of-topic test, the authority cards, the library passages used, and the decision (approve,
+  reject with a note, withdraw). A reviewer can remove a wrong question or card (the lesson then goes
+  back to review).
+- Writing a lesson (`POST /api/admin/lessons/generate`, staff only, same-site only, 5-minute limit):
+  Haiku lists up to 6 subtopics (`outline-v1`, search phrases only); the library is searched for the
+  topic (14 passages) and each subtopic (6), up to 40 passages; Opus writes the lesson (`lesson-v1`,
+  structured reply checked by `lessonReplySchema`). Before saving, `cleanLesson` runs the citation
+  check on every paragraph, card and question; drops authorities the library cannot confirm and any
+  question naming one; drops broken multiple-choice questions; keeps case facts only if the library
+  gives them; places highlights within the calm limits (`src/lib/lessonMarks.ts`). Saved as "awaiting
+  review". Rewriting replaces the questions, so students' revision for that topic restarts.
+- Cost: about US$0.20–0.50 per lesson (Opus), once per topic. Staff-only, so it is not counted
+  against any student's questions; every call is logged with model, tokens and cost.
+- Tests: `tests/unit/lessonMarks.test.ts`, `tests/unit/lessonClean.test.ts`, e2e (pages and the
+  writing route refuse visitors).
