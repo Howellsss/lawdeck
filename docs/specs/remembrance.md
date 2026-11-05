@@ -137,3 +137,26 @@ learning record is its owner's alone (staff do not read them); one session per t
   full" to clear the mark. Any later change sends it back to review, unmarked.
 - **Reminder:** next, "skim, tick and approve": a quick "Looks right" tick per lesson and
   "Approve all ticked", so every lesson is looked at once before students see it unmarked.
+
+## Memory aids and stories (Phase 2a)
+- **Data (migration 47):** `lesson_extras` (one set per lesson, its own review state and
+  `bulk_approved` mark), `lesson_memory_aids` (acronym, phrase, association, pattern: title,
+  device, what each letter or word stands for, explanation, sources) and `lesson_stories`
+  (everyday or case: parts, takeaway, an optional multiple-choice question, sources). Kept beside
+  the lesson, so writing them never sends an approved lesson back to review. Students read them
+  only when both the set and its lesson are approved (`lesson_extras_readable`). Removing an aid or
+  story sends the set back to review; a change to the lesson's wording does too.
+- **Writing** (`src/server/lessons/extras.ts`, prompt `extras-v3`, Opus): from the lesson, its
+  authority cards and the same library passages. Lawdeck's own limits (`src/lib/extrasRules.ts`):
+  one aid per section, at most 4 aids and 3 stories; an acronym is kept only if its items spell
+  it; a case story only for an authority whose facts the library gives; then the citation check
+  on every piece of text. About US$0.10–0.25 a lesson.
+- **Admin → Lessons:** "Write memory aids and stories for every lesson" (bulk, like lessons),
+  "Approve N memory aid sets" per course (marked, like lessons), and on each lesson's page the
+  aids and stories with Remove, Rewrite and the decision.
+- **Test:** `tests/eval/extras.eval.ts` ("Memory aids test" workflow; runs when the instructions
+  or rules change): a made-up lesson, checked for an aid with all five conditions, acronyms
+  spelled by their items, no case story without library facts, no number or case the material
+  does not give, an everyday Nigerian story, and the limits.
+- **Next (2b):** students see them in the lesson (aid cards after their section, "Read it as a
+  story"), save the ones they like, and saved aids appear in the Study Diary.

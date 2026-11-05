@@ -21,12 +21,12 @@ for (const width of [360, 1200]) {
     await expect(page.getByText("About US$0.80–2.00")).toBeVisible();
 
     await page.getByRole("button", { name: "Write 4 lessons" }).click();
-    await expect(page.getByRole("status")).toContainText("3 of 4 written · 1 not written");
+    await expect(page.getByRole("region", { name: "Write all missing lessons" }).getByRole("status")).toContainText("3 of 4 written · 1 not written");
     await expect(page.getByText("Koala bail: The library has too little on this topic.")).toBeVisible();
     expect(asked).toHaveLength(4);
 
     await page.getByRole("button", { name: "Try the 1 again" }).click();
-    await expect(page.getByRole("status")).toContainText("4 of 4 written");
+    await expect(page.getByRole("region", { name: "Write all missing lessons" }).getByRole("status")).toContainText("4 of 4 written");
     expect(asked).toHaveLength(5);
     await expect(page.getByRole("button", { name: "Write 0 lessons" })).toBeDisabled();
 
@@ -39,7 +39,27 @@ for (const width of [360, 1200]) {
 
 test("bulk write can be limited to one course", async ({ page }) => {
   await page.goto("/test-pages/bulk-lessons");
-  await page.getByLabel("Which course").selectOption({ label: "Made-up criminal (1)" });
-  await expect(page.getByRole("button", { name: "Write 1 lesson" })).toBeVisible();
-  await expect(page.getByText("About US$0.20–0.50")).toBeVisible();
+  const panel = page.getByRole("region", { name: "Write all missing lessons" });
+  await panel.getByRole("combobox").selectOption({ label: "Made-up criminal (1)" });
+  await expect(panel.getByRole("button", { name: "Write 1 lesson" })).toBeVisible();
+  await expect(panel.getByText("About US$0.20–0.50")).toBeVisible();
+});
+
+test("memory aids are written in bulk through their own route, and an acronym shows every letter", async ({ page }) => {
+  const asked: string[] = [];
+  await page.route("**/api/admin/lessons/extras", async (route) => {
+    asked.push((route.request().postDataJSON() as { topicId: string }).topicId);
+    return route.fulfill({ json: { ok: true, aids: 3, stories: 2, removed: 0 } });
+  });
+  await page.route("**/api/admin/lessons/generate", (route) => route.abort());
+  page.on("dialog", (dialog) => void dialog.accept());
+  await page.goto("/test-pages/bulk-lessons");
+  const panel = page.getByRole("region", { name: "Write memory aids and stories for every lesson" });
+  await expect(panel.getByText("About US$0.20–0.50")).toBeVisible();
+  await panel.getByRole("button", { name: "Write 2 sets of memory aids" }).click();
+  await expect(panel.getByRole("status")).toContainText("2 of 2 written");
+  expect(asked).toHaveLength(2);
+  const aid = page.getByRole("region", { name: "Memory aid: Made-up conditions for a wombat licence" });
+  await expect(aid.getByText("RWFOI")).toBeVisible();
+  await expect(aid.getByRole("definition")).toHaveCount(5);
 });

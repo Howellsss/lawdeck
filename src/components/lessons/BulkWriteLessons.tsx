@@ -14,10 +14,37 @@ const AT_ONCE = 3;
 const COST_LOW = 0.2;
 const COST_HIGH = 0.5;
 
-// Admin → Lessons: write every missing lesson in one go (founder, 2026-11-05). Each lesson is still
-// its own request (a few minutes each), so the page must stay open; it only writes topics with no
-// lesson yet, so pressing it again never pays twice.
-export function BulkWriteLessons({ topics, courses }: { topics: MissingTopic[]; courses: { id: string; name: string }[] }) {
+// Per set of memory aids and stories: a shorter Opus call from the lesson's own passages.
+const EXTRAS_COST_LOW = 0.1;
+const EXTRAS_COST_HIGH = 0.25;
+
+const KINDS = {
+  lesson: { endpoint: "/api/admin/lessons/generate", title: "Write all missing lessons", one: "lesson", many: "lessons", low: COST_LOW, high: COST_HIGH, none: "Every topic has a lesson." },
+  extras: {
+    endpoint: "/api/admin/lessons/extras",
+    title: "Write memory aids and stories for every lesson",
+    one: "set of memory aids",
+    many: "sets of memory aids",
+    low: EXTRAS_COST_LOW,
+    high: EXTRAS_COST_HIGH,
+    none: "Every lesson has its memory aids and stories.",
+  },
+} as const;
+
+// Admin → Lessons: write every missing lesson (or every lesson's missing memory aids) in one go
+// (founder, 2026-11-05). Each is still its own request (a few minutes each), so the page must stay
+// open; it only writes what is missing, so pressing it again never pays twice.
+export function BulkWriteLessons({
+  topics,
+  courses,
+  kind = "lesson",
+}: {
+  topics: MissingTopic[];
+  courses: { id: string; name: string }[];
+  kind?: "lesson" | "extras";
+}) {
+  const k = KINDS[kind];
+  const label = (n: number) => `${n} ${n === 1 ? k.one : k.many}`;
   const router = useRouter();
   const [course, setCourse] = useState("all");
   const [states, setStates] = useState<Record<string, State>>({});
@@ -40,7 +67,7 @@ export function BulkWriteLessons({ topics, courses }: { topics: MissingTopic[]; 
   async function writeOne(topic: MissingTopic) {
     setStates((s) => ({ ...s, [topic.id]: "writing" }));
     try {
-      const response = await fetch("/api/admin/lessons/generate", {
+      const response = await fetch(k.endpoint, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ topicId: topic.id }),
@@ -58,9 +85,9 @@ export function BulkWriteLessons({ topics, courses }: { topics: MissingTopic[]; 
   }
 
   async function start(list: MissingTopic[]) {
-    const low = (list.length * COST_LOW).toFixed(2);
-    const high = (list.length * COST_HIGH).toFixed(2);
-    if (!window.confirm(`Write ${list.length} lesson${list.length === 1 ? "" : "s"}? This costs about US$${low}–${high} and takes a while. Keep this page open until it finishes.`)) return;
+    const low = (list.length * k.low).toFixed(2);
+    const high = (list.length * k.high).toFixed(2);
+    if (!window.confirm(`Write ${label(list.length)}? This costs about US$${low}–${high} and takes a while. Keep this page open until it finishes.`)) return;
     stop.current = false;
     setRunning(true);
     setErrors({});
@@ -78,16 +105,16 @@ export function BulkWriteLessons({ topics, courses }: { topics: MissingTopic[]; 
   }
 
   if (topics.length === 0)
-    return <p className="text-sm text-success">Every topic has a lesson.</p>;
+    return <p className="text-sm text-success">{k.none}</p>;
 
   return (
-    <section aria-labelledby="bulk-write" className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4">
-      <h2 id="bulk-write" className="text-base font-medium">
-        Write all missing lessons
+    <section aria-labelledby={`bulk-write-${kind}`} className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4">
+      <h2 id={`bulk-write-${kind}`} className="text-base font-medium">
+        {k.title}
       </h2>
       <div className="flex flex-wrap items-end gap-3">
         <label className="flex flex-col gap-1 text-sm">
-          Which course
+          {kind === "lesson" ? "Which course" : "Which course (memory aids)"}
           <select
             value={course}
             onChange={(e) => setCourse(e.target.value)}
@@ -111,13 +138,13 @@ export function BulkWriteLessons({ topics, courses }: { topics: MissingTopic[]; 
           </button>
         ) : (
           <button type="button" className={compactPrimaryButton} disabled={queue.length === 0} onClick={() => void start(queue)}>
-            Write {queue.length} lesson{queue.length === 1 ? "" : "s"}
+            Write {label(queue.length)}
           </button>
         )}
       </div>
       <p className="text-sm text-muted">
-        About US${(queue.length * COST_LOW).toFixed(2)}–{(queue.length * COST_HIGH).toFixed(2)} · {AT_ONCE} at a time, a few minutes each. Every
-        lesson still waits for approval before students see it.
+        About US${(queue.length * k.low).toFixed(2)}–{(queue.length * k.high).toFixed(2)} · {AT_ONCE} at a time, a few minutes each. Each one still
+        waits for approval before students see it.
       </p>
       {(running || done > 0 || failed.length > 0) && (
         <p role="status" className="text-sm">
@@ -128,7 +155,7 @@ export function BulkWriteLessons({ topics, courses }: { topics: MissingTopic[]; 
       )}
       {!running && failed.length > 0 && (
         <div className="flex flex-col gap-2">
-          <FormAlert tone="warning" message={`${failed.length} lesson${failed.length === 1 ? " was" : "s were"} not written. You can try them again.`} />
+          <FormAlert tone="warning" message={`${label(failed.length)} not written. You can try ${failed.length === 1 ? "it" : "them"} again.`} />
           <ul className="flex flex-col gap-1 text-sm">
             {failed.map((t) => (
               <li key={t.id}>

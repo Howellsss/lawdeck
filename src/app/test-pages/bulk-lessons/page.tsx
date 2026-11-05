@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { connection } from "next/server";
 import { Suspense } from "react";
 import { BulkWriteLessons } from "@/components/lessons/BulkWriteLessons";
+import { MemoryAidCard } from "@/components/lessons/MemoryAidCard";
 import { BulkApprovedNote } from "@/components/study/BulkApprovedNote";
 import { testPagesEnabled } from "../sample";
 
@@ -37,7 +38,23 @@ async function TestBulkLessons() {
           { id: course(2), name: "Made-up criminal" },
         ]}
       />
+      <BulkWriteLessons topics={topics.slice(0, 2)} courses={[{ id: course(1), name: "Made-up procedure" }]} kind="extras" />
       <BulkApprovedNote lessonId="00000000-0000-4000-8000-000000000520" />
+      <MemoryAidCard
+        aid={{
+          kind: "acronym",
+          title: "Made-up conditions for a wombat licence",
+          device: "RWFOI",
+          items: [
+            { key: "R", meaning: "Resident in Wombat State" },
+            { key: "W", meaning: "Written application" },
+            { key: "F", meaning: "Fee paid (not for registered charities)" },
+            { key: "O", meaning: "No previous wombat offence" },
+            { key: "I", meaning: "Inspection of the premises" },
+          ],
+          explanation: "All five are needed; missing one makes the licence invalid.",
+        }}
+      />
     </div>
   );
 }

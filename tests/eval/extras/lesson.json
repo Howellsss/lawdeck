@@ -1,0 +1,93 @@
+{
+  "note": "Made-up law about made-up places, for testing only. Not legal content.",
+  "lesson": {
+    "topic": "Wombat licences",
+    "sections": [
+      {
+        "heading": "Conditions for a valid wombat licence",
+        "paragraphs": [
+          "Under section 4 of the Wombat Licensing Law, a wombat licence is valid only if five conditions are all met: the applicant is resident in Wombat State; the application is made in writing; the prescribed fee is paid; the applicant has no previous wombat offence; and the licensing officer has inspected the premises.",
+          "Missing any one condition makes the licence invalid. Examiners often ask candidates to list all five."
+        ]
+      },
+      {
+        "heading": "The application procedure",
+        "paragraphs": [
+          "An application passes through three stages, in this order: filing at the licensing registry; inspection of the premises within 14 days of filing; and the officer's decision within 30 days of the inspection."
+        ]
+      },
+      {
+        "heading": "Licences granted without inspection",
+        "paragraphs": [
+          "In Quokka v Numbat Licensing Board the High Court of Wombat State held that a licence granted without an inspection is void from the start, because inspection is a condition of validity and not a mere formality.",
+          "In Emu v Koala the court held that a counter-application is a fresh application, not an amendment of the first one."
+        ]
+      },
+      {
+        "heading": "The charity exception",
+        "paragraphs": [
+          "The fee condition does not apply to a charity registered under the Wombat Charities Law. All the other conditions still apply to a charity."
+        ]
+      }
+    ],
+    "authorities": [
+      {
+        "key": "quokka-v-numbat-licensing-board",
+        "kind": "case",
+        "name": "Quokka v Numbat Licensing Board",
+        "citation": null,
+        "principle": "A licence granted without an inspection is void from the start.",
+        "factsFromLibrary": true,
+        "facts": "Quokka was granted a licence for a wombat farm in Numbat Town although the premises were never inspected. A neighbour, Ms Possum, complained, and the Board later revoked the licence. Quokka sued, arguing that a licence, once granted, could not be treated as invalid.",
+        "issue": "Whether a licence granted without inspection is valid.",
+        "decision": "The High Court of Wombat State held the licence void from the start, because inspection is a condition of validity."
+      },
+      {
+        "key": "emu-v-koala",
+        "kind": "case",
+        "name": "Emu v Koala",
+        "citation": null,
+        "principle": "A counter-application is a fresh application, not an amendment.",
+        "factsFromLibrary": false,
+        "facts": null,
+        "issue": null,
+        "decision": null
+      },
+      {
+        "key": "wombat-licensing-law-s4",
+        "kind": "statute",
+        "name": "Wombat Licensing Law, section 4",
+        "citation": null,
+        "principle": "The five conditions for a valid wombat licence.",
+        "factsFromLibrary": false,
+        "facts": null,
+        "issue": null,
+        "decision": null
+      }
+    ]
+  },
+  "passages": [
+    {
+      "label": 1,
+      "itemTitle": "Made-up study notes",
+      "heading": "Wombat licences",
+      "pages": "p. 1",
+      "text": "Section 4 of the Wombat Licensing Law: a wombat licence is valid only if (a) the applicant is resident in Wombat State; (b) the application is made in writing; (c) the prescribed fee is paid; (d) the applicant has no previous wombat offence; and (e) the licensing officer has inspected the premises. The fee in (c) does not apply to a charity registered under the Wombat Charities Law."
+    },
+    {
+      "label": 2,
+      "itemTitle": "Made-up study notes",
+      "heading": "Procedure",
+      "pages": "p. 2",
+      "text": "Procedure: file at the licensing registry; the premises are inspected within 14 days of filing; the officer decides within 30 days of the inspection."
+    },
+    {
+      "label": 3,
+      "itemTitle": "Made-up study notes",
+      "heading": "Cases",
+      "pages": "p. 3",
+      "text": "Quokka v Numbat Licensing Board: Quokka was granted a licence for a wombat farm in Numbat Town although the premises were never inspected. A neighbour, Ms Possum, complained, and the Board later revoked the licence. Quokka sued, arguing that a licence, once granted, could not be treated as invalid. The High Court of Wombat State held the licence void from the start, because inspection is a condition of validity. Emu v Koala: a counter-application is a fresh application, not an amendment."
+    }
+  ],
+  "elements": ["resident", "writing", "fee", "offence", "inspect"]
+}
