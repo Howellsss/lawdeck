@@ -16,6 +16,10 @@ export function StaffNav({ isAdmin = false }: { isAdmin?: boolean }) {
         <Icon name="scale" size={NAV_ICON_SIZE} />
         <span className={collapsed ? "sr-only" : ""}>Library</span>
       </NavLink>
+      <NavLink href="/admin/lessons" onNavigate={onNavigate} className={itemClass} match="prefix">
+        <Icon name="book" size={NAV_ICON_SIZE} />
+        <span className={collapsed ? "sr-only" : ""}>Lessons</span>
+      </NavLink>
       <NavLink href="/admin/rubrics" onNavigate={onNavigate} className={itemClass} match="prefix">
         <Icon name="pen" size={NAV_ICON_SIZE} />
         <span className={collapsed ? "sr-only" : ""}>Marking guides</span>

@@ -233,3 +233,22 @@ test("The question box's + button attaches a file, and asks visitors to sign in 
   await (await chooser).setFiles({ name: "notes.pdf", mimeType: "application/pdf", buffer: Buffer.from("%PDF-1.7 made-up") });
   await expect(page.getByRole("alert").filter({ hasText: "notes.pdf" })).toContainText("Sign in");
 });
+
+test("Lessons pages are hidden from visitors, and writing a lesson is refused", async ({ page, request, baseURL }) => {
+  await page.goto("/admin/lessons");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Lessons", exact: true })).toHaveCount(0);
+  await page.goto("/admin/lessons/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("button", { name: /Write the lesson/ })).toHaveCount(0);
+  const visitor = await request.post("/api/admin/lessons/generate", {
+    data: { topicId: "3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a" },
+    headers: { Origin: baseURL ?? "" },
+  });
+  expect(visitor.status()).toBe(404);
+  const elsewhere = await request.post("/api/admin/lessons/generate", {
+    data: { topicId: "3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a" },
+    headers: { Origin: "https://example.com" },
+  });
+  expect(elsewhere.status()).toBe(403);
+});
