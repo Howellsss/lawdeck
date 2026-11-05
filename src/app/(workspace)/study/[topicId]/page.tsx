@@ -39,6 +39,11 @@ async function Study({ params }: { params: Promise<{ topicId: string }> }) {
           ← {data.course.name}
         </Link>
         <h1 className="font-serif text-3xl font-normal text-greeting">{data.topic.name}</h1>
+        {data.lesson && (
+          <Link href={`/study/${data.topic.id}/visual`} className="self-start text-sm">
+            Revise visually: only the key points
+          </Link>
+        )}
       </div>
       <Suspense fallback={null}>
         <BeforeYouMoveOn compact />

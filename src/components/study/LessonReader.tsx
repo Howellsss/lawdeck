@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, useSyncExternalStore } from "react";
+import { useCallback, useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { HighlightFrame } from "@/components/lessons/HighlightFrame";
 import { LessonBody } from "@/components/lessons/LessonBody";
 import { useRightPanel } from "@/components/shell/panelContext";
@@ -14,6 +14,7 @@ import { RecallCard } from "./RecallCard";
 import { SectionExtras } from "./SectionExtras";
 import { TopicTest } from "./TopicTest";
 import { useAnnotations } from "./useAnnotations";
+import { useJumpToSection } from "./useJumpToSection";
 
 const RECALL_KEY = "lawdeck-recall";
 const SAVE_EVERY_MS = 60_000;
@@ -42,6 +43,8 @@ export function LessonReader({ data }: { data: StudyLesson & { lesson: NonNullab
   const recall = recallChoice ?? storedRecall ?? true;
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [upTo, setUpTo] = useState(0);
+  const revealTo = useCallback((index: number) => setUpTo((u) => Math.max(u, index)), [setUpTo]);
+  useJumpToSection(sections, revealTo);
   const [answered, setAnswered] = useState<Set<string>>(new Set());
   const [testing, setTesting] = useState(false);
   const [notice, setNotice] = useState<string>();

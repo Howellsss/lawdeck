@@ -19,6 +19,7 @@ for (const [path, heading] of [
   [`/study/${someId}`, "Sign in to see your lessons"],
   ["/diary", "Sign in to see your study diary"],
   ["/revise", "Sign in to see your revision"],
+  ["/study/00000000-0000-4000-8000-000000000000/visual", "Sign in to see your revision"],
   [`/diary/${someId}`, "Sign in to see your study diary"],
 ] as const) {
   test(`${path} asks visitors to sign in`, async ({ page }) => {
@@ -268,7 +269,7 @@ test("the test-only diary page is not there", async ({ page }) => {
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
 });
 
-for (const path of ["/test-pages/revise", "/test-pages/bulk-lessons", "/test-pages/lesson-aids", "/test-pages/lesson-marks"]) {
+for (const path of ["/test-pages/revise", "/test-pages/bulk-lessons", "/test-pages/lesson-aids", "/test-pages/lesson-marks", "/test-pages/visual"]) {
   test(`the test-only page ${path} is not there`, async ({ page }) => {
     await page.goto(path);
     await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();

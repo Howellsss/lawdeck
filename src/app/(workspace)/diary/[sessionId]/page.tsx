@@ -46,9 +46,14 @@ async function Entry({ params }: { params: Promise<{ sessionId: string }> }) {
         <p className="text-sm text-muted">
           {summary.courseName} · {formatWat(summary.startedAt)} · {summary.minutes} min{summary.completed ? " · completed" : ""}
         </p>
-        <Link href={`/study/${summary.topicId}`} className="text-sm">
-          Study this topic again
-        </Link>
+        <div className="flex flex-wrap gap-x-4 gap-y-1">
+          <Link href={`/study/${summary.topicId}`} className="text-sm">
+            Study this topic again
+          </Link>
+          <Link href={`/study/${summary.topicId}/visual`} className="text-sm">
+            Revise visually
+          </Link>
+        </div>
       </div>
 
       <Section title="What I studied">
