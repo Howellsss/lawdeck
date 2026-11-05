@@ -1,13 +1,26 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { compactPrimaryButton, compactSecondaryButton, compactWarningButton } from "@/components/ui/buttons";
-import { decideLesson } from "@/server/lessons/actions";
+import { decideExtras, decideLesson } from "@/server/lessons/actions";
 
 // A reviewer's decision: approve (students see it), reject with a note, or withdraw an approved
-// lesson. The database records who decided and when.
-export function LessonDecision({ lessonId, status, note, bulkApproved = false }: { lessonId: string; status: string; note: string | null; bulkApproved?: boolean }) {
+// lesson, or a lesson's memory aids (target "extras"). The database records who decided and when.
+export function LessonDecision({
+  lessonId,
+  status,
+  note,
+  bulkApproved = false,
+  target = "lesson",
+}: {
+  lessonId: string;
+  status: string;
+  note: string | null;
+  bulkApproved?: boolean;
+  target?: "lesson" | "extras";
+}) {
+  const ids = useId();
   const [text, setText] = useState(note ?? "");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string>();
@@ -15,24 +28,27 @@ export function LessonDecision({ lessonId, status, note, bulkApproved = false }:
   async function decide(next: "approved" | "rejected" | "withdrawn" | "pending") {
     setBusy(true);
     setMessage(undefined);
-    const result = await decideLesson({ lessonId, status: next, note: text });
+    const result =
+      target === "lesson" ? await decideLesson({ lessonId, status: next, note: text }) : await decideExtras({ extrasId: lessonId, status: next, note: text });
     setBusy(false);
     if (!result.ok) setMessage(result.message);
   }
 
   return (
-    <section aria-labelledby="decision" className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4">
-      <h2 id="decision" className="text-lg font-medium">
-        Decision
+    <section aria-labelledby={`${ids}-decision`} className="flex flex-col gap-3 rounded-2xl border border-line bg-surface p-4">
+      <h2 id={`${ids}-decision`} className="text-lg font-medium">
+        {target === "lesson" ? "Decision" : "Decision on the memory aids and stories"}
       </h2>
       <p className="text-sm text-muted">
-        Check every section, authority card and question against the library before approving. Students only see approved lessons.
+        {target === "lesson"
+          ? "Check every section, authority card and question against the library before approving. Students only see approved lessons."
+          : "Check that every acronym has all its elements, and that no story adds a fact the library does not give. Students see them only once both these and the lesson are approved."}
       </p>
-      <label htmlFor="review-note" className="text-sm font-medium">
+      <label htmlFor={`${ids}-note`} className="text-sm font-medium">
         Note (optional)
       </label>
       <textarea
-        id="review-note"
+        id={`${ids}-note`}
         rows={3}
         maxLength={2000}
         value={text}

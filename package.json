@@ -18,6 +18,7 @@
     "eval:explain": "vitest run --config vitest.jobs.config.mts jobs/explain-eval.job.ts",
     "eval:routing": "vitest run --config vitest.eval.config.mts tests/eval/routing.eval.ts",
     "eval:drafting": "vitest run --config vitest.eval.config.mts tests/eval/drafting.eval.ts",
+    "eval:extras": "vitest run --config vitest.eval.config.mts tests/eval/extras.eval.ts",
     "test:export": "playwright test --config playwright.export.config.ts",
     "test:voice": "playwright test --config playwright.voice.config.ts"
   },

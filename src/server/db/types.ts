@@ -704,6 +704,73 @@ export type Database = {
         Update: Partial<Omit<Database["public"]["Tables"]["lesson_authorities"]["Row"], "id" | "lesson_id" | "key">>;
         Relationships: [];
       };
+      // Memory aids and stories, Remembrance Phase 2 (migration 47): one reviewed set per lesson.
+      lesson_extras: {
+        Row: {
+          id: string;
+          lesson_id: string;
+          bulk_approved: boolean;
+          model: string | null;
+          prompt_version: string | null;
+          review_note: string | null;
+        } & Reviewed &
+          Timestamps;
+        Insert: { lesson_id: string; model?: string | null; prompt_version?: string | null };
+        Update: { status?: ReviewStatus; bulk_approved?: boolean; review_note?: string | null; model?: string | null; prompt_version?: string | null };
+        Relationships: [];
+      };
+      lesson_memory_aids: {
+        Row: {
+          id: string;
+          extras_id: string;
+          position: number;
+          after_section: number;
+          kind: "acronym" | "phrase" | "association" | "pattern";
+          title: string;
+          device: string;
+          items: Json;
+          explanation: string | null;
+          sources: Json;
+        };
+        Insert: Omit<Database["public"]["Tables"]["lesson_memory_aids"]["Row"], "id" | "explanation" | "items" | "sources"> & {
+          explanation?: string | null;
+          items?: Json;
+          sources?: Json;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
+      lesson_stories: {
+        Row: {
+          id: string;
+          extras_id: string;
+          position: number;
+          after_section: number;
+          kind: "everyday" | "case";
+          title: string;
+          authority_key: string | null;
+          parts: Json;
+          takeaway: string;
+          question: string | null;
+          choices: Json | null;
+          correct_choice: number | null;
+          explanation: string | null;
+          sources: Json;
+        };
+        Insert: Omit<
+          Database["public"]["Tables"]["lesson_stories"]["Row"],
+          "id" | "authority_key" | "question" | "choices" | "correct_choice" | "explanation" | "sources"
+        > & {
+          authority_key?: string | null;
+          question?: string | null;
+          choices?: Json | null;
+          correct_choice?: number | null;
+          explanation?: string | null;
+          sources?: Json;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       study_sessions: {
         Row: {
           id: string;

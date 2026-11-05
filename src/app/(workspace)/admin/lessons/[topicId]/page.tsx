@@ -5,6 +5,7 @@ import { Suspense } from "react";
 import { GenerateLessonButton } from "@/components/lessons/GenerateLessonButton";
 import { HighlightFrame } from "@/components/lessons/HighlightFrame";
 import { LessonBody } from "@/components/lessons/LessonBody";
+import { ExtrasReview } from "@/components/lessons/ExtrasReview";
 import { LessonDecision } from "@/components/lessons/LessonDecision";
 import { RemovePartButton } from "@/components/lessons/RemovePartButton";
 import { LoadingRows } from "@/components/ui/LoadingRows";
@@ -101,6 +102,7 @@ async function Review({ params }: { params: Promise<{ topicId: string }> }) {
               ))}
             </ol>
           </section>
+          <ExtrasReview topicId={data.topic.id} extras={data.extras} authorityNames={new Map(data.authorities.map((a) => [a.key, a.name]))} />
         </>
       )}
     </>

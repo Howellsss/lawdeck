@@ -3,8 +3,8 @@
 import { useState } from "react";
 import { removeLessonPart } from "@/server/lessons/actions";
 
-// Removes one question or authority card a reviewer finds wrong. The lesson goes back to review.
-export function RemovePartButton({ kind, id, label }: { kind: "checkpoint" | "authority"; id: string; label: string }) {
+// Removes one question, authority card, memory aid or story a reviewer finds wrong. It goes back to review.
+export function RemovePartButton({ kind, id, label }: { kind: "checkpoint" | "authority" | "aid" | "story"; id: string; label: string }) {
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
   return (
