@@ -16,6 +16,7 @@ for (const [path, heading] of [
   ["/practice/mark", "Sign in to see your marked answers"],
   [`/practice/mark/${someId}`, "Sign in to see your marked answers"],
   [`/briefs/${someId}`, "Sign in to see your briefs"],
+  [`/study/${someId}`, "Sign in to see your lessons"],
 ] as const) {
   test(`${path} asks visitors to sign in`, async ({ page }) => {
     await page.goto(path);
@@ -251,4 +252,10 @@ test("Lessons pages are hidden from visitors, and writing a lesson is refused", 
     headers: { Origin: "https://example.com" },
   });
   expect(elsewhere.status()).toBe(403);
+});
+
+test("the test-only lesson page is not there", async ({ page }) => {
+  await page.goto("/test-pages/lesson");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.locator("[data-highlights]")).toHaveCount(0);
 });

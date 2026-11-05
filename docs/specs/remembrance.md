@@ -70,3 +70,28 @@ learning record is its owner's alone (staff do not read them); one session per t
   against any student's questions; every call is logged with model, tokens and cost.
 - Tests: `tests/unit/lessonMarks.test.ts`, `tests/unit/lessonClean.test.ts`, e2e (pages and the
   writing route refuse visitors).
+
+## Studying a topic (Phase 1b)
+- Course page: topics with an approved lesson show **Study** (black button) before Explain and MCQ.
+- `/study/[topicId]`: the approved lesson with highlights (opens Full; Quiet / Off remembered on the
+  device). With "Questions while reading" on (default; remembered on the device), the lesson opens a
+  section at a time; after a section that teaches something worth remembering, its recall questions
+  appear and "Continue reading" opens once they are answered or skipped. Off shows the whole lesson.
+- Answers never reach the browser before an attempt: the page receives questions without answers;
+  `revealAnswer` (needs a written attempt or a skip) and `recordAnswer` return them. Multiple choice
+  is marked on the server; for written answers the student compares with the model answer and marks
+  Got it / Partly / Missed it (no AI cost).
+- Every answer is saved (`recall_attempts`) and sets the question's revision date (`review_items`,
+  `src/lib/revision.ts`: about 1, 3, 7, 14, 30, 60, 120 days; partly right repeats the step; a miss
+  starts again tomorrow; a first answer while learning always comes back tomorrow).
+- One study session per topic per day: opening the lesson again the same day continues it, from the
+  section reached; active reading time is saved every minute and when the page is hidden.
+- Case and statute names in the text open their authority card in the side panel (citation, court,
+  facts only from the library or "verification required", issue, decision, principle, library source).
+- End-of-topic test: one question at a time, then a report (answered, correct, partly, missed or
+  skipped; remembered well; worth revisiting; authorities struggled with), with "Try the missed
+  questions again". The session is marked finished. The report says it is based on these answers
+  only, not a prediction of exam results.
+- Tests: `tests/unit/revision.test.ts`; `tests/voice/lesson.spec.ts` (test-only lesson page: highlight
+  modes, mark caps, no answer shown before trying, no sideways scroll at 360 px and desktop); e2e:
+  `/study/[id]` asks visitors to sign in; the test page does not exist on the live configuration.
