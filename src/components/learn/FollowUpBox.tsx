@@ -46,7 +46,7 @@ export function FollowUpBox({
         {PICKABLE_LEVELS.map((value) => (
           <label
             key={value}
-            className={`cursor-pointer rounded-full border px-3 py-1.5 text-sm has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink ${
+            className={`cursor-pointer rounded-full border px-3 py-1 text-[13px] has-[:focus-visible]:outline-2 has-[:focus-visible]:outline-ink ${
               level === value
                 ? "border-ink bg-ink text-on-ink"
                 : "border-line text-ink"
@@ -66,7 +66,7 @@ export function FollowUpBox({
       </fieldset>
       <form
         onSubmit={submit}
-        className="flex flex-wrap items-end gap-2 rounded-3xl border border-line bg-surface p-2 has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
+        className="flex flex-wrap items-end gap-1.5 rounded-[22px] border border-line bg-surface p-2 shadow-[0_4px_20px_rgba(0,0,0,0.08)] has-[textarea:focus-visible]:outline-2 has-[textarea:focus-visible]:outline-offset-2 has-[textarea:focus-visible]:outline-ink"
       >
         <label htmlFor="follow-up" className="sr-only">
           Ask a follow-up question

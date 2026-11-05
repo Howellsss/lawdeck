@@ -5,6 +5,7 @@ import { BrandMark, Wordmark } from "@/components/ui/BrandMark";
 import { Icon, type IconName } from "@/components/ui/Icon";
 import { ThemeToggle } from "@/components/ui/ThemeToggle";
 import { NavLink } from "./NavLink";
+import { NAV_ICON_SIZE, navItemClass } from "./navStyles";
 import { SidebarContext } from "./sidebarContext";
 
 const MAIN_LINKS: { href: string; label: string; icon: IconName }[] = [
@@ -32,19 +33,16 @@ type SidebarProps = {
 };
 
 export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav }: SidebarProps) {
-  const itemClass = (active: boolean) =>
-    `flex h-10 items-center gap-3 rounded-lg px-2 text-[15px] no-underline hover:bg-pill ${
-      active ? "bg-pill font-medium" : ""
-    } ${collapsed ? "justify-center" : ""}`;
+  const itemClass = (active: boolean) => navItemClass(active, collapsed);
   const label = (text: string) => <span className={collapsed ? "sr-only" : ""}>{text}</span>;
 
   return (
     <SidebarContext.Provider value={{ collapsed, onNavigate }}>
-      <nav aria-label="Main" className="flex h-full min-h-0 flex-col gap-5 bg-sidebar px-3 py-3">
+      <nav aria-label="Main" className="flex h-full min-h-0 flex-col gap-4 bg-sidebar px-3 py-3">
         <div className={`flex items-center gap-2 px-1 ${collapsed ? "flex-col" : "justify-between"}`}>
           <Link href="/" onClick={onNavigate} className="flex items-center gap-2 no-underline" aria-label="Lawdeck home">
-            <BrandMark size={26} />
-            {!collapsed && <Wordmark className="text-[22px]" />}
+            <BrandMark size={24} />
+            {!collapsed && <Wordmark className="text-[20px]" />}
           </Link>
           {closeButton}
           {onToggleCollapse && (
@@ -52,43 +50,43 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
               type="button"
               onClick={onToggleCollapse}
               aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
-              className="flex size-9 items-center justify-center rounded-lg text-muted hover:bg-pill"
+              className="flex size-8 items-center justify-center rounded-lg text-muted hover:bg-pill"
             >
-              <Icon name="sidebar" size={18} />
+              <Icon name="sidebar" size={17} />
             </button>
           )}
         </div>
 
         <div className="flex flex-col gap-0.5">
           <Link href="/" onClick={onNavigate} className={itemClass(false)}>
-            <span className="flex size-[26px] items-center justify-center rounded-full bg-pill">
-              <Icon name="plus" size={14} />
+            <span className="flex size-[22px] items-center justify-center rounded-full bg-pill">
+              <Icon name="plus" size={13} />
             </span>
             {label("New task")}
           </Link>
           <NavLink href="/search" onNavigate={onNavigate} className={itemClass}>
-            <Icon name="search" />
+            <Icon name="search" size={NAV_ICON_SIZE} />
             {label("Search")}
           </NavLink>
         </div>
 
         {/* Everything between the top and the account row scrolls, so on a phone the whole menu
             can be reached however long it gets (staff links, recents). */}
-        <div className="-mx-3 flex min-h-0 flex-1 flex-col gap-5 overflow-y-auto overscroll-contain px-3">
+        <div className="-mx-3 flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto overscroll-contain px-3">
           <div className="flex flex-col gap-0.5">
             {MAIN_LINKS.map((link) => (
               <NavLink key={link.href} href={link.href} onNavigate={onNavigate} className={itemClass} match="prefix">
-                <Icon name={link.icon} />
+                <Icon name={link.icon} size={NAV_ICON_SIZE} />
                 {label(link.label)}
               </NavLink>
             ))}
-            {staffNav}
           </div>
+          {staffNav}
 
           {recents}
         </div>
 
-        <div className={`flex shrink-0 items-center gap-2 border-t border-line pt-3 ${collapsed ? "flex-col" : ""}`}>
+        <div className={`flex shrink-0 items-center gap-1.5 border-t border-line pt-2.5 ${collapsed ? "flex-col" : ""}`}>
           {account}
           <ThemeToggle />
         </div>
