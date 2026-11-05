@@ -47,12 +47,13 @@ export function failureDetails(error: unknown): Record<string, string | number |
   return { name, status: error.status ?? null, type: error.type ?? null, reason, requestId: error.requestID ?? null };
 }
 
-// Anthropic refuses every call once the account's prepaid credit is used up.
+// Anthropic refuses every call once the account's prepaid credit is used up, or once the
+// workspace's monthly spending limit (set in the Anthropic console) is reached.
 export function isCreditError(error: unknown): boolean {
   if (!(error instanceof Anthropic.APIError)) return false;
   const body = error.error as { error?: { message?: unknown } } | undefined;
   const message = typeof body?.error?.message === "string" ? body.error.message : error.message;
-  return /credit balance|billing|purchase credits/i.test(message);
+  return /credit balance|billing|purchase credits|usage limits?/i.test(message);
 }
 
 export function isTimeout(error: unknown): boolean {
