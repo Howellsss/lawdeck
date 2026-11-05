@@ -1,4 +1,5 @@
 import "server-only";
+import type { Annotation } from "@/lib/annotations";
 import { lessonContentSchema, type LessonContent } from "@/schemas/lesson";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -65,6 +66,8 @@ export type StudyLesson = {
   aids: StudyAid[];
   stories: StudyStory[];
   savedAids: SavedAid[];
+  // The student's own marks and notes on this topic (Phase 3a), placed by the reader.
+  annotations: Annotation[];
 };
 
 // A saved aid as the pages show it.
@@ -94,15 +97,16 @@ export async function getStudyLesson(topicId: string): Promise<Loaded<StudyLesso
   const base = { topic: { id: topic.data.id, name: topic.data.name }, course: course.data };
   const content = lesson.data ? lessonContentSchema.safeParse(lesson.data.content) : null;
   if (!lesson.data || !content?.success) {
-    return { status: "ok", data: { ...base, lesson: null, checkpoints: [], authorities: [], aids: [], stories: [], savedAids: [] } };
+    return { status: "ok", data: { ...base, lesson: null, checkpoints: [], authorities: [], aids: [], stories: [], savedAids: [], annotations: [] } };
   }
 
-  const [checkpoints, authorities, extras, saved] = await Promise.all([
+  const [checkpoints, authorities, extras, saved, marks] = await Promise.all([
     db.from("lesson_checkpoints").select("id, placement, after_section, kind, prompt, choices, key_point").eq("lesson_id", lesson.data.id).order("position"),
     db.from("lesson_authorities").select("key, kind, name, citation, court, facts, facts_from_library, issue, decision, principle, sources").eq("lesson_id", lesson.data.id),
     // Readable only when approved (row-level security); otherwise the lesson shows without them.
     db.from("lesson_extras").select("id").eq("lesson_id", lesson.data.id).maybeSingle(),
     db.from("saved_memory_aids").select("id, aid_id, kind, title, device, items, explanation, made_for_me").eq("topic_id", topicId).order("created_at"),
+    db.from("lesson_annotations").select("id, lesson_id, section, paragraph, start_offset, end_offset, quote, style, note").eq("topic_id", topicId).order("created_at"),
   ]);
   const [aids, stories] = extras.data
     ? await Promise.all([
@@ -160,6 +164,17 @@ export async function getStudyLesson(topicId: string): Promise<Loaded<StudyLesso
         choices: Array.isArray(s.choices) ? s.choices.filter((x): x is string => typeof x === "string") : null,
       })),
       savedAids: (saved.data ?? []).map(toSavedAid),
+      annotations: (marks.data ?? []).map((m) => ({
+        id: m.id,
+        lessonId: m.lesson_id,
+        section: m.section,
+        paragraph: m.paragraph,
+        start: m.start_offset,
+        end: m.end_offset,
+        quote: m.quote,
+        style: m.style,
+        note: m.note,
+      })),
     },
   };
 }
