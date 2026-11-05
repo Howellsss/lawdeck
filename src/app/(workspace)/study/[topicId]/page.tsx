@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { BeforeYouMoveOn } from "@/components/study/BeforeYouMoveOn";
+import { BulkApprovedNote } from "@/components/study/BulkApprovedNote";
 import { LessonReader } from "@/components/study/LessonReader";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
@@ -41,6 +42,7 @@ async function Study({ params }: { params: Promise<{ topicId: string }> }) {
       <Suspense fallback={null}>
         <BeforeYouMoveOn compact />
       </Suspense>
+      {data.lesson?.bulkApproved && <BulkApprovedNote lessonId={data.lesson.id} />}
       {data.lesson ? (
         <LessonReader data={{ ...data, lesson: data.lesson }} />
       ) : (

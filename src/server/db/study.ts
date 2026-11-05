@@ -33,7 +33,7 @@ export type StudyAuthority = {
 export type StudyLesson = {
   topic: { id: string; name: string };
   course: { slug: string; name: string };
-  lesson: { id: string; version: number; title: string; content: LessonContent } | null;
+  lesson: { id: string; version: number; title: string; content: LessonContent; bulkApproved: boolean } | null;
   checkpoints: StudyCheckpoint[];
   authorities: StudyAuthority[];
 };
@@ -47,7 +47,7 @@ export async function getStudyLesson(topicId: string): Promise<Loaded<StudyLesso
   if (topic.error || !topic.data) return { status: "ok", data: null };
   const [course, lesson] = await Promise.all([
     db.from("courses").select("slug, name").eq("id", topic.data.course_id).single(),
-    db.from("topic_lessons").select("id, version, title, content").eq("topic_id", topicId).eq("status", "approved").maybeSingle(),
+    db.from("topic_lessons").select("id, version, title, content, bulk_approved").eq("topic_id", topicId).eq("status", "approved").maybeSingle(),
   ]);
   if (course.error) return { status: "ok", data: null };
   const base = { topic: { id: topic.data.id, name: topic.data.name }, course: course.data };
@@ -62,7 +62,7 @@ export async function getStudyLesson(topicId: string): Promise<Loaded<StudyLesso
     status: "ok",
     data: {
       ...base,
-      lesson: { id: lesson.data.id, version: lesson.data.version, title: lesson.data.title, content: content.data },
+      lesson: { id: lesson.data.id, version: lesson.data.version, title: lesson.data.title, content: content.data, bulkApproved: lesson.data.bulk_approved },
       checkpoints: (checkpoints.data ?? []).map((c) => ({
         id: c.id,
         placement: c.placement,

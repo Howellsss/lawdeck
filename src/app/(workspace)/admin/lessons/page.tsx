@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { ApproveCourseButton } from "@/components/lessons/ApproveCourseButton";
+import { BulkWriteLessons } from "@/components/lessons/BulkWriteLessons";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { formatWat } from "@/lib/dates";
 import { REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
@@ -27,6 +29,9 @@ async function Overview() {
   const all = overview.courses.flatMap((course) => course.topics);
   const approved = all.filter((topic) => topic.lesson?.status === "approved").length;
   const waiting = all.filter((topic) => topic.lesson?.status === "pending").length;
+  const missing = overview.courses.flatMap((course) =>
+    course.topics.filter((topic) => !topic.lesson).map((topic) => ({ id: topic.id, name: topic.name, courseId: course.id, courseName: course.name })),
+  );
   return (
     <>
       <h1 className="font-serif text-3xl font-normal text-greeting">Lessons</h1>
@@ -37,11 +42,21 @@ async function Overview() {
       <p className="text-sm text-muted">
         {all.length} topics · {approved} approved · {waiting} awaiting review · {all.length - all.filter((t) => t.lesson).length} not written yet
       </p>
+      <BulkWriteLessons topics={missing} courses={overview.courses.map((c) => ({ id: c.id, name: c.name }))} />
       {overview.courses.map((course) => (
         <section key={course.id} aria-labelledby={`course-${course.id}`} className="flex flex-col gap-2">
-          <h2 id={`course-${course.id}`} className="font-serif text-2xl font-normal">
-            {course.name}
-          </h2>
+          <div className="flex flex-wrap items-center justify-between gap-2">
+            <h2 id={`course-${course.id}`} className="font-serif text-2xl font-normal">
+              {course.name}
+            </h2>
+            {course.topics.some((t) => t.lesson?.status === "pending") && (
+              <ApproveCourseButton
+                courseId={course.id}
+                courseName={course.name}
+                waiting={course.topics.filter((t) => t.lesson?.status === "pending").length}
+              />
+            )}
+          </div>
           {course.topics.length === 0 ? (
             <p className="rounded-2xl border border-dashed border-line px-4 py-6 text-center text-muted">
               No topics yet. Add them on the course&rsquo;s page under Courses.
@@ -55,7 +70,7 @@ async function Overview() {
                   </Link>
                   <span className={`text-sm ${topic.lesson?.status === "approved" ? "text-success" : "text-muted"}`}>
                     {topic.lesson
-                      ? `${REVIEW_STATUS_LABELS[topic.lesson.status]} · version ${topic.lesson.version} · ${formatWat(topic.lesson.updatedAt)}`
+                      ? `${REVIEW_STATUS_LABELS[topic.lesson.status]}${topic.lesson.bulkApproved ? " with course" : ""} · version ${topic.lesson.version} · ${formatWat(topic.lesson.updatedAt)}`
                       : "Not written yet"}
                   </span>
                 </li>

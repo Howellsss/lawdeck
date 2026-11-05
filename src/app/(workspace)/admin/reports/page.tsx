@@ -11,7 +11,7 @@ import { listReports } from "@/server/db/feedback";
 
 export const metadata: Metadata = { title: "Reports · Lawdeck" };
 
-const KIND = { answer: "Answer", document: "Document", brief: "Brief", practice_item: "Practice question" } as const;
+const KIND = { answer: "Answer", document: "Document", brief: "Brief", practice_item: "Practice question", lesson: "Lesson" } as const;
 
 // Problems students reported (PRD FB-01): reviewers and admins only; everyone else gets
 // "page not found".

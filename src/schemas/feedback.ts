@@ -1,7 +1,7 @@
 import { z } from "@/lib/zod";
 
 // Report a problem (PRD FB-01) and takedown requests (PRD FB-03): Phase 6, step 6f.
-export const REPORT_TARGETS = ["answer", "document", "brief", "practice_item"] as const;
+export const REPORT_TARGETS = ["answer", "document", "brief", "practice_item", "lesson"] as const;
 export type ReportTarget = (typeof REPORT_TARGETS)[number];
 
 export const REPORT_CATEGORIES = {

@@ -12,7 +12,7 @@ export type LessonOverview = {
   courses: {
     id: string;
     name: string;
-    topics: { id: string; name: string; lesson: { status: ReviewStatus; version: number; updatedAt: string } | null }[];
+    topics: { id: string; name: string; lesson: { status: ReviewStatus; version: number; updatedAt: string; bulkApproved: boolean } | null }[];
   }[];
 };
 
@@ -23,7 +23,7 @@ export async function listLessonOverview(): Promise<LessonOverview | null> {
   const [courses, topics, lessons] = await Promise.all([
     db.from("courses").select("id, name, position").order("position"),
     db.from("topics").select("id, name, course_id, position").order("position"),
-    db.from("topic_lessons").select("topic_id, status, version, updated_at"),
+    db.from("topic_lessons").select("topic_id, status, version, updated_at, bulk_approved"),
   ]);
   if (courses.error || topics.error || lessons.error) {
     console.error("lesson overview failed", { code: courses.error?.code ?? topics.error?.code ?? lessons.error?.code });
@@ -37,7 +37,7 @@ export async function listLessonOverview(): Promise<LessonOverview | null> {
         .filter((topic) => topic.course_id === course.id)
         .map((topic) => {
           const lesson = lessons.data.find((l) => l.topic_id === topic.id);
-          return { id: topic.id, name: topic.name, lesson: lesson ? { status: lesson.status, version: lesson.version, updatedAt: lesson.updated_at } : null };
+          return { id: topic.id, name: topic.name, lesson: lesson ? { status: lesson.status, version: lesson.version, updatedAt: lesson.updated_at, bulkApproved: lesson.bulk_approved } : null };
         }),
     })),
   };
@@ -52,6 +52,7 @@ export type LessonForReview = {
     status: ReviewStatus;
     version: number;
     reviewNote: string | null;
+    bulkApproved: boolean;
     updatedAt: string;
     model: string | null;
     content: LessonContent | null;
@@ -89,6 +90,7 @@ export async function getLessonForReview(topicId: string): Promise<LessonForRevi
       status: lesson.data.status,
       version: lesson.data.version,
       reviewNote: lesson.data.review_note,
+      bulkApproved: lesson.data.bulk_approved,
       updatedAt: lesson.data.updated_at,
       model: lesson.data.model,
       content: content.success ? content.data : null,

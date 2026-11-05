@@ -52,6 +52,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - No legal content in code. It lives in the knowledge base or `src/templates`.
 - Templates and forum formatting profiles are data files validated by schema. One renderer makes preview, DOCX and PDF.
 - Unreviewed content and templates are never shown to students.
+- Exception (founder's decision, 2026-11-05): a reviewer may approve all of a course's Topic Lessons at once. Those lessons are marked; students see "Not yet read in full by a reviewer" with Report a problem until a reviewer reads one and clicks "I have read it in full". Reminder: build skim, tick and approve next, to replace this.
 
 ## Look (from the Lawdeck UI Design canvas)
 - Black and white, calm, input-first. Tokens live in `src/app/globals.css`.

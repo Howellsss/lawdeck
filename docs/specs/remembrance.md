@@ -125,3 +125,15 @@ learning record is its owner's alone (staff do not read them); one session per t
 - At the end: how many were remembered, a refresher link to each topic with a missed point, and
   "Continue to today's study". "Stop here" is always there; unanswered questions stay due.
 - No AI cost: multiple choice is marked by Lawdeck, written answers self-marked.
+
+## Writing and approving many lessons (founder, 2026-11-05)
+- **Write all missing lessons** (Admin → Lessons): for all courses or one, writes every topic that
+  has no lesson, 3 at a time, through the same route as a single lesson. Shows the estimated cost
+  (US$0.20–0.50 a lesson) and asks first; lists failures with "Try again". The page stays open
+  while it runs. Lessons already written are never rewritten.
+- **Approve all awaiting review** (per course): approves that course's pending lessons and marks
+  them `bulk_approved` (migration 46). Students see "Not yet read in full by a reviewer" and
+  Report a problem (report kind `lesson`). A reviewer who reads one clicks "I have read it in
+  full" to clear the mark. Any later change sends it back to review, unmarked.
+- **Reminder:** next, "skim, tick and approve": a quick "Looks right" tick per lesson and
+  "Approve all ticked", so every lesson is looked at once before students see it unmarked.

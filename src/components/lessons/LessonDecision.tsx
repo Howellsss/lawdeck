@@ -7,7 +7,7 @@ import { decideLesson } from "@/server/lessons/actions";
 
 // A reviewer's decision: approve (students see it), reject with a note, or withdraw an approved
 // lesson. The database records who decided and when.
-export function LessonDecision({ lessonId, status, note }: { lessonId: string; status: string; note: string | null }) {
+export function LessonDecision({ lessonId, status, note, bulkApproved = false }: { lessonId: string; status: string; note: string | null; bulkApproved?: boolean }) {
   const [text, setText] = useState(note ?? "");
   const [busy, setBusy] = useState(false);
   const [message, setMessage] = useState<string>();
@@ -49,6 +49,11 @@ export function LessonDecision({ lessonId, status, note }: { lessonId: string; s
         {status !== "rejected" && status !== "approved" && (
           <button type="button" disabled={busy} onClick={() => void decide("rejected")} className={compactSecondaryButton}>
             Reject
+          </button>
+        )}
+        {status === "approved" && bulkApproved && (
+          <button type="button" disabled={busy} onClick={() => void decide("approved")} className={compactPrimaryButton}>
+            I have read it in full
           </button>
         )}
         {status === "approved" && (
