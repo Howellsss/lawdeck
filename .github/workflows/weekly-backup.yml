@@ -38,12 +38,28 @@ jobs:
           sudo apt-get install -y --no-install-recommends postgresql-common
           sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
           sudo apt-get install -y --no-install-recommends postgresql-client-17
+      # The address is tidied (spaces, line breaks, quotation marks around it) and checked first, with
+      # a plain message for each common mistake. It is never printed: it holds the database password.
       - name: Dump and encrypt
         run: |
           set -euo pipefail
           umask 077
+          url="$(printf '%s' "$SUPABASE_DB_URL" | tr -d '\r\n' | sed -e "s/^[[:space:]\"']*//" -e "s/[[:space:]\"']*$//")"
+          echo "::add-mask::$url"
+          case "$url" in
+            postgres://*|postgresql://*) ;;
+            *) echo "SUPABASE_DB_URL must be only the address that starts with postgresql:// (Supabase > Connect > Direct > Session pooler)."; exit 1 ;;
+          esac
+          if printf '%s' "$url" | grep -q 'YOUR-PASSWORD'; then
+            echo "SUPABASE_DB_URL still contains [YOUR-PASSWORD]: replace it (and its square brackets) with the database password."; exit 1
+          fi
+          rest="${url#*://}"
+          ats=$(printf '%s' "$rest" | tr -cd '@' | wc -c)
+          if [ "$ats" -ne 1 ]; then
+            echo "SUPABASE_DB_URL has $ats @ signs; it needs exactly one, just before the server name. A password with @ must have it written as %40, or choose a password with letters and numbers only."; exit 1
+          fi
           stamp=$(date -u +%Y-%m-%d)
-          /usr/lib/postgresql/17/bin/pg_dump "$SUPABASE_DB_URL" \
+          /usr/lib/postgresql/17/bin/pg_dump "$url" \
             --format=custom --no-owner --no-privileges \
             --schema=public --schema=auth --schema=storage \
             --file=lawdeck.dump
