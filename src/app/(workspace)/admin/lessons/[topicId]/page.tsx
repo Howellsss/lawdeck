@@ -56,7 +56,8 @@ async function Review({ params }: { params: Promise<{ topicId: string }> }) {
         <h1 className="font-serif text-3xl font-normal text-greeting">{data.topic.name}</h1>
         {lesson && (
           <p className={`text-sm ${lesson.status === "approved" ? "text-success" : "text-muted"}`}>
-            {REVIEW_STATUS_LABELS[lesson.status]} · version {lesson.version} · {formatWat(lesson.updatedAt)}
+            {REVIEW_STATUS_LABELS[lesson.status]}
+            {lesson.bulkApproved ? " with its course (not yet read in full; students see a note)" : ""} · version {lesson.version} · {formatWat(lesson.updatedAt)}
             {lesson.model ? ` · written by ${lesson.model}` : ""}
           </p>
         )}
@@ -74,7 +75,7 @@ async function Review({ params }: { params: Promise<{ topicId: string }> }) {
         </p>
       ) : (
         <>
-          <LessonDecision lessonId={lesson.id} status={lesson.status} note={lesson.reviewNote} />
+          <LessonDecision lessonId={lesson.id} status={lesson.status} note={lesson.reviewNote} bulkApproved={lesson.bulkApproved} />
           <HighlightFrame>
             <LessonBody
               content={lesson.content}

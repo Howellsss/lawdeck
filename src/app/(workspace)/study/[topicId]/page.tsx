@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { BulkApprovedNote } from "@/components/study/BulkApprovedNote";
 import { LessonReader } from "@/components/study/LessonReader";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
@@ -37,6 +38,7 @@ async function Study({ params }: { params: Promise<{ topicId: string }> }) {
         </Link>
         <h1 className="font-serif text-3xl font-normal text-greeting">{data.topic.name}</h1>
       </div>
+      {data.lesson?.bulkApproved && <BulkApprovedNote lessonId={data.lesson.id} />}
       {data.lesson ? (
         <LessonReader data={{ ...data, lesson: data.lesson }} />
       ) : (

@@ -171,7 +171,7 @@ export type Database = {
         Row: {
           id: string;
           owner_id: string;
-          target_kind: "answer" | "document" | "brief" | "practice_item";
+          target_kind: "answer" | "document" | "brief" | "practice_item" | "lesson";
           target_id: string;
           category: "wrong_law" | "outdated" | "unclear" | "formatting" | "other";
           note: string | null;
@@ -181,7 +181,7 @@ export type Database = {
           created_at: string;
         };
         Insert: {
-          target_kind: "answer" | "document" | "brief" | "practice_item";
+          target_kind: "answer" | "document" | "brief" | "practice_item" | "lesson";
           target_id: string;
           category: "wrong_law" | "outdated" | "unclear" | "formatting" | "other";
           note?: string | null;
@@ -642,6 +642,8 @@ export type Database = {
           model: string | null;
           prompt_version: string | null;
           review_note: string | null;
+          // Approved with its whole course, not yet read in full (migration 46).
+          bulk_approved: boolean;
         } & Reviewed &
           Timestamps;
         Insert: { topic_id: string; title: string; content?: Json; model?: string | null; prompt_version?: string | null };
@@ -652,6 +654,7 @@ export type Database = {
           model?: string | null;
           prompt_version?: string | null;
           review_note?: string | null;
+          bulk_approved?: boolean;
         };
         Relationships: [];
       };
