@@ -1,7 +1,7 @@
 "use client";
 
 import { useId, useState } from "react";
-import { compactSecondaryButton } from "@/components/ui/buttons";
+import { Icon } from "@/components/ui/Icon";
 import type { StudyStory } from "@/server/db/study";
 import { checkStoryAnswer } from "@/server/study/aids";
 import { AnotherStory } from "./AnotherStory";
@@ -30,10 +30,28 @@ export function StoryCard({ story, authorityName }: { story: StudyStory; authori
     setResult(answer);
   }
 
+  // Closed: a card of its own (book symbol, kind and title), so it does not look like an ordinary
+  // button among the lesson's other cards (founder, 2026-11-06).
   if (!open)
     return (
-      <button type="button" onClick={() => setOpen(true)} className={`${compactSecondaryButton} self-start`} aria-expanded={false} aria-controls={id}>
-        Read it as a story: {story.title}
+      <button
+        type="button"
+        onClick={() => setOpen(true)}
+        aria-expanded={false}
+        aria-controls={id}
+        aria-label={`Read it as a story: ${story.title}`}
+        className="flex w-full items-center gap-3 rounded-2xl border border-line bg-surface px-4 py-3 text-left hover:border-ink"
+      >
+        <span aria-hidden className="flex size-9 shrink-0 items-center justify-center rounded-full border border-line">
+          <Icon name="book" size={18} />
+        </span>
+        <span className="flex min-w-0 flex-1 flex-col">
+          <span className="text-xs uppercase tracking-[0.14em] text-muted">{story.kind === "everyday" ? "Story" : "Case story"}</span>
+          <span className="break-words font-serif text-lg leading-snug">{story.title}</span>
+        </span>
+        <span aria-hidden className="shrink-0 text-sm text-muted">
+          Read it ›
+        </span>
       </button>
     );
 

@@ -43,3 +43,20 @@ test("saving needs an account: a visitor is told plainly", async ({ page }) => {
   await page.getByRole("button", { name: "Save “Made-up licence conditions” to my memory aids" }).click();
   await expect(page.getByRole("region", { name: "Memory aid: Made-up licence conditions" }).getByRole("alert")).toContainText("Sign in to save memory aids.");
 });
+
+// "Stories in this topic" (founder, 2026-11-06): every story listed at the top, as cards that open in place.
+for (const width of [360, 1200]) {
+  test(`a topic lists its stories at the top as cards that open in place (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/test-pages/topic-stories");
+    await expect(page.getByText("Stories in this topic (2)")).toBeVisible();
+    const card = page.getByRole("button", { name: "Read it as a story: The farm that was never inspected" });
+    await expect(card).toContainText("Case story");
+    await expect(page.getByRole("button", { name: "Read it as a story: Chidi's poultry licence" })).toContainText("Story");
+    await card.click();
+    await expect(page.getByText("Case story: Quokka v Numbat Licensing Board")).toBeVisible();
+    await expect(page.getByText("Inspection is a condition of validity.")).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
