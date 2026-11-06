@@ -16,7 +16,7 @@ export async function ChatGate() {
       </div>
       {status === "approved" ? (
         <p role="status" className="rounded-2xl border border-success px-4 py-4 text-[15px]">
-          <span className="font-medium text-success">You&rsquo;re verified.</span> Campus chat opens to students soon; you&rsquo;ll find it in the side menu.
+          <span className="font-medium text-success">You&rsquo;re verified.</span> Campus chat opens to students soon. Your groups will appear here when it does.
         </p>
       ) : status === "pending" ? (
         <p role="status" className="rounded-2xl border border-line bg-surface px-4 py-4 text-[15px]">

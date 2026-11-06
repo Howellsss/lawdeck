@@ -6,7 +6,7 @@ import { NAV_ICON_SIZE, navItemClass } from "./navStyles";
 import { SidebarSection } from "./SidebarSection";
 import { useSidebar } from "./sidebarContext";
 
-export function StaffNav({ isAdmin = false }: { isAdmin?: boolean }) {
+export function StaffNav({ isAdmin = false, chatWaiting = 0 }: { isAdmin?: boolean; chatWaiting?: number }) {
   const { collapsed, onNavigate } = useSidebar();
   const itemClass = (active: boolean) => navItemClass(active, collapsed);
   // Staff pages fold under "Admin", so the student-facing menu stays calm.
@@ -31,7 +31,10 @@ export function StaffNav({ isAdmin = false }: { isAdmin?: boolean }) {
       {isAdmin && (
         <NavLink href="/admin/chat" onNavigate={onNavigate} className={itemClass} match="prefix">
           <Icon name="chat" size={NAV_ICON_SIZE} />
-          <span className={collapsed ? "sr-only" : ""}>Chat checks</span>
+          <span className={collapsed ? "sr-only" : ""}>
+            Chat checks
+            {chatWaiting > 0 && <span className="ml-1.5 rounded-full bg-ink px-1.5 text-[11px] font-semibold text-on-ink">{chatWaiting}<span className="sr-only"> waiting</span></span>}
+          </span>
         </NavLink>
       )}
       <NavLink href="/admin/reports" onNavigate={onNavigate} className={itemClass} match="prefix">

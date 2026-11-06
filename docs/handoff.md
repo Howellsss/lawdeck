@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat Phase 3: files, reports, hide, open switch).
+Last updated: 2026-11-06 (campus chat entry: campus asked in chat, link for everyone).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -38,6 +38,8 @@ Last updated: 2026-11-06 (campus chat Phase 3: files, reports, hide, open switch
   aspirants see Aspirants only; contact details blocked. Phase 3 (migration 57): files in messages,
   Report a message, admin Hide, and the "Open chat to students" switch on Admin → Chat checks.
   Chat is still closed to students: the founder switches it on (after counsel's terms review).
+  Everyone signed in sees Campus chat in the side menu and can send their ID while it is closed;
+  the campus is asked there, not on the home page. Students also need pilot access to use chat.
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
 - **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch
   and pull request before touching `src/server/limits` or billing.

@@ -1,6 +1,6 @@
 import { expect, test } from "@playwright/test";
 
-// Campus choice (PRD v2.1 CH-01) on the test-only page: the home prompt asks for a campus, offers
+// Campus choice (PRD v2.1 CH-01) on the test-only page: the compact form asks for a campus, offers
 // "Law School aspirant", and the Account form starts on the saved campus.
 for (const width of [360, 1200]) {
   test(`students choose a campus or Law School aspirant (${width}px)`, async ({ page }) => {

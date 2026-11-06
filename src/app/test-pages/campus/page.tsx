@@ -4,7 +4,7 @@ import { Suspense } from "react";
 import { CampusForm } from "@/components/account/CampusForm";
 import { testPagesEnabled } from "../sample";
 
-// Campus choice test only (tests/voice/campus.spec.ts): the home-page prompt and the Account page
+// Campus choice test only (tests/voice/campus.spec.ts): the compact form and the Account page
 // form with the draft campus list, to check the layout on phones and desktops.
 // "Not found" unless LAWDECK_TEST_PAGES=1 (never set on the live site).
 const campuses = [

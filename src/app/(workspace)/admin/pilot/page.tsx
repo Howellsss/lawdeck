@@ -36,7 +36,7 @@ async function Pilot() {
         <h1 className="font-serif text-3xl font-normal text-greeting">Pilot</h1>
         <p className="text-muted">
           The pilot&apos;s tools: registered emails, invite codes, settings and limits. Student numbers, usage and costs are all on{" "}
-          <Link href="/admin/users">Users</Link>.
+          <Link href="/admin/users">Users</Link>. Campus chat ID requests are on <Link href="/admin/chat">Chat checks</Link>.
         </p>
       </div>
       <section aria-labelledby="emails-heading" className="flex flex-col gap-3 border-t border-line pt-6">
