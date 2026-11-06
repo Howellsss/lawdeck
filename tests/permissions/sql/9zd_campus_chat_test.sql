@@ -68,17 +68,26 @@ select test.check((select not open_to_students from public.chat_settings), 'stud
 select test.as_user('a5c55004-0000-0000-0000-000000000004');
 update public.chat_settings set open_to_students = true;
 reset role;
+-- Since migration 56 a student also needs an approved verification (9ze tests that in full).
+select test.as_user('a5c55001-0000-0000-0000-000000000001');
+insert into public.chat_verifications (kind, campus_key, id_number) values ('student', 'abuja', 'NLS/ABJ/55/1');
+reset role;
+select test.as_user('a5c55004-0000-0000-0000-000000000004');
+update public.chat_verifications set status = 'approved' where id_number = 'NLS/ABJ/55/1';
+reset role;
 
 select test.as_user('a5c55001-0000-0000-0000-000000000001');
-select test.check((select count(*) from public.chat_groups) >= 9, 'once open, students see the groups');
-select test.check((select count(*) from public.chat_messages) >= 2, 'and the messages');
+select test.check((select count(*) from public.chat_groups) = 2, 'once open, a verified student sees their campus and All campuses');
+select test.check((select count(*) from public.chat_messages) >= 1, 'and the messages there');
 insert into public.chat_members default values;
 insert into public.chat_messages (group_id, body) select id, 'Hello from Ada' from public.chat_groups where key = 'abuja';
 select test.check((select count(*) from public.chat_people_search('Ada')) = 1, 'a student is found by the name they signed up with');
 select test.check((select unread from public.chat_unread_counts() u join public.chat_groups g on g.id = u.group_id where g.key = 'abuja') = 0,
   'their own messages are not unread for them');
 delete from public.chat_messages where body = 'Who has the #civil notes for Order 3?';
+reset role;
 select test.check((select count(*) from public.chat_messages where body like 'Who has%') = 1, 'a student cannot delete someone else''s message');
+select test.as_user('a5c55001-0000-0000-0000-000000000001');
 delete from public.chat_messages where body = 'Hello from Ada';
 select test.check((select count(*) from public.chat_messages where body = 'Hello from Ada') = 0, 'but can delete their own');
 select test.check((select count(*) from public.chat_blocked_words) = 0, 'students cannot read the blocked word list');
@@ -86,7 +95,7 @@ select test.refused($$insert into public.chat_blocked_words values ('hello')$$, 
 reset role;
 
 select test.as_user('a5c55002-0000-0000-0000-000000000002');
-select test.check((select count(*) from public.chat_people_search('Ada')) = 1, 'other students can @mention a member');
+select test.check((select count(*) from public.chat_people_search('Ada')) = 0, 'an unverified student cannot look anyone up');
 select test.check((select count(*) from public.chat_people(array['a5c55002-0000-0000-0000-000000000002'::uuid])) = 0,
   'people who have not joined chat are never listed');
 reset role;

@@ -250,6 +250,9 @@ test("Lessons pages are hidden from visitors, and writing a lesson is refused", 
   await page.goto("/admin/lessons/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await expect(page.getByRole("button", { name: /Write the lesson/ })).toHaveCount(0);
+  await page.goto("/admin/chat");
+  await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Chat checks" })).toHaveCount(0);
   await page.goto("/admin/lessons/read/3f2b6d1e-8c4a-4e1f-9b2d-7a6c5e4d3b2a");
   await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   await expect(page.getByRole("button", { name: "Approve as read in full" })).toHaveCount(0);

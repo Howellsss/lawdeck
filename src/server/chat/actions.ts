@@ -60,6 +60,9 @@ export async function sendMessage(input: { groupId: string; text: string; picked
     if (error.message.includes("blocked_word")) {
       return { ok: false, message: "Your message wasn’t sent: it contains a word that isn’t allowed in Lawdeck chat. Please reword it." };
     }
+    if (error.message.includes("contact_details")) {
+      return { ok: false, message: "Your message wasn’t sent: phone numbers, email addresses and WhatsApp or social links aren’t allowed in Lawdeck chat, to keep everyone safe." };
+    }
     if (error.message.includes("post_limit")) return { ok: false, message: "You’re sending messages very quickly. Please wait a minute, then try again." };
     if (error.code === "42501") return { ok: false, message: "Please accept the community rules before posting." };
     console.error("chat send failed", { code: error.code });

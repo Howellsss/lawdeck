@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { redirect } from "next/navigation";
 import { Suspense } from "react";
-import { ChatClosed } from "@/components/chat/ChatClosed";
+import { ChatGate } from "@/components/chat/ChatGate";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { getCurrentAccount } from "@/server/auth/session";
@@ -20,6 +20,6 @@ export default function ChatHome() {
 
 async function Home() {
   if (!(await getCurrentAccount())) return <SignInPrompt level={1} what="campus chat" returnTo="/chat" />;
-  if (!(await chatAllowed())) return <ChatClosed />;
+  if (!(await chatAllowed())) return <ChatGate />;
   redirect(`/chat/${await homeGroupKey()}`);
 }

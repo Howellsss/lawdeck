@@ -42,3 +42,22 @@ for (const width of [360, 1280]) {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+// Verification before chat (founder, 2026-11-06): students send their Law School ID; aspirants their
+// university ID, for the Aspirants group only.
+for (const width of [360, 1280]) {
+  test(`students verify with their ID before joining chat (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/test-pages/chat-verify");
+    await expect(page.getByLabel("A Law School student")).toBeChecked();
+    await expect(page.getByLabel("Your campus")).toHaveValue("lagos");
+    await expect(page.getByLabel("Your Law School number")).toBeVisible();
+    await expect(page.getByText(/deleted as soon as they decide/)).toBeVisible();
+    await page.getByLabel("A Law School aspirant").check();
+    await expect(page.getByLabel("Your campus")).toHaveCount(0);
+    await expect(page.getByLabel("Your university matriculation number")).toBeVisible();
+    await expect(page.getByLabel(/university ID or final-year letter/).first()).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}

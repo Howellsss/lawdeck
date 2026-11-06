@@ -302,6 +302,25 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      // Chat verification (migration 56).
+      chat_verifications: {
+        Row: {
+          id: string;
+          owner_id: string;
+          kind: "student" | "aspirant";
+          campus_key: string;
+          id_number: string;
+          document_path: string | null;
+          status: "pending" | "approved" | "rejected" | "revoked";
+          note: string | null;
+          created_at: string;
+          decided_at: string | null;
+          decided_by: string | null;
+        };
+        Insert: { kind: "student" | "aspirant"; campus_key: string; id_number: string; document_path?: string | null };
+        Update: { status?: "pending" | "approved" | "rejected" | "revoked"; note?: string | null; document_path?: string | null };
+        Relationships: [];
+      };
       chat_reads: {
         Row: { owner_id: string; group_id: string; last_read_at: string };
         Insert: { group_id: string; last_read_at?: string };
@@ -1337,6 +1356,24 @@ export type Database = {
       has_pilot_access: { Args: Record<string, never>; Returns: boolean };
       // Campus chat (migration 55).
       chat_allowed: { Args: Record<string, never>; Returns: boolean };
+      chat_scope: { Args: Record<string, never>; Returns: string | null };
+      chat_verification_queue: {
+        Args: Record<string, never>;
+        Returns: {
+          id: string;
+          owner_id: string;
+          name: string | null;
+          email: string;
+          kind: "student" | "aspirant";
+          campus: string | null;
+          id_number: string;
+          has_document: boolean;
+          status: "pending" | "approved" | "rejected" | "revoked";
+          note: string | null;
+          created_at: string;
+          decided_at: string | null;
+        }[];
+      };
       chat_unread_counts: { Args: Record<string, never>; Returns: { group_id: string; unread: number }[] };
       chat_people: { Args: { people: string[] }; Returns: { id: string; name: string; campus: string | null }[] };
       chat_people_search: { Args: { q: string }; Returns: { id: string; name: string; campus: string | null }[] };

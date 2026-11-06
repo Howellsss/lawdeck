@@ -14,6 +14,22 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
 - Look: Slack-style layout (clean lines, names and times, day markers, a formatting bar) in
   Lawdeck's own black-and-white tokens.
 
+## Who may use chat (founder, 2026-11-06, after Phase 2)
+- **Verification first:** a free account is not enough. A student sends a photo or PDF of their Law
+  School ID card or admission letter and their Law School number; an aspirant, their university ID or
+  final-year letter and matriculation number (`/chat` shows the form; `ChatVerifyForm`,
+  `src/server/chat/verification.ts`). The document goes to a private store (`chat-ids`, own folder,
+  readable only by admins), its real type is checked, and it is deleted as soon as an admin decides.
+- **Admin → Chat checks** (`/admin/chat`, admins only): view the ID for 2 minutes, Approve, Reject with
+  a reason the student sees, or Remove from chat (permanent; they cannot ask again). Approval sets the
+  student's campus to the verified one.
+- **Groups (founder: option A):** a verified student sees their own campus group and All campuses only;
+  an aspirant sees only Aspirants; staff see every group (`chat_scope()`, `chat_group_visible()`).
+- **No contact harvesting:** phone numbers (any format), email addresses and WhatsApp, Telegram or
+  social links are refused in messages, like blocked words; no direct messages; no member list.
+- Side menu: staff always see Campus chat; students see it once chat is open to them (Phase 3), and
+  land on the verification form until approved. Migration 56.
+
 ## Phases
 1. **Campus choice (built):** migration 54 adds `campuses` (reference data, readable by signed-in
    people, changed only by migration) and makes `profiles.campus` a key on that list. Draft list:
@@ -49,4 +65,7 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
 - `tests/permissions/sql/9zd_campus_chat_test.sql` (staff only until opened, rules first, word filter,
   posting limit, own messages only, members only listed), `tests/unit/chatFormat.test.ts`,
   `tests/unit/chatTime.test.ts`, `tests/unit/chatComposer.test.ts`, `tests/voice/chat.spec.ts`
-  (test page `/test-pages/chat`, 360 px and desktop); e2e: chat pages ask visitors to sign in.
+  (test pages `/test-pages/chat` and `/test-pages/chat-verify`, 360 px and desktop); e2e: chat pages
+  ask visitors to sign in; Admin → Chat checks is hidden from visitors.
+- `tests/permissions/sql/9ze_chat_verification_test.sql` (free accounts see nothing, one open request,
+  admins decide, groups per campus, aspirants apart, contact details refused, removal, ID documents).

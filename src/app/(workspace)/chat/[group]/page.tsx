@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
-import { ChatClosed } from "@/components/chat/ChatClosed";
+import { ChatGate } from "@/components/chat/ChatGate";
 import { ChatRoom } from "@/components/chat/ChatRoom";
 import { ChatRules } from "@/components/chat/ChatRules";
 import { ChatShell } from "@/components/chat/ChatShell";
@@ -34,7 +34,7 @@ async function Group({ params }: { params: Promise<{ group: string }> }) {
   const key = keySchema.safeParse((await params).group);
   if (!key.success) notFound();
   if (!(await getCurrentAccount())) return <SignInPrompt level={1} what="campus chat" returnTo={`/chat/${key.data}`} />;
-  if (!(await chatAllowed())) return <ChatClosed />;
+  if (!(await chatAllowed())) return <ChatGate />;
   const room = await getChatRoom(key.data);
   if (!room) notFound();
   return (

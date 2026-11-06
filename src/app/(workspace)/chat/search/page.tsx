@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { ChatBody } from "@/components/chat/ChatBody";
-import { ChatClosed } from "@/components/chat/ChatClosed";
+import { ChatGate } from "@/components/chat/ChatGate";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { dayLabel, watDay, watTime } from "@/lib/chatTime";
@@ -39,7 +39,7 @@ async function Search({ searchParams }: { searchParams: Promise<Record<string, s
   if (!parsed.success) notFound();
   const { q, tag } = parsed.data;
   if (!(await getCurrentAccount())) return <SignInPrompt level={1} what="campus chat" returnTo="/chat/search" />;
-  if (!(await chatAllowed())) return <ChatClosed />;
+  if (!(await chatAllowed())) return <ChatGate />;
   const results = q || tag ? await searchChat(q, tag ?? null) : [];
   return (
     <>

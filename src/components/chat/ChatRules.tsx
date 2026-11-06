@@ -27,7 +27,7 @@ export function ChatRules() {
         <li>Be respectful. No insults, harassment or hate.</li>
         <li>No vulgar or curse words: a message containing one is not sent.</li>
         <li>No exam leaks, cheating or sharing other people&rsquo;s work as your own.</li>
-        <li>Don&rsquo;t post phone numbers, addresses or other private details.</li>
+        <li>No phone numbers, email addresses or WhatsApp and social links: a message containing one is not sent.</li>
         <li>Messages are students&rsquo; own words, not checked by Lawdeck. Report anything that breaks these rules.</li>
       </ul>
       <div className="flex flex-wrap items-center gap-3 pt-1">
