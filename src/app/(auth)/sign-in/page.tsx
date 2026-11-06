@@ -4,6 +4,7 @@ import { isGoogleSignInEnabled } from "@/server/auth/config";
 import Link from "next/link";
 import { AuthHero } from "@/components/auth/AuthHero";
 import { SignInForm } from "@/components/auth/SignInForm";
+import { SignUpLink } from "@/components/auth/SignUpLink";
 
 export const metadata: Metadata = { title: "Sign in · Lawdeck" };
 
@@ -21,7 +22,7 @@ export default function SignInPage() {
       )}
       <SignInForm />
       <p className="text-sm text-muted">
-        New to Lawdeck? <Link href="/sign-up">Create an account</Link>
+        New to Lawdeck? <SignUpLink />
       </p>
       <p className="text-sm text-muted">
         <Link href="/takedown">Request removal of material</Link>

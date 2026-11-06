@@ -82,6 +82,40 @@ export async function submitVerification(input: z.input<typeof requestSchema> & 
   return { ok: true };
 }
 
+const quickSchema = z
+  .object({
+    kind: z.enum(["student", "aspirant"], { error: "Choose Law School student or aspirant." }),
+    campusKey: z.string().regex(/^[a-z][a-z-]{1,39}$/, { error: "Choose your campus." }),
+    idNumber: z.string().trim().min(3, { error: "Type at least 3 characters." }).max(40, { error: "That number is too long." }),
+  })
+  .refine((r) => (r.kind === "aspirant") === (r.campusKey === "aspirant"), { error: "Choose your campus." });
+
+// Whether "Approve IDs automatically (testing)" is on (Admin -> Chat).
+export async function idTestMode(): Promise<boolean> {
+  if (!(await getCurrentAccount())) return false;
+  const db = await createSupabaseServerClient();
+  const { data } = await db.from("chat_settings").select("auto_approve_ids").eq("id", true).maybeSingle();
+  return data?.auto_approve_ids === true;
+}
+
+// While the test switch is on: the number only, no document; the database approves it at once.
+export async function submitQuickVerification(input: z.input<typeof quickSchema>): Promise<{ ok: true } | Fail> {
+  const parsed = quickSchema.safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Check the details." };
+  if (!(await getCurrentAccount())) return SIGN_IN;
+  if (!(await idTestMode())) return { ok: false, message: "Please add a photo or PDF of your ID." };
+  const db = await createSupabaseServerClient();
+  const { error } = await db.from("chat_verifications").insert({ kind: parsed.data.kind, campus_key: parsed.data.campusKey, id_number: parsed.data.idNumber });
+  if (error) {
+    if (error.code === "23505") return { ok: false, message: "You already have a request being checked." };
+    if (error.code === "42501") return { ok: false, message: "You can’t ask to join chat again." };
+    console.error("verification request failed", { code: error.code });
+    return { ok: false, message: "Your request wasn’t sent. Please try again." };
+  }
+  refresh();
+  return { ok: true };
+}
+
 export type MyVerification = { status: "pending" | "approved" | "rejected" | "revoked"; kind: "student" | "aspirant"; campusKey: string; note: string | null } | null;
 
 export async function getMyVerification(): Promise<MyVerification> {

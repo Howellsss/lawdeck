@@ -263,9 +263,9 @@ export type Database = {
       };
       // Campus chat, Phase 2 (migration 55).
       chat_settings: {
-        Row: { id: boolean; open_to_students: boolean; updated_at: string; call_minutes_month: number };
+        Row: { id: boolean; open_to_students: boolean; updated_at: string; call_minutes_month: number; auto_approve_ids: boolean };
         Insert: never;
-        Update: { open_to_students?: boolean; updated_at?: string; call_minutes_month?: number };
+        Update: { open_to_students?: boolean; updated_at?: string; call_minutes_month?: number; auto_approve_ids?: boolean };
         Relationships: [];
       };
       chat_groups: {
@@ -1446,6 +1446,13 @@ export type Database = {
         Returns: { topic_id: string; course: string; topic: string; lesson_title: string; bulk_approved: boolean }[];
       };
       chat_share_lesson: { Args: { g: string; topic: string; note?: string }; Returns: string };
+      // Invite links and the ID test switch (migration 66).
+      chat_link_create: { Args: { g: string }; Returns: string };
+      chat_link_revoke: { Args: { g: string }; Returns: undefined };
+      chat_link_status: { Args: { g: string }; Returns: string | null };
+      chat_link_open: { Args: { code: string }; Returns: { result: string; group_name: string | null; group_key: string | null }[] };
+      chat_link_claim_access: { Args: { code: string }; Returns: boolean };
+      chat_link_join: { Args: { code: string }; Returns: string };
       // Group calls (migration 65).
       chat_call_join: { Args: { g: string }; Returns: { call_id: string; room: string; started: boolean }[] };
       chat_call_heartbeat: { Args: { c: string }; Returns: string };

@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useId, useState } from "react";
 import { uploadFile } from "@/components/library/uploadFile";
 import { primaryButton } from "@/components/ui/buttons";
-import { startVerification, submitVerification } from "@/server/chat/verification";
+import { startVerification, submitQuickVerification, submitVerification } from "@/server/chat/verification";
 
 type Campus = { key: string; name: string; kind: "campus" | "aspirant" };
 
 // "Verify you're a Law School student" (docs/specs/chat.md): the student's ID card or admission
 // letter (an aspirant's university ID or final-year letter) and their number, checked by an admin.
-export function ChatVerifyForm({ campuses, campus, apiKey }: { campuses: Campus[]; campus: string | null; apiKey: string }) {
+// While the admin test switch is on ("quick"), the number alone is enough and is approved at once.
+export function ChatVerifyForm({ campuses, campus, apiKey, quick = false }: { campuses: Campus[]; campus: string | null; apiKey: string; quick?: boolean }) {
   const id = useId();
   const router = useRouter();
   const [kind, setKind] = useState<"student" | "aspirant">(campus === "aspirant" ? "aspirant" : "student");
@@ -20,6 +21,17 @@ export function ChatVerifyForm({ campuses, campus, apiKey }: { campuses: Campus[
 
   const submit = async (form: FormData) => {
     setError(undefined);
+    if (quick) {
+      setBusy("Sending…");
+      const sent = await submitQuickVerification({
+        kind,
+        campusKey: kind === "aspirant" ? "aspirant" : String(form.get("campus") ?? ""),
+        idNumber: String(form.get("idNumber") ?? ""),
+      });
+      setBusy(undefined);
+      if (!sent.ok) return setError(sent.message);
+      return router.refresh();
+    }
     const file = form.get("document");
     if (!(file instanceof File) || file.size === 0) return setError("Choose a photo or PDF of your ID or letter.");
     const details = {
@@ -50,8 +62,12 @@ export function ChatVerifyForm({ campuses, campus, apiKey }: { campuses: Campus[
         <legend className="mb-1 text-sm font-medium">I am</legend>
         {(
           [
-            ["student", "A Law School student", "Upload your Law School ID card or admission letter."],
-            ["aspirant", "A Law School aspirant", "Final-year at university: upload your university ID or final-year letter. You will join the Aspirants group."],
+            ["student", "A Law School student", quick ? "You will join your campus group and All campuses." : "Upload your Law School ID card or admission letter."],
+            [
+              "aspirant",
+              "A Law School aspirant",
+              quick ? "Final-year at university. You will join the Aspirants group." : "Final-year at university: upload your university ID or final-year letter. You will join the Aspirants group.",
+            ],
           ] as const
         ).map(([value, label, hint]) => (
           <label key={value} className="flex cursor-pointer items-start gap-3 rounded-xl border border-line px-3 py-2.5 has-[:checked]:border-ink">
@@ -82,6 +98,8 @@ export function ChatVerifyForm({ campuses, campus, apiKey }: { campuses: Campus[
         {kind === "student" ? "Your Law School number" : "Your university matriculation number"}
         <input name="idNumber" required minLength={3} maxLength={40} autoComplete="off" className="h-11 rounded-lg border border-line bg-surface px-3 text-[16px] font-normal sm:max-w-xs" />
       </label>
+      {!quick && (
+      <>
       <label htmlFor={`${id}-doc`} className="flex flex-col gap-1 text-sm font-medium">
         {kind === "student" ? "Photo or PDF of your Law School ID card or admission letter" : "Photo or PDF of your university ID or final-year letter"}
         <input id={`${id}-doc`} name="document" type="file" required accept="image/png,image/jpeg,application/pdf" className="text-[15px] font-normal file:mr-3 file:rounded-full file:border file:border-line file:bg-surface file:px-3 file:py-1.5" />
@@ -89,9 +107,11 @@ export function ChatVerifyForm({ campuses, campus, apiKey }: { campuses: Campus[
       <p className="text-sm text-muted">
         Only Lawdeck admins see your document, only to check you&rsquo;re a student. It is deleted as soon as they decide. PNG, JPEG or PDF, up to 10 MB.
       </p>
+      </>
+      )}
       <div className="flex flex-wrap items-center gap-3">
         <button type="submit" disabled={Boolean(busy)} className={primaryButton}>
-          {busy ?? "Send for checking"}
+          {busy ?? (quick ? "Join chat" : "Send for checking")}
         </button>
         {error && (
           <p role="alert" className="text-sm text-warning">

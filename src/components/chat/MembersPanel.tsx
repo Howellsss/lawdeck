@@ -5,11 +5,12 @@ import { useState } from "react";
 import { compactPrimaryButton, compactSecondaryButton, compactWarningButton } from "@/components/ui/buttons";
 import type { ChatGroup, GroupPerson } from "@/server/chat/data";
 import { deleteGroup, leaveGroup, removeMember, renameGroup } from "@/server/chat/groups";
+import { InviteLinkBox } from "./InviteLinkBox";
 import { InvitePeople } from "./InvitePeople";
 
 // A study group's Members tab: who is in it and who is invited; invite more people; the creator
 // renames the group, removes people or deletes it; others can leave.
-export function MembersPanel({ group, people, me }: { group: ChatGroup; people: GroupPerson[]; me: string }) {
+export function MembersPanel({ group, people, me, linkUntil = null }: { group: ChatGroup; people: GroupPerson[]; me: string; linkUntil?: string | null }) {
   const router = useRouter();
   const [name, setName] = useState(group.name);
   const [error, setError] = useState<string>();
@@ -32,6 +33,7 @@ export function MembersPanel({ group, people, me }: { group: ChatGroup; people: 
         </p>
       )}
       <InvitePeople groupId={group.id} />
+      {group.mine && <InviteLinkBox groupId={group.id} linkUntil={linkUntil} />}
       <section aria-labelledby="members-h" className="flex flex-col gap-2">
         <h2 id="members-h" className="text-[16px] font-medium">
           Members ({members.length}){invited.length > 0 && <span className="font-normal text-muted"> · {invited.length} invited</span>}

@@ -34,7 +34,7 @@ async function Members({ params }: { params: Promise<{ group: string }> }) {
   const campusName = page.groups.find((g) => g.key === campus)?.name ?? null;
   return (
     <ChatShell groups={page.groups} group={page.group} tab="members" ownCampusName={campusName} invites={page.invites}>
-      <MembersPanel group={page.group} people={page.people} me={page.me} />
+      <MembersPanel group={page.group} people={page.people} me={page.me} linkUntil={page.linkUntil} />
     </ChatShell>
   );
 }
