@@ -13,6 +13,7 @@ export const quizStateSchema = z.object({
   total: z.number().int(),
   current: z.number().int(),
   seconds: z.number().int(),
+  readyIn: z.number().default(0),
   secondsLeft: z.number(),
   answered: z.number().int(),
   question: z.object({ prompt: z.string(), choices: z.array(z.string()) }).nullable(),
@@ -22,7 +23,9 @@ export const quizStateSchema = z.object({
   myChoice: z.number().int().nullable(),
   myCorrect: z.boolean().nullable(),
   myPoints: z.number().int().nullable(),
-  leaderboard: z.array(z.object({ name: z.string(), points: z.number().int(), correct: z.number().int(), me: z.boolean() })),
+  counts: z.array(z.number().int()).nullable().default(null),
+  myStreak: z.number().int().default(0),
+  leaderboard: z.array(z.object({ name: z.string(), points: z.number().int(), correct: z.number().int(), streak: z.number().int().default(0), me: z.boolean() })),
 });
 export type QuizState = z.infer<typeof quizStateSchema>;
 

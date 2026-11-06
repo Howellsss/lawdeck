@@ -188,6 +188,17 @@ for (const width of [360, 1280]) {
     await setup.getByLabel("Topic").selectOption({ label: "Bail (6 questions)" });
     await expect(setup.getByRole("button", { name: "Create quiz" })).toBeEnabled();
 
+    // Sound: on by default, remembered on this phone.
+    await page.getByRole("button", { name: "Turn quiz sound off" }).click();
+    await expect(page.getByRole("button", { name: "Turn quiz sound on" })).toHaveAttribute("aria-pressed", "false");
+    await page.reload();
+    await expect(page.getByRole("button", { name: "Turn quiz sound on" })).toBeVisible();
+    await page.getByRole("button", { name: "Turn quiz sound on" }).click();
+
+    await page.goto("/test-pages/chat-quiz?s=ready");
+    await expect(page.getByRole("region", { name: "Get ready" })).toContainText("Get ready…");
+    await expect(page.getByRole("region", { name: "Get ready" }).getByText("3", { exact: true })).toBeVisible();
+
     await page.goto("/test-pages/chat-quiz?s=live");
     const question = page.getByRole("region", { name: "Question 2 of 5" });
     await expect(question.getByText("12s")).toBeVisible();
@@ -198,15 +209,19 @@ for (const width of [360, 1280]) {
     await expect(page.getByRole("alert").filter({ hasText: /sign in/i })).toBeVisible();
 
     await page.goto("/test-pages/chat-quiz?s=closed");
-    await expect(page.getByText("Correct! +860 points")).toBeVisible();
-    await expect(page.getByText("Right answer")).toBeVisible();
+    await expect(page.getByText("Correct! +960 points · 🔥 2 in a row")).toBeVisible();
+    const chart = page.getByRole("figure", { name: "How everyone answered" });
+    await expect(chart.getByText("2 players")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Leaderboard" }).getByText("🔥 2")).toBeVisible();
+    await expect(page.getByText("Right answer", { exact: true })).toBeVisible();
     await expect(page.getByRole("region", { name: "Leaderboard" }).getByText("1st")).toBeVisible();
     await expect(page.getByRole("button", { name: "Next question" })).toBeEnabled();
 
     await page.goto("/test-pages/chat-quiz?s=done");
     const results = page.getByRole("region", { name: "Final leaderboard" });
-    await expect(results.getByText("Ada Wombat")).toBeVisible();
-    await expect(results.getByText("(you)")).toBeVisible();
+    await expect(results.getByRole("listitem").filter({ hasText: "2nd" }).getByText("Ada Wombat").last()).toBeVisible();
+    await expect(results.getByRole("list", { name: "Podium" }).getByText("1st")).toBeVisible();
+    await expect(results.getByRole("list", { name: "Podium" }).getByText("Tunde Quokka")).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });

@@ -1436,7 +1436,7 @@ export type Database = {
       chat_quiz_join: { Args: { q: string }; Returns: "ok" | "not_allowed" };
       chat_quiz_next: { Args: { q: string }; Returns: "ok" | "done" | "not_allowed" };
       chat_quiz_end: { Args: { q: string }; Returns: "ok" | "not_allowed" };
-      chat_quiz_answer: { Args: { q: string; question: number; choice: number }; Returns: "ok" | "late" | "already" | "not_allowed" };
+      chat_quiz_answer: { Args: { q: string; question: number; choice: number }; Returns: "ok" | "late" | "early" | "already" | "not_allowed" };
       chat_quiz_state: { Args: { q: string }; Returns: Json | null };
       chat_quiz_latest: { Args: { g: string }; Returns: string | null };
       chat_group_people: {

@@ -66,6 +66,10 @@ select test.check(public.chat_quiz_answer(:'quiz', 0, 1) = 'not_allowed', 'nobod
 reset role;
 select test.as_user('a5c61001-0000-0000-0000-000000000001');
 select test.check(public.chat_quiz_next(:'quiz') = 'ok', 'the host starts the quiz');
+reset role;
+-- Questions open after a 3-second "get ready" (migration 62); skip it here.
+update public.chat_quizzes set question_started_at = now() where id = :'quiz';
+select test.as_user('a5c61001-0000-0000-0000-000000000001');
 select test.check(public.chat_quiz_state(:'quiz') -> 'question' ->> 'prompt' like 'Question %', 'everyone sees the question');
 select test.check(public.chat_quiz_state(:'quiz') ->> 'correctChoice' is null, 'but not the answer while it is open');
 select test.check(public.chat_quiz_answer(:'quiz', 0, 1) = 'ok', 'the host answers');
