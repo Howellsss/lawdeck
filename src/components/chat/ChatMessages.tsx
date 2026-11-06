@@ -2,7 +2,7 @@
 
 import { Fragment } from "react";
 import { dayLabel, startsRun, watDay } from "@/lib/chatTime";
-import type { ChatMessage } from "@/server/chat/data";
+import type { ChatMessage, ChatPoll } from "@/server/chat/data";
 import { ChatMessageItem } from "./ChatMessageItem";
 
 // The messages of a group, oldest at the top, with a day marker ("Today", "Yesterday", a date) where
@@ -14,6 +14,7 @@ export function ChatMessages({
   onOlder,
   onDelete,
   onHide,
+  onPoll,
   isAdmin,
   groupName,
   welcome = groupName,
@@ -24,6 +25,7 @@ export function ChatMessages({
   onOlder: () => void;
   onDelete: (id: string) => void;
   onHide: (id: string) => void;
+  onPoll?: (messageId: string, poll: ChatPoll) => void;
   isAdmin: boolean;
   groupName: string;
   welcome?: string;
@@ -56,7 +58,7 @@ export function ChatMessages({
                 <span className="relative rounded-full border border-line bg-paper px-3 py-0.5 text-[12px] font-medium">{dayLabel(watDay(m.createdAt))}</span>
               </li>
             )}
-            <ChatMessageItem message={m} first={first} isAdmin={isAdmin} onDelete={onDelete} onHide={onHide} />
+            <ChatMessageItem message={m} first={first} isAdmin={isAdmin} onDelete={onDelete} onHide={onHide} onPoll={onPoll} />
           </Fragment>
         );
       })}

@@ -320,6 +320,8 @@ export type Database = {
           attachments: Json;
           // A lesson card (migration 63); set only by chat_share_lesson and chat_set_week_topic.
           lesson_topic_id: string | null;
+          // A poll (migration 64); set only by chat_poll_create.
+          poll: boolean;
         };
         Insert: { group_id: string; body: string; mentions?: string[]; hashtags?: string[]; attachments?: Json };
         Update: never;
@@ -1444,6 +1446,25 @@ export type Database = {
         Returns: { topic_id: string; course: string; topic: string; lesson_title: string; bulk_approved: boolean }[];
       };
       chat_share_lesson: { Args: { g: string; topic: string; note?: string }; Returns: string };
+      // Polls (migration 64).
+      chat_poll_create: { Args: { g: string; question: string; options: string[]; days: number; names?: boolean }; Returns: string };
+      chat_poll_vote: { Args: { p: string; pick: number }; Returns: "ok" | "closed" | "not_allowed" };
+      chat_poll_close: { Args: { p: string }; Returns: "ok" | "not_allowed" };
+      chat_poll_cards: {
+        Args: { messages: string[] };
+        Returns: {
+          message_id: string;
+          poll_id: string;
+          choices: string[];
+          show_names: boolean;
+          closes_at: string;
+          closed: boolean;
+          mine: boolean;
+          my_choice: number | null;
+          counts: number[] | null;
+          voters: Json | null;
+        }[];
+      };
       chat_set_week_topic: { Args: { g: string; topic: string | null }; Returns: "set" | "cleared" };
       chat_quiz_topics: { Args: Record<string, never>; Returns: { topic_id: string; course: string; topic: string; questions: number }[] };
       chat_quiz_create: { Args: { g: string; topic: string; how_many: number; secs: number }; Returns: string };

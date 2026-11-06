@@ -134,7 +134,14 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      creator sets, changes or clears it, and setting it posts the card in the group. The note goes
      through the word filter, contact-details check and posting limit; everything goes through
      checked database functions (`chat_share_lesson`, `chat_set_week_topic`).
-   - **4e Polls** in groups (founder chose polls over an ideas board).
+   - **4e Polls (built, migration 64; founder approved):** a chart button in the message box makes a
+     poll in any group the student can see: a question (the message's text) and 2 to 6 different
+     choices, open for 1 day, 3 days or 1 week. One vote each, changeable until it closes; results
+     (bars with numbers) show after voting or once closed. Anonymous by default; in study groups the
+     maker can show who voted for each choice. The maker can close it early. The question and choices
+     go through the word filter, contact-details check and posting limit; Report and admin Hide work
+     on the message, and deleting it deletes the poll. Open polls on screen refresh every few
+     seconds. Poll tables are read and written only through checked database functions.
    - **4f Group calls with LiveKit** (founder's choice): needs a LiveKit account and approval of its
      library and costs.
    - Later still: direct messages, reactions, threads, editing a sent message, notifications

@@ -2,11 +2,12 @@
 
 import { useState } from "react";
 import { watTime } from "@/lib/chatTime";
-import type { ChatMessage } from "@/server/chat/data";
+import type { ChatMessage, ChatPoll } from "@/server/chat/data";
 import { ChatBody } from "./ChatBody";
 import { ChatFiles } from "./ChatFiles";
 import { LessonCard } from "./LessonCard";
 import { MessageActions } from "./MessageActions";
+import { MessagePoll } from "./MessagePoll";
 import { ReportForm } from "./ReportForm";
 
 export function initials(name: string): string {
@@ -23,12 +24,14 @@ export function ChatMessageItem({
   isAdmin,
   onDelete,
   onHide,
+  onPoll,
 }: {
   message: ChatMessage;
   first: boolean;
   isAdmin: boolean;
   onDelete: (id: string) => void;
   onHide: (id: string) => void;
+  onPoll?: (messageId: string, poll: ChatPoll) => void;
 }) {
   const [reporting, setReporting] = useState(false);
   const [notice, setNotice] = useState<string | null>(null);
@@ -53,7 +56,11 @@ export function ChatMessageItem({
             </time>
           </p>
         )}
-        {message.body.trim() && <ChatBody body={message.body} />}
+        {message.poll ? (
+          <MessagePoll messageId={message.id} question={message.body} poll={message.poll} onPoll={(id, poll) => onPoll?.(id, poll)} />
+        ) : (
+          message.body.trim() && <ChatBody body={message.body} />
+        )}
         {message.lesson && <LessonCard card={message.lesson} />}
         <ChatFiles files={message.files} />
         {reporting && <ReportForm messageId={message.id} onDone={(sent) => (setReporting(false), setNotice(sent))} />}
