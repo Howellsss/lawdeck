@@ -40,11 +40,13 @@ const mcq = (over: Partial<PracticeReply["items"][number]> = {}) => ({
 });
 
 describe("practice request", () => {
-  it("defaults to 5 questions and allows 3 to 10", () => {
+  it("defaults to 5 questions; multiple choice allows 3 to 30 (founder, 2026-11-06), scenarios 3 to 10", () => {
     const topicId = "11111111-1111-4111-8111-111111111111";
     expect(newPracticeSetSchema.parse({ topicId, kind: "mcq" }).count).toBe(5);
     expect(newPracticeSetSchema.safeParse({ topicId, kind: "mcq", count: 2 }).success).toBe(false);
-    expect(newPracticeSetSchema.safeParse({ topicId, kind: "mcq", count: 11 }).success).toBe(false);
+    expect(newPracticeSetSchema.parse({ topicId, kind: "mcq", count: 30 }).count).toBe(30);
+    expect(newPracticeSetSchema.safeParse({ topicId, kind: "mcq", count: 31 }).success).toBe(false);
+    expect(newPracticeSetSchema.safeParse({ topicId, kind: "scenario", count: 11 }).success).toBe(false);
     expect(newPracticeSetSchema.safeParse({ topicId, kind: "essay", count: 5 }).success).toBe(false);
   });
 

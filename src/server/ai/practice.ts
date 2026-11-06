@@ -7,8 +7,8 @@ import { failureDetails, getClaude, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { MODELS } from "./models";
 
-// A set of up to 10 questions with model answers takes longer to write than one explanation, so
-// this call has its own time limit (rule G-10: every call is time-limited).
+// A batch of questions with model answers (a set is up to 30, split into batches) takes longer to
+// write than one explanation, so this call has its own time limit (rule G-10: every call is time-limited).
 const PRACTICE_TIMEOUT_MS = 120_000;
 // Malformed replies are retried once, then reported (rule F-03).
 const ATTEMPTS = 2;

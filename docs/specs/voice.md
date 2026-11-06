@@ -5,6 +5,10 @@ answer, and clean pronunciation of Nigerian names. Founder chose Microsoft Azure
 voices) and that students choose the voice.
 
 ## What students get
+- **Dictation** (the microphone in the question box): the words appear in the box to check before
+  sending. It keeps listening through pauses until the student taps Stop (founder, 2026-11-06:
+  "it stops at some point"); when the browser ends a listening session on its own, a new one
+  starts at once and the words so far are kept; after 30 seconds of silence it switches off.
 - **Read** on every Learn answer: reads the whole answer, with Pause, Resume and Stop.
 - **Voice mode** (sound-wave button on the home screen and in a chat), like ChatGPT's voice mode
   (founder, 2026-10-28: "you press it, say something, it responds immediately there; it doesn't

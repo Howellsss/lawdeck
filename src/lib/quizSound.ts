@@ -4,6 +4,8 @@
 // from a tap; everything is quiet until then.
 
 type Mode = "lobby" | "question" | "hurry" | null;
+// Overall loudness (founder, 2026-11-06: the music was too quiet; it was 0.18).
+const MUSIC_VOLUME = 0.45;
 
 const hz = (midi: number) => 440 * 2 ** ((midi - 69) / 12);
 
@@ -40,7 +42,7 @@ export class QuizSound {
       if (!Ctor) return;
       this.ctx = new Ctor();
       this.master = this.ctx.createGain();
-      this.master.gain.value = this.muted ? 0 : 0.18;
+      this.master.gain.value = this.muted ? 0 : MUSIC_VOLUME;
       this.master.connect(this.ctx.destination);
     }
     if (this.ctx.state === "suspended") void this.ctx.resume();
@@ -52,10 +54,10 @@ export class QuizSound {
 
   setMuted(muted: boolean) {
     this.muted = muted;
-    if (this.master && this.ctx) this.master.gain.setTargetAtTime(muted ? 0 : 0.18, this.ctx.currentTime, 0.05);
+    if (this.master && this.ctx) this.master.gain.setTargetAtTime(muted ? 0 : MUSIC_VOLUME, this.ctx.currentTime, 0.05);
   }
 
-  // Background music: lobby (relaxed), question (driving) or hurry (the last seconds); null stops it.
+  // Background music: lobby (relaxed) or question (steady, also in the last seconds); null stops it.
   music(mode: Mode) {
     if (mode === this.mode) return;
     this.mode = mode;
@@ -75,7 +77,7 @@ export class QuizSound {
   private schedule() {
     const ctx = this.ctx;
     if (!ctx || !this.mode) return;
-    const bpm = this.mode === "lobby" ? 112 : this.mode === "question" ? 132 : 168;
+        const bpm = musicTempo(this.mode);
     const eighth = 60 / bpm / 2;
     while (this.nextTime < ctx.currentTime + 0.12) {
       const bars = this.mode === "lobby" ? LOBBY : QUESTION;
@@ -166,6 +168,12 @@ export class QuizSound {
 }
 
 // What should be heard for a quiz moment (pure, so it can be tested).
+// Beats a minute. The last seconds keep the question's pace (founder, 2026-11-06: speeding up
+// caused panic).
+export function musicTempo(mode: Exclude<Mode, null>): number {
+  return mode === "lobby" ? 112 : 132;
+}
+
 export function musicFor(status: "lobby" | "live" | "done", readyIn: number, closed: boolean, secondsLeft: number): Mode {
   if (status === "lobby") return "lobby";
   if (status === "done" || readyIn > 0 || closed) return null;
