@@ -1365,6 +1365,7 @@ export type Database = {
       chat_allowed: { Args: Record<string, never>; Returns: boolean };
       chat_scope: { Args: Record<string, never>; Returns: string | null };
       chat_set_hidden: { Args: { msg: string; hide: boolean }; Returns: "ok" | "not_allowed" | "not_found" };
+      chat_member_counts: { Args: Record<string, never>; Returns: { group_id: string; members: number }[] };
       chat_report_queue: {
         Args: Record<string, never>;
         Returns: {

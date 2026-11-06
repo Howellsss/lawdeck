@@ -7,7 +7,7 @@ import type { Json } from "@/server/db/types";
 // Campus chat reads (docs/specs/chat.md). Row-level security decides who sees what: staff only in
 // Phase 2, students once an admin opens chat; hidden messages are left out for students.
 
-export type ChatGroup = { id: string; key: string; name: string; kind: "all" | "campus" | "aspirants"; unread: number };
+export type ChatGroup = { id: string; key: string; name: string; kind: "all" | "campus" | "aspirants"; unread: number; members: number };
 export type ChatPerson = { id: string; name: string; campus: string | null };
 export type ChatFile = { name: string; kind: "pdf" | "docx" | "png" | "jpeg"; size: number; url: string | null };
 export type ChatMessage = { id: string; groupId: string; body: string; createdAt: string; author: ChatPerson; mine: boolean; files: ChatFile[] };
@@ -74,15 +74,11 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
   if (!account) return null;
   const db = await createSupabaseServerClient();
   if (!(await chatAllowed(db))) return null;
-  const [groups, unread, member, self] = await Promise.all([
-    db.from("chat_groups").select("id, key, name, kind").order("position"),
-    db.rpc("chat_unread_counts"),
+  const [list, member, self] = await Promise.all([
+    listGroups(db),
     db.from("chat_members").select("owner_id").eq("owner_id", account.id).maybeSingle(),
     db.rpc("chat_people", { people: [account.id] }),
   ]);
-  if (groups.error) throw new Error("chat read failed");
-  const counts = new Map((unread.data ?? []).map((u) => [u.group_id, Number(u.unread)]));
-  const list = groups.data.map((g) => ({ ...g, unread: counts.get(g.id) ?? 0 }));
   const group = list.find((g) => g.key === groupKey);
   if (!group) return null;
   const rows = await db
@@ -105,6 +101,47 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
   };
 }
 
+// The groups this person can see, with unread messages and member numbers.
+async function listGroups(db: Db): Promise<ChatGroup[]> {
+  const [groups, unread, members] = await Promise.all([
+    db.from("chat_groups").select("id, key, name, kind").order("position"),
+    db.rpc("chat_unread_counts"),
+    db.rpc("chat_member_counts"),
+  ]);
+  if (groups.error) throw new Error("chat read failed");
+  const counts = new Map((unread.data ?? []).map((u) => [u.group_id, Number(u.unread)]));
+  const people = new Map((members.data ?? []).map((m) => [m.group_id, Number(m.members)]));
+  return groups.data.map((g) => ({ ...g, unread: counts.get(g.id) ?? 0, members: people.get(g.id) ?? 0 }));
+}
+
+export type ChatShared = { groups: ChatGroup[]; group: ChatGroup; items: ChatMessage[] };
+
+// A group's "Files & links": the latest messages with a file or a web link, newest first.
+export async function getChatShared(groupKey: string): Promise<ChatShared | null> {
+  const account = await getCurrentAccount();
+  if (!account) return null;
+  const db = await createSupabaseServerClient();
+  if (!(await chatAllowed(db))) return null;
+  const list = await listGroups(db);
+  const group = list.find((g) => g.key === groupKey);
+  if (!group) return null;
+  const base = () => db.from("chat_messages").select(MESSAGE_COLUMNS).eq("group_id", group.id).is("hidden_at", null);
+  const [files, links] = await Promise.all([
+    base().neq("attachments", "[]").order("created_at", { ascending: false }).limit(100),
+    base().ilike("body", "%http%").order("created_at", { ascending: false }).limit(100),
+  ]);
+  if (files.error || links.error) throw new Error("chat read failed");
+  const rows = [...new Map([...files.data, ...links.data].map((m) => [m.id, m])).values()].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 100);
+  return { groups: list, group, items: await withAuthors(db, rows, account.id) };
+}
+
+// A group's name, if this person can see it (row-level security decides).
+export async function chatGroupName(groupKey: string): Promise<string | null> {
+  const db = await createSupabaseServerClient();
+  const { data } = await db.from("chat_groups").select("name").eq("key", groupKey).maybeSingle();
+  return data?.name ?? null;
+}
+
 // Where /chat opens: the student's own campus group, else All campuses.
 export async function homeGroupKey(): Promise<string> {
   const account = await getCurrentAccount();
@@ -114,8 +151,8 @@ export async function homeGroupKey(): Promise<string> {
   return profile.data?.campus ?? "all-campuses";
 }
 
-// Messages matching words or a #hashtag across every group, newest first (at most 50).
-export async function searchChat(q: string, tag: string | null): Promise<(ChatMessage & { groupKey: string; groupName: string })[] | null> {
+// Messages matching words or a #hashtag across every group (or one group), newest first (at most 50).
+export async function searchChat(q: string, tag: string | null, groupKey: string | null = null): Promise<(ChatMessage & { groupKey: string; groupName: string })[] | null> {
   const account = await getCurrentAccount();
   if (!account) return null;
   const db = await createSupabaseServerClient();
@@ -123,8 +160,15 @@ export async function searchChat(q: string, tag: string | null): Promise<(ChatMe
   let query = db.from("chat_messages").select(MESSAGE_COLUMNS).is("hidden_at", null);
   if (tag) query = query.contains("hashtags", [tag]);
   if (q) query = query.ilike("body", `%${q.replace(/[%_\\]/g, (c) => `\\${c}`)}%`);
-  const [rows, groups] = await Promise.all([query.order("created_at", { ascending: false }).limit(50), db.from("chat_groups").select("id, key, name")]);
-  if (rows.error || groups.error) throw new Error("chat search failed");
+  const groups = await db.from("chat_groups").select("id, key, name");
+  if (groups.error) throw new Error("chat search failed");
+  if (groupKey) {
+    const only = groups.data.find((g) => g.key === groupKey);
+    if (!only) return [];
+    query = query.eq("group_id", only.id);
+  }
+  const rows = await query.order("created_at", { ascending: false }).limit(50);
+  if (rows.error) throw new Error("chat search failed");
   const byGroup = new Map(groups.data.map((g) => [g.id, g]));
   return (await withAuthors(db, rows.data, account.id)).map((m) => ({ ...m, groupKey: byGroup.get(m.groupId)?.key ?? "", groupName: byGroup.get(m.groupId)?.name ?? "" }));
 }

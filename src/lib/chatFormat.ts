@@ -1,12 +1,12 @@
 // Campus chat messages (docs/specs/chat.md): a small Markdown-like set, read by Lawdeck's own parser
 // and drawn as React elements (never as raw HTML), so a message can never inject markup.
-//   **bold**  _italic_  ~~strike~~  `code`  [text](https://link)  plain https:// links
+//   **bold**  _italic_  ++underline++  ~~strike~~  `code`  [text](https://link)  plain https:// links
 //   - bullet   1. numbered   > quote   ``` code block ```
 //   @[Name](person id) mentions and #hashtags.
 
 export type Inline =
   | { t: "text"; v: string }
-  | { t: "bold" | "italic" | "strike"; c: Inline[] }
+  | { t: "bold" | "italic" | "underline" | "strike"; c: Inline[] }
   | { t: "code"; v: string }
   | { t: "link"; href: string; c: Inline[] }
   | { t: "mention"; id: string; name: string }
@@ -29,6 +29,7 @@ const INLINE = new RegExp(
     "(?<![\\w])_([^_\\n]+?)_(?![\\w])", // 8 italic
     "(https?:\\/\\/[^\\s<>()]{2,500}[^\\s<>().,;:!?'\"])", // 9 plain link
     "(?<![\\w#])#([A-Za-z0-9_]{1,40})", // 10 hashtag
+    "\\+\\+([^+\\n]+?)\\+\\+", // 11 underline
   ].join("|"),
   "g",
 );
@@ -47,6 +48,7 @@ export function parseInline(text: string): Inline[] {
     else if (m[8] !== undefined) out.push({ t: "italic", c: parseInline(m[8]) });
     else if (m[9] !== undefined) out.push({ t: "link", href: m[9], c: [{ t: "text", v: m[9] }] });
     else if (m[10] !== undefined) out.push({ t: "hashtag", tag: m[10].toLowerCase() });
+    else if (m[11] !== undefined) out.push({ t: "underline", c: parseInline(m[11]) });
     at = start + m[0].length;
   }
   if (at < text.length) out.push({ t: "text", v: text.slice(at) });
@@ -96,14 +98,45 @@ export function messageTags(body: string): { mentions: string[]; hashtags: strin
     for (const item of items) {
       if (item.t === "mention") mentions.add(item.id);
       else if (item.t === "hashtag") hashtags.add(item.tag);
-      else if (item.t === "bold" || item.t === "italic" || item.t === "strike" || item.t === "link") walk(item.c);
+      else if ("c" in item) walk(item.c);
     }
   };
-  for (const block of parseMessage(body)) {
-    if (block.t === "p" || block.t === "quote") block.lines.forEach(walk);
-    else if (block.t === "ul" || block.t === "ol") block.items.forEach(walk);
-  }
+  eachLine(body, walk);
   return { mentions: [...mentions].slice(0, 20), hashtags: [...hashtags].slice(0, 20) };
+}
+
+function eachLine(body: string, fn: (items: Inline[]) => void) {
+  for (const block of parseMessage(body)) {
+    if (block.t === "p" || block.t === "quote") block.lines.forEach(fn);
+    else if (block.t === "ul" || block.t === "ol") block.items.forEach(fn);
+  }
+}
+
+// The web links in a message, with their words (for a group's "Files & links").
+export function linksIn(body: string): { href: string; label: string }[] {
+  const found: { href: string; label: string }[] = [];
+  const words = (items: Inline[]): string =>
+    items.map((i) => (i.t === "text" || i.t === "code" ? i.v : i.t === "mention" ? `@${i.name}` : i.t === "hashtag" ? `#${i.tag}` : words(i.c))).join("");
+  const walk = (items: Inline[]) => {
+    for (const item of items) {
+      if (item.t === "link") found.push({ href: item.href, label: words(item.c) });
+      else if ("c" in item) walk(item.c);
+    }
+  };
+  eachLine(body, walk);
+  return found;
+}
+
+// The message box shows a link's words only ("Test"); before sending, the first place those words
+// appear becomes [Test](https://…). A link whose words were deleted is dropped.
+export function linkLabels(text: string, links: { label: string; href: string }[]): string {
+  let out = text;
+  for (const link of [...links].sort((a, b) => b.label.length - a.label.length)) {
+    const at = out.indexOf(link.label);
+    if (at < 0 || out[at - 1] === "[") continue;
+    out = `${out.slice(0, at)}[${link.label}](${link.href})${out.slice(at + link.label.length)}`;
+  }
+  return out;
 }
 
 // The composer shows "@Ada Obi"; before sending, each name picked from the suggestions becomes
@@ -122,7 +155,7 @@ export function plainText(body: string): string {
   return body
     .replace(new RegExp(`@\\[([^\\]]+)\\]\\(${UUID}\\)`, "g"), "@$1")
     .replace(/\[([^\]]+)\]\((https?:[^)]+)\)/g, "$1")
-    .replace(/(\*\*|~~|`{1,3})/g, "")
+    .replace(/(\*\*|~~|\+\+|`{1,3})/g, "")
     .replace(/(?<![\w])_([^_\n]+)_(?![\w])/g, "$1")
     .replace(/\s+/g, " ")
     .trim();

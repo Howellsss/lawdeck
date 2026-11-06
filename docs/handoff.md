@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat entry: campus asked in chat, link for everyone).
+Last updated: 2026-11-06 (campus chat Slack-style message box, header and Files & links).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat entry: campus asked in chat, link for ever
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **57** (`20261106005700_chat_files_reports.sql`, chat files and reports).
+  merge only after that. The latest is **58** (`20261106005800_chat_member_counts.sql`, chat member counts).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -40,6 +40,8 @@ Last updated: 2026-11-06 (campus chat entry: campus asked in chat, link for ever
   Chat is still closed to students: the founder switches it on (after counsel's terms review).
   Everyone signed in sees Campus chat in the side menu and can send their ID while it is closed;
   the campus is asked there, not on the home page. Students also need pilot access to use chat.
+  Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
+  (migration 58).
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
 - **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch
   and pull request before touching `src/server/limits` or billing.
