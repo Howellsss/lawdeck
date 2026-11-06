@@ -15,6 +15,7 @@ const CHECK_EVERY = 4000;
 export function ChatRoom({
   groupId,
   groupName,
+  welcome,
   initial,
   initialHasOlder,
   isAdmin = false,
@@ -23,6 +24,7 @@ export function ChatRoom({
 }: {
   groupId: string;
   groupName: string;
+  welcome?: string;
   initial: ChatMessage[];
   initialHasOlder: boolean;
   isAdmin?: boolean;
@@ -125,7 +127,7 @@ export function ChatRoom({
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div ref={scroller} onScroll={() => atBottom() && unseen > 0 && setUnseen(0)} className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         <div className="mt-auto" />
-        <ChatMessages messages={messages} hasOlder={hasOlder} loadingOlder={loadingOlder} onOlder={() => void older()} onDelete={(id) => void remove(id)} onHide={(id) => void hide(id)} isAdmin={isAdmin} groupName={groupName} />
+        <ChatMessages messages={messages} hasOlder={hasOlder} loadingOlder={loadingOlder} onOlder={() => void older()} onDelete={(id) => void remove(id)} onHide={(id) => void hide(id)} isAdmin={isAdmin} groupName={groupName} welcome={welcome} />
       </div>
       {unseen > 0 && (
         <button type="button" onClick={toBottom} className="absolute bottom-[132px] left-1/2 -translate-x-1/2 rounded-full bg-ink px-3 py-1 text-[13px] font-medium text-on-ink shadow-md">
