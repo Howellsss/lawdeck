@@ -27,7 +27,7 @@ Last updated: 2026-11-06 (study group invite links and the ID test switch).
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
 - **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
-  #173 quiz extras · #174 study together · #175 polls · #176 group calls. Invite links (migration 66) is the open pull request after #176.
+  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links. A fix for the call Leave button is the open pull request after #177.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
@@ -42,7 +42,7 @@ Last updated: 2026-11-06 (study group invite links and the ID test switch).
   Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
   (migration 58). Full emoji pack. Study groups (migration 59). Voice notes in study groups
   (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Study together: lesson cards in any group and "This week's topic" in study groups (63). Polls in any group (64). Group calls in study groups with LiveKit (65; hidden until the founder adds LIVEKIT_URL, LIVEKIT_API_KEY and LIVEKIT_API_SECRET in Vercel; free plan, 4,500-minute monthly limit on Admin → Chat). LiveKit keys are in Vercel (founder,
-  2026-11-06); a real test call is still to be done. Invite links and the ID test switch (66). The
+  2026-11-06); the founder made a test call that worked (2026-11-06); Leave was fixed after. Invite links and the ID test switch (66). The
   founder is turning invite-only off (Lawdeck open to everyone) and chat is open; the ID test switch
   must be turned off before real students join. Adding an email on Admin → Pilot only gives access
   to people who sign in with Google (not needed once invite-only is off). Pilot invites run alongside (founder: build and invite now).

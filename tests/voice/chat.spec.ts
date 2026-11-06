@@ -321,6 +321,16 @@ test("a broken invite link says so; a real-looking one asks the visitor to sign 
   await expect(page.getByRole("main").getByRole("link", { name: "Sign in" })).toHaveAttribute("href", `/sign-in?next=${encodeURIComponent(`/chat/join/${"b".repeat(64)}`)}`);
 });
 
+// Leave works at once, even before the call has connected (founder, 2026-11-06: Leave didn't work).
+test("leaving a call closes the call screen straight away", async ({ page }) => {
+  await page.goto("/test-pages/chat-call-live");
+  const call = page.getByRole("region", { name: "Group call" });
+  await expect(call).toContainText("connecting…");
+  await call.getByRole("button", { name: "Leave" }).click();
+  await expect(page.getByRole("status")).toHaveText("You left the call.", { timeout: 2000 });
+  await expect(call).toHaveCount(0);
+});
+
 // Group quiz like Kahoot (founder, 2026-11-06): host form, a timed question, the reveal and results.
 for (const width of [360, 1280]) {
   test(`group quiz: host, answer, reveal and results (${width}px)`, async ({ page }) => {
