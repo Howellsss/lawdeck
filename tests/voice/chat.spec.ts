@@ -177,6 +177,39 @@ for (const width of [360, 1280]) {
   });
 }
 
+// Study together (founder, 2026-11-06): lesson cards and "This week's topic".
+for (const width of [360, 1280]) {
+  test(`study together: lesson cards and this week's topic (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 860 });
+    await page.goto("/test-pages/chat-study");
+    const card = page.getByRole("group", { name: "Lesson: Originating processes" });
+    await expect(card).toContainText("Lesson · Civil Litigation");
+    await expect(card).toContainText("Not yet read in full by a reviewer.");
+    await expect(card.getByRole("link", { name: "Open lesson" })).toHaveAttribute("href", "/study/00000000-0000-4000-8000-000000000871");
+
+    const week = page.getByRole("region", { name: "This week’s topic" });
+    await expect(week).toContainText("Originating processes");
+    await expect(week).toContainText("Set by Ada Wombat · Today");
+    await expect(week.getByRole("link", { name: "Open lesson" })).toHaveAttribute("href", "/study/00000000-0000-4000-8000-000000000871");
+    await expect(week.getByRole("button", { name: "Change" })).toBeVisible();
+    await expect(week.getByRole("button", { name: "Clear" })).toBeVisible();
+
+    // The picker opens from the message box; test pages have no database, so it says so plainly.
+    await page.getByRole("button", { name: "Share a lesson" }).click();
+    const dialog = page.getByRole("dialog", { name: "Share a lesson" });
+    await expect(dialog.getByRole("alert")).toBeVisible();
+    await expect(dialog.getByRole("button", { name: "Share" })).toBeDisabled();
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toHaveCount(0);
+    await week.getByRole("button", { name: "Change" }).click();
+    await expect(page.getByRole("dialog", { name: "This week’s topic" })).toBeVisible();
+    await page.keyboard.press("Escape");
+
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+
 // Group quiz like Kahoot (founder, 2026-11-06): host form, a timed question, the reveal and results.
 for (const width of [360, 1280]) {
   test(`group quiz: host, answer, reveal and results (${width}px)`, async ({ page }) => {

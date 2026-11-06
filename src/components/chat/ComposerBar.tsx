@@ -8,7 +8,7 @@ import { EmojiPicker } from "./EmojiPicker";
 const tool = "flex size-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pill hover:text-ink disabled:opacity-40";
 
 // The row under the message box, as in Slack: + to attach a file, Aa to show or hide formatting,
-// an emoji, @ to mention someone, a microphone for voice notes (study groups only), and Send.
+// an emoji, @ to mention someone, a book to share a lesson, a microphone for voice notes (study groups only), and Send.
 export function ComposerBar({
   busy,
   canSend,
@@ -18,6 +18,7 @@ export function ComposerBar({
   onInsert,
   onMention,
   onVoice,
+  onShareLesson,
   onSend,
 }: {
   busy: boolean;
@@ -28,6 +29,7 @@ export function ComposerBar({
   onInsert: (text: string) => void;
   onMention: () => void;
   onVoice?: () => void;
+  onShareLesson?: () => void;
   onSend: () => void;
 }) {
   const picker = useRef<HTMLInputElement>(null);
@@ -67,6 +69,11 @@ export function ComposerBar({
       <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={onMention} aria-label="Mention someone" title="Mention someone" className={`${tool} text-[18px]`}>
         @
       </button>
+      {onShareLesson && (
+        <button type="button" onClick={onShareLesson} disabled={busy} aria-label="Share a lesson" title="Share a lesson" className={tool}>
+          <Icon name="book" size={18} />
+        </button>
+      )}
       {onVoice && (
         <button type="button" onClick={onVoice} disabled={busy} aria-label="Record a voice note" title="Record a voice note (up to 2 minutes)" className={tool}>
           <Icon name="mic" size={18} />

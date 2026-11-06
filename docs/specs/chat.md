@@ -125,7 +125,15 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      for each right answer in a row before this one, up to 500. After each question, a chart of how
      many chose each answer; the final leaderboard has a podium for the top three. Join by code
      (people outside the group) is not built: it would change who can see a group's quiz.
-   - **4d Study together:** share topic lessons as cards; "This week's topic".
+   - **4d Study together (built, migration 63; founder approved):** a book button in the message box
+     shares a topic lesson as a card (pick a course, then a topic, with an optional note) in any group
+     the student can see. The card shows the topic, its course and Open lesson, and the "Not yet read in
+     full by a reviewer" note when the lesson was approved with its course; it never copies the
+     lesson's text. Only topics with an approved, current lesson can be shared. Study groups show
+     "This week's topic" at the top (topic, who set it and when, Open lesson); only the group's
+     creator sets, changes or clears it, and setting it posts the card in the group. The note goes
+     through the word filter, contact-details check and posting limit; everything goes through
+     checked database functions (`chat_share_lesson`, `chat_set_week_topic`).
    - **4e Polls** in groups (founder chose polls over an ideas board).
    - **4f Group calls with LiveKit** (founder's choice): needs a LiveKit account and approval of its
      library and costs.

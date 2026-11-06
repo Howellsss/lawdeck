@@ -3,13 +3,15 @@ import { connection } from "next/server";
 import { Suspense } from "react";
 import { ChatRoom } from "@/components/chat/ChatRoom";
 import { ChatShell } from "@/components/chat/ChatShell";
-import type { ChatMessage } from "@/server/chat/data";
+import type { ChatMessage, LessonCard, WeekTopic } from "@/server/chat/data";
 import { groups, invites } from "../chatSample";
 import { testPagesEnabled } from "../sample";
 
 // Study group conversation test only (tests/voice/chat.spec.ts): a made-up voice note and the
-// record button, which only study groups have. "Not found" unless LAWDECK_TEST_PAGES=1.
+// record button, which only study groups have, a shared lesson card and "This week's topic". "Not found" unless LAWDECK_TEST_PAGES=1.
 const study = groups.find((g) => g.kind === "study") ?? groups[0];
+const card: LessonCard = { topicId: "00000000-0000-4000-8000-000000000871", course: "Civil Litigation", topic: "Originating processes", title: "Originating processes", bulkApproved: true };
+const weekTopic: WeekTopic = { card: { ...card, bulkApproved: false }, setBy: "Ada Wombat", setAt: new Date(Date.now() - 60 * 60_000).toISOString() };
 const messages: ChatMessage[] = [
   {
     id: "00000000-0000-4000-8000-000000000861",
@@ -19,6 +21,17 @@ const messages: ChatMessage[] = [
     author: { id: "00000000-0000-4000-8000-000000000812", name: "Tunde Quokka", campus: "Abuja" },
     mine: false,
     files: [{ name: "Voice note", kind: "voice", size: 48_000, url: null, seconds: 42 }],
+    lesson: null,
+  },
+  {
+    id: "00000000-0000-4000-8000-000000000862",
+    groupId: study.id,
+    body: "Read this before Thursday",
+    createdAt: new Date(Date.now() - 5 * 60_000).toISOString(),
+    author: { id: "00000000-0000-4000-8000-000000000812", name: "Tunde Quokka", campus: "Abuja" },
+    mine: false,
+    files: [],
+    lesson: card,
   },
 ];
 
@@ -35,7 +48,7 @@ async function TestChatStudy() {
   if (!testPagesEnabled()) notFound();
   return (
     <ChatShell groups={groups} group={study} ownCampusName="Lagos" invites={invites}>
-      <ChatRoom groupId={study.id} groupName={study.name} initial={messages} initialHasOlder={false} voiceNotes apiKey="test" />
+      <ChatRoom groupId={study.id} groupName={study.name} initial={messages} initialHasOlder={false} voiceNotes apiKey="test" studyGroup canSetWeekTopic initialWeekTopic={weekTopic} />
     </ChatShell>
   );
 }

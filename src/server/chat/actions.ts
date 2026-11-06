@@ -6,6 +6,7 @@ import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { detectAudioKind, VOICE_MAX_BYTES, VOICE_MAX_SECONDS } from "@/lib/chatFiles";
 import { LIBRARY_MAX_BYTES, detectFileKind } from "@/lib/libraryFiles";
+import { sendErrorMessage } from "./sendErrors";
 import { chatAllowed, MESSAGE_COLUMNS, PAGE, withAuthors, type ChatMessage, type ChatPerson } from "./data";
 
 // Campus chat actions (docs/specs/chat.md). Sign-in, chat access and input are checked here; the
@@ -71,15 +72,8 @@ export async function sendMessage(input: z.input<typeof sendSchema>): Promise<{ 
     .select(MESSAGE_COLUMNS)
     .single();
   if (error) {
-    if (error.message.includes("blocked_word")) {
-      return { ok: false, message: "Your message wasn’t sent: it contains a word that isn’t allowed in Lawdeck chat. Please reword it." };
-    }
-    if (error.message.includes("contact_details")) {
-      return { ok: false, message: "Your message wasn’t sent: phone numbers, email addresses and WhatsApp or social links aren’t allowed in Lawdeck chat, to keep everyone safe." };
-    }
-    if (error.message.includes("voice_note")) return { ok: false, message: "Voice notes can be sent in study groups only, up to 2 minutes." };
-    if (error.message.includes("post_limit")) return { ok: false, message: "You’re sending messages very quickly. Please wait a minute, then try again." };
-    if (error.code === "42501") return { ok: false, message: "Please accept the community rules before posting." };
+    const known = sendErrorMessage(error);
+    if (known) return { ok: false, message: known };
     console.error("chat send failed", { code: error.code });
     return { ok: false, message: "Your message wasn’t sent. Please try again." };
   }

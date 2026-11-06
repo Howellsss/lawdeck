@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat quiz extras: music, countdown, streaks, chart, podium).
+Last updated: 2026-11-06 (campus chat study together: lesson cards and "This week's topic").
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat quiz extras: music, countdown, streaks, ch
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **62** (`20261106006200_chat_quiz_extras.sql`, quiz extras; 61 is the group quiz).
+  merge only after that. The latest is **63** (`20261106006300_chat_study_together.sql`, study together; 62 is quiz extras).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -26,9 +26,8 @@ Last updated: 2026-11-06 (campus chat quiz extras: music, countdown, streaks, ch
   approval was retired by the founder; memory aid sets can still be approved per course.
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
-- **Last merged pull requests:** #153 wider pages · #154 adaptive revision · #155 My progress ·
-  #156 skim, tick and approve · #157 one click per lesson · #158 course approval retired ·
-  #159 stories easy to find · #160 stories box folded.
+- **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
+  #173 quiz extras. Study together (migration 63) is the open pull request after #173.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
@@ -42,11 +41,12 @@ Last updated: 2026-11-06 (campus chat quiz extras: music, countdown, streaks, ch
   the campus is asked there, not on the home page. Students also need pilot access to use chat.
   Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
   (migration 58). Full emoji pack. Study groups (migration 59). Voice notes in study groups
-  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Founder's next set, in order: study together (lesson cards), polls, LiveKit group calls (needs account,
+  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Study together: lesson cards in any group and "This week's topic" in study groups (63). Founder's next set, in order: polls, LiveKit group calls (needs account,
   library and cost approval). Pilot invites run alongside (founder: build and invite now).
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
-- **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch
-  and pull request before touching `src/server/limits` or billing.
+- **Plans, credits and Flutterwave payments:** not being built (founder, 2026-11-06: "Not connecting
+  payments" for now). The plans document (Free, Standard ₦6,999, Pro ₦9,999, Max ₦14,999) was made
+  outside the repo; no payments branch exists.
 
 ## Open items
 - ⬜ Pilot: invite 10–20 students (Admin → Pilot is built) — recommended next; needs the
