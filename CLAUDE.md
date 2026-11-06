@@ -36,6 +36,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - Service-role key only in marked admin jobs.
 - Validate all input on the server with Zod. Validate uploads (PDF/DOCX/images, ≤25 MB, real type checked; voice notes in chat study groups only: audio ≤2 min and ≤5 MB, real type checked, founder 2026-11-06). Use the query builder, never string-built SQL.
 - Logs never contain document text, uploads, passwords, keys or payment data.
+- Study group calls (founder, 2026-11-06): LiveKit Cloud, called only from `src/server/chat/livekit.ts`; keys server-only; students get a short-lived pass for one room after the server checks membership; never recorded; a monthly minute limit set on Admin → Chat (docs/specs/chat.md, step 4f).
 
 ## AI
 - AI is Anthropic Claude via `@anthropic-ai/sdk`, called only from `src/server/ai`. Models are settings: Opus 5.5 for marking and documents, Sonnet 5.5 for explanations if it passes the eval, Haiku 5.5 for small jobs. Embeddings: Voyage AI.

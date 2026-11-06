@@ -2,8 +2,9 @@
 // - never show Lawdeck inside another site's frame (stops "clickjacking");
 // - never guess a file's type from its contents (a file is only what the server says it is);
 // - send only Lawdeck's address, not the full page address, when following a link elsewhere;
-// - keep the camera, location and payment features switched off, and allow the microphone only
-//   on Lawdeck's own pages (for speaking a question);
+// - keep location and payment switched off, and allow the microphone and camera only on Lawdeck's
+//   own pages (speaking a question, chat voice notes, and study group calls, founder 2026-11-06:
+//   cameras stay off until the student turns theirs on);
 // - use secure (https) connections only, for two years.
 //
 // The content security policy (which scripts, styles and connections a page may use) is sent in
@@ -14,6 +15,8 @@
 const GOOGLE_SCRIPTS = "https://apis.google.com https://accounts.google.com";
 const GOOGLE_FRAMES = "https://docs.google.com https://accounts.google.com https://content.googleapis.com";
 const GOOGLE_APIS = "https://www.googleapis.com https://content.googleapis.com https://accounts.google.com";
+// Study group calls connect to LiveKit Cloud (docs/specs/chat.md, step 4f).
+const LIVEKIT = "wss://*.livekit.cloud https://*.livekit.cloud";
 
 export function contentSecurityPolicy(supabaseUrl: string | undefined, dev: boolean): string {
   const supabase = supabaseUrl ? new URL(supabaseUrl).origin : "";
@@ -27,7 +30,7 @@ export function contentSecurityPolicy(supabaseUrl: string | undefined, dev: bool
     "font-src 'self'",
     // Answers read aloud play from audio made in the page; chat voice notes from the Supabase store.
     `media-src 'self' blob: data: ${supabase}`.trim(),
-    `connect-src 'self' ${supabase} ${GOOGLE_APIS}`.trim(),
+    `connect-src 'self' ${supabase} ${GOOGLE_APIS} ${LIVEKIT}`.trim(),
     `frame-src ${GOOGLE_FRAMES}`,
     "object-src 'none'",
     "base-uri 'self'",
@@ -42,7 +45,7 @@ export function securityHeaders(supabaseUrl: string | undefined, dev: boolean): 
     { key: "X-Frame-Options", value: "DENY" },
     { key: "X-Content-Type-Options", value: "nosniff" },
     { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
-    { key: "Permissions-Policy", value: "camera=(), microphone=(self), geolocation=(), payment=(), usb=()" },
+    { key: "Permissions-Policy", value: "camera=(self), microphone=(self), geolocation=(), payment=(), usb=()" },
     { key: "Strict-Transport-Security", value: "max-age=63072000; includeSubDomains" },
     { key: "Content-Security-Policy-Report-Only", value: contentSecurityPolicy(supabaseUrl, dev) },
   ];

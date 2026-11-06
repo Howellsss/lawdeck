@@ -96,7 +96,7 @@ async function TestChatStudy() {
   if (!testPagesEnabled()) notFound();
   return (
     <ChatShell groups={groups} group={study} ownCampusName="Lagos" invites={invites}>
-      <ChatRoom groupId={study.id} groupName={study.name} initial={messages} initialHasOlder={false} voiceNotes apiKey="test" studyGroup canSetWeekTopic initialWeekTopic={weekTopic} />
+      <ChatRoom groupId={study.id} groupName={study.name} initial={messages} initialHasOlder={false} voiceNotes apiKey="test" studyGroup canSetWeekTopic initialWeekTopic={weekTopic} calls initialCall={{ callId: "00000000-0000-4000-8000-000000000891", startedAt: new Date().toISOString(), people: ["Ada Wombat", "Tunde Quokka"] }} />
     </ChatShell>
   );
 }

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { CallUsage } from "@/components/chat/CallUsage";
 import { ChatOpenSwitch } from "@/components/chat/ChatOpenSwitch";
 import { ReportedRow, type Reported } from "@/components/chat/ReportedRow";
 import { VerificationRow } from "@/components/chat/VerificationRow";
@@ -8,6 +9,7 @@ import { LoadingRows } from "@/components/ui/LoadingRows";
 import { formatWat } from "@/lib/dates";
 import { getStaffRole } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { callsEnabled } from "@/server/chat/livekit";
 
 export const metadata: Metadata = { title: "Chat checks · Lawdeck" };
 
@@ -26,11 +28,13 @@ export default function ChatChecksPage() {
 async function Checks() {
   if ((await getStaffRole()) !== "admin") notFound();
   const db = await createSupabaseServerClient();
-  const [queue, reports, settings] = await Promise.all([
+  const [queue, reports, settings, usage] = await Promise.all([
     db.rpc("chat_verification_queue"),
     db.rpc("chat_report_queue"),
     db.from("chat_settings").select("open_to_students").maybeSingle(),
+    db.rpc("chat_call_usage"),
   ]);
+  const callUse = usage.data?.[0];
   const { data, error } = queue;
   if (error || reports.error) throw new Error("chat checks failed");
   const reported: Reported[] = reports.data.map((m) => ({
@@ -72,6 +76,7 @@ async function Checks() {
         </p>
       </div>
       <ChatOpenSwitch open={settings.data?.open_to_students ?? false} />
+      <CallUsage used={callUse?.used ?? 0} limit={callUse?.monthly_limit ?? 4500} calls={callUse?.calls ?? 0} enabled={callsEnabled()} />
       <section aria-labelledby="reported" className="flex flex-col gap-2">
         <h2 id="reported" className="text-lg font-medium">
           Reported messages ({openReports.length})

@@ -5,9 +5,11 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import type { ChatMessage, ChatPerson, WeekTopic } from "@/server/chat/data";
 import { deleteMessage, loadMessages, markRead, sendMessage } from "@/server/chat/actions";
 import { hideMessage } from "@/server/chat/moderation";
+import type { CallStatus } from "@/server/chat/calls";
 import { createPoll } from "@/server/chat/polls";
 import { setWeekTopic, shareLesson } from "@/server/chat/together";
 import { ChatComposer, type Attached } from "./ChatComposer";
+import { CallBar } from "./call/CallBar";
 import { ChatMessages } from "./ChatMessages";
 import { PollDialog, type PollDraft } from "./PollDialog";
 import { ShareLessonDialog } from "./ShareLessonDialog";
@@ -30,6 +32,8 @@ export function ChatRoom({
   studyGroup = false,
   canSetWeekTopic = false,
   initialWeekTopic = null,
+  calls = false,
+  initialCall = null,
 }: {
   groupId: string;
   groupName: string;
@@ -42,6 +46,9 @@ export function ChatRoom({
   studyGroup?: boolean;
   canSetWeekTopic?: boolean;
   initialWeekTopic?: WeekTopic | null;
+  // Study groups, once LiveKit is set up: the call line at the top.
+  calls?: boolean;
+  initialCall?: CallStatus;
 }) {
   const router = useRouter();
   const scroller = useRef<HTMLDivElement>(null);
@@ -180,6 +187,7 @@ export function ChatRoom({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
+      {calls && <CallBar groupId={groupId} initialStatus={initialCall} />}
       {studyGroup && <WeekTopicBar weekTopic={weekTopic} canSet={canSetWeekTopic} busy={pickBusy} onSet={() => (setPickError(undefined), setPicking("week"))} onClear={() => void clearWeek()} />}
       <div ref={scroller} onScroll={() => atBottom() && unseen > 0 && setUnseen(0)} className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         <div className="mt-auto" />

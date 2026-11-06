@@ -263,9 +263,9 @@ export type Database = {
       };
       // Campus chat, Phase 2 (migration 55).
       chat_settings: {
-        Row: { id: boolean; open_to_students: boolean; updated_at: string };
+        Row: { id: boolean; open_to_students: boolean; updated_at: string; call_minutes_month: number };
         Insert: never;
-        Update: { open_to_students?: boolean; updated_at?: string };
+        Update: { open_to_students?: boolean; updated_at?: string; call_minutes_month?: number };
         Relationships: [];
       };
       chat_groups: {
@@ -1446,6 +1446,12 @@ export type Database = {
         Returns: { topic_id: string; course: string; topic: string; lesson_title: string; bulk_approved: boolean }[];
       };
       chat_share_lesson: { Args: { g: string; topic: string; note?: string }; Returns: string };
+      // Group calls (migration 65).
+      chat_call_join: { Args: { g: string }; Returns: { call_id: string; room: string; started: boolean }[] };
+      chat_call_heartbeat: { Args: { c: string }; Returns: string };
+      chat_call_leave: { Args: { c: string }; Returns: undefined };
+      chat_call_status: { Args: { g: string }; Returns: { call_id: string; started_at: string; people: string[] }[] };
+      chat_call_usage: { Args: Record<string, never>; Returns: { used: number; monthly_limit: number; calls: number }[] };
       // Polls (migration 64).
       chat_poll_create: { Args: { g: string; question: string; options: string[]; days: number; names?: boolean }; Returns: string };
       chat_poll_vote: { Args: { p: string; pick: number }; Returns: "ok" | "closed" | "not_allowed" };

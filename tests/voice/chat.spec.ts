@@ -257,6 +257,34 @@ for (const width of [360, 1280]) {
   });
 }
 
+// Group calls in study groups (founder, 2026-11-06): the call line, and the call screen.
+for (const width of [360, 1280]) {
+  test(`group calls: call line and call screen (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 860 });
+    await page.goto("/test-pages/chat-study");
+    const line = page.getByRole("region", { name: "Group call" });
+    await expect(line).toContainText("Call in progress · Ada Wombat, Tunde Quokka");
+    // Test pages have no LiveKit keys: the student is told calls aren't on, not left waiting.
+    await line.getByRole("button", { name: "Join call" }).click();
+    await expect(line.getByRole("alert")).toContainText("aren’t switched on");
+
+    await page.goto("/test-pages/chat-call");
+    const call = page.getByRole("region", { name: "Group call" });
+    await expect(call).toContainText("3 people · not recorded");
+    await expect(call.getByRole("listitem", { name: "Tunde Quokka, speaking" })).toBeVisible();
+    await expect(call.getByRole("listitem", { name: "Bisi Numbat, muted" })).toBeVisible();
+    await expect(call.getByRole("button", { name: "Tap to hear the call" })).toBeVisible();
+    await call.getByRole("button", { name: "Mute" }).click();
+    await expect(call.getByRole("listitem", { name: "Ada Wombat (you), muted" })).toBeVisible();
+    await expect(call.getByRole("button", { name: "Unmute" })).toHaveAttribute("aria-pressed", "true");
+    await expect(call.getByRole("button", { name: "Camera on" })).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+    await call.getByRole("button", { name: "Leave" }).click();
+    await expect(page.getByRole("status")).toHaveText("You left the call.");
+  });
+}
+
 // Group quiz like Kahoot (founder, 2026-11-06): host form, a timed question, the reveal and results.
 for (const width of [360, 1280]) {
   test(`group quiz: host, answer, reveal and results (${width}px)`, async ({ page }) => {
