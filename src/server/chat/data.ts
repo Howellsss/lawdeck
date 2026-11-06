@@ -20,9 +20,23 @@ export type ChatGroup = {
 export type ChatInvite = { groupId: string; groupName: string; invitedBy: string };
 export type ChatPerson = { id: string; name: string; campus: string | null };
 export type ChatFile = { name: string; kind: "pdf" | "docx" | "png" | "jpeg" | "voice"; size: number; url: string | null; seconds?: number };
-export type ChatMessage = { id: string; groupId: string; body: string; createdAt: string; author: ChatPerson; mine: boolean; files: ChatFile[] };
-export type MessageRow = { id: string; group_id: string; owner_id: string; body: string; created_at: string; attachments: Json };
-export const MESSAGE_COLUMNS = "id, group_id, owner_id, body, created_at, attachments";
+// A lesson card (migration 63): it points to a topic and never carries the lesson's text.
+export type LessonCard = { topicId: string; course: string; topic: string; title: string; bulkApproved: boolean };
+export type ChatMessage = {
+  id: string;
+  groupId: string;
+  body: string;
+  createdAt: string;
+  author: ChatPerson;
+  mine: boolean;
+  files: ChatFile[];
+  // Null when the message has no card, or the lesson is no longer approved.
+  lesson: LessonCard | null;
+};
+export type MessageRow = { id: string; group_id: string; owner_id: string; body: string; created_at: string; attachments: Json; lesson_topic_id: string | null };
+export const MESSAGE_COLUMNS = "id, group_id, owner_id, body, created_at, attachments, lesson_topic_id";
+// A study group's "This week's topic": who set it and when.
+export type WeekTopic = { card: LessonCard; setBy: string; setAt: string };
 
 type Db = Awaited<ReturnType<typeof createSupabaseServerClient>>;
 export const PAGE = 50;
@@ -53,9 +67,11 @@ function filesOf(value: Json): StoredFile[] {
 export async function withAuthors(db: Db, rows: MessageRow[], me: string): Promise<ChatMessage[]> {
   const ids = [...new Set(rows.map((r) => r.owner_id))];
   const paths = rows.flatMap((r) => filesOf(r.attachments).map((f) => f.path));
-  const [people, signed] = await Promise.all([
+  const topics = [...new Set(rows.flatMap((r) => (r.lesson_topic_id ? [r.lesson_topic_id] : [])))];
+  const [people, signed, cards] = await Promise.all([
     ids.length ? db.rpc("chat_people", { people: ids }) : Promise.resolve({ data: [], error: null }),
     paths.length ? db.storage.from("chat-files").createSignedUrls(paths, 3600) : Promise.resolve({ data: [], error: null }),
+    lessonCards(db, topics),
   ]);
   const byId = new Map((people.data ?? []).map((p) => [p.id, p]));
   const urls = new Map((signed.data ?? []).map((s) => [s.path ?? "", s.signedUrl ?? null]));
@@ -67,7 +83,17 @@ export async function withAuthors(db: Db, rows: MessageRow[], me: string): Promi
     author: byId.get(r.owner_id) ?? { id: r.owner_id, name: "Lawdeck student", campus: null },
     mine: r.owner_id === me,
     files: filesOf(r.attachments).map(({ path, ...f }) => ({ ...f, url: urls.get(path) ?? null })),
+    lesson: (r.lesson_topic_id && cards.get(r.lesson_topic_id)) || null,
   }));
+}
+
+// What lesson cards show (topic, course, title, whether it was read in full), by topic.
+export async function lessonCards(db: Db, topics: string[]): Promise<Map<string, LessonCard>> {
+  if (!topics.length) return new Map();
+  const { data } = await db.rpc("chat_lesson_cards", { topics: topics.slice(0, 100) });
+  return new Map(
+    (data ?? []).map((c) => [c.topic_id, { topicId: c.topic_id, course: c.course, topic: c.topic, title: c.lesson_title, bulkApproved: c.bulk_approved }]),
+  );
 }
 
 export type ChatRoom = {
@@ -79,6 +105,8 @@ export type ChatRoom = {
   group: ChatGroup;
   messages: ChatMessage[];
   hasOlder: boolean;
+  // Study groups only; null when none is set (or its lesson is no longer approved).
+  weekTopic: WeekTopic | null;
 };
 
 // One group with the list of groups, unread counts and the latest messages. Null when chat is not
@@ -105,6 +133,7 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
     .limit(PAGE + 1);
   if (rows.error) throw new Error("chat read failed");
   const page = rows.data.slice(0, PAGE).reverse();
+  const [messages, weekTopic] = await Promise.all([withAuthors(db, page, account.id), group.kind === "study" ? getWeekTopic(db, group.id) : null]);
   return {
     me: self.data?.[0] ?? { id: account.id, name: "You", campus: null },
     invites,
@@ -112,9 +141,23 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
     member: Boolean(member.data),
     groups: list,
     group,
-    messages: await withAuthors(db, page, account.id),
+    messages,
     hasOlder: rows.data.length > PAGE,
+    weekTopic,
   };
+}
+
+// A study group's "This week's topic", with the name of who set it.
+export async function getWeekTopic(db: Db, groupId: string): Promise<WeekTopic | null> {
+  const { data } = await db.from("chat_groups").select("week_topic_id, week_topic_by, week_topic_at").eq("id", groupId).maybeSingle();
+  if (!data?.week_topic_id || !data.week_topic_at) return null;
+  const [cards, people] = await Promise.all([
+    lessonCards(db, [data.week_topic_id]),
+    data.week_topic_by ? db.rpc("chat_people", { people: [data.week_topic_by] }) : Promise.resolve({ data: [], error: null }),
+  ]);
+  const card = cards.get(data.week_topic_id);
+  if (!card) return null;
+  return { card, setBy: people.data?.[0]?.name ?? "Lawdeck student", setAt: data.week_topic_at };
 }
 
 // The groups this person can see (campus groups first, then their study groups by name), with

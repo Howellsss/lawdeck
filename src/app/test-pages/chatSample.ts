@@ -19,6 +19,7 @@ const msg = (n: number, author: typeof ada, at: string, body: string, mine = fal
   author,
   mine,
   files: [],
+  lesson: null,
 });
 const now = Date.now();
 const today = (minutesAgo: number) => new Date(now - minutesAgo * 60_000).toISOString();

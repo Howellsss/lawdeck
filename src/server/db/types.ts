@@ -279,6 +279,10 @@ export type Database = {
           owner_id: string | null;
           audience: "student" | "aspirant" | null;
           created_at: string;
+          // "This week's topic" in study groups (migration 63).
+          week_topic_id: string | null;
+          week_topic_by: string | null;
+          week_topic_at: string | null;
         };
         Insert: never;
         Update: never;
@@ -314,6 +318,8 @@ export type Database = {
           hidden_at: string | null;
           hidden_by: string | null;
           attachments: Json;
+          // A lesson card (migration 63); set only by chat_share_lesson and chat_set_week_topic.
+          lesson_topic_id: string | null;
         };
         Insert: { group_id: string; body: string; mentions?: string[]; hashtags?: string[]; attachments?: Json };
         Update: never;
@@ -1431,6 +1437,14 @@ export type Database = {
       chat_rename_group: { Args: { g: string; group_name: string }; Returns: "ok" | "not_allowed" | "bad_name" };
       chat_delete_group: { Args: { g: string }; Returns: "ok" | "not_allowed" };
       // Group quizzes (migration 61).
+      // Study together (migration 63).
+      chat_lesson_topics: { Args: Record<string, never>; Returns: { topic_id: string; course: string; topic: string }[] };
+      chat_lesson_cards: {
+        Args: { topics: string[] };
+        Returns: { topic_id: string; course: string; topic: string; lesson_title: string; bulk_approved: boolean }[];
+      };
+      chat_share_lesson: { Args: { g: string; topic: string; note?: string }; Returns: string };
+      chat_set_week_topic: { Args: { g: string; topic: string | null }; Returns: "set" | "cleared" };
       chat_quiz_topics: { Args: Record<string, never>; Returns: { topic_id: string; course: string; topic: string; questions: number }[] };
       chat_quiz_create: { Args: { g: string; topic: string; how_many: number; secs: number }; Returns: string };
       chat_quiz_join: { Args: { q: string }; Returns: "ok" | "not_allowed" };

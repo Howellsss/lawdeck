@@ -2,16 +2,19 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import type { ChatMessage, ChatPerson } from "@/server/chat/data";
+import type { ChatMessage, ChatPerson, WeekTopic } from "@/server/chat/data";
 import { deleteMessage, loadMessages, markRead, sendMessage } from "@/server/chat/actions";
 import { hideMessage } from "@/server/chat/moderation";
+import { setWeekTopic, shareLesson } from "@/server/chat/together";
 import { ChatComposer, type Attached } from "./ChatComposer";
 import { ChatMessages } from "./ChatMessages";
+import { ShareLessonDialog } from "./ShareLessonDialog";
+import { WeekTopicBar } from "./WeekTopicBar";
 
 const CHECK_EVERY = 4000;
 
 // One open group: its messages, checked for new ones every few seconds while the page is in view,
-// and the message box. Scrolls to the newest message unless the student has scrolled up to read.
+// and the message box. Study groups show "This week's topic" at the top. Scrolls to the newest message unless the student has scrolled up to read.
 export function ChatRoom({
   groupId,
   groupName,
@@ -21,6 +24,9 @@ export function ChatRoom({
   isAdmin = false,
   voiceNotes = false,
   apiKey,
+  studyGroup = false,
+  canSetWeekTopic = false,
+  initialWeekTopic = null,
 }: {
   groupId: string;
   groupName: string;
@@ -30,6 +36,9 @@ export function ChatRoom({
   isAdmin?: boolean;
   voiceNotes?: boolean;
   apiKey: string;
+  studyGroup?: boolean;
+  canSetWeekTopic?: boolean;
+  initialWeekTopic?: WeekTopic | null;
 }) {
   const router = useRouter();
   const scroller = useRef<HTMLDivElement>(null);
@@ -40,6 +49,10 @@ export function ChatRoom({
   const [unseen, setUnseen] = useState(0);
   const stick = useRef(true);
   const keepOffset = useRef<number | null>(null);
+  const [picking, setPicking] = useState<"share" | "week" | null>(null);
+  const [pickError, setPickError] = useState<string>();
+  const [pickBusy, setPickBusy] = useState(false);
+  const [weekTopic, setWeek] = useState(initialWeekTopic);
 
   const atBottom = () => {
     const el = scroller.current;
@@ -99,6 +112,32 @@ export function ChatRoom({
     return true;
   };
 
+  const pick = async (topicId: string, note: string) => {
+    setPickBusy(true);
+    setPickError(undefined);
+    if (picking === "week") {
+      const result = await setWeekTopic({ groupId, topicId });
+      setPickBusy(false);
+      if (!result.ok) return setPickError(result.message);
+      setWeek(result.weekTopic);
+    } else {
+      const result = await shareLesson({ groupId, topicId, note });
+      setPickBusy(false);
+      if (!result.ok) return setPickError(result.message);
+      stick.current = true;
+      merge([result.message]);
+    }
+    setPicking(null);
+  };
+
+  const clearWeek = async () => {
+    setPickBusy(true);
+    const result = await setWeekTopic({ groupId, topicId: null });
+    setPickBusy(false);
+    if (!result.ok) return setError(result.message);
+    setWeek(null);
+  };
+
   const older = async () => {
     const first = messages[0];
     if (!first) return;
@@ -125,6 +164,7 @@ export function ChatRoom({
 
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
+      {studyGroup && <WeekTopicBar weekTopic={weekTopic} canSet={canSetWeekTopic} busy={pickBusy} onSet={() => (setPickError(undefined), setPicking("week"))} onClear={() => void clearWeek()} />}
       <div ref={scroller} onScroll={() => atBottom() && unseen > 0 && setUnseen(0)} className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         <div className="mt-auto" />
         <ChatMessages messages={messages} hasOlder={hasOlder} loadingOlder={loadingOlder} onOlder={() => void older()} onDelete={(id) => void remove(id)} onHide={(id) => void hide(id)} isAdmin={isAdmin} groupName={groupName} welcome={welcome} />
@@ -134,7 +174,16 @@ export function ChatRoom({
           {unseen} new message{unseen === 1 ? "" : "s"} ↓
         </button>
       )}
-      <ChatComposer groupId={groupId} groupName={groupName} apiKey={apiKey} voiceNotes={voiceNotes} onSend={send} error={error} />
+      <ChatComposer
+        groupId={groupId}
+        groupName={groupName}
+        apiKey={apiKey}
+        voiceNotes={voiceNotes}
+        onShareLesson={() => (setPickError(undefined), setPicking("share"))}
+        onSend={send}
+        error={error}
+      />
+      {picking && <ShareLessonDialog mode={picking} busy={pickBusy} error={pickError} onPick={(t, n) => void pick(t, n)} onClose={() => setPicking(null)} />}
     </div>
   );
 }

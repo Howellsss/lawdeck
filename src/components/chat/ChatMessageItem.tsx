@@ -5,6 +5,7 @@ import { watTime } from "@/lib/chatTime";
 import type { ChatMessage } from "@/server/chat/data";
 import { ChatBody } from "./ChatBody";
 import { ChatFiles } from "./ChatFiles";
+import { LessonCard } from "./LessonCard";
 import { MessageActions } from "./MessageActions";
 import { ReportForm } from "./ReportForm";
 
@@ -53,6 +54,7 @@ export function ChatMessageItem({
           </p>
         )}
         {message.body.trim() && <ChatBody body={message.body} />}
+        {message.lesson && <LessonCard card={message.lesson} />}
         <ChatFiles files={message.files} />
         {reporting && <ReportForm messageId={message.id} onDone={(sent) => (setReporting(false), setNotice(sent))} />}
         {notice && (
