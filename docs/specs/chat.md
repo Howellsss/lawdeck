@@ -27,8 +27,10 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
   an aspirant sees only Aspirants; staff see every group (`chat_scope()`, `chat_group_visible()`).
 - **No contact harvesting:** phone numbers (any format), email addresses and WhatsApp, Telegram or
   social links are refused in messages, like blocked words; no direct messages; no member list.
-- Side menu: staff always see Campus chat; students see it once chat is open to them (Phase 3), and
-  land on the verification form until approved. Migration 56.
+- Side menu: everyone signed in sees Campus chat (founder, 2026-11-06). Students who can't use it
+  yet land on the verification form, which is also where they choose their campus (the home page no
+  longer asks; the Account page can still change it). Admins see "Chat checks" with the number of
+  requests waiting. Migration 56.
 
 ## Phases
 1. **Campus choice (built):** migration 54 adds `campuses` (reference data, readable by signed-in

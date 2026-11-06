@@ -138,3 +138,11 @@ export async function decideVerification(input: { id: string; decision: string; 
   refresh();
   return { ok: true };
 }
+
+// Admins: how many verification requests are waiting (for the Admin menu). 0 for everyone else.
+export async function pendingChatChecks(): Promise<number> {
+  if ((await getStaffRole()) !== "admin") return 0;
+  const db = await createSupabaseServerClient();
+  const { count } = await db.from("chat_verifications").select("id", { count: "exact", head: true }).eq("status", "pending");
+  return count ?? 0;
+}
