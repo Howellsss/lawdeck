@@ -9,6 +9,7 @@ import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { z } from "@/lib/zod";
 import { getCurrentAccount } from "@/server/auth/session";
+import { getSupabaseConfig } from "@/server/auth/config";
 import { chatAllowed, getChatRoom, type ChatGroup } from "@/server/chat/data";
 
 export const metadata: Metadata = { title: "Campus chat · Lawdeck" };
@@ -40,7 +41,7 @@ async function Group({ params }: { params: Promise<{ group: string }> }) {
   return (
     <ChatShell groups={room.groups} current={room.group.key} title={room.group.name} subtitle={SUBTITLES[room.group.kind](room.group.name)} ownCampusName={room.me.campus}>
       {room.member ? (
-        <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} initial={room.messages} initialHasOlder={room.hasOlder} />
+        <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} initial={room.messages} initialHasOlder={room.hasOlder} isAdmin={room.isAdmin} apiKey={getSupabaseConfig()?.key ?? ""} />
       ) : (
         <ChatRules />
       )}

@@ -25,6 +25,7 @@ const msg = (n: number, author: typeof ada, at: string, body: string, mine = fal
   createdAt: at,
   author,
   mine,
+  files: [],
 });
 const now = Date.now();
 const today = (minutesAgo: number) => new Date(now - minutesAgo * 60_000).toISOString();
@@ -33,6 +34,13 @@ const messages: ChatMessage[] = [
   msg(2, ada, today(40), `Yes! See [the summary](https://mylawdeck.com/diary) @[Tunde Quokka](${tunde.id})\n- Originating summons\n- Writ of summons`),
   msg(3, ada, today(38), "> Facts not in dispute: use an originating summons", true),
   msg(4, tunde, today(5), "Thanks, that helps ~~a little~~ a lot. `Order 3 rule 5` is the one."),
+  {
+    ...msg(5, tunde, today(3), "Here is the class handout."),
+    files: [
+      { name: "Order 3 handout.pdf", kind: "pdf", size: 482_000, url: null },
+      { name: "Board notes.png", kind: "png", size: 1_300_000, url: null },
+    ],
+  },
 ];
 
 export default function TestChatPage() {
@@ -48,7 +56,7 @@ async function TestChat() {
   if (!testPagesEnabled()) notFound();
   return (
     <ChatShell groups={groups} current="lagos" title="Lagos" subtitle="Lagos campus · everyone can read and post" ownCampusName="Lagos">
-      <ChatRoom groupId={groupId} groupName="Lagos" initial={messages} initialHasOlder />
+      <ChatRoom groupId={groupId} groupName="Lagos" initial={messages} initialHasOlder apiKey="test" />
     </ChatShell>
   );
 }

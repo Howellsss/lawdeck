@@ -22,7 +22,8 @@ export function contentSecurityPolicy(supabaseUrl: string | undefined, dev: bool
     // Next.js adds small inline scripts to each page; without per-request codes these need 'unsafe-inline'.
     `script-src 'self' 'unsafe-inline' ${GOOGLE_SCRIPTS}${dev ? " 'unsafe-eval'" : ""}`,
     "style-src 'self' 'unsafe-inline' https://accounts.google.com",
-    "img-src 'self' data: blob: https://*.googleusercontent.com https://ssl.gstatic.com",
+    // Pictures shared in campus chat open from short-lived private links on the Supabase store.
+    `img-src 'self' data: blob: https://*.googleusercontent.com https://ssl.gstatic.com ${supabase}`.trim(),
     "font-src 'self'",
     // Answers read aloud play from audio made in the page.
     "media-src 'self' blob: data:",

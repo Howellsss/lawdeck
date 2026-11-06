@@ -34,6 +34,22 @@ for (const width of [360, 1280]) {
     await expect(box).toHaveValue("**hello**");
     await page.getByRole("button", { name: "Bullet list" }).click();
     await expect(box).toHaveValue("- **hello**");
+    // Files show as cards with their kind and size; the paperclip attaches more.
+    const files = list.getByRole("list", { name: "Attached files" });
+    await expect(files.getByText("Order 3 handout.pdf")).toBeVisible();
+    await expect(files.getByText("PDF · 471 KB · not available")).toBeVisible();
+    await expect(page.getByRole("button", { name: /Attach a file/ })).toBeVisible();
+    // Other people's messages can be reported with a reason; your own can be deleted, not reported.
+    const handout = list.getByRole("listitem").filter({ hasText: "Here is the class handout." });
+    await handout.hover();
+    await handout.getByRole("button", { name: "Report this message" }).click();
+    const report = page.getByRole("form", { name: "Report this message" });
+    await report.getByRole("button", { name: "Send report" }).click();
+    await expect(report.getByRole("alert")).toHaveText("Choose a reason.");
+    await report.getByLabel("Exam cheating or leaked papers").check();
+    await report.getByRole("button", { name: "Cancel" }).click();
+    await expect(report).toHaveCount(0);
+    await expect(page.getByRole("button", { name: "Hide this message" })).toHaveCount(0);
     // Sending needs an account on the test page.
     await box.press("Enter");
     await expect(page.getByRole("alert").filter({ hasText: /sign in|isn’t open/i })).toBeVisible();

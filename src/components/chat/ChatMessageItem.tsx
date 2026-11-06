@@ -4,6 +4,9 @@ import { useState } from "react";
 import { watTime } from "@/lib/chatTime";
 import type { ChatMessage } from "@/server/chat/data";
 import { ChatBody } from "./ChatBody";
+import { ChatFiles } from "./ChatFiles";
+import { MessageActions } from "./MessageActions";
+import { ReportForm } from "./ReportForm";
 
 export function initials(name: string): string {
   const parts = name.trim().split(/\s+/).filter(Boolean);
@@ -11,9 +14,23 @@ export function initials(name: string): string {
 }
 
 // One message, Slack-style: avatar, name, campus and time on the first message of a run; later
-// messages in the run show only the time on hover. The author can delete their own message.
-export function ChatMessageItem({ message, first, onDelete }: { message: ChatMessage; first: boolean; onDelete: (id: string) => void }) {
-  const [confirming, setConfirming] = useState(false);
+// messages in the run show only the time on hover. Files show under the text. The author can delete
+// their own message; others can report it; admins can hide it.
+export function ChatMessageItem({
+  message,
+  first,
+  isAdmin,
+  onDelete,
+  onHide,
+}: {
+  message: ChatMessage;
+  first: boolean;
+  isAdmin: boolean;
+  onDelete: (id: string) => void;
+  onHide: (id: string) => void;
+}) {
+  const [reporting, setReporting] = useState(false);
+  const [notice, setNotice] = useState<string | null>(null);
   return (
     <li className={`group relative flex gap-3 px-4 hover:bg-surface/60 lg:px-6 ${first ? "pt-2.5 pb-1" : "py-0.5"}`}>
       <div className="w-9 shrink-0">
@@ -35,26 +52,16 @@ export function ChatMessageItem({ message, first, onDelete }: { message: ChatMes
             </time>
           </p>
         )}
-        <ChatBody body={message.body} />
+        {message.body.trim() && <ChatBody body={message.body} />}
+        <ChatFiles files={message.files} />
+        {reporting && <ReportForm messageId={message.id} onDone={(sent) => (setReporting(false), setNotice(sent))} />}
+        {notice && (
+          <p role="status" className="mt-1 text-[13px] text-muted">
+            {notice}
+          </p>
+        )}
       </div>
-      {message.mine && (
-        <div className="absolute right-3 top-1 hidden items-center gap-2 rounded-lg border border-line bg-paper px-2 py-1 text-[12px] shadow-sm group-hover:flex group-focus-within:flex">
-          {confirming ? (
-            <>
-              <button type="button" onClick={() => onDelete(message.id)} className="text-warning underline underline-offset-2">
-                Delete for everyone
-              </button>
-              <button type="button" onClick={() => setConfirming(false)} className="text-muted underline underline-offset-2">
-                Cancel
-              </button>
-            </>
-          ) : (
-            <button type="button" onClick={() => setConfirming(true)} className="text-muted underline underline-offset-2" aria-label="Delete this message">
-              Delete
-            </button>
-          )}
-        </div>
-      )}
+      <MessageActions mine={message.mine} isAdmin={isAdmin} onDelete={() => onDelete(message.id)} onHide={() => onHide(message.id)} onReport={() => (setReporting(true), setNotice(null))} />
     </li>
   );
 }

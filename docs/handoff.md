@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat verification).
+Last updated: 2026-11-06 (campus chat Phase 3: files, reports, hide, open switch).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat verification).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **56** (`20261106005600_chat_verification.sql`, chat verification).
+  merge only after that. The latest is **57** (`20261106005700_chat_files_reports.sql`, chat files and reports).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -35,8 +35,10 @@ Last updated: 2026-11-06 (campus chat verification).
   Phase 1 campus choice (migration 54, live; seven campuses + aspirant). Phase 2 campus groups
   built (migration 55; staff only). Verification and per-campus groups (migration 56): students verify
   with their Law School ID (admin approves on /admin/chat), see their campus + All campuses only;
-  aspirants see Aspirants only; contact details blocked. Next: Phase 3 files, Report and admin Hide,
-  an admin switch to open chat to students (`chat_settings.open_to_students`), then open.
+  aspirants see Aspirants only; contact details blocked. Phase 3 (migration 57): files in messages,
+  Report a message, admin Hide, and the "Open chat to students" switch on Admin → Chat checks.
+  Chat is still closed to students: the founder switches it on (after counsel's terms review).
+  Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
 - **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch
   and pull request before touching `src/server/limits` or billing.
 

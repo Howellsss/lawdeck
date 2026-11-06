@@ -55,8 +55,23 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      refresh every 30 seconds; search across all groups (`/chat/search`). Delete your own message.
    - Times in WAT with Today / Yesterday / date markers; a person's messages within 5 minutes sit
      under one name.
-3. **Files and safety:** PDF, Word and images up to 25 MB; Report a message; admin Hide and a
-   moderation page. Then open to students, after counsel reviews the terms and paid plans are on.
+3. **Files and safety (built):** migration 57.
+   - Files: up to 4 a message (PDF, Word DOCX, PNG, JPEG; 25 MB each) by the paperclip in the
+     message box; a message may be files only. Each file goes to the private `chat-files` store at
+     `group/sender/random.ext`: only people who can see the group can open it (links last an hour),
+     people add files only to their own folder in their own groups. Before posting, the server
+     checks each file is the sender's, in that group, and really the kind its name says; the
+     database checks the details again. File names go through the word and contact filters.
+     Pictures show as previews, documents as cards with kind and size. Deleting a message deletes
+     its files.
+   - Report a message (`chat_reports`): anyone who can see a message reports it once, with a reason
+     (rude or vulgar, contact details, exam cheating, spam, other with a note).
+   - Admin Hide (`chat_set_hidden`): hides a message for everyone (from the message menu or the
+     moderation list) and closes its reports; Show again undoes it. Admins can also keep a reported
+     message and close its reports.
+   - Admin → Chat checks: the "Open chat to students" switch (`chat_settings.open_to_students`),
+     reported messages (`chat_report_queue`, admins only; "Dealt with" folded below), then
+     verification requests. Open it after counsel reviews the terms and paid plans are on.
 4. **Later (after the pilot):** direct messages, private groups, reactions, threads.
 
 ## Tests
@@ -69,3 +84,8 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
   ask visitors to sign in; Admin → Chat checks is hidden from visitors.
 - `tests/permissions/sql/9ze_chat_verification_test.sql` (free accounts see nothing, one open request,
   admins decide, groups per campus, aspirants apart, contact details refused, removal, ID documents).
+- `tests/permissions/sql/9zf_chat_files_reports_test.sql` (files only in your own folder of your own
+  groups, others' groups unreadable, file details checked, filters on file names, one report per
+  person, reports private, only admins hide, show or list reports, the open switch admins only),
+  `tests/unit/chatFiles.test.ts`; `tests/voice/chat.spec.ts` checks file cards, the paperclip and the
+  report form.
