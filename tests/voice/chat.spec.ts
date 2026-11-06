@@ -323,6 +323,10 @@ test("a broken invite link says so; a real-looking one asks the visitor to sign 
 
 // Leave works at once, even before the call has connected (founder, 2026-11-06: Leave didn't work).
 test("leaving a call closes the call screen straight away", async ({ page }) => {
+  // Hold the call service's connection open without answering, so the call stays "connecting"
+  // whatever the network does (an unreachable address sometimes fails at once instead).
+  await page.routeWebSocket(/10\.255\.255\.1/, () => undefined);
+  await page.route(/10\.255\.255\.1/, () => undefined);
   await page.goto("/test-pages/chat-call-live");
   const call = page.getByRole("region", { name: "Group call" });
   await expect(call).toContainText("connecting…");
