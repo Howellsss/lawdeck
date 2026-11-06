@@ -141,6 +141,23 @@ learning record is its owner's alone (staff do not read them); one session per t
 - Existing points start at the normal ease, so nothing already scheduled moves. No AI cost.
 - Tests: `tests/unit/revision.test.ts`; `tests/permissions/sql/9za_adaptive_revision_test.sql`.
 
+## My progress (Phase 4b)
+- Side menu: **My progress** (`/progress`), assembled from the student's own revision points,
+  answers and study days (`src/server/db/progress.ts`, rules in `src/lib/progress.ts`); nothing new
+  is stored and no AI is used.
+- Each revision point is **mastered** (remembered last time and now 14 days or more apart),
+  **slipping** (missed, skipped or partly remembered last time, or ease below 2.2) or **learning**.
+- Shows: totals (mastered, slipping, recall accuracy, days in a row) with one mastery bar; **Worth
+  revising first** (up to 5 topics with slipping points, the largest share first) with **Revise now
+  (n)** to `/revise?topic=<id>` when questions are due, otherwise **Revise visually**; recall
+  accuracy for each of the last 8 weeks (Monday to Sunday, Lagos), one ink bar per week with a
+  hover or focus tooltip and a table for screen readers; study days over the last 35 days; and each
+  course, opening to its topics.
+- Colour only for meaning: green mastered, amber slipping, neutral learning; counts always written.
+- Labelled: based only on the student's recorded answers; not a prediction of exam results.
+- Tests: `tests/unit/progress.test.ts`; `tests/voice/progress.spec.ts` (360 px and desktop); e2e:
+  `/progress` asks visitors to sign in.
+
 ## Writing and approving many lessons (founder, 2026-11-05)
 - **Write all missing lessons** (Admin → Lessons): for all courses or one, writes every topic that
   has no lesson, 2 at a time, through the same route as a single lesson. Shows the estimated cost

@@ -13,66 +13,35 @@ export function CourseBreakdown({ courses }: { courses: CourseProgress[] }) {
       </h2>
       <div className="flex flex-col gap-2">
         {courses.map((c) => (
-          <details
-            key={c.slug}
-            className="group rounded-2xl border border-line bg-surface"
-          >
+          <details key={c.slug} className="group rounded-2xl border border-line bg-surface">
             <summary className="flex cursor-pointer list-none flex-col gap-2 px-4 py-3">
               <span className="flex flex-wrap items-baseline justify-between gap-2">
                 <span className="font-medium">{c.name}</span>
                 <span className="text-sm text-muted">
-                  {c.topics.length} topic{c.topics.length === 1 ? "" : "s"} ·{" "}
-                  {c.accuracy === null
-                    ? "no answers yet"
-                    : `${c.accuracy}% recalled`}
+                  {c.topics.length} topic{c.topics.length === 1 ? "" : "s"} · {c.accuracy === null ? "no answers yet" : `${c.accuracy}% recalled`}
                   {c.dueNow ? ` · ${c.dueNow} due` : ""}
-                  <span
-                    aria-hidden
-                    className="ml-2 inline-block transition-transform group-open:rotate-90"
-                  >
+                  <span aria-hidden className="ml-2 inline-block transition-transform group-open:rotate-90">
                     ›
                   </span>
                 </span>
               </span>
-              <MasteryBar
-                label={c.name}
-                mastered={c.mastered}
-                learning={c.learning}
-                slipping={c.slipping}
-              />
-              <MasteryCounts
-                mastered={c.mastered}
-                learning={c.learning}
-                slipping={c.slipping}
-              />
+              <MasteryBar label={c.name} mastered={c.mastered} learning={c.learning} slipping={c.slipping} />
+              <MasteryCounts mastered={c.mastered} learning={c.learning} slipping={c.slipping} />
             </summary>
             <ul className="flex flex-col divide-y divide-line border-t border-line">
               {c.topics.map((t) => (
-                <li
-                  key={t.id}
-                  className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4"
-                >
+                <li key={t.id} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:gap-4">
                   <div className="flex min-w-0 flex-1 flex-col gap-1.5">
                     <Link href={`/study/${t.id}`} className="break-words">
                       {t.name}
                     </Link>
                     <p className="text-sm text-muted">
-                      {t.mastered} mastered · {t.learning} learning ·{" "}
-                      {t.slipping} slipping
+                      {t.mastered} mastered · {t.learning} learning · {t.slipping} slipping
                       {t.accuracy !== null ? ` · ${t.accuracy}% recalled` : ""}
                     </p>
-                    <MasteryBar
-                      label={t.name}
-                      mastered={t.mastered}
-                      learning={t.learning}
-                      slipping={t.slipping}
-                    />
+                    <MasteryBar label={t.name} mastered={t.mastered} learning={t.learning} slipping={t.slipping} />
                   </div>
-                  <RevisePick
-                    topicId={t.id}
-                    dueNow={t.dueNow}
-                    className="self-start sm:self-center"
-                  />
+                  <RevisePick topicId={t.id} dueNow={t.dueNow} className="self-start sm:self-center" />
                 </li>
               ))}
             </ul>

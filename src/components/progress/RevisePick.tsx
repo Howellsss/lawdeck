@@ -1,15 +1,7 @@
 import Link from "next/link";
 
 // "Revise now" for a topic: its due questions if any, otherwise its key points to look over.
-export function RevisePick({
-  topicId,
-  dueNow,
-  className = "",
-}: {
-  topicId: string;
-  dueNow: number;
-  className?: string;
-}) {
+export function RevisePick({ topicId, dueNow, className = "" }: { topicId: string; dueNow: number; className?: string }) {
   return dueNow > 0 ? (
     <Link
       href={`/revise?topic=${topicId}`}

@@ -11,7 +11,12 @@ import { testPagesEnabled } from "../sample";
 const now = new Date("2026-11-06T10:00:00Z");
 const topics = [
   { id: "00000000-0000-4000-8000-000000000601", name: "Wombat summons", courseSlug: "civil-litigation", courseName: "Civil Litigation" },
-  { id: "00000000-0000-4000-8000-000000000602", name: "Quokka bail applications", courseSlug: "criminal-litigation", courseName: "Criminal Litigation" },
+  {
+    id: "00000000-0000-4000-8000-000000000602",
+    name: "Quokka bail applications",
+    courseSlug: "criminal-litigation",
+    courseName: "Criminal Litigation",
+  },
   { id: "00000000-0000-4000-8000-000000000603", name: "Numbat appeals", courseSlug: "civil-litigation", courseName: "Civil Litigation" },
 ];
 const point = (topic: number, interval_days: number, last_outcome: Point["last_outcome"], due_at = "2026-11-12T00:00:00Z"): Point => ({

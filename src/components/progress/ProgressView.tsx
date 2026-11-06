@@ -11,8 +11,7 @@ export function ProgressView({ progress }: { progress: Progress }) {
   if (progress.totals.points === 0 && progress.totals.answered === 0) {
     return (
       <p className="rounded-2xl border border-dashed border-line px-4 py-8 text-center text-muted">
-        Your progress appears here once you answer questions while studying.
-        Open a course in <Link href="/courses">Courses</Link> and choose{" "}
+        Your progress appears here once you answer questions while studying. Open a course in <Link href="/courses">Courses</Link> and choose{" "}
         <strong>Study</strong> on a topic.
       </p>
     );
@@ -27,12 +26,9 @@ export function ProgressView({ progress }: { progress: Progress }) {
       </div>
       <CourseBreakdown courses={progress.courses} />
       <p className="text-xs text-muted">
-        Based only on your own recorded answers and revision (
-        {progress.totals.answered} answers). It shows what you have remembered
-        so far; it is not a prediction of exam results. A point is mastered when
-        you remembered it last time and it now comes back two weeks or more
-        apart; it is slipping when you missed it or only partly remembered it
-        last time, or have found it hard.
+        Based only on your own recorded answers and revision ({progress.totals.answered} answers). It shows what you have remembered so far; it is not
+        a prediction of exam results. A point is mastered when you remembered it last time and it now comes back two weeks or more apart; it is
+        slipping when you missed it or only partly remembered it last time, or have found it hard.
       </p>
     </>
   );

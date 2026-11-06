@@ -17,14 +17,10 @@ export function StudyDaysGrid({ days }: { days: StudyDays }) {
           Study days
         </h2>
         <p className="text-sm text-muted">
-          {days.studiedCount} of the last {days.days.length} days ·{" "}
-          {days.streak} in a row
+          {days.studiedCount} of the last {days.days.length} days · {days.streak} in a row
         </p>
       </div>
-      <ol
-        aria-label="Days studied"
-        className="grid w-full max-w-md grid-cols-7 gap-1.5"
-      >
+      <ol aria-label="Days studied" className="grid w-full max-w-[17rem] grid-cols-7 gap-1.5">
         {days.days.map((d) => (
           <li
             key={d.date}

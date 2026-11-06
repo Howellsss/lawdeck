@@ -1,17 +1,7 @@
 // One bar split into mastered, learning and slipping points (Phase 4b). Colour carries meaning only:
 // green for mastered, amber for slipping, a neutral tone for learning; the counts are always written
 // out beside it, so nothing depends on colour alone.
-export function MasteryBar({
-  mastered,
-  learning,
-  slipping,
-  label,
-}: {
-  mastered: number;
-  learning: number;
-  slipping: number;
-  label: string;
-}) {
+export function MasteryBar({ mastered, learning, slipping, label }: { mastered: number; learning: number; slipping: number; label: string }) {
   const total = mastered + learning + slipping;
   const parts = [
     { key: "mastered", n: mastered, className: "bg-success" },
@@ -36,36 +26,19 @@ export function MasteryBar({
   );
 }
 
-export function MasteryCounts({
-  mastered,
-  learning,
-  slipping,
-}: {
-  mastered: number;
-  learning: number;
-  slipping: number;
-}) {
+export function MasteryCounts({ mastered, learning, slipping }: { mastered: number; learning: number; slipping: number }) {
   return (
     <p className="flex flex-wrap gap-x-4 gap-y-1 text-sm text-muted">
       <span>
-        <span
-          aria-hidden
-          className="mr-1.5 inline-block size-2 rounded-full bg-success"
-        />
+        <span aria-hidden className="mr-1.5 inline-block size-2 rounded-full bg-success" />
         {mastered} mastered
       </span>
       <span>
-        <span
-          aria-hidden
-          className="mr-1.5 inline-block size-2 rounded-full bg-muted/45"
-        />
+        <span aria-hidden className="mr-1.5 inline-block size-2 rounded-full bg-muted/45" />
         {learning} learning
       </span>
       <span>
-        <span
-          aria-hidden
-          className="mr-1.5 inline-block size-2 rounded-full bg-warning"
-        />
+        <span aria-hidden className="mr-1.5 inline-block size-2 rounded-full bg-warning" />
         {slipping} slipping
       </span>
     </p>

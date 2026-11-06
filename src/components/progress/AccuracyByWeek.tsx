@@ -20,49 +20,34 @@ export function AccuracyByWeek({ weeks }: { weeks: Week[] }) {
         </h2>
         {latest && (
           <p className="text-sm text-muted">
-            Latest: <span className="text-ink">{latest.accuracy}%</span> in the
-            week of {weekName(latest.start)}
+            Latest: <span className="text-ink">{latest.accuracy}%</span> in the week of {weekName(latest.start)}
           </p>
         )}
       </div>
-      <div
-        aria-hidden
-        className="relative flex h-40 items-end gap-2 border-b border-line sm:gap-3"
-      >
+      <div aria-hidden className="relative flex h-40 items-end gap-2 border-b border-line sm:gap-3">
         {[25, 50, 75, 100].map((y) => (
-          <span
-            key={y}
-            className="pointer-events-none absolute inset-x-0 border-t border-line/60"
-            style={{ bottom: `${y}%` }}
-          />
+          <span key={y} className="pointer-events-none absolute inset-x-0 border-t border-line/60" style={{ bottom: `${y}%` }} />
         ))}
-        {weeks.map((w) => (
-          <div
-            key={w.start}
-            tabIndex={0}
-            className="group relative flex h-full flex-1 items-end justify-center outline-offset-2"
-          >
+        {weeks.map((w, i) => (
+          <div key={w.start} tabIndex={0} className="group relative flex h-full flex-1 items-end justify-center outline-offset-2">
             {w.accuracy === null ? (
               <span className="mb-0.5 h-px w-full max-w-10 border-t border-dashed border-muted" />
             ) : (
-              <span
-                className="w-full max-w-10 rounded-t-[4px] bg-ink"
-                style={{ height: `${Math.max(2, w.accuracy)}%` }}
-              />
+              <span className="w-full max-w-10 rounded-t-[4px] bg-ink" style={{ height: `${Math.max(2, w.accuracy)}%` }} />
             )}
-            <span className="pointer-events-none absolute bottom-full z-10 mb-1 hidden w-max max-w-[11rem] rounded-lg border border-line bg-paper px-2.5 py-1.5 text-xs text-ink shadow-md group-hover:block group-focus:block">
+            <span
+              className={`pointer-events-none absolute bottom-full z-10 mb-1 hidden w-max max-w-[11rem] ${i < 2 ? "left-0" : i >= weeks.length - 2 ? "right-0" : "left-1/2 -translate-x-1/2"} rounded-lg border border-line bg-paper px-2.5 py-1.5 text-xs text-ink shadow-md group-hover:block group-focus:block`}
+            >
               Week of {weekName(w.start)}
               <br />
-              {w.accuracy === null
-                ? "No answers"
-                : `${w.accuracy}% · ${w.correct} of ${w.answered} remembered`}
+              {w.accuracy === null ? "No answers" : `${w.accuracy}% · ${w.correct} of ${w.answered} remembered`}
             </span>
           </div>
         ))}
       </div>
-      <div aria-hidden className="flex gap-2 text-[11px] text-muted sm:gap-3">
+      <div aria-hidden className="flex gap-2 text-[10.5px] text-muted sm:gap-3">
         {weeks.map((w, i) => (
-          <span key={w.start} className="flex-1 text-center">
+          <span key={w.start} className="flex-1 whitespace-nowrap text-center">
             {i % 2 === 1 || i === weeks.length - 1 ? weekName(w.start) : ""}
           </span>
         ))}
