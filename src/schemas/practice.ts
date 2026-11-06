@@ -1,10 +1,11 @@
 import { z } from "@/lib/zod";
 
 // Practice set requests (Phase 4; PRD LN-06, LN-07). Founder's decisions: questions default 5,
-// at most 10; flashcards default 10, at most 20.
+// at most 10, except multiple choice, at most 30 (2026-11-06); flashcards default 10, at most 20.
 export const PRACTICE_DEFAULT_COUNT = 5;
 export const PRACTICE_MIN_COUNT = 3;
 export const PRACTICE_MAX_COUNT = 10;
+export const MCQ_MAX_COUNT = 30;
 export const FLASHCARD_DEFAULT_COUNT = 10;
 export const FLASHCARD_MIN_COUNT = 5;
 export const FLASHCARD_MAX_COUNT = 20;
@@ -14,7 +15,7 @@ export type PracticeKind = "mcq" | "scenario" | "flashcards";
 export function countLimits(kind: PracticeKind): { min: number; max: number; default: number } {
   return kind === "flashcards"
     ? { min: FLASHCARD_MIN_COUNT, max: FLASHCARD_MAX_COUNT, default: FLASHCARD_DEFAULT_COUNT }
-    : { min: PRACTICE_MIN_COUNT, max: PRACTICE_MAX_COUNT, default: PRACTICE_DEFAULT_COUNT };
+    : { min: PRACTICE_MIN_COUNT, max: kind === "mcq" ? MCQ_MAX_COUNT : PRACTICE_MAX_COUNT, default: PRACTICE_DEFAULT_COUNT };
 }
 
 export const newPracticeSetSchema = z

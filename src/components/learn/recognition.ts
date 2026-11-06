@@ -18,7 +18,7 @@ export type Recognition = {
   start: () => void;
   stop: () => void;
 };
-type RecognitionConstructor = new () => Recognition;
+export type RecognitionConstructor = new () => Recognition;
 
 export function recognitionConstructor(): RecognitionConstructor | null {
   if (typeof window === "undefined") return null;
@@ -87,4 +87,72 @@ const noSubscription = () => () => {};
 // Whether this browser understands speech, read only in the browser (the server shows no button).
 export function useSpeechSupported(): boolean {
   return useSyncExternalStore(noSubscription, () => recognitionConstructor() !== null, () => false);
+}
+
+// How long dictation waits in silence before switching the microphone off by itself.
+export const DICTATION_SILENCE_MS = 30_000;
+
+// Dictation (founder, 2026-11-06: "it stops at some point"): keeps listening through pauses until
+// the student taps Stop, like dictation in other apps. Browsers end a listening session on their
+// own now and then (Chrome after about a minute); it starts a new one at once and keeps the words
+// already heard. After DICTATION_SILENCE_MS of silence it stops, so the microphone is never left on.
+// Returns a function that stops it.
+export function dictate(
+  Constructor: RecognitionConstructor,
+  handlers: { onText: (words: string) => void; onError: (code: string) => void; onStop: () => void },
+  now: () => number = Date.now,
+): () => void {
+  let kept = "";
+  let session = "";
+  let lastHeard = now();
+  let stopped = false;
+  let current: Recognition | null = null;
+  const joined = () => [kept, session].filter(Boolean).join(" ");
+
+  const finish = () => {
+    if (stopped) return;
+    stopped = true;
+    clearInterval(timer);
+    current?.stop();
+    handlers.onStop();
+  };
+
+  const listen = () => {
+    const recognition = new Constructor();
+    current = recognition;
+    session = "";
+    recognition.lang = "en-NG";
+    recognition.interimResults = true;
+    recognition.continuous = true;
+    recognition.onresult = (event) => {
+      let words = "";
+      for (let i = 0; i < event.results.length; i++) words += event.results[i][0]?.transcript ?? "";
+      session = words.trim();
+      lastHeard = now();
+      handlers.onText(joined());
+    };
+    recognition.onerror = (event) => {
+      // Silence and the browser's own restarts are not problems; anything else stops dictation.
+      if (event.error === "no-speech" || event.error === "aborted") return;
+      handlers.onError(event.error);
+      finish();
+    };
+    recognition.onend = () => {
+      if (stopped) return;
+      kept = joined();
+      session = "";
+      try {
+        listen();
+      } catch {
+        finish();
+      }
+    };
+    recognition.start();
+  };
+
+  const timer = setInterval(() => {
+    if (now() - lastHeard >= DICTATION_SILENCE_MS) finish();
+  }, 1000);
+  listen();
+  return finish;
 }

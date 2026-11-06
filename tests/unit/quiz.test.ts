@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { parseQuizState, place } from "@/lib/quiz";
-import { musicFor } from "@/lib/quizSound";
+import { musicFor, musicTempo } from "@/lib/quizSound";
 
 const live = {
   id: "00000000-0000-4000-8000-000000000901",
@@ -49,6 +49,8 @@ describe("group quiz", () => {
     expect(musicFor("live", 2, false, 20)).toBeNull();
     expect(musicFor("live", 0, false, 12)).toBe("question");
     expect(musicFor("live", 0, false, 4)).toBe("hurry");
+    // The last seconds keep the same pace as the rest of the question (founder, 2026-11-06).
+    expect(musicTempo("hurry")).toBe(musicTempo("question"));
     expect(musicFor("live", 0, true, 0)).toBeNull();
     expect(musicFor("done", 0, true, 0)).toBeNull();
   });

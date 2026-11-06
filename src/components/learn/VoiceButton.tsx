@@ -3,14 +3,14 @@
 import { useEffect, useRef, useState, useSyncExternalStore } from "react";
 import { VoiceWave } from "@/components/ui/VoiceWave";
 import { Icon } from "@/components/ui/Icon";
-import { recognitionConstructor, voiceErrorMessage, type Recognition } from "./recognition";
+import { dictate, recognitionConstructor, voiceErrorMessage } from "./recognition";
 
 export { voiceErrorMessage };
 
 // Speaking a question (founder, 2026-10-24). Uses the speech recognition built into the browser
 // (Chrome sends the audio to Google, Safari to Apple, to turn it into words); Lawdeck never
 // receives or stores the recording, only the words, which appear in the box to check before
-// sending. Browsers without it (for example Firefox) simply show no button.
+// sending. It keeps listening through pauses until the student taps Stop (founder, 2026-11-06). Browsers without it (for example Firefox) simply show no button.
 
 const noSubscription = () => () => {};
 
@@ -30,34 +30,25 @@ export function VoiceButton({
   // Whether the browser can do this, read only in the browser (the server renders no button).
   const supported = useSyncExternalStore(noSubscription, () => recognitionConstructor() !== null, () => false);
   const [listening, setListening] = useState(false);
-  const recognitionRef = useRef<Recognition | null>(null);
+  const stopRef = useRef<(() => void) | null>(null);
 
-  useEffect(() => () => recognitionRef.current?.stop(), []);
+  useEffect(() => () => stopRef.current?.(), []);
 
   if (!supported) return null;
 
+  // Keeps listening through pauses until Stop is tapped (see dictate in recognition.ts).
   function start() {
     const Constructor = recognitionConstructor();
     if (!Constructor) return;
-    const recognition = new Constructor();
-    recognition.lang = "en-NG";
-    recognition.interimResults = true;
-    recognition.continuous = false;
-    recognition.onresult = (event) => {
-      let words = "";
-      for (let i = 0; i < event.results.length; i++) words += event.results[i][0]?.transcript ?? "";
-      onText(words.trim());
-    };
-    recognition.onerror = (event) => {
-      if (event.error !== "aborted") onError(voiceErrorMessage(event.error));
-    };
-    recognition.onend = () => {
-      setListening(false);
-      recognitionRef.current = null;
-    };
-    recognitionRef.current = recognition;
     setListening(true);
-    recognition.start();
+    stopRef.current = dictate(Constructor, {
+      onText,
+      onError: (code) => onError(voiceErrorMessage(code)),
+      onStop: () => {
+        setListening(false);
+        stopRef.current = null;
+      },
+    });
   }
 
   // While listening: a moving wave of bars beside a filled button that reads "Stop dictation".
@@ -67,7 +58,7 @@ export function VoiceButton({
       <button
         type="button"
         disabled={disabled}
-        onClick={() => (listening ? recognitionRef.current?.stop() : start())}
+        onClick={() => (listening ? stopRef.current?.() : start())}
         aria-label={listening ? "Stop dictation" : "Speak your question"}
         title={listening ? "Stop dictation" : "Speak your question"}
         aria-pressed={listening}

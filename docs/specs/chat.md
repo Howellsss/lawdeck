@@ -118,7 +118,7 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
    - **4c+ Quiz extras (built, migration 62; founder approved):** Lawdeck's own music and sounds
      (original tunes played by the browser's Web Audio from notes in `src/lib/quizSound.ts`; no
      files, no library; Kahoot's music is not used because it belongs to Kahoot): lobby music,
-     question music with a tick that speeds up in the last 5 seconds, "3, 2, 1" beeps, a chime for
+     question music with a steady tick that keeps its pace to the end (founder, 2026-11-06: no speed-up; music louder), "3, 2, 1" beeps, a chime for
      a right answer, a low tone for a wrong one, a fanfare for the results; a sound on/off button
      remembered on the phone; sound starts only after a tap (phones require it). Each question
      opens after a 3-second "Get ready" (answers before it are refused). Streaks: 100 bonus points

@@ -19,6 +19,16 @@ describe("practice batches", () => {
     expect(planBatches([1, 2], 10).map((b) => b.count)).toEqual([5, 5]);
   });
 
+  it("never asks one reply for more than 20 questions, even from one passage", () => {
+    const plan = planBatches([1], 30);
+    expect(plan.map((b) => b.count)).toEqual([15, 15]);
+    expect(plan.every((b) => b.hits.length === 1)).toBe(true);
+    const many = planBatches([1, 2, 3, 4, 5, 6, 7, 8, 9, 10], 30);
+    expect(many).toHaveLength(10);
+    expect(many.reduce((n, b) => n + b.count, 0)).toBe(30);
+    expect(Math.max(...many.map((b) => b.count))).toBeLessThanOrEqual(20);
+  });
+
   it("joins the replies in order and says when any batch had too little", () => {
     const item = { question: "Q?", choices: ["a", "b"], correctChoice: 0, answer: "Because [S1].", sources: [1] };
     expect(mergeReplies([{ notEnough: false, items: [item] }, { notEnough: true, items: [] }])).toEqual({ notEnough: true, items: [item] });
