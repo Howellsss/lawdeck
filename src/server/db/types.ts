@@ -261,6 +261,53 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      // Campus chat, Phase 2 (migration 55).
+      chat_settings: {
+        Row: { id: boolean; open_to_students: boolean; updated_at: string };
+        Insert: never;
+        Update: { open_to_students?: boolean; updated_at?: string };
+        Relationships: [];
+      };
+      chat_groups: {
+        Row: { id: string; key: string; name: string; kind: "all" | "campus" | "aspirants"; campus_key: string | null; position: number };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      chat_members: {
+        Row: { owner_id: string; accepted_rules_at: string };
+        Insert: { owner_id?: string };
+        Update: never;
+        Relationships: [];
+      };
+      chat_blocked_words: {
+        Row: { word: string };
+        Insert: { word: string };
+        Update: never;
+        Relationships: [];
+      };
+      chat_messages: {
+        Row: {
+          id: string;
+          group_id: string;
+          owner_id: string;
+          body: string;
+          mentions: string[];
+          hashtags: string[];
+          created_at: string;
+          hidden_at: string | null;
+          hidden_by: string | null;
+        };
+        Insert: { group_id: string; body: string; mentions?: string[]; hashtags?: string[] };
+        Update: never;
+        Relationships: [];
+      };
+      chat_reads: {
+        Row: { owner_id: string; group_id: string; last_read_at: string };
+        Insert: { group_id: string; last_read_at?: string };
+        Update: { last_read_at?: string };
+        Relationships: [];
+      };
       courses: {
         Row: {
           id: string;
@@ -1288,6 +1335,11 @@ export type Database = {
         }[];
       };
       has_pilot_access: { Args: Record<string, never>; Returns: boolean };
+      // Campus chat (migration 55).
+      chat_allowed: { Args: Record<string, never>; Returns: boolean };
+      chat_unread_counts: { Args: Record<string, never>; Returns: { group_id: string; unread: number }[] };
+      chat_people: { Args: { people: string[] }; Returns: { id: string; name: string; campus: string | null }[] };
+      chat_people_search: { Args: { q: string }; Returns: { id: string; name: string; campus: string | null }[] };
       redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
       set_pilot_access: { Args: { person: string; allow: boolean; days?: number | null }; Returns: "ok" | "not_found" };
       // Registered emails and the invite link (migration 36). The first three are admins only.

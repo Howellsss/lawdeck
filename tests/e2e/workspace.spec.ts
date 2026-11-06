@@ -20,6 +20,9 @@ for (const [path, heading] of [
   ["/diary", "Sign in to see your study diary"],
   ["/revise", "Sign in to see your revision"],
   ["/progress", "Sign in to see your progress"],
+  ["/chat", "Sign in to see your campus chat"],
+  ["/chat/lagos", "Sign in to see your campus chat"],
+  ["/chat/search", "Sign in to see your campus chat"],
   ["/study/00000000-0000-4000-8000-000000000000/visual", "Sign in to see your revision"],
   [`/diary/${someId}`, "Sign in to see your study diary"],
 ] as const) {
