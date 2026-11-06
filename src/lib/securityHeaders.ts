@@ -25,8 +25,8 @@ export function contentSecurityPolicy(supabaseUrl: string | undefined, dev: bool
     // Pictures shared in campus chat open from short-lived private links on the Supabase store.
     `img-src 'self' data: blob: https://*.googleusercontent.com https://ssl.gstatic.com ${supabase}`.trim(),
     "font-src 'self'",
-    // Answers read aloud play from audio made in the page.
-    "media-src 'self' blob: data:",
+    // Answers read aloud play from audio made in the page; chat voice notes from the Supabase store.
+    `media-src 'self' blob: data: ${supabase}`.trim(),
     `connect-src 'self' ${supabase} ${GOOGLE_APIS}`.trim(),
     `frame-src ${GOOGLE_FRAMES}`,
     "object-src 'none'",

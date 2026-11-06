@@ -8,7 +8,7 @@ import { EmojiPicker } from "./EmojiPicker";
 const tool = "flex size-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pill hover:text-ink disabled:opacity-40";
 
 // The row under the message box, as in Slack: + to attach a file, Aa to show or hide formatting,
-// an emoji, @ to mention someone, and Send on the right.
+// an emoji, @ to mention someone, a microphone for voice notes (study groups only), and Send.
 export function ComposerBar({
   busy,
   canSend,
@@ -17,6 +17,7 @@ export function ComposerBar({
   onToggleFormatting,
   onInsert,
   onMention,
+  onVoice,
   onSend,
 }: {
   busy: boolean;
@@ -26,6 +27,7 @@ export function ComposerBar({
   onToggleFormatting: () => void;
   onInsert: (text: string) => void;
   onMention: () => void;
+  onVoice?: () => void;
   onSend: () => void;
 }) {
   const picker = useRef<HTMLInputElement>(null);
@@ -65,6 +67,11 @@ export function ComposerBar({
       <button type="button" onMouseDown={(e) => e.preventDefault()} onClick={onMention} aria-label="Mention someone" title="Mention someone" className={`${tool} text-[18px]`}>
         @
       </button>
+      {onVoice && (
+        <button type="button" onClick={onVoice} disabled={busy} aria-label="Record a voice note" title="Record a voice note (up to 2 minutes)" className={tool}>
+          <Icon name="mic" size={18} />
+        </button>
+      )}
       <button
         type="button"
         onClick={onSend}

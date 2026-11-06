@@ -18,6 +18,7 @@ export function ChatRoom({
   initial,
   initialHasOlder,
   isAdmin = false,
+  voiceNotes = false,
   apiKey,
 }: {
   groupId: string;
@@ -25,6 +26,7 @@ export function ChatRoom({
   initial: ChatMessage[];
   initialHasOlder: boolean;
   isAdmin?: boolean;
+  voiceNotes?: boolean;
   apiKey: string;
 }) {
   const router = useRouter();
@@ -130,7 +132,7 @@ export function ChatRoom({
           {unseen} new message{unseen === 1 ? "" : "s"} ↓
         </button>
       )}
-      <ChatComposer groupId={groupId} groupName={groupName} apiKey={apiKey} onSend={send} error={error} />
+      <ChatComposer groupId={groupId} groupName={groupName} apiKey={apiKey} voiceNotes={voiceNotes} onSend={send} error={error} />
     </div>
   );
 }

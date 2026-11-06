@@ -97,8 +97,14 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      The creator renames it, removes people or deletes it (messages go with it; its files can no
      longer be opened); others leave. Members tab: members, invited, invite by name, settings. All
      changes go through database functions; nobody writes the tables directly.
-   - **4b Voice notes:** study groups only (founder: audio can't be word-filtered); audio up to
-     2 minutes and 5 MB, real type checked.
+   - **4b Voice notes (built, migration 60):** study groups only (founder: audio can't be
+     word-filtered; Report and Hide are the safeguards). The microphone button records with the
+     browser's own recorder (no library): WebM on Chrome and Android, MP4 audio on iPhone, Ogg on
+     Firefox; up to 2 minutes (stops by itself) and 5 MB; listen back, then Send or Delete. Stored in
+     the group's private file store; the server checks the real audio type from the first bytes and
+     the database checks study group only, one per message, 2 minutes and 5 MB. Played with play,
+     pause, progress and 1x / 1.5x / 2x. Security headers allow the microphone on Lawdeck and
+     playback from the Supabase store.
    - **4c Group quiz (Kahoot-style):** from approved recall questions (no AI cost), live timer,
      points and leaderboard.
    - **4d Study together:** share topic lessons as cards; "This week's topic".
@@ -128,3 +134,6 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
   only, 15 people and 10 groups, creator-only rename, remove and delete, leave, name filter, visitors);
   `tests/voice/chat.spec.ts` checks the Study groups list, invitations, New study group and Members
   (test page `/test-pages/chat-members`).
+- `tests/permissions/sql/9zi_chat_voice_notes_test.sql` (study groups only, 5 MB, 2 minutes, audio
+  only, one per message); unit checks of audio types in `tests/unit/chatFiles.test.ts`; test page
+  `/test-pages/chat-study` (voice note player, record button only in study groups).

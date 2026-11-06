@@ -6,7 +6,7 @@ import { chatFileProblem, type ChatFileKind } from "@/lib/chatFiles";
 import { kindFromFileName } from "@/lib/libraryFiles";
 import { startChatFile } from "@/server/chat/actions";
 
-export type Attached = { path: string; name: string; kind: ChatFileKind; size: number };
+export type Attached = { path: string; name: string; kind: ChatFileKind; size: number; seconds?: number };
 export type Pending = { key: string; name: string; size: number; progress: number; done: Attached | null };
 
 // Files picked for the next message: each goes straight to the group's private store, showing

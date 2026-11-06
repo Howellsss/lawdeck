@@ -36,7 +36,7 @@ async function Group({ params }: { params: Promise<{ group: string }> }) {
   return (
     <ChatShell groups={room.groups} group={room.group} ownCampusName={room.me.campus} invites={room.invites}>
       {room.member ? (
-        <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} initial={room.messages} initialHasOlder={room.hasOlder} isAdmin={room.isAdmin} apiKey={getSupabaseConfig()?.key ?? ""} />
+        <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} initial={room.messages} initialHasOlder={room.hasOlder} isAdmin={room.isAdmin} voiceNotes={room.group.kind === "study"} apiKey={getSupabaseConfig()?.key ?? ""} />
       ) : (
         <ChatRules />
       )}

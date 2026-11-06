@@ -9,6 +9,7 @@ import { ComposerBar } from "./ComposerBar";
 import { LinkNote, MentionList } from "./ComposerParts";
 import { applyFormat, FormatBar, type Format } from "./FormatBar";
 import { LinkDialog } from "./LinkDialog";
+import { VoiceRecorder } from "./VoiceRecorder";
 import { useAttachments, type Attached } from "./useAttachments";
 
 export type { Attached };
@@ -20,12 +21,14 @@ export function ChatComposer({
   groupId,
   groupName,
   apiKey,
+  voiceNotes = false,
   onSend,
   error,
 }: {
   groupId: string;
   groupName: string;
   apiKey: string;
+  voiceNotes?: boolean;
   onSend: (text: string, picked: ChatPerson[], files: Attached[]) => Promise<boolean>;
   error?: string;
 }) {
@@ -40,6 +43,7 @@ export function ChatComposer({
   const [active, setActive] = useState(0);
   const [formatting, setFormatting] = useState(true);
   const [links, setLinks] = useState<{ label: string; href: string }[]>([]);
+  const [recording, setRecording] = useState(false);
   const [linkBox, setLinkBox] = useState<{ text: string; start: number; end: number } | null>(null);
 
   // Grow with the text, up to about eight lines.
@@ -172,6 +176,7 @@ export function ChatComposer({
           className="block min-h-[40px] w-full resize-none bg-transparent px-3 py-2 text-[16px] leading-[1.5] outline-none placeholder:text-muted lg:text-[15px]"
         />
         <LinkNote links={links.filter((l) => text.includes(l.label))} />
+        {recording && <VoiceRecorder groupId={groupId} apiKey={apiKey} onSend={(voice) => onSend("", [], [voice])} onClose={() => setRecording(false)} />}
         <ComposerBar
           busy={busy}
           canSend={!busy && !attach.uploading && (Boolean(text.trim()) || attach.ready.length > 0)}
@@ -183,6 +188,7 @@ export function ChatComposer({
             insert("@", true);
             setQuery(null);
           }}
+          onVoice={voiceNotes && !recording ? () => setRecording(true) : undefined}
           onSend={() => void send()}
         />
       </div>

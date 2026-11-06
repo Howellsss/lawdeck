@@ -4,6 +4,7 @@ import { linkMentions, messageTags } from "@/lib/chatFormat";
 import { z } from "@/lib/zod";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { detectAudioKind, VOICE_MAX_BYTES, VOICE_MAX_SECONDS } from "@/lib/chatFiles";
 import { LIBRARY_MAX_BYTES, detectFileKind } from "@/lib/libraryFiles";
 import { chatAllowed, MESSAGE_COLUMNS, PAGE, withAuthors, type ChatMessage, type ChatPerson } from "./data";
 
@@ -41,8 +42,9 @@ export async function joinChat(): Promise<{ ok: true } | Fail> {
 const fileSchema = z.object({
   path: z.string().max(200),
   name: z.string().trim().min(1).max(200),
-  kind: z.enum(["pdf", "docx", "png", "jpeg"]),
+  kind: z.enum(["pdf", "docx", "png", "jpeg", "voice"]),
   size: z.number().int().min(1).max(LIBRARY_MAX_BYTES),
+  seconds: z.number().min(1).max(VOICE_MAX_SECONDS).optional(),
 });
 const sendSchema = z
   .object({
@@ -75,6 +77,7 @@ export async function sendMessage(input: z.input<typeof sendSchema>): Promise<{ 
     if (error.message.includes("contact_details")) {
       return { ok: false, message: "Your message wasn’t sent: phone numbers, email addresses and WhatsApp or social links aren’t allowed in Lawdeck chat, to keep everyone safe." };
     }
+    if (error.message.includes("voice_note")) return { ok: false, message: "Voice notes can be sent in study groups only, up to 2 minutes." };
     if (error.message.includes("post_limit")) return { ok: false, message: "You’re sending messages very quickly. Please wait a minute, then try again." };
     if (error.code === "42501") return { ok: false, message: "Please accept the community rules before posting." };
     console.error("chat send failed", { code: error.code });
@@ -140,30 +143,58 @@ export async function findPeople(input: { q: string }): Promise<ChatPerson[]> {
 }
 
 const EXT = { pdf: "pdf", docx: "docx", png: "png", jpeg: "jpg" } as const;
+const VOICE_EXT = ["webm", "ogg", "m4a"] as const;
 
-// A one-time link to put a file in the sender's own folder of a group (25 MB at most).
-export async function startChatFile(input: { groupId: string; name: string; size: number; kind: string }): Promise<{ ok: true; path: string; signedUrl: string } | Fail> {
-  const parsed = z.object({ groupId: z.uuid(), name: z.string().min(1).max(200), size: z.number().int().min(1).max(LIBRARY_MAX_BYTES, { error: "Files must be 25 MB or smaller." }), kind: z.enum(["pdf", "docx", "png", "jpeg"], { error: "Attach a PDF, Word (DOCX), PNG or JPEG file." }) }).safeParse(input);
+const startSchema = z.discriminatedUnion("kind", [
+  z.object({
+    groupId: z.uuid(),
+    name: z.string().min(1).max(200),
+    size: z.number().int().min(1).max(LIBRARY_MAX_BYTES, { error: "Files must be 25 MB or smaller." }),
+    kind: z.enum(["pdf", "docx", "png", "jpeg"], { error: "Attach a PDF, Word (DOCX), PNG or JPEG file." }),
+  }),
+  z.object({
+    groupId: z.uuid(),
+    name: z.string().min(1).max(200),
+    size: z.number().int().min(1).max(VOICE_MAX_BYTES, { error: "A voice note can be up to 5 MB." }),
+    kind: z.literal("voice"),
+    format: z.enum(VOICE_EXT),
+  }),
+]);
+
+// A one-time link to put a file (or a voice note, in a study group) in the sender's own folder of a group.
+export async function startChatFile(input: z.input<typeof startSchema>): Promise<{ ok: true; path: string; signedUrl: string } | Fail> {
+  const parsed = startSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "That file can’t be attached." };
   const r = await ready();
   if (r.fail) return r.fail;
-  const path = `${parsed.data.groupId}/${r.account.id}/${crypto.randomUUID()}.${EXT[parsed.data.kind]}`;
+  if (parsed.data.kind === "voice" && !(await isStudyGroup(r.db, parsed.data.groupId))) {
+    return { ok: false, message: "Voice notes can be sent in study groups only." };
+  }
+  const ext = parsed.data.kind === "voice" ? parsed.data.format : EXT[parsed.data.kind];
+  const path = `${parsed.data.groupId}/${r.account.id}/${crypto.randomUUID()}.${ext}`;
   const { data, error } = await r.db.storage.from("chat-files").createSignedUploadUrl(path);
   if (error || !data) return { ok: false, message: "The file could not be attached. Please try again." };
   return { ok: true, path, signedUrl: data.signedUrl };
 }
 
+async function isStudyGroup(db: Db, groupId: string): Promise<boolean> {
+  const { data } = await db.from("chat_groups").select("kind").eq("id", groupId).maybeSingle();
+  return data?.kind === "study";
+}
+
 // Every attached file must be the sender's own, in this group, and really the kind it claims.
 async function checkFiles(db: Db, groupId: string, me: string, files: z.infer<typeof fileSchema>[]): Promise<{ ok: true } | Fail> {
   for (const f of files) {
-    const own = new RegExp(`^${groupId}/${me}/[0-9a-f-]{36}\\.${EXT[f.kind]}$`);
+    const exts = f.kind === "voice" ? VOICE_EXT.join("|") : EXT[f.kind];
+    const own = new RegExp(`^${groupId}/${me}/[0-9a-f-]{36}\\.(${exts})$`);
     if (!own.test(f.path)) return { ok: false, message: "That file could not be attached." };
     const download = await db.storage.from("chat-files").download(f.path);
     if (download.error || !download.data) return { ok: false, message: `“${f.name}” did not finish uploading. Please attach it again.` };
     const bytes = new Uint8Array(await download.data.arrayBuffer());
-    if (detectFileKind(bytes) !== f.kind || bytes.length > LIBRARY_MAX_BYTES) {
+    const real = f.kind === "voice" ? detectAudioKind(bytes) === f.path.split(".").pop() && bytes.length <= VOICE_MAX_BYTES : detectFileKind(bytes) === f.kind;
+    if (!real || bytes.length > LIBRARY_MAX_BYTES) {
       await db.storage.from("chat-files").remove([f.path]);
-      return { ok: false, message: `“${f.name}” is not a real PDF, Word or image file.` };
+      return { ok: false, message: f.kind === "voice" ? "That voice note could not be read. Please record it again." : `“${f.name}” is not a real PDF, Word or image file.` };
     }
   }
   return { ok: true };

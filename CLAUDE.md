@@ -34,7 +34,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - Check auth and permissions on the server in every route and server action. Hidden buttons are not security.
 - Row-level security on every table from its first migration. Every user-owned table has `owner_id`.
 - Service-role key only in marked admin jobs.
-- Validate all input on the server with Zod. Validate uploads (PDF/DOCX/images, ≤25 MB, real type checked). Use the query builder, never string-built SQL.
+- Validate all input on the server with Zod. Validate uploads (PDF/DOCX/images, ≤25 MB, real type checked; voice notes in chat study groups only: audio ≤2 min and ≤5 MB, real type checked, founder 2026-11-06). Use the query builder, never string-built SQL.
 - Logs never contain document text, uploads, passwords, keys or payment data.
 
 ## AI
