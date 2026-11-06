@@ -74,7 +74,12 @@ for (const width of [360, 1280]) {
     await page.getByRole("button", { name: "Show formatting" }).click();
     await expect(page.getByRole("button", { name: "Underline" })).toBeVisible();
     await page.getByRole("button", { name: "Add an emoji" }).click();
-    await page.getByRole("button", { name: "thank you" }).click();
+    const emojis = page.getByRole("dialog", { name: "Emojis" });
+    await expect(emojis.getByRole("region", { name: "Flags" })).toBeAttached();
+    await emojis.getByLabel("Search emojis").fill("nigeria");
+    await expect(emojis.getByRole("button", { name: "flag Nigeria" })).toBeVisible();
+    await emojis.getByLabel("Search emojis").fill("folded");
+    await emojis.getByRole("button", { name: "folded hands", exact: true }).click();
     await expect(box).toHaveValue("See Test🙏");
     await page.getByRole("button", { name: "Mention someone" }).click();
     await expect(box).toHaveValue("See Test🙏 @");
