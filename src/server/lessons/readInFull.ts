@@ -57,10 +57,11 @@ export async function tickSection(input: { lessonId: string; version: number; se
   return { ok: true };
 }
 
-const finishSchema = z.object({ lessonId: lessonIdSchema, version: z.number().int().min(1), decision: z.enum(["approve", "send-back"]) });
+const finishSchema = z.object({ lessonId: lessonIdSchema, version: z.number().int().min(1), decision: z.enum(["approve", "check-all", "send-back"]) });
 
 // Approve as read in full (every section checked), or send back for a fix (any problem), with the
-// problems as the review note. The ticks are read again here, so the buttons alone decide nothing.
+// problems as the review note. "check-all" (founder, 2026-11-06: one click per lesson) ticks every
+// section not yet ticked as checked by this reviewer, then approves; never over a problem. The ticks are read again here, so the buttons alone decide nothing.
 export async function finishReading(input: { lessonId: string; version: number; decision: string }): Promise<Result> {
   const parsed = finishSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Check the decision." };
@@ -77,10 +78,24 @@ export async function finishReading(input: { lessonId: string; version: number; 
   if (!content.success) return { ok: false, message: "This lesson's text could not be read. Rewrite it from the library." };
   const tests = await testCount(db, lessonId);
   if (tests === null) return { ok: false, message: "That lesson could not be found." };
-  const state = readingState(partsToRead(content.data.sections.length, tests), ticks.data);
+  let state = readingState(partsToRead(content.data.sections.length, tests), ticks.data);
+
+  if (decision === "check-all") {
+    if (state.problems.length) return { ok: false, message: "A section is marked as a problem. Send the lesson back, or re-check that section." };
+    if (state.missing.length) {
+      const added = await db
+        .from("lesson_section_checks")
+        .insert(state.missing.map((section) => ({ lesson_id: lessonId, lesson_version: version, section, verdict: "checked" as const })));
+      if (added.error) {
+        console.error("check all failed", { code: added.error.code });
+        return { ok: false, message: "The ticks were not saved. Please try again." };
+      }
+      state = readingState(state.sections, [...ticks.data, ...state.missing.map((section) => ({ section, verdict: "checked" as const, note: null }))]);
+    }
+  }
 
   let update: { status: "approved" | "rejected"; bulk_approved: false; review_note: string | null };
-  if (decision === "approve") {
+  if (decision !== "send-back") {
     if (!state.canApprove) {
       return {
         ok: false,
