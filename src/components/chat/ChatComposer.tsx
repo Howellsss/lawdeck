@@ -4,21 +4,32 @@ import { useEffect, useId, useRef, useState } from "react";
 import { Icon } from "@/components/ui/Icon";
 import type { ChatPerson } from "@/server/chat/data";
 import { findPeople } from "@/server/chat/actions";
+import { CHAT_FILE_ACCEPT } from "@/lib/chatFiles";
+import { AttachmentChips } from "./AttachmentChips";
 import { applyFormat, FormatBar, type Format } from "./FormatBar";
+import { useAttachments, type Attached } from "./useAttachments";
+
+export type { Attached };
 
 // The message box (Slack-style): formatting row, the text, @mention suggestions, Enter to send and
 // Shift+Enter for a new line. The text is sent as typed; names picked from the suggestions become
 // mentions on the server.
 export function ChatComposer({
+  groupId,
   groupName,
+  apiKey,
   onSend,
   error,
 }: {
+  groupId: string;
   groupName: string;
-  onSend: (text: string, picked: ChatPerson[]) => Promise<boolean>;
+  apiKey: string;
+  onSend: (text: string, picked: ChatPerson[], files: Attached[]) => Promise<boolean>;
   error?: string;
 }) {
   const id = useId();
+  const attach = useAttachments(groupId, apiKey);
+  const picker = useRef<HTMLInputElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -73,13 +84,14 @@ export function ChatComposer({
   };
 
   const send = async () => {
-    if (!text.trim() || busy) return;
+    if ((!text.trim() && attach.ready.length === 0) || busy || attach.uploading) return;
     setBusy(true);
-    const sent = await onSend(text, picked.filter((p) => text.includes(`@${p.name}`)));
+    const sent = await onSend(text, picked.filter((p) => text.includes(`@${p.name}`)), attach.ready);
     setBusy(false);
     if (sent) {
       setText("");
       setPicked([]);
+      attach.clear();
     }
     box.current?.focus();
   };
@@ -131,7 +143,28 @@ export function ChatComposer({
       )}
       <div className="rounded-xl border border-line bg-surface focus-within:border-muted">
         <FormatBar onFormat={format} disabled={busy} />
+        <AttachmentChips files={attach.files} onRemove={attach.remove} />
         <div className="flex items-end gap-2 px-3 pb-2">
+          <input
+            ref={picker}
+            type="file"
+            multiple
+            accept={CHAT_FILE_ACCEPT}
+            className="sr-only"
+            tabIndex={-1}
+            aria-hidden
+            onChange={(e) => (void attach.add(e.target.files), (e.target.value = ""))}
+          />
+          <button
+            type="button"
+            onClick={() => picker.current?.click()}
+            disabled={busy}
+            aria-label="Attach a file (PDF, Word or image, up to 25 MB)"
+            title="Attach a file"
+            className="mb-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pill hover:text-ink"
+          >
+            <Icon name="paperclip" size={18} />
+          </button>
           <label htmlFor={`${id}-box`} className="sr-only">
             Message {groupName}
           </label>
@@ -149,7 +182,7 @@ export function ChatComposer({
           <button
             type="button"
             onClick={() => void send()}
-            disabled={busy || !text.trim()}
+            disabled={busy || attach.uploading || (!text.trim() && attach.ready.length === 0)}
             aria-label="Send message"
             className="mb-1 flex size-9 shrink-0 items-center justify-center rounded-lg bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
           >
@@ -158,9 +191,9 @@ export function ChatComposer({
         </div>
       </div>
       <div className="flex min-h-5 items-start justify-between gap-3 pt-1 text-[12px] text-muted">
-        {error ? (
+        {error || attach.problem ? (
           <p role="alert" className="text-warning">
-            {error}
+            {attach.problem ?? error}
           </p>
         ) : (
           <p className="hidden sm:block">

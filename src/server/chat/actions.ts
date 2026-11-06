@@ -4,7 +4,8 @@ import { linkMentions, messageTags } from "@/lib/chatFormat";
 import { z } from "@/lib/zod";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
-import { chatAllowed, PAGE, withAuthors, type ChatMessage, type ChatPerson } from "./data";
+import { LIBRARY_MAX_BYTES, detectFileKind } from "@/lib/libraryFiles";
+import { chatAllowed, MESSAGE_COLUMNS, PAGE, withAuthors, type ChatMessage, type ChatPerson } from "./data";
 
 // Campus chat actions (docs/specs/chat.md). Sign-in, chat access and input are checked here; the
 // database checks them again (row-level security, the word filter and the posting limit). Logs
@@ -37,24 +38,35 @@ export async function joinChat(): Promise<{ ok: true } | Fail> {
   return { ok: true };
 }
 
-const sendSchema = z.object({
-  groupId: z.uuid(),
-  text: z.string().trim().min(1, { error: "Type a message first." }).max(4000, { error: "A message can be up to 4,000 characters." }),
-  picked: z.array(z.object({ id: z.uuid(), name: z.string().min(1).max(80) })).max(20),
+const fileSchema = z.object({
+  path: z.string().max(200),
+  name: z.string().trim().min(1).max(200),
+  kind: z.enum(["pdf", "docx", "png", "jpeg"]),
+  size: z.number().int().min(1).max(LIBRARY_MAX_BYTES),
 });
+const sendSchema = z
+  .object({
+    groupId: z.uuid(),
+    text: z.string().trim().max(4000, { error: "A message can be up to 4,000 characters." }),
+    picked: z.array(z.object({ id: z.uuid(), name: z.string().min(1).max(80) })).max(20),
+    files: z.array(fileSchema).max(4, { error: "Attach up to 4 files to a message." }).optional().default([]),
+  })
+  .refine((m) => m.text.length > 0 || m.files.length > 0, { error: "Type a message first." });
 
-export async function sendMessage(input: { groupId: string; text: string; picked: { id: string; name: string }[] }): Promise<{ ok: true; message: ChatMessage } | Fail> {
+export async function sendMessage(input: z.input<typeof sendSchema>): Promise<{ ok: true; message: ChatMessage } | Fail> {
   const parsed = sendSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Check your message." };
   const r = await ready();
   if (r.fail) return r.fail;
   const body = linkMentions(parsed.data.text, parsed.data.picked);
   if (body.length > 4000) return { ok: false, message: "A message can be up to 4,000 characters." };
+  const checked = await checkFiles(r.db, parsed.data.groupId, r.account.id, parsed.data.files);
+  if (!checked.ok) return checked;
   const { mentions, hashtags } = messageTags(body);
   const { data, error } = await r.db
     .from("chat_messages")
-    .insert({ group_id: parsed.data.groupId, body, mentions, hashtags })
-    .select("id, group_id, owner_id, body, created_at")
+    .insert({ group_id: parsed.data.groupId, body, mentions, hashtags, attachments: parsed.data.files })
+    .select(MESSAGE_COLUMNS)
     .single();
   if (error) {
     if (error.message.includes("blocked_word")) {
@@ -68,6 +80,7 @@ export async function sendMessage(input: { groupId: string; text: string; picked
     console.error("chat send failed", { code: error.code });
     return { ok: false, message: "Your message wasn’t sent. Please try again." };
   }
+  if (!data) return { ok: false, message: "Your message wasn’t sent. Please try again." };
   const [message] = await withAuthors(r.db, [data], r.account.id);
   return { ok: true, message };
 }
@@ -81,7 +94,7 @@ export async function loadMessages(input: { groupId: string; after?: string; bef
   const r = await ready();
   if (r.fail) return r.fail;
   const { groupId, after, before } = parsed.data;
-  let query = r.db.from("chat_messages").select("id, group_id, owner_id, body, created_at").eq("group_id", groupId).is("hidden_at", null);
+  let query = r.db.from("chat_messages").select(MESSAGE_COLUMNS).eq("group_id", groupId).is("hidden_at", null);
   if (after) query = query.gt("created_at", after).order("created_at", { ascending: true }).limit(100);
   else {
     if (before) query = query.lt("created_at", before);
@@ -98,8 +111,12 @@ export async function deleteMessage(input: { id: string }): Promise<{ ok: true }
   if (!parsed.success) return { ok: false, message: "That message could not be found." };
   const r = await ready();
   if (r.fail) return r.fail;
-  const { data, error } = await r.db.from("chat_messages").delete().eq("id", parsed.data.id).eq("owner_id", r.account.id).select("id");
+  const { data, error } = await r.db.from("chat_messages").delete().eq("id", parsed.data.id).eq("owner_id", r.account.id).select("attachments");
   if (error || !data.length) return { ok: false, message: "That message could not be deleted." };
+  const paths = (Array.isArray(data[0].attachments) ? data[0].attachments : []).flatMap((f) =>
+    f && typeof f === "object" && !Array.isArray(f) && typeof f.path === "string" ? [f.path] : [],
+  );
+  if (paths.length) await r.db.storage.from("chat-files").remove(paths);
   return { ok: true };
 }
 
@@ -120,4 +137,34 @@ export async function findPeople(input: { q: string }): Promise<ChatPerson[]> {
   if (r.fail) return [];
   const { data } = await r.db.rpc("chat_people_search", { q: parsed.data.q });
   return data ?? [];
+}
+
+const EXT = { pdf: "pdf", docx: "docx", png: "png", jpeg: "jpg" } as const;
+
+// A one-time link to put a file in the sender's own folder of a group (25 MB at most).
+export async function startChatFile(input: { groupId: string; name: string; size: number; kind: string }): Promise<{ ok: true; path: string; signedUrl: string } | Fail> {
+  const parsed = z.object({ groupId: z.uuid(), name: z.string().min(1).max(200), size: z.number().int().min(1).max(LIBRARY_MAX_BYTES, { error: "Files must be 25 MB or smaller." }), kind: z.enum(["pdf", "docx", "png", "jpeg"], { error: "Attach a PDF, Word (DOCX), PNG or JPEG file." }) }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "That file can’t be attached." };
+  const r = await ready();
+  if (r.fail) return r.fail;
+  const path = `${parsed.data.groupId}/${r.account.id}/${crypto.randomUUID()}.${EXT[parsed.data.kind]}`;
+  const { data, error } = await r.db.storage.from("chat-files").createSignedUploadUrl(path);
+  if (error || !data) return { ok: false, message: "The file could not be attached. Please try again." };
+  return { ok: true, path, signedUrl: data.signedUrl };
+}
+
+// Every attached file must be the sender's own, in this group, and really the kind it claims.
+async function checkFiles(db: Db, groupId: string, me: string, files: z.infer<typeof fileSchema>[]): Promise<{ ok: true } | Fail> {
+  for (const f of files) {
+    const own = new RegExp(`^${groupId}/${me}/[0-9a-f-]{36}\\.${EXT[f.kind]}$`);
+    if (!own.test(f.path)) return { ok: false, message: "That file could not be attached." };
+    const download = await db.storage.from("chat-files").download(f.path);
+    if (download.error || !download.data) return { ok: false, message: `“${f.name}” did not finish uploading. Please attach it again.` };
+    const bytes = new Uint8Array(await download.data.arrayBuffer());
+    if (detectFileKind(bytes) !== f.kind || bytes.length > LIBRARY_MAX_BYTES) {
+      await db.storage.from("chat-files").remove([f.path]);
+      return { ok: false, message: `“${f.name}” is not a real PDF, Word or image file.` };
+    }
+  }
+  return { ok: true };
 }

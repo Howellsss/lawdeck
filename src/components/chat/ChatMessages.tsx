@@ -13,6 +13,8 @@ export function ChatMessages({
   loadingOlder,
   onOlder,
   onDelete,
+  onHide,
+  isAdmin,
   groupName,
 }: {
   messages: ChatMessage[];
@@ -20,6 +22,8 @@ export function ChatMessages({
   loadingOlder: boolean;
   onOlder: () => void;
   onDelete: (id: string) => void;
+  onHide: (id: string) => void;
+  isAdmin: boolean;
   groupName: string;
 }) {
   if (messages.length === 0)
@@ -50,7 +54,7 @@ export function ChatMessages({
                 <span className="relative rounded-full border border-line bg-paper px-3 py-0.5 text-[12px] font-medium">{dayLabel(watDay(m.createdAt))}</span>
               </li>
             )}
-            <ChatMessageItem message={m} first={first} onDelete={onDelete} />
+            <ChatMessageItem message={m} first={first} isAdmin={isAdmin} onDelete={onDelete} onHide={onHide} />
           </Fragment>
         );
       })}

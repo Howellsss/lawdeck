@@ -4,7 +4,8 @@ import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import type { ChatMessage, ChatPerson } from "@/server/chat/data";
 import { deleteMessage, loadMessages, markRead, sendMessage } from "@/server/chat/actions";
-import { ChatComposer } from "./ChatComposer";
+import { hideMessage } from "@/server/chat/moderation";
+import { ChatComposer, type Attached } from "./ChatComposer";
 import { ChatMessages } from "./ChatMessages";
 
 const CHECK_EVERY = 4000;
@@ -16,11 +17,15 @@ export function ChatRoom({
   groupName,
   initial,
   initialHasOlder,
+  isAdmin = false,
+  apiKey,
 }: {
   groupId: string;
   groupName: string;
   initial: ChatMessage[];
   initialHasOlder: boolean;
+  isAdmin?: boolean;
+  apiKey: string;
 }) {
   const router = useRouter();
   const scroller = useRef<HTMLDivElement>(null);
@@ -78,9 +83,9 @@ export function ChatRoom({
     return () => (window.clearInterval(timer), window.clearInterval(counts));
   }, [groupId, initial, merge, router]);
 
-  const send = async (text: string, picked: ChatPerson[]) => {
+  const send = async (text: string, picked: ChatPerson[], files: Attached[]) => {
     setError(undefined);
-    const result = await sendMessage({ groupId, text, picked: picked.map((p) => ({ id: p.id, name: p.name })) });
+    const result = await sendMessage({ groupId, text, picked: picked.map((p) => ({ id: p.id, name: p.name })), files });
     if (!result.ok) {
       setError(result.message);
       return false;
@@ -108,18 +113,24 @@ export function ChatRoom({
     setMessages((list) => list.filter((m) => m.id !== id));
   };
 
+  const hide = async (id: string) => {
+    const result = await hideMessage({ id, hide: true });
+    if (!result.ok) return setError(result.message);
+    setMessages((list) => list.filter((m) => m.id !== id));
+  };
+
   return (
     <div className="relative flex min-h-0 flex-1 flex-col">
       <div ref={scroller} onScroll={() => atBottom() && unseen > 0 && setUnseen(0)} className="flex min-h-0 flex-1 flex-col overflow-y-auto overscroll-contain">
         <div className="mt-auto" />
-        <ChatMessages messages={messages} hasOlder={hasOlder} loadingOlder={loadingOlder} onOlder={() => void older()} onDelete={(id) => void remove(id)} groupName={groupName} />
+        <ChatMessages messages={messages} hasOlder={hasOlder} loadingOlder={loadingOlder} onOlder={() => void older()} onDelete={(id) => void remove(id)} onHide={(id) => void hide(id)} isAdmin={isAdmin} groupName={groupName} />
       </div>
       {unseen > 0 && (
         <button type="button" onClick={toBottom} className="absolute bottom-[132px] left-1/2 -translate-x-1/2 rounded-full bg-ink px-3 py-1 text-[13px] font-medium text-on-ink shadow-md">
           {unseen} new message{unseen === 1 ? "" : "s"} ↓
         </button>
       )}
-      <ChatComposer groupName={groupName} onSend={send} error={error} />
+      <ChatComposer groupId={groupId} groupName={groupName} apiKey={apiKey} onSend={send} error={error} />
     </div>
   );
 }

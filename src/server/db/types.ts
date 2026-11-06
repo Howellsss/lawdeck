@@ -1,6 +1,6 @@
 // Shape of the Lawdeck database, written to match supabase/migrations (same format as
 // Supabase's generated types). Update it in the same pull request as any migration.
-type Json =
+export type Json =
   | string
   | number
   | boolean
@@ -297,8 +297,9 @@ export type Database = {
           created_at: string;
           hidden_at: string | null;
           hidden_by: string | null;
+          attachments: Json;
         };
-        Insert: { group_id: string; body: string; mentions?: string[]; hashtags?: string[] };
+        Insert: { group_id: string; body: string; mentions?: string[]; hashtags?: string[]; attachments?: Json };
         Update: never;
         Relationships: [];
       };
@@ -319,6 +320,12 @@ export type Database = {
         };
         Insert: { kind: "student" | "aspirant"; campus_key: string; id_number: string; document_path?: string | null };
         Update: { status?: "pending" | "approved" | "rejected" | "revoked"; note?: string | null; document_path?: string | null };
+        Relationships: [];
+      };
+      chat_reports: {
+        Row: { id: string; message_id: string; owner_id: string; reason: "abuse" | "contact" | "cheating" | "spam" | "other"; note: string | null; status: "open" | "closed"; created_at: string };
+        Insert: { message_id: string; reason: "abuse" | "contact" | "cheating" | "spam" | "other"; note?: string | null };
+        Update: { status?: "open" | "closed" };
         Relationships: [];
       };
       chat_reads: {
@@ -1357,6 +1364,25 @@ export type Database = {
       // Campus chat (migration 55).
       chat_allowed: { Args: Record<string, never>; Returns: boolean };
       chat_scope: { Args: Record<string, never>; Returns: string | null };
+      chat_set_hidden: { Args: { msg: string; hide: boolean }; Returns: "ok" | "not_allowed" | "not_found" };
+      chat_report_queue: {
+        Args: Record<string, never>;
+        Returns: {
+          message_id: string;
+          body: string;
+          attachments: Json;
+          group_name: string;
+          author: string;
+          author_email: string;
+          posted_at: string;
+          hidden: boolean;
+          reports: number;
+          open_reports: number;
+          reasons: string[];
+          notes: string[];
+          last_report: string;
+        }[];
+      };
       chat_verification_queue: {
         Args: Record<string, never>;
         Returns: {
