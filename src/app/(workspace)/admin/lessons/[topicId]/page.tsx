@@ -88,6 +88,11 @@ async function Review({ params }: { params: Promise<{ topicId: string }> }) {
         </p>
       ) : (
         <>
+          {(lesson.status === "pending" || lesson.bulkApproved) && (
+            <p className="text-sm">
+              Faster: <Link href={`/admin/lessons/read/${data.course.id}?topic=${data.topic.id}`}>read it section by section and tick each one</Link>.
+            </p>
+          )}
           <LessonDecision lessonId={lesson.id} status={lesson.status} note={lesson.reviewNote} bulkApproved={lesson.bulkApproved} />
           <HighlightFrame>
             <LessonBody
