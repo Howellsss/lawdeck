@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
+import { CampusForm } from "@/components/account/CampusForm";
 import { NameForm } from "@/components/account/NameForm";
 import { InviteCodeForm } from "@/components/pilot/InviteCodeForm";
 import { VoicePicker } from "@/components/voice/VoicePicker";
@@ -8,6 +9,7 @@ import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { speechConfigured } from "@/server/ai/speech";
 import { getCurrentAccount } from "@/server/auth/session";
+import { getOwnCampus, listCampuses } from "@/server/db/campuses";
 import { getFullName } from "@/server/db/profile";
 import { getPilotStatus } from "@/server/db/pilot";
 
@@ -27,7 +29,7 @@ export default function AccountPage() {
 async function Account() {
   const account = await getCurrentAccount();
   if (!account) return <SignInPrompt level={1} what="account" returnTo="/account" />;
-  const name = await getFullName();
+  const [name, campuses, campus] = await Promise.all([getFullName(), listCampuses(), getOwnCampus()]);
   const pilot = await getPilotStatus().catch(() => null);
   return (
     <>
@@ -49,6 +51,7 @@ async function Account() {
           Your details
         </h2>
         <NameForm name={name} />
+        <CampusForm campuses={campuses} campus={campus} />
       </section>
       {speechConfigured() && (
         <section aria-labelledby="voice-heading" className="flex flex-col gap-3 border-t border-line pt-6">

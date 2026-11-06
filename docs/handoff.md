@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06.
+Last updated: 2026-11-06 (campus chat Phase 1).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06.
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **53** (`20261106005300_lesson_section_checks.sql`, applied).
+  merge only after that. The latest is **54** (`20261106005400_campuses.sql`, campus chat Phase 1).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -30,7 +30,14 @@ Last updated: 2026-11-06.
   #156 skim, tick and approve · #157 one click per lesson · #158 course approval retired ·
   #159 stories easy to find · #160 stories box folded.
 
-## Open items (nothing is half-built)
+## In progress
+- **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
+  Phase 1 campus choice built (migration 54, draft campus list awaiting the founder's confirmation).
+  Next: Phase 2 campus groups (admins only), Phase 3 files and safety, then open to students.
+- **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch
+  and pull request before touching `src/server/limits` or billing.
+
+## Open items
 - ⬜ Pilot: invite 10–20 students (Admin → Pilot is built) — recommended next; needs the
   founder's go-ahead and AI budget.
 - ⚠️ Payments (7b): founder to choose a Nigerian provider, prices and free-tier limits.
