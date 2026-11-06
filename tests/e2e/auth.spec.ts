@@ -151,3 +151,11 @@ test("sign-in screens fit a 360 px phone without sideways scrolling", async ({ p
     expect(overflow, path).toBeLessThanOrEqual(0);
   }
 });
+
+test("creating an account from sign-in keeps where the person was going (for example an invite link)", async ({ page }) => {
+  const next = `/chat/join/${"c".repeat(64)}`;
+  await page.goto(`/sign-in?next=${encodeURIComponent(next)}`);
+  await expect(page.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", `/sign-up?next=${encodeURIComponent(next)}`);
+  await page.goto("/sign-in?next=https://evil.example");
+  await expect(page.getByRole("link", { name: "Create an account" })).toHaveAttribute("href", "/sign-up");
+});

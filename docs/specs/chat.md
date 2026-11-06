@@ -155,6 +155,15 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      the 1st (West Africa Time). LiveKit's code loads only when a student joins a call. The camera
      is now allowed on Lawdeck's own pages (security headers), as the microphone already was.
      Until the three LiveKit settings are added in Vercel, the call line stays hidden.
+   - **4g Invite links and the ID test switch (built, migration 66; founder approved):** a study
+     group's creator makes an invite link in the Members tab (`/chat/join/<code>`; only a hash is
+     stored, so the link is shown once; 7 days; a new link stops the old one; Turn off link). Opening
+     it: sign up or log in (account creation keeps the link as the place to return to), Lawdeck
+     access (the link gives it while invite-only is on), the chat ID step, the community rules,
+     then Join. Students join student groups, aspirants aspirant groups; at most 15 people.
+     Admin -> Chat has "Approve IDs automatically (testing)", off by default: while on, the ID step
+     asks for a number only (3+ characters, no document) and approves it at once, marked as
+     automatic. It switches off a safety check: turn it off before real students join.
    - Later still: direct messages, reactions, threads, editing a sent message, notifications
      outside Lawdeck.
 

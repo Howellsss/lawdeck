@@ -1,11 +1,11 @@
 import { getOwnCampus, listCampuses } from "@/server/db/campuses";
-import { getMyVerification } from "@/server/chat/verification";
+import { getMyVerification, idTestMode } from "@/server/chat/verification";
 import { ChatVerifyForm } from "./ChatVerifyForm";
 
 // What a student sees before they can use campus chat (docs/specs/chat.md): verify first, then wait
 // for an admin; once verified, chat opens when Lawdeck opens it to students.
 export async function ChatGate() {
-  const [verification, campuses, campus] = await Promise.all([getMyVerification(), listCampuses(), getOwnCampus()]);
+  const [verification, campuses, campus, quick] = await Promise.all([getMyVerification(), listCampuses(), getOwnCampus(), idTestMode()]);
   const apiKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY ?? "";
   const status = verification?.status;
   return (
@@ -36,8 +36,10 @@ export async function ChatGate() {
               Your last request wasn&rsquo;t approved{verification?.note ? `: ${verification.note}` : "."} Please try again.
             </p>
           )}
-          <p className="text-[15px] text-muted">To keep chat safe, only verified students can join. An admin checks every request.</p>
-          <ChatVerifyForm campuses={campuses} campus={campus} apiKey={apiKey} />
+          <p className="text-[15px] text-muted">
+            {quick ? "Testing: requests are approved straight away, with no document needed." : "To keep chat safe, only verified students can join. An admin checks every request."}
+          </p>
+          <ChatVerifyForm campuses={campuses} campus={campus} apiKey={apiKey} quick={quick} />
         </section>
       )}
     </div>

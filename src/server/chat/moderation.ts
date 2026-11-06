@@ -85,3 +85,18 @@ export async function setChatOpen(input: { open: boolean }): Promise<{ ok: true 
   refresh();
   return { ok: true };
 }
+
+// Admin -> Chat: "Approve IDs automatically (testing)". It switches off a safety check, so admins only.
+export async function setAutoApproveIds(input: { on: boolean }): Promise<{ ok: true } | Fail> {
+  const parsed = z.object({ on: z.boolean() }).safeParse(input);
+  if (!parsed.success) return { ok: false, message: "Check the setting." };
+  if ((await getStaffRole()) !== "admin") return ADMINS_ONLY;
+  const db = await createSupabaseServerClient();
+  const { data, error } = await db.from("chat_settings").update({ auto_approve_ids: parsed.data.on, updated_at: new Date().toISOString() }).eq("id", true).select("auto_approve_ids");
+  if (error || !data.length) {
+    if (error) console.error("chat id test switch failed", { code: error.code });
+    return { ok: false, message: "The setting was not saved. Please try again." };
+  }
+  refresh();
+  return { ok: true };
+}

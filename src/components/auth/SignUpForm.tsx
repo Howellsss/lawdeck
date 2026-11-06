@@ -8,11 +8,15 @@ import { CheckEmail } from "./CheckEmail";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { TextField } from "@/components/ui/TextField";
 import { primaryButton } from "@/components/ui/buttons";
+import { safeNextPath } from "@/lib/safeNextPath";
+import { useQuery } from "./useQuery";
 
 const initialState: AuthFormState = { status: "idle" };
 
 export function SignUpForm() {
   const [state, formAction, pending] = useActionState(signUp, initialState);
+  // Where to go once the account is ready (for example a study group invite link).
+  const next = safeNextPath(useQuery().get("next"));
 
   if (state.status === "sent" && state.email) {
     return (
@@ -24,6 +28,7 @@ export function SignUpForm() {
 
   return (
     <form action={formAction} noValidate className="flex w-full flex-col gap-4">
+      <input type="hidden" name="next" value={next} />
       <FormAlert message={state.message} />
       <TextField
         label="Your name"

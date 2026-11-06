@@ -285,6 +285,42 @@ for (const width of [360, 1280]) {
   });
 }
 
+// Invite links and the ID test switch (founder, 2026-11-06).
+for (const width of [360, 1280]) {
+  test(`invite links, quick ID step and join (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/test-pages/chat-invite");
+    const box = page.getByRole("region", { name: "Invite link" });
+    await expect(box).toContainText("A link is working until");
+    await expect(box.getByRole("button", { name: "Turn off link" })).toBeVisible();
+    page.once("dialog", (d) => void d.accept());
+    await box.getByRole("button", { name: "Make a new link" }).click();
+    await expect(box.getByRole("alert")).toBeVisible();
+
+    await expect(page.getByRole("region", { name: /Approve IDs automatically/ })).toContainText("Turn this off before real students join");
+
+    // Test mode: the number only, no document.
+    const quick = page.getByRole("region", { name: "Quick ID" });
+    await expect(quick.getByLabel(/Photo or PDF/)).toHaveCount(0);
+    await quick.getByLabel("Your Law School number").fill("123");
+    await quick.getByRole("button", { name: "Join chat" }).click();
+    await expect(quick.getByRole("alert")).toBeVisible();
+
+    const join = page.getByRole("region", { name: "Join" });
+    await join.getByRole("button", { name: "Join Civil Lit squad" }).click();
+    await expect(join.getByRole("alert")).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+
+test("a broken invite link says so; a real-looking one asks the visitor to sign in first", async ({ page }) => {
+  await page.goto("/chat/join/not-a-code");
+  await expect(page.getByRole("heading", { name: "This invite link doesn’t work" })).toBeVisible();
+  await page.goto(`/chat/join/${"b".repeat(64)}`);
+  await expect(page.getByRole("main").getByRole("link", { name: "Sign in" })).toHaveAttribute("href", `/sign-in?next=${encodeURIComponent(`/chat/join/${"b".repeat(64)}`)}`);
+});
+
 // Group quiz like Kahoot (founder, 2026-11-06): host form, a timed question, the reveal and results.
 for (const width of [360, 1280]) {
   test(`group quiz: host, answer, reveal and results (${width}px)`, async ({ page }) => {

@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat group calls with LiveKit).
+Last updated: 2026-11-06 (study group invite links and the ID test switch).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat group calls with LiveKit).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **65** (`20261106006500_chat_calls.sql`, group calls; 64 is polls).
+  merge only after that. The latest is **66** (`20261106006600_chat_invite_links.sql`, invite links and the ID test switch; 65 is group calls).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -27,7 +27,7 @@ Last updated: 2026-11-06 (campus chat group calls with LiveKit).
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
 - **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
-  #173 quiz extras · #174 study together · #175 polls. Group calls (migration 65) is the open pull request after #175.
+  #173 quiz extras · #174 study together · #175 polls · #176 group calls. Invite links (migration 66) is the open pull request after #176.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
@@ -41,8 +41,11 @@ Last updated: 2026-11-06 (campus chat group calls with LiveKit).
   the campus is asked there, not on the home page. Students also need pilot access to use chat.
   Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
   (migration 58). Full emoji pack. Study groups (migration 59). Voice notes in study groups
-  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Study together: lesson cards in any group and "This week's topic" in study groups (63). Polls in any group (64). Group calls in study groups with LiveKit (65; hidden until the founder adds LIVEKIT_URL, LIVEKIT_API_KEY and LIVEKIT_API_SECRET in Vercel; free plan, 4,500-minute monthly limit on Admin → Chat). Founder's next step: create the free
-  LiveKit account and add its keys. Pilot invites run alongside (founder: build and invite now).
+  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Study together: lesson cards in any group and "This week's topic" in study groups (63). Polls in any group (64). Group calls in study groups with LiveKit (65; hidden until the founder adds LIVEKIT_URL, LIVEKIT_API_KEY and LIVEKIT_API_SECRET in Vercel; free plan, 4,500-minute monthly limit on Admin → Chat). LiveKit keys are in Vercel (founder,
+  2026-11-06); a real test call is still to be done. Invite links and the ID test switch (66). The
+  founder is turning invite-only off (Lawdeck open to everyone) and chat is open; the ID test switch
+  must be turned off before real students join. Adding an email on Admin → Pilot only gives access
+  to people who sign in with Google (not needed once invite-only is off). Pilot invites run alongside (founder: build and invite now).
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
 - **Plans, credits and Flutterwave payments:** not being built (founder, 2026-11-06: "Not connecting
   payments" for now). The plans document (Free, Standard ₦6,999, Pro ₦9,999, Max ₦14,999) was made

@@ -75,18 +75,20 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
   if (limited) return { ...limited, name };
 
   const supabase = await createSupabaseServerClient();
+  // Where to go after confirming (for example a study group invite link); checked to stay on Lawdeck.
+  const next = safeNextPath(formData.get("next"));
   // The name is kept with the account (like Google's), for the greeting and the admin list.
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=/`, data: { full_name: parsed.data.name } },
+    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`, data: { full_name: parsed.data.name } },
   });
   if (error) {
     logAuthFailure("signUp", error.code);
     return { status: "error", message: messageForAuthError(error.code), email, name };
   }
   // If email confirmation is switched off in Supabase, the student is signed in straight away.
-  if (data.session) redirect("/");
+  if (data.session) redirect(next);
   // Same answer whether or not the email was already registered (no account guessing).
   return { status: "sent", email: parsed.data.email };
 }

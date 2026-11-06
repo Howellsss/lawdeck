@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { CallUsage } from "@/components/chat/CallUsage";
 import { ChatOpenSwitch } from "@/components/chat/ChatOpenSwitch";
+import { IdTestSwitch } from "@/components/chat/IdTestSwitch";
 import { ReportedRow, type Reported } from "@/components/chat/ReportedRow";
 import { VerificationRow } from "@/components/chat/VerificationRow";
 import { LoadingRows } from "@/components/ui/LoadingRows";
@@ -31,7 +32,7 @@ async function Checks() {
   const [queue, reports, settings, usage] = await Promise.all([
     db.rpc("chat_verification_queue"),
     db.rpc("chat_report_queue"),
-    db.from("chat_settings").select("open_to_students").maybeSingle(),
+    db.from("chat_settings").select("open_to_students, auto_approve_ids").maybeSingle(),
     db.rpc("chat_call_usage"),
   ]);
   const callUse = usage.data?.[0];
@@ -76,6 +77,7 @@ async function Checks() {
         </p>
       </div>
       <ChatOpenSwitch open={settings.data?.open_to_students ?? false} />
+      <IdTestSwitch on={settings.data?.auto_approve_ids ?? false} />
       <CallUsage used={callUse?.used ?? 0} limit={callUse?.monthly_limit ?? 4500} calls={callUse?.calls ?? 0} enabled={callsEnabled()} />
       <section aria-labelledby="reported" className="flex flex-col gap-2">
         <h2 id="reported" className="text-lg font-medium">

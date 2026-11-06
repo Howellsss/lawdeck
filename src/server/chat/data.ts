@@ -255,7 +255,15 @@ export async function getChatShared(groupKey: string): Promise<ChatShared | null
 }
 
 export type GroupPerson = ChatPerson & { status: "invited" | "member"; isOwner: boolean };
-export type ChatMembersPage = { groups: ChatGroup[]; invites: ChatInvite[]; group: ChatGroup; people: GroupPerson[]; me: string };
+export type ChatMembersPage = {
+  groups: ChatGroup[];
+  invites: ChatInvite[];
+  group: ChatGroup;
+  people: GroupPerson[];
+  me: string;
+  // The creator only: until when the group's invite link works (null: no working link).
+  linkUntil: string | null;
+};
 
 // A study group's Members tab: who is in it and who is invited (members only).
 export async function getChatMembers(groupKey: string): Promise<ChatMembersPage | null> {
@@ -266,13 +274,17 @@ export async function getChatMembers(groupKey: string): Promise<ChatMembersPage 
   const [list, invites] = await Promise.all([listGroups(db, account.id), listInvites(db)]);
   const group = list.find((g) => g.key === groupKey);
   if (!group || group.kind !== "study") return null;
-  const { data, error } = await db.rpc("chat_group_people", { g: group.id });
+  const [{ data, error }, link] = await Promise.all([
+    db.rpc("chat_group_people", { g: group.id }),
+    group.mine ? db.rpc("chat_link_status", { g: group.id }) : Promise.resolve({ data: null }),
+  ]);
   if (error) throw new Error("chat read failed");
   return {
     groups: list,
     invites,
     group,
     me: account.id,
+    linkUntil: link.data ?? null,
     people: data.map((p) => ({ id: p.id, name: p.name, campus: p.campus, status: p.status, isOwner: p.is_owner })),
   };
 }
