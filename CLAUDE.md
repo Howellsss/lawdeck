@@ -52,7 +52,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - No legal content in code. It lives in the knowledge base or `src/templates`.
 - Templates and forum formatting profiles are data files validated by schema. One renderer makes preview, DOCX and PDF.
 - Unreviewed content and templates are never shown to students.
-- Exception (founder's decision, 2026-11-05): a reviewer may approve all of a course's Topic Lessons at once. Those lessons are marked; students see "Not yet read in full by a reviewer" with Report a problem until a reviewer reads one and clicks "I have read it in full". Skim, tick and approve is built (2026-11-06): Admin → Lessons → Read in full, section by section, is how those lessons get read; the course-wide approval stays until the founder retires it.
+- Course-wide approval of Topic Lessons was retired (founder, 2026-11-06): every lesson is read in full (Admin → Lessons → Read in full, one click per lesson) before students see it without a note. Lessons approved with their course before then keep showing students "Not yet read in full by a reviewer" with Report a problem until a reviewer reads them. Memory aid sets may still be approved a course at a time (founder, 2026-11-05).
 
 ## Look (from the Lawdeck UI Design canvas)
 - Black and white, calm, input-first. Tokens live in `src/app/globals.css`.

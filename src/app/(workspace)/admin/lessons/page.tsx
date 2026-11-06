@@ -76,19 +76,11 @@ async function Overview() {
                   Read in full ({toRead(course)} to read)
                 </Link>
               )}
-              {course.topics.some((t) => t.lesson?.status === "pending") && (
-                <ApproveCourseButton
-                  courseId={course.id}
-                  courseName={course.name}
-                  waiting={course.topics.filter((t) => t.lesson?.status === "pending").length}
-                />
-              )}
               {course.topics.some((t) => t.extras?.status === "pending") && (
                 <ApproveCourseButton
                   courseId={course.id}
                   courseName={course.name}
                   waiting={course.topics.filter((t) => t.extras?.status === "pending").length}
-                  target="extras"
                 />
               )}
             </div>
