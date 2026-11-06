@@ -65,57 +65,44 @@ export async function decideExtras(input: { extrasId: string; status: string; no
 
 const courseSchema = z.object({ courseId: z.uuid({ error: "That course could not be found." }) });
 
-// Founder's decision (2026-11-05): approve every lesson awaiting review in a course at once. They
-// are marked, so students see a note that a reviewer has not read them in full yet and can report
-// a mistake. Only lessons awaiting review; rejected and withdrawn ones stay as they are.
-export async function approveCourseLessons(input: { courseId: string }): Promise<{ ok: true; approved: number } | { ok: false; message: string }> {
-  return approveCourse("topic_lessons", input);
-}
-
-// The same for memory aids and stories (founder's decision, 2026-11-05, applied to Phase 2).
+// Approve every set of memory aids and stories awaiting review in one course at once (founder's
+// decision, 2026-11-05, Phase 2). Marked, like before. Lessons themselves are no longer approved a
+// course at a time (founder, 2026-11-06): each goes through Read in full.
 export async function approveCourseExtras(input: { courseId: string }): Promise<{ ok: true; approved: number } | { ok: false; message: string }> {
-  return approveCourse("lesson_extras", input);
-}
-
-async function approveCourse(
-  table: "topic_lessons" | "lesson_extras",
-  input: { courseId: string },
-): Promise<{ ok: true; approved: number } | { ok: false; message: string }> {
   const parsed = courseSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "That course could not be found." };
-  if (!(await getStaffRole())) return { ok: false, message: "Only reviewers can approve lessons." };
+  if (!(await getStaffRole())) return { ok: false, message: "Only reviewers can approve memory aids." };
   const db = await createSupabaseServerClient();
   const topics = await db.from("topics").select("id").eq("course_id", parsed.data.courseId);
   if (topics.error) {
     console.error("course approval failed", { code: topics.error.code });
-    return { ok: false, message: "The lessons were not approved. Please try again." };
+    return { ok: false, message: "The memory aids were not approved. Please try again." };
   }
   if (topics.data.length === 0) return { ok: true, approved: 0 };
-  const topicIds = topics.data.map((t) => t.id);
-  let result;
-  if (table === "topic_lessons") {
-    result = await db.from("topic_lessons").update({ status: "approved", bulk_approved: true }).eq("status", "pending").in("topic_id", topicIds).select("id");
-  } else {
-    const lessons = await db.from("topic_lessons").select("id").in("topic_id", topicIds);
-    if (lessons.error) {
-      console.error("course approval failed", { code: lessons.error.code });
-      return { ok: false, message: "The memory aids were not approved. Please try again." };
-    }
-    if (lessons.data.length === 0) return { ok: true, approved: 0 };
-    result = await db
-      .from("lesson_extras")
-      .update({ status: "approved", bulk_approved: true })
-      .eq("status", "pending")
-      .in(
-        "lesson_id",
-        lessons.data.map((l) => l.id),
-      )
-      .select("id");
+  const lessons = await db
+    .from("topic_lessons")
+    .select("id")
+    .in(
+      "topic_id",
+      topics.data.map((t) => t.id),
+    );
+  if (lessons.error) {
+    console.error("course approval failed", { code: lessons.error.code });
+    return { ok: false, message: "The memory aids were not approved. Please try again." };
   }
-  const { data, error } = result;
+  if (lessons.data.length === 0) return { ok: true, approved: 0 };
+  const { data, error } = await db
+    .from("lesson_extras")
+    .update({ status: "approved", bulk_approved: true })
+    .eq("status", "pending")
+    .in(
+      "lesson_id",
+      lessons.data.map((l) => l.id),
+    )
+    .select("id");
   if (error) {
     console.error("course approval failed", { code: error.code });
-    return { ok: false, message: "The lessons were not approved. Please try again." };
+    return { ok: false, message: "The memory aids were not approved. Please try again." };
   }
   revalidatePath("/admin/lessons", "layout");
   return { ok: true, approved: data.length };

@@ -163,7 +163,8 @@ learning record is its owner's alone (staff do not read them); one session per t
   has no lesson, 2 at a time, through the same route as a single lesson. Shows the estimated cost
   (US$0.20–0.50 a lesson) and asks first; lists failures with "Try again". The page stays open
   while it runs. Lessons already written are never rewritten.
-- **Approve all awaiting review** (per course): approves that course's pending lessons and marks
+- **Approve all awaiting review** (per course; **retired 2026-11-06** by the founder: lessons now
+  go through Read in full, below; memory aid sets can still be approved per course): approved that course's pending lessons and marks
   them `bulk_approved` (migration 46). Students see "Not yet read in full by a reviewer" and
   Report a problem (report kind `lesson`). A reviewer who reads one clicks "I have read it in
   full" to clear the mark. Any later change sends it back to review, unmarked.
