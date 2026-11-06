@@ -108,6 +108,7 @@ export async function answerQuiz(input: z.input<typeof answerSchema>): Promise<{
   const { data, error } = await r.db.rpc("chat_quiz_answer", { q: parsed.data.quizId, question: parsed.data.question, choice: parsed.data.choice });
   if (error) return { ok: false, message: "Your answer wasn’t saved. Please try again." };
   if (data === "late") return { ok: false, message: "Time’s up for this question." };
+  if (data === "early") return { ok: false, message: "Wait for the question to open." };
   if (data === "already") return { ok: false, message: "You’ve already answered this one." };
   if (data !== "ok") return { ok: false, message: "Join the quiz to answer." };
   return { ok: true };

@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat group quiz).
+Last updated: 2026-11-06 (campus chat quiz extras: music, countdown, streaks, chart, podium).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat group quiz).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **61** (`20261106006100_chat_quizzes.sql`, group quiz).
+  merge only after that. The latest is **62** (`20261106006200_chat_quiz_extras.sql`, quiz extras; 61 is the group quiz).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -42,7 +42,7 @@ Last updated: 2026-11-06 (campus chat group quiz).
   the campus is asked there, not on the home page. Students also need pilot access to use chat.
   Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
   (migration 58). Full emoji pack. Study groups (migration 59). Voice notes in study groups
-  (migration 60). Group quiz like Kahoot (migration 61). Founder's next set, in order: study together (lesson cards), polls, LiveKit group calls (needs account,
+  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Founder's next set, in order: study together (lesson cards), polls, LiveKit group calls (needs account,
   library and cost approval). Pilot invites run alongside (founder: build and invite now).
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
 - **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch

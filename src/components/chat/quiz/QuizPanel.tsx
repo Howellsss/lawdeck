@@ -7,6 +7,7 @@ import { answerQuiz, createQuiz, endQuiz, joinQuiz, nextQuestion, quizState, typ
 import { QuizLeaderboard } from "./QuizLeaderboard";
 import { QuizQuestion } from "./QuizQuestion";
 import { QuizSetup } from "./QuizSetup";
+import { useQuizSound } from "./useQuizSound";
 
 // A study group's Quiz tab, like Kahoot: host a quiz, wait in the lobby, answer timed questions and
 // see the leaderboard. While a quiz is on, the screen checks for changes every second.
@@ -14,6 +15,7 @@ export function QuizPanel({ groupId, initial, topics }: { groupId: string; initi
   const [quiz, setQuiz] = useState(initial);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string>();
+  const sound = useQuizSound(quiz);
   const quizId = quiz?.id;
   const on = quiz && quiz.status !== "done";
 
@@ -48,7 +50,17 @@ export function QuizPanel({ groupId, initial, topics }: { groupId: string; initi
   };
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 lg:px-6">
+    <div onPointerDown={sound.unlock} className="relative flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 lg:px-6">
+      <button
+        type="button"
+        onClick={sound.toggle}
+        aria-pressed={sound.on}
+        aria-label={sound.on ? "Turn quiz sound off" : "Turn quiz sound on"}
+        title={sound.on ? "Sound on" : "Sound off"}
+        className="absolute right-4 top-4 flex size-9 items-center justify-center rounded-lg border border-line text-[16px] lg:right-6"
+      >
+        <span aria-hidden>{sound.on ? "🔊" : "🔇"}</span>
+      </button>
       {error && (
         <p role="alert" className="text-[14px] text-warning">
           {error}
@@ -56,7 +68,7 @@ export function QuizPanel({ groupId, initial, topics }: { groupId: string; initi
       )}
       {quiz?.status === "lobby" && (
         <section aria-label="Quiz lobby" className="flex max-w-xl flex-col gap-3 rounded-2xl border border-line bg-surface p-4">
-          <h2 className="font-serif text-2xl">Quiz on {quiz.topic}</h2>
+          <h2 className="pr-12 font-serif text-2xl">Quiz on {quiz.topic}</h2>
           <p className="text-[15px] text-muted">
             {quiz.isHost ? "You’re hosting." : `Hosted by ${quiz.host}.`} {quiz.total} questions, {quiz.seconds} seconds each. {quiz.players} joined so far.
           </p>
@@ -77,7 +89,7 @@ export function QuizPanel({ groupId, initial, topics }: { groupId: string; initi
       )}
       {quiz?.status === "live" && (
         <div className="flex max-w-2xl flex-col gap-5">
-          <h2 className="font-serif text-xl text-muted">Quiz on {quiz.topic}</h2>
+          <h2 className="pr-12 font-serif text-xl text-muted">Quiz on {quiz.topic}</h2>
           <QuizQuestion quiz={quiz} busy={busy} onAnswer={(choice) => void run(() => answerQuiz({ quizId: quiz.id, question: quiz.current, choice }))} />
           {!quiz.joined && (
             <button type="button" disabled={busy} onClick={() => void run(() => joinQuiz({ quizId: quiz.id }))} className={`${primaryButton} self-start`}>
@@ -99,7 +111,7 @@ export function QuizPanel({ groupId, initial, topics }: { groupId: string; initi
       )}
       {quiz?.status === "done" && (
         <section aria-label="Quiz results" className="flex max-w-xl flex-col gap-3">
-          <h2 className="font-serif text-2xl">Quiz on {quiz.topic}: results</h2>
+          <h2 className="pr-12 font-serif text-2xl">Quiz on {quiz.topic}: results</h2>
           <QuizLeaderboard rows={quiz.leaderboard} total={quiz.total} final />
         </section>
       )}

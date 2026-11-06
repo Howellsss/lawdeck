@@ -1,4 +1,5 @@
 import { place, type QuizState } from "@/lib/quiz";
+import { QuizPodium } from "./QuizPodium";
 
 // Names and points, best first. The caller's own row is marked "you".
 export function QuizLeaderboard({ rows, total, final = false }: { rows: QuizState["leaderboard"]; total: number; final?: boolean }) {
@@ -6,6 +7,7 @@ export function QuizLeaderboard({ rows, total, final = false }: { rows: QuizStat
   return (
     <section aria-label={final ? "Final leaderboard" : "Leaderboard"} className="flex flex-col gap-2">
       <h3 className="text-[15px] font-medium">{final ? "Final leaderboard" : "Leaderboard"}</h3>
+      {final && <QuizPodium rows={rows} />}
       <ol className="flex flex-col divide-y divide-line rounded-xl border border-line">
         {rows.map((r, i) => (
           <li key={`${r.name}-${i}`} className={`flex items-center gap-3 px-3 py-2 text-[15px] ${r.me ? "bg-pill" : ""}`}>
@@ -14,6 +16,7 @@ export function QuizLeaderboard({ rows, total, final = false }: { rows: QuizStat
               {r.name}
               {r.me && <span className="text-muted"> (you)</span>}
             </span>
+            {r.streak > 1 && !final && <span className="shrink-0 text-[13px]">🔥 {r.streak}</span>}
             <span className="shrink-0 text-[13px] text-muted">
               {r.correct}/{total} right
             </span>

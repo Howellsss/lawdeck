@@ -1,12 +1,15 @@
 "use client";
 
 import type { QuizState } from "@/lib/quiz";
+import { QuizChart } from "./QuizChart";
+import { QuizReady } from "./QuizReady";
 
 const LETTERS = ["A", "B", "C", "D", "E", "F"];
 
 // One live question: the timer, the question and its choices as large buttons. Once it closes
 // (time up or everyone answered), the right answer, the student's result and the explanation show.
 export function QuizQuestion({ quiz, busy, onAnswer }: { quiz: QuizState; busy: boolean; onAnswer: (choice: number) => void }) {
+  if (quiz.readyIn > 0) return <QuizReady readyIn={quiz.readyIn} current={quiz.current} total={quiz.total} />;
   const q = quiz.question;
   if (!q) return null;
   const answered = quiz.myChoice !== null;
@@ -54,7 +57,9 @@ export function QuizQuestion({ quiz, busy, onAnswer }: { quiz: QuizState; busy: 
         <div role="status" className="flex flex-col gap-1 rounded-xl border border-line bg-surface px-3 py-2 text-[15px]">
           <p className="font-medium">
             {quiz.myCorrect ? (
-              <span className="text-success">Correct! +{quiz.myPoints} points</span>
+              <span className="text-success">
+                Correct! +{quiz.myPoints} points{quiz.myStreak > 1 && ` · 🔥 ${quiz.myStreak} in a row`}
+              </span>
             ) : answered ? (
               <span className="text-warning">Not this time.</span>
             ) : (
@@ -63,7 +68,9 @@ export function QuizQuestion({ quiz, busy, onAnswer }: { quiz: QuizState; busy: 
           </p>
           {quiz.explanation && <p className="text-muted">{quiz.explanation}</p>}
         </div>
-      ) : (
+      ) : null}
+      {quiz.closed && quiz.counts && <QuizChart counts={quiz.counts} correct={quiz.correctChoice} />}
+      {!quiz.closed && (
         <p className="text-[14px] text-muted" aria-live="polite">
           {answered ? "Answer locked in. Waiting for the others…" : quiz.joined ? "Choose your answer." : "Join the quiz to answer."} {quiz.answered} of {quiz.players} answered.
         </p>

@@ -115,6 +115,16 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      older than 3 hours counts as finished); the host or the group's creator can end it early.
      Screens check for changes every second while a quiz is on (no live connection, no library).
      No AI cost. All reads and changes go through database functions.
+   - **4c+ Quiz extras (built, migration 62; founder approved):** Lawdeck's own music and sounds
+     (original tunes played by the browser's Web Audio from notes in `src/lib/quizSound.ts`; no
+     files, no library; Kahoot's music is not used because it belongs to Kahoot): lobby music,
+     question music with a tick that speeds up in the last 5 seconds, "3, 2, 1" beeps, a chime for
+     a right answer, a low tone for a wrong one, a fanfare for the results; a sound on/off button
+     remembered on the phone; sound starts only after a tap (phones require it). Each question
+     opens after a 3-second "Get ready" (answers before it are refused). Streaks: 100 bonus points
+     for each right answer in a row before this one, up to 500. After each question, a chart of how
+     many chose each answer; the final leaderboard has a podium for the top three. Join by code
+     (people outside the group) is not built: it would change who can see a group's quiz.
    - **4d Study together:** share topic lessons as cards; "This week's topic".
    - **4e Polls** in groups (founder chose polls over an ideas board).
    - **4f Group calls with LiveKit** (founder's choice): needs a LiveKit account and approval of its
@@ -147,4 +157,6 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
   `/test-pages/chat-study` (voice note player, record button only in study groups).
 - `tests/permissions/sql/9zj_chat_quizzes_test.sql` (study groups only, members only, one quiz at a
   time, answer hidden until the question closes, one answer each, the timer, host-only controls,
-  scoring, no direct table access); `tests/unit/quiz.test.ts`; test page `/test-pages/chat-quiz`.
+  scoring, no direct table access); `tests/permissions/sql/9zk_chat_quiz_extras_test.sql` (get
+  ready, early answers refused, streak bonus, answer chart only once closed); `tests/unit/quiz.test.ts`;
+  test page `/test-pages/chat-quiz` (?s=ready, live, closed, done).
