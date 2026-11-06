@@ -27,13 +27,17 @@ export function useLiveKitCall(pass: { callId: string; url: string; token: strin
   const [needsAudioTap, setNeedsAudioTap] = useState(false);
   const ended = useRef(false);
 
+  // Ending the call: the screen changes at once; hanging up and telling Lawdeck finish in the
+  // background (they can take a few seconds on a slow connection).
   const finish = useCallback(
-    async (why?: string) => {
+    (why?: string) => {
       if (ended.current) return;
       ended.current = true;
-      await room.current?.disconnect();
-      await leaveCall({ callId: pass.callId });
+      const r = room.current;
+      room.current = null;
       onEnded(why);
+      void r?.disconnect().catch(() => undefined);
+      void leaveCall({ callId: pass.callId });
     },
     [onEnded, pass.callId],
   );
@@ -41,13 +45,14 @@ export function useLiveKitCall(pass: { callId: string; url: string; token: strin
   useEffect(() => {
     let cancelled = false;
     let timer = 0;
+    ended.current = false;
     const holder = document.createElement("div");
     holder.hidden = true;
     document.body.append(holder);
     audio.current = holder;
     (async () => {
       const { Room, RoomEvent, Track } = await import("livekit-client");
-      if (cancelled) return;
+      if (cancelled || ended.current) return;
       const r = new Room({ adaptiveStream: true, dynacast: true, videoCaptureDefaults: { resolution: { width: 640, height: 360, frameRate: 24 } } });
       room.current = r;
       const person = (p: Participant, me: boolean): CallPerson => {
@@ -71,11 +76,16 @@ export function useLiveKitCall(pass: { callId: string; url: string; token: strin
         .on(RoomEvent.AudioPlaybackStatusChanged, () => setNeedsAudioTap(!r.canPlaybackAudio));
       for (const e of [RoomEvent.ParticipantConnected, RoomEvent.ParticipantDisconnected, RoomEvent.ActiveSpeakersChanged, RoomEvent.TrackMuted,
         RoomEvent.TrackUnmuted, RoomEvent.LocalTrackPublished, RoomEvent.LocalTrackUnpublished] as const) r.on(e, update);
-      r.on(RoomEvent.Disconnected, () => void finish(ended.current ? undefined : "The call ended."));
+      r.on(RoomEvent.Disconnected, () => finish("The call ended."));
       try {
         await r.connect(pass.url, pass.token);
       } catch {
-        if (!cancelled) await finish("The call couldn’t connect. Check your internet, then try again.");
+        if (!cancelled) finish("The call couldn’t connect. Check your internet, then try again.");
+        return;
+      }
+      // Left while connecting: hang up now.
+      if (cancelled || ended.current) {
+        void r.disconnect();
         return;
       }
       try {
@@ -89,7 +99,7 @@ export function useLiveKitCall(pass: { callId: string; url: string; token: strin
       update();
       timer = window.setInterval(async () => {
         const result = await callHeartbeat({ callId: pass.callId });
-        if (result !== "ok") void finish(ENDED[result]);
+        if (result !== "ok") finish(ENDED[result]);
       }, CHECK_IN_EVERY);
     })();
     return () => {
@@ -128,5 +138,5 @@ export function useLiveKitCall(pass: { callId: string; url: string; token: strin
   };
   const startAudio = () => void room.current?.startAudio().then(() => setNeedsAudioTap(false));
 
-  return { people, micOn, cameraOn, busy, notice, needsAudioTap, toggleMic, toggleCamera, startAudio, leave: () => void finish() };
+  return { people, micOn, cameraOn, busy, notice, needsAudioTap, toggleMic, toggleCamera, startAudio, leave: () => finish("You left the call.") };
 }
