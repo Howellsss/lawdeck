@@ -931,6 +931,21 @@ export type Database = {
         };
         Relationships: [];
       };
+      lesson_section_checks: {
+        Row: {
+          id: string;
+          lesson_id: string;
+          lesson_version: number;
+          section: number;
+          verdict: "checked" | "problem";
+          note: string | null;
+          checked_by: string | null;
+          checked_at: string;
+        };
+        Insert: { lesson_id: string; lesson_version: number; section: number; verdict: "checked" | "problem"; note?: string | null };
+        Update: { verdict?: "checked" | "problem"; note?: string | null; checked_at?: string };
+        Relationships: [];
+      };
       diary_notes: {
         Row: { id: string; owner_id: string; topic_id: string; body: string; updated_at: string };
         Insert: { topic_id: string; body?: string };

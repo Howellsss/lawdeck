@@ -7,6 +7,7 @@ import { BulkWriteLessons } from "@/components/lessons/BulkWriteLessons";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { formatWat } from "@/lib/dates";
 import { REVIEW_STATUS_LABELS } from "@/lib/libraryLabels";
+import { needsReading } from "@/lib/readInFull";
 import { listLessonOverview } from "@/server/db/lessons";
 
 export const metadata: Metadata = { title: "Lessons · Lawdeck" };
@@ -22,6 +23,10 @@ export default function LessonsPage() {
     </div>
   );
 }
+
+// Lessons still to read in full: awaiting review, or approved with their course.
+const toRead = (course: { topics: { lesson: { status: string; bulkApproved: boolean } | null }[] }) =>
+  course.topics.filter((t) => t.lesson && needsReading({ status: t.lesson.status, bulk_approved: t.lesson.bulkApproved })).length;
 
 async function Overview() {
   const overview = await listLessonOverview();
@@ -63,6 +68,14 @@ async function Overview() {
               {course.name}
             </h2>
             <div className="flex flex-wrap items-start gap-2">
+              {toRead(course) > 0 && (
+                <Link
+                  href={`/admin/lessons/read/${course.id}`}
+                  className="inline-flex h-9 items-center rounded-full bg-ink px-4 text-[13.5px] font-medium text-on-ink no-underline"
+                >
+                  Read in full ({toRead(course)} to read)
+                </Link>
+              )}
               {course.topics.some((t) => t.lesson?.status === "pending") && (
                 <ApproveCourseButton
                   courseId={course.id}

@@ -167,8 +167,24 @@ learning record is its owner's alone (staff do not read them); one session per t
   them `bulk_approved` (migration 46). Students see "Not yet read in full by a reviewer" and
   Report a problem (report kind `lesson`). A reviewer who reads one clicks "I have read it in
   full" to clear the mark. Any later change sends it back to review, unmarked.
-- **Reminder:** next, "skim, tick and approve": a quick "Looks right" tick per lesson and
-  "Approve all ticked", so every lesson is looked at once before students see it unmarked.
+- **Skim, tick and approve** (built 2026-11-06; below) is how course-approved lessons get read.
+
+## Skim, tick and approve (founder approved 2026-11-06)
+- Admin → Lessons → **Read in full (n to read)** per course opens `/admin/lessons/read/[courseId]`:
+  the course's lessons awaiting review or approved with their course, one after another, with
+  "x of y lessons read in full" and "Skip to the next lesson". A lesson's own page links to it too.
+- Each section is shown with its highlights and, under it, what to check: the cases and statutes it
+  names (each already matched in the library by the citation check; "Facts not in the library:
+  verification required" where so) and its recall questions with answers. The end-of-topic test is
+  one more item. Each gets **✓ Checked**, or **Problem…** with a short note (required); Undo clears.
+- Ticks are saved straight away (migration 53, `lesson_section_checks`: one per section of a lesson
+  version; reviewers only; who and when set by the database). A new version needs reading again.
+- **Approve as read in full** works only when every item is checked and none is a problem; it
+  approves and clears the course mark, so students' "Not yet read in full" note disappears. **Send
+  back for a fix** (any problem) rejects the lesson with the problems, by section, as its note. The
+  server re-reads the ticks before either (`src/server/lessons/readInFull.ts`). No AI cost.
+- Tests: `tests/unit/readInFull.test.ts`; `tests/permissions/sql/9zb_lesson_section_checks_test.sql`;
+  `tests/voice/read-in-full.spec.ts` (360 px and desktop); e2e: the page is hidden from visitors.
 
 ## Memory aids and stories (Phase 2a)
 - **Data (migration 47):** `lesson_extras` (one set per lesson, its own review state and
