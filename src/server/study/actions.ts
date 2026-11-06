@@ -131,7 +131,7 @@ export async function recordAnswer(input: AnswerInput): Promise<(Revealed & { ou
 
   const existing = await db
     .from("review_items")
-    .select("id, interval_days, successes, lapses, due_at")
+    .select("id, interval_days, successes, lapses, due_at, ease")
     .eq("checkpoint_id", checkpoint.id)
     .maybeSingle();
   const next = scheduleAfter(existing.data ?? null, outcome, input2.context);

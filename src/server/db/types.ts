@@ -907,6 +907,7 @@ export type Database = {
           lapses: number;
           last_outcome: RecallOutcome | null;
           last_reviewed_at: string | null;
+          ease: number;
         };
         Insert: {
           checkpoint_id: string;
@@ -917,6 +918,7 @@ export type Database = {
           lapses?: number;
           last_outcome?: RecallOutcome | null;
           last_reviewed_at?: string | null;
+          ease?: number;
         };
         Update: {
           due_at?: string;
@@ -925,6 +927,7 @@ export type Database = {
           lapses?: number;
           last_outcome?: RecallOutcome | null;
           last_reviewed_at?: string | null;
+          ease?: number;
         };
         Relationships: [];
       };
