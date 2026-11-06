@@ -160,7 +160,9 @@ learning record is its owner's alone (staff do not read them); one session per t
 
 ## Stories easy to find (founder, 2026-11-06)
 - **Stories in this topic (n)** at the top of a topic's lesson and of Revise visually lists every
-  approved story (`TopicStories`), open by default; each opens in place with its quick question.
+  approved story (`TopicStories`); each opens in place with its quick question. On the lesson it is
+  one folded line (the stories also sit under their sections; founder: not too much); on Revise
+  visually it is open.
 - Under a section, a story is a card of its own (book symbol, "Story" or "Case story", title,
   "Read it ›") instead of a plain button. Same stories, no AI, no database change.
 - Tests: `tests/voice/lessonAids.spec.ts` (test page `/test-pages/topic-stories`, 360 px and desktop).

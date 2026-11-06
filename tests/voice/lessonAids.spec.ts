@@ -44,12 +44,16 @@ test("saving needs an account: a visitor is told plainly", async ({ page }) => {
   await expect(page.getByRole("region", { name: "Memory aid: Made-up licence conditions" }).getByRole("alert")).toContainText("Sign in to save memory aids.");
 });
 
-// "Stories in this topic" (founder, 2026-11-06): every story listed at the top, as cards that open in place.
+// "Stories in this topic" (founder, 2026-11-06): one folded line at the top of a lesson; opened, the
+// stories are cards that open in place.
 for (const width of [360, 1200]) {
-  test(`a topic lists its stories at the top as cards that open in place (${width}px)`, async ({ page }) => {
+  test(`a topic lists its stories in one folded line that opens to cards (${width}px)`, async ({ page }) => {
     await page.setViewportSize({ width, height: 900 });
     await page.goto("/test-pages/topic-stories");
     await expect(page.getByText("Stories in this topic (2)")).toBeVisible();
+    // Folded: the story cards stay hidden until the line is opened.
+    await expect(page.getByRole("button", { name: /Read it as a story/ })).toHaveCount(0);
+    await page.getByText("Stories in this topic (2)").click();
     const card = page.getByRole("button", { name: "Read it as a story: The farm that was never inspected" });
     await expect(card).toContainText("Case story");
     await expect(page.getByRole("button", { name: "Read it as a story: Chidi's poultry licence" })).toContainText("Story");
