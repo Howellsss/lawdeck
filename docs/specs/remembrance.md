@@ -126,6 +126,21 @@ learning record is its owner's alone (staff do not read them); one session per t
   "Continue to today's study". "Stop here" is always there; unanswered questions stay due.
 - No AI cost: multiple choice is marked by Lawdeck, written answers self-marked.
 
+## Adaptive revision (Phase 4a, founder approved 2026-11-06)
+- Every revision point has an **ease** (migration 52, `review_items.ease`, 1.3 to 3.0, starting at
+  2.5). In revision: remembered +0.1, partly −0.15, missed or skipped −0.3; while reading or in the
+  topic test only a miss lowers it, so rereading cannot inflate it.
+- After a correct revision answer the gap is the next step (1, 3, 7, 14, 30, 60, 120 days) times
+  ease ÷ 2.5, always at least a day longer than before, at most 180 days. A point always
+  remembered goes about 3, 8, 16, 35, 72 days; a point the student keeps missing comes back sooner
+  and more often. Partly right repeats the gap; a miss starts again tomorrow (`src/lib/revision.ts`).
+- **Weakest first:** due points are asked missed-last-time first, then partly remembered, then the
+  lowest ease, the most misses, and the longest waiting (`weakestFirst`).
+- **Daily cap:** at most 20 revision answers per Lagos day (`DAILY_REVISION_CAP`); then /revise says
+  today's are done and the rest come back tomorrow, and "Before you move on" stays quiet until then.
+- Existing points start at the normal ease, so nothing already scheduled moves. No AI cost.
+- Tests: `tests/unit/revision.test.ts`; `tests/permissions/sql/9za_adaptive_revision_test.sql`.
+
 ## Writing and approving many lessons (founder, 2026-11-05)
 - **Write all missing lessons** (Admin → Lessons): for all courses or one, writes every topic that
   has no lesson, 2 at a time, through the same route as a single lesson. Shows the estimated cost
