@@ -95,7 +95,9 @@ export class QuizSound {
       this.note(hz(chord.root + 24 + tones[ARP[beat]]), this.nextTime, eighth * 0.95, "triangle", 0.9);
       // Bass on beats 1 and 3, the same in the lobby and during questions, so the pace never changes
       // (founder, 2026-11-06: the music sped up when the game started).
-      if (beat % 4 === 0) this.note(hz(chord.root - 12 + (beat === 4 ? 7 : 0)), this.nextTime, eighth * 3, "square", 0.35);
+      // A smooth tone an octave higher than before: very low, buzzy bass rattles phone speakers
+      // (founder, 2026-11-06: "the vibration is bad").
+      if (beat % 4 === 0) this.note(hz(chord.root + (beat === 4 ? 7 : 0)), this.nextTime, eighth * 3, "triangle", 0.5);
       this.nextTime += eighth;
       this.step += 1;
     }
@@ -143,8 +145,8 @@ export class QuizSound {
         [55, 0, 0.18],
         [50, 0.16, 0.35],
       ],
-      "square",
-      0.25,
+      "triangle",
+      0.5,
     );
   }
 
