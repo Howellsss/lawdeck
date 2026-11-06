@@ -8,7 +8,7 @@ import { EmojiPicker } from "./EmojiPicker";
 const tool = "flex size-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pill hover:text-ink disabled:opacity-40";
 
 // The row under the message box, as in Slack: + to attach a file, Aa to show or hide formatting,
-// an emoji, @ to mention someone, a book to share a lesson, a microphone for voice notes (study groups only), and Send.
+// an emoji, @ to mention someone, a book to share a lesson, a chart to make a poll, a microphone for voice notes (study groups only), and Send.
 export function ComposerBar({
   busy,
   canSend,
@@ -19,6 +19,7 @@ export function ComposerBar({
   onMention,
   onVoice,
   onShareLesson,
+  onPoll,
   onSend,
 }: {
   busy: boolean;
@@ -30,6 +31,7 @@ export function ComposerBar({
   onMention: () => void;
   onVoice?: () => void;
   onShareLesson?: () => void;
+  onPoll?: () => void;
   onSend: () => void;
 }) {
   const picker = useRef<HTMLInputElement>(null);
@@ -72,6 +74,11 @@ export function ComposerBar({
       {onShareLesson && (
         <button type="button" onClick={onShareLesson} disabled={busy} aria-label="Share a lesson" title="Share a lesson" className={tool}>
           <Icon name="book" size={18} />
+        </button>
+      )}
+      {onPoll && (
+        <button type="button" onClick={onPoll} disabled={busy} aria-label="Make a poll" title="Make a poll" className={tool}>
+          <Icon name="progress" size={18} />
         </button>
       )}
       {onVoice && (

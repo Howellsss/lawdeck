@@ -20,6 +20,7 @@ const msg = (n: number, author: typeof ada, at: string, body: string, mine = fal
   mine,
   files: [],
   lesson: null,
+  poll: null,
 });
 const now = Date.now();
 const today = (minutesAgo: number) => new Date(now - minutesAgo * 60_000).toISOString();

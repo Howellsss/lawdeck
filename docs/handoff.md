@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat study together: lesson cards and "This week's topic").
+Last updated: 2026-11-06 (campus chat polls).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat study together: lesson cards and "This wee
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **63** (`20261106006300_chat_study_together.sql`, study together; 62 is quiz extras).
+  merge only after that. The latest is **64** (`20261106006400_chat_polls.sql`, polls; 63 is study together).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -27,7 +27,7 @@ Last updated: 2026-11-06 (campus chat study together: lesson cards and "This wee
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
 - **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
-  #173 quiz extras. Study together (migration 63) is the open pull request after #173.
+  #173 quiz extras · #174 study together. Polls (migration 64) is the open pull request after #174.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
@@ -41,7 +41,7 @@ Last updated: 2026-11-06 (campus chat study together: lesson cards and "This wee
   the campus is asked there, not on the home page. Students also need pilot access to use chat.
   Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
   (migration 58). Full emoji pack. Study groups (migration 59). Voice notes in study groups
-  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Study together: lesson cards in any group and "This week's topic" in study groups (63). Founder's next set, in order: polls, LiveKit group calls (needs account,
+  (migration 60). Group quiz like Kahoot (migration 61) with music, countdown, streaks, chart and podium (62). Study together: lesson cards in any group and "This week's topic" in study groups (63). Polls in any group (64). Founder's next set: LiveKit group calls (needs account,
   library and cost approval). Pilot invites run alongside (founder: build and invite now).
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
 - **Plans, credits and Flutterwave payments:** not being built (founder, 2026-11-06: "Not connecting

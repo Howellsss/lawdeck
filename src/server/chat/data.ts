@@ -32,9 +32,23 @@ export type ChatMessage = {
   files: ChatFile[];
   // Null when the message has no card, or the lesson is no longer approved.
   lesson: LessonCard | null;
+  // Null unless the message is a poll (its text is the question).
+  poll: ChatPoll | null;
 };
-export type MessageRow = { id: string; group_id: string; owner_id: string; body: string; created_at: string; attachments: Json; lesson_topic_id: string | null };
-export const MESSAGE_COLUMNS = "id, group_id, owner_id, body, created_at, attachments, lesson_topic_id";
+// A poll (migration 64). Votes and voters are null until the reader has voted or the poll closed;
+// voters are listed only when the poll's maker chose to show names (study groups only).
+export type ChatPoll = {
+  id: string;
+  choices: { label: string; votes: number | null; voters: string[] | null }[];
+  total: number | null;
+  showNames: boolean;
+  closesAt: string;
+  closed: boolean;
+  mine: boolean;
+  myChoice: number | null;
+};
+export type MessageRow = { id: string; group_id: string; owner_id: string; body: string; created_at: string; attachments: Json; lesson_topic_id: string | null; poll: boolean };
+export const MESSAGE_COLUMNS = "id, group_id, owner_id, body, created_at, attachments, lesson_topic_id, poll";
 // A study group's "This week's topic": who set it and when.
 export type WeekTopic = { card: LessonCard; setBy: string; setAt: string };
 
@@ -68,10 +82,12 @@ export async function withAuthors(db: Db, rows: MessageRow[], me: string): Promi
   const ids = [...new Set(rows.map((r) => r.owner_id))];
   const paths = rows.flatMap((r) => filesOf(r.attachments).map((f) => f.path));
   const topics = [...new Set(rows.flatMap((r) => (r.lesson_topic_id ? [r.lesson_topic_id] : [])))];
-  const [people, signed, cards] = await Promise.all([
+  const polls = rows.flatMap((r) => (r.poll ? [r.id] : []));
+  const [people, signed, cards, pollsById] = await Promise.all([
     ids.length ? db.rpc("chat_people", { people: ids }) : Promise.resolve({ data: [], error: null }),
     paths.length ? db.storage.from("chat-files").createSignedUrls(paths, 3600) : Promise.resolve({ data: [], error: null }),
     lessonCards(db, topics),
+    pollCards(db, polls),
   ]);
   const byId = new Map((people.data ?? []).map((p) => [p.id, p]));
   const urls = new Map((signed.data ?? []).map((s) => [s.path ?? "", s.signedUrl ?? null]));
@@ -84,7 +100,44 @@ export async function withAuthors(db: Db, rows: MessageRow[], me: string): Promi
     mine: r.owner_id === me,
     files: filesOf(r.attachments).map(({ path, ...f }) => ({ ...f, url: urls.get(path) ?? null })),
     lesson: (r.lesson_topic_id && cards.get(r.lesson_topic_id)) || null,
+    poll: pollsById.get(r.id) ?? null,
   }));
+}
+
+function idsOf(value: Json | undefined): string[] {
+  return Array.isArray(value) ? value.filter((v): v is string => typeof v === "string") : [];
+}
+
+// Poll cards for these messages, by message id, with voters' names when shown.
+export async function pollCards(db: Db, messageIds: string[]): Promise<Map<string, ChatPoll>> {
+  if (!messageIds.length) return new Map();
+  const { data } = await db.rpc("chat_poll_cards", { messages: messageIds.slice(0, 100) });
+  const rows = data ?? [];
+  const voterIds = [...new Set(rows.flatMap((p) => (Array.isArray(p.voters) ? p.voters.flatMap((v) => idsOf(v)) : [])))];
+  const people = voterIds.length ? await db.rpc("chat_people", { people: voterIds }) : { data: [] };
+  const names = new Map((people.data ?? []).map((p) => [p.id, p.name]));
+  return new Map(
+    rows.map((p) => {
+      const voters = Array.isArray(p.voters) ? p.voters : null;
+      return [
+        p.message_id,
+        {
+          id: p.poll_id,
+          choices: p.choices.map((label, i) => ({
+            label,
+            votes: p.counts ? (p.counts[i] ?? 0) : null,
+            voters: voters ? idsOf(voters[i]).map((id) => names.get(id) ?? "Lawdeck student") : null,
+          })),
+          total: p.counts ? p.counts.reduce((a, b) => a + b, 0) : null,
+          showNames: p.show_names,
+          closesAt: p.closes_at,
+          closed: p.closed,
+          mine: p.mine,
+          myChoice: p.my_choice,
+        },
+      ];
+    }),
+  );
 }
 
 // What lesson cards show (topic, course, title, whether it was read in full), by topic.

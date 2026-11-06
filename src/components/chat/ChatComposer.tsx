@@ -23,6 +23,7 @@ export function ChatComposer({
   apiKey,
   voiceNotes = false,
   onShareLesson,
+  onPoll,
   onSend,
   error,
 }: {
@@ -31,6 +32,7 @@ export function ChatComposer({
   apiKey: string;
   voiceNotes?: boolean;
   onShareLesson?: () => void;
+  onPoll?: () => void;
   onSend: (text: string, picked: ChatPerson[], files: Attached[]) => Promise<boolean>;
   error?: string;
 }) {
@@ -192,6 +194,7 @@ export function ChatComposer({
           }}
           onVoice={voiceNotes && !recording ? () => setRecording(true) : undefined}
           onShareLesson={onShareLesson}
+          onPoll={onPoll}
           onSend={() => void send()}
         />
       </div>

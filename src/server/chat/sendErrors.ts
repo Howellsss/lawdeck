@@ -13,6 +13,8 @@ export function sendErrorMessage(error: { code?: string; message: string }): str
   if (error.message.includes("post_limit")) return "You’re sending messages very quickly. Please wait a minute, then try again.";
   if (error.message.includes("lesson_not_shareable")) return "That lesson can’t be shared right now: it is waiting for a reviewer. Please pick another topic.";
   if (error.message.includes("note_too_long")) return "A note can be up to 500 characters.";
+  if (error.message.includes("poll_invalid")) return "A poll needs a question (up to 200 characters) and 2 to 6 different choices (up to 80 characters each).";
+  if (error.message.includes("poll_names")) return "Names can be shown on polls in study groups only.";
   if (error.code === "42501") return "Please accept the community rules before posting.";
   return null;
 }
