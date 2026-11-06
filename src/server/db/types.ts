@@ -255,6 +255,12 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      campuses: {
+        Row: { key: string; name: string; kind: "campus" | "aspirant"; position: number };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       courses: {
         Row: {
           id: string;

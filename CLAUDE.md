@@ -54,6 +54,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - Templates and forum formatting profiles are data files validated by schema. One renderer makes preview, DOCX and PDF.
 - Unreviewed content and templates are never shown to students.
 - Course-wide approval of Topic Lessons was retired (founder, 2026-11-06): every lesson is read in full (Admin → Lessons → Read in full, one click per lesson) before students see it without a note. Lessons approved with their course before then keep showing students "Not yet read in full by a reviewer" with Report a problem until a reviewer reads them. Memory aid sets may still be approved a course at a time (founder, 2026-11-05).
+- Exception (founder, 2026-11-06): campus chat messages are students' own words and appear straight away, labelled as such, with Report a message, admin Hide, a posting limit, community rules, and vulgar or curse words blocked before sending (docs/specs/chat.md).
 
 ## Look (from the Lawdeck UI Design canvas)
 - Black and white, calm, input-first. Tokens live in `src/app/globals.css`.

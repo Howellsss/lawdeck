@@ -113,5 +113,11 @@ export async function getUserDetail(id: string): Promise<UserDetail | "missing" 
     throw new Error("This person's details could not be loaded.");
   }
   if (!data?.length) return "missing";
-  return Object.fromEntries(data.map((row) => [row.metric, row.value]));
+  const detail: UserDetail = Object.fromEntries(data.map((row) => [row.metric, row.value]));
+  // The campus is stored as its key (migration 54); show its name.
+  if (detail.campus) {
+    const campus = await supabase.from("campuses").select("name").eq("key", detail.campus).maybeSingle();
+    if (campus.data) detail.campus = campus.data.name;
+  }
+  return detail;
 }
