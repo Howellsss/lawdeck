@@ -7,7 +7,17 @@ import type { Json } from "@/server/db/types";
 // Campus chat reads (docs/specs/chat.md). Row-level security decides who sees what: staff only in
 // Phase 2, students once an admin opens chat; hidden messages are left out for students.
 
-export type ChatGroup = { id: string; key: string; name: string; kind: "all" | "campus" | "aspirants"; unread: number; members: number };
+export type ChatGroup = {
+  id: string;
+  key: string;
+  name: string;
+  kind: "all" | "campus" | "aspirants" | "study";
+  unread: number;
+  members: number;
+  // Study groups: whether the person looking created it.
+  mine: boolean;
+};
+export type ChatInvite = { groupId: string; groupName: string; invitedBy: string };
 export type ChatPerson = { id: string; name: string; campus: string | null };
 export type ChatFile = { name: string; kind: "pdf" | "docx" | "png" | "jpeg"; size: number; url: string | null };
 export type ChatMessage = { id: string; groupId: string; body: string; createdAt: string; author: ChatPerson; mine: boolean; files: ChatFile[] };
@@ -59,6 +69,7 @@ export async function withAuthors(db: Db, rows: MessageRow[], me: string): Promi
 
 export type ChatRoom = {
   me: ChatPerson;
+  invites: ChatInvite[];
   isAdmin: boolean;
   member: boolean;
   groups: ChatGroup[];
@@ -74,8 +85,9 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
   if (!account) return null;
   const db = await createSupabaseServerClient();
   if (!(await chatAllowed(db))) return null;
-  const [list, member, self] = await Promise.all([
-    listGroups(db),
+  const [list, invites, member, self] = await Promise.all([
+    listGroups(db, account.id),
+    listInvites(db),
     db.from("chat_members").select("owner_id").eq("owner_id", account.id).maybeSingle(),
     db.rpc("chat_people", { people: [account.id] }),
   ]);
@@ -92,6 +104,7 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
   const page = rows.data.slice(0, PAGE).reverse();
   return {
     me: self.data?.[0] ?? { id: account.id, name: "You", campus: null },
+    invites,
     isAdmin: (await getStaffRole()) === "admin",
     member: Boolean(member.data),
     groups: list,
@@ -101,20 +114,27 @@ export async function getChatRoom(groupKey: string): Promise<ChatRoom | null> {
   };
 }
 
-// The groups this person can see, with unread messages and member numbers.
-async function listGroups(db: Db): Promise<ChatGroup[]> {
+// The groups this person can see (campus groups first, then their study groups by name), with
+// unread messages and member numbers.
+async function listGroups(db: Db, me: string): Promise<ChatGroup[]> {
   const [groups, unread, members] = await Promise.all([
-    db.from("chat_groups").select("id, key, name, kind").order("position"),
+    db.from("chat_groups").select("id, key, name, kind, owner_id").order("position", { nullsFirst: false }).order("name"),
     db.rpc("chat_unread_counts"),
     db.rpc("chat_member_counts"),
   ]);
   if (groups.error) throw new Error("chat read failed");
   const counts = new Map((unread.data ?? []).map((u) => [u.group_id, Number(u.unread)]));
   const people = new Map((members.data ?? []).map((m) => [m.group_id, Number(m.members)]));
-  return groups.data.map((g) => ({ ...g, unread: counts.get(g.id) ?? 0, members: people.get(g.id) ?? 0 }));
+  return groups.data.map(({ owner_id, ...g }) => ({ ...g, unread: counts.get(g.id) ?? 0, members: people.get(g.id) ?? 0, mine: owner_id === me }));
 }
 
-export type ChatShared = { groups: ChatGroup[]; group: ChatGroup; items: ChatMessage[] };
+// Study group invitations waiting for this person.
+export async function listInvites(db: Db): Promise<ChatInvite[]> {
+  const { data } = await db.rpc("chat_my_invites");
+  return (data ?? []).map((i) => ({ groupId: i.group_id, groupName: i.group_name, invitedBy: i.invited_by }));
+}
+
+export type ChatShared = { groups: ChatGroup[]; invites: ChatInvite[]; group: ChatGroup; items: ChatMessage[] };
 
 // A group's "Files & links": the latest messages with a file or a web link, newest first.
 export async function getChatShared(groupKey: string): Promise<ChatShared | null> {
@@ -122,7 +142,7 @@ export async function getChatShared(groupKey: string): Promise<ChatShared | null
   if (!account) return null;
   const db = await createSupabaseServerClient();
   if (!(await chatAllowed(db))) return null;
-  const list = await listGroups(db);
+  const [list, invites] = await Promise.all([listGroups(db, account.id), listInvites(db)]);
   const group = list.find((g) => g.key === groupKey);
   if (!group) return null;
   const base = () => db.from("chat_messages").select(MESSAGE_COLUMNS).eq("group_id", group.id).is("hidden_at", null);
@@ -132,7 +152,30 @@ export async function getChatShared(groupKey: string): Promise<ChatShared | null
   ]);
   if (files.error || links.error) throw new Error("chat read failed");
   const rows = [...new Map([...files.data, ...links.data].map((m) => [m.id, m])).values()].sort((a, b) => b.created_at.localeCompare(a.created_at)).slice(0, 100);
-  return { groups: list, group, items: await withAuthors(db, rows, account.id) };
+  return { groups: list, invites, group, items: await withAuthors(db, rows, account.id) };
+}
+
+export type GroupPerson = ChatPerson & { status: "invited" | "member"; isOwner: boolean };
+export type ChatMembersPage = { groups: ChatGroup[]; invites: ChatInvite[]; group: ChatGroup; people: GroupPerson[]; me: string };
+
+// A study group's Members tab: who is in it and who is invited (members only).
+export async function getChatMembers(groupKey: string): Promise<ChatMembersPage | null> {
+  const account = await getCurrentAccount();
+  if (!account) return null;
+  const db = await createSupabaseServerClient();
+  if (!(await chatAllowed(db))) return null;
+  const [list, invites] = await Promise.all([listGroups(db, account.id), listInvites(db)]);
+  const group = list.find((g) => g.key === groupKey);
+  if (!group || group.kind !== "study") return null;
+  const { data, error } = await db.rpc("chat_group_people", { g: group.id });
+  if (error) throw new Error("chat read failed");
+  return {
+    groups: list,
+    invites,
+    group,
+    me: account.id,
+    people: data.map((p) => ({ id: p.id, name: p.name, campus: p.campus, status: p.status, isOwner: p.is_owner })),
+  };
 }
 
 // A group's name, if this person can see it (row-level security decides).

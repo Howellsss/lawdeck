@@ -1,5 +1,5 @@
 import type { ReactNode } from "react";
-import type { ChatGroup } from "@/server/chat/data";
+import type { ChatGroup, ChatInvite } from "@/server/chat/data";
 import { ChatGroupNav } from "./ChatGroupNav";
 import { ChatHeader, type ChatTab } from "./ChatHeader";
 
@@ -10,12 +10,14 @@ export function ChatShell({
   group,
   tab = "messages",
   ownCampusName,
+  invites = [],
   children,
 }: {
   groups: ChatGroup[];
   group: ChatGroup;
   tab?: ChatTab;
   ownCampusName: string | null;
+  invites?: ChatInvite[];
   children: ReactNode;
 }) {
   return (
@@ -25,11 +27,11 @@ export function ChatShell({
           <p className="font-serif text-xl">Campus chat</p>
         </div>
         <div className="min-h-0 flex-1 overflow-y-auto">
-          <ChatGroupNav groups={groups} current={group.key} ownCampusName={ownCampusName} />
+          <ChatGroupNav groups={groups} current={group.key} ownCampusName={ownCampusName} invites={invites} />
         </div>
       </aside>
       <section className="flex min-w-0 flex-1 flex-col">
-        <ChatHeader groups={groups} group={group} ownCampusName={ownCampusName} tab={tab} />
+        <ChatHeader groups={groups} group={group} ownCampusName={ownCampusName} invites={invites} tab={tab} />
         {children}
       </section>
     </div>
