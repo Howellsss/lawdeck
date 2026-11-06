@@ -41,8 +41,8 @@ Last updated: 2026-11-06 (campus chat voice notes).
   Everyone signed in sees Campus chat in the side menu and can send their ID while it is closed;
   the campus is asked there, not on the home page. Students also need pilot access to use chat.
   Slack-style message box (Add link box, Aa, emojis, @), member counts, Files & links tab
-  (migration 58). Full emoji pack. Study groups (migration 59). Founder's next set, in order:
-  voice notes (study groups only; audio ≤2 min, 5 MB, approved), group quiz like Kahoot from
+  (migration 58). Full emoji pack. Study groups (migration 59). Voice notes in study groups
+  (migration 60). Founder's next set, in order: group quiz like Kahoot from
   recall questions, study together (lesson cards), polls, LiveKit group calls (needs account,
   library and cost approval). Pilot invites run alongside (founder: build and invite now).
   Phase 4 (direct messages, private groups, reactions, threads) waits for the pilot.
