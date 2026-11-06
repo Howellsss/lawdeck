@@ -2,11 +2,12 @@
 
 import { Icon, type IconName } from "@/components/ui/Icon";
 
-export type Format = "bold" | "italic" | "strike" | "link" | "ul" | "ol" | "quote" | "code";
+export type Format = "bold" | "italic" | "underline" | "strike" | "link" | "ul" | "ol" | "quote" | "code";
 
 const BUTTONS: { f: Format; label: string; keys?: string; text?: string; icon?: IconName; cls?: string }[] = [
   { f: "bold", label: "Bold", keys: "Ctrl+B", text: "B", cls: "font-bold" },
   { f: "italic", label: "Italic", keys: "Ctrl+I", text: "I", cls: "italic font-serif text-[17px]" },
+  { f: "underline", label: "Underline", keys: "Ctrl+U", text: "U", cls: "underline underline-offset-2" },
   { f: "strike", label: "Strikethrough", text: "S", cls: "line-through" },
   { f: "link", label: "Link", keys: "Ctrl+K", icon: "link" },
   { f: "ol", label: "Numbered list", icon: "listNumber" },
@@ -15,13 +16,14 @@ const BUTTONS: { f: Format; label: string; keys?: string; text?: string; icon?: 
   { f: "code", label: "Code", icon: "code" },
 ];
 
-// The formatting row above the message box, as in Slack: each button wraps the selected words.
+// The formatting row above the message box, as in Slack: each button wraps the selected words;
+// Link opens the "Add link" box.
 export function FormatBar({ onFormat, disabled }: { onFormat: (f: Format) => void; disabled?: boolean }) {
   return (
     <div role="toolbar" aria-label="Formatting" className="flex items-center gap-0.5 overflow-x-auto px-2 pt-1.5">
       {BUTTONS.map((b, i) => (
         <span key={b.f} className="flex items-center">
-          {(i === 3 || i === 4 || i === 6) && <span aria-hidden className="mx-1 h-4 w-px bg-line" />}
+          {(i === 4 || i === 5 || i === 7) && <span aria-hidden className="mx-1 h-4 w-px bg-line" />}
           <button
             type="button"
             disabled={disabled}
@@ -49,15 +51,12 @@ export function applyFormat(text: string, start: number, end: number, f: Format)
   };
   if (f === "bold") return wrap("**", "**", "bold text");
   if (f === "italic") return wrap("_", "_", "italic text");
+  if (f === "underline") return wrap("++", "++", "underlined text");
   if (f === "strike") return wrap("~~", "~~", "struck text");
   if (f === "code" && picked.includes("\n")) return wrap("```\n", "\n```", "");
   if (f === "code") return wrap("`", "`", "code");
-  if (f === "link") {
-    const label = picked || "link text";
-    const next = `${text.slice(0, start)}[${label}](https://)${text.slice(end)}`;
-    const at = start + label.length + 3;
-    return { text: next, start: at, end: at + 8 };
-  }
+  // Links are added with the "Add link" box (LinkDialog), not typed markers.
+  if (f === "link") return { text, start, end };
   // Lists and quotes mark every line the selection touches.
   const lineStart = text.lastIndexOf("\n", start - 1) + 1;
   const lines = text.slice(lineStart, end).split("\n");

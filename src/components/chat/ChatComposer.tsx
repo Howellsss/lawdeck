@@ -1,19 +1,21 @@
 "use client";
 
 import { useEffect, useId, useRef, useState } from "react";
-import { Icon } from "@/components/ui/Icon";
 import type { ChatPerson } from "@/server/chat/data";
 import { findPeople } from "@/server/chat/actions";
-import { CHAT_FILE_ACCEPT } from "@/lib/chatFiles";
+import { linkLabels } from "@/lib/chatFormat";
 import { AttachmentChips } from "./AttachmentChips";
+import { ComposerBar } from "./ComposerBar";
+import { LinkNote, MentionList } from "./ComposerParts";
 import { applyFormat, FormatBar, type Format } from "./FormatBar";
+import { LinkDialog } from "./LinkDialog";
 import { useAttachments, type Attached } from "./useAttachments";
 
 export type { Attached };
 
-// The message box (Slack-style): formatting row, the text, @mention suggestions, Enter to send and
-// Shift+Enter for a new line. The text is sent as typed; names picked from the suggestions become
-// mentions on the server.
+// The message box (Slack-style): formatting row (Aa hides it), the text, @mention suggestions, files,
+// emojis, Enter to send and Shift+Enter for a new line. A link shows only its words while typing and
+// becomes a link when sent; names picked from the suggestions become mentions on the server.
 export function ChatComposer({
   groupId,
   groupName,
@@ -29,7 +31,6 @@ export function ChatComposer({
 }) {
   const id = useId();
   const attach = useAttachments(groupId, apiKey);
-  const picker = useRef<HTMLInputElement>(null);
   const box = useRef<HTMLTextAreaElement>(null);
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
@@ -37,6 +38,9 @@ export function ChatComposer({
   const [query, setQuery] = useState<string | null>(null);
   const [people, setPeople] = useState<ChatPerson[]>([]);
   const [active, setActive] = useState(0);
+  const [formatting, setFormatting] = useState(true);
+  const [links, setLinks] = useState<{ label: string; href: string }[]>([]);
+  const [linkBox, setLinkBox] = useState<{ text: string; start: number; end: number } | null>(null);
 
   // Grow with the text, up to about eight lines.
   useEffect(() => {
@@ -75,9 +79,32 @@ export function ChatComposer({
     });
   };
 
+  // Puts text where the cursor is (an emoji, or @ to start a mention).
+  const insert = (value: string, mention = false) => {
+    const el = box.current;
+    const start = el?.selectionStart ?? text.length;
+    const end = el?.selectionEnd ?? text.length;
+    const lead = mention && start > 0 && !/\s/.test(text[start - 1]) ? " " : "";
+    const next = text.slice(0, start) + lead + value + text.slice(end);
+    const at = start + lead.length + value.length;
+    setText(next);
+    requestAnimationFrame(() => (el?.focus(), el?.setSelectionRange(at, at)));
+  };
+
+  const addLink = (label: string, href: string) => {
+    const place = linkBox ?? { start: text.length, end: text.length };
+    const next = text.slice(0, place.start) + label + text.slice(place.end);
+    setText(next);
+    setLinks((list) => [...list.filter((l) => l.label !== label), { label, href }]);
+    setLinkBox(null);
+    const at = place.start + label.length;
+    requestAnimationFrame(() => (box.current?.focus(), box.current?.setSelectionRange(at, at)));
+  };
+
   const format = (f: Format) => {
     const el = box.current;
     if (!el) return;
+    if (f === "link") return setLinkBox({ text: text.slice(el.selectionStart, el.selectionEnd), start: el.selectionStart, end: el.selectionEnd });
     const result = applyFormat(text, el.selectionStart, el.selectionEnd, f);
     setText(result.text);
     requestAnimationFrame(() => (el.focus(), el.setSelectionRange(result.start, result.end)));
@@ -86,11 +113,13 @@ export function ChatComposer({
   const send = async () => {
     if ((!text.trim() && attach.ready.length === 0) || busy || attach.uploading) return;
     setBusy(true);
-    const sent = await onSend(text, picked.filter((p) => text.includes(`@${p.name}`)), attach.ready);
+    const body = linkLabels(text, links.filter((l) => text.includes(l.label)));
+    const sent = await onSend(body, picked.filter((p) => text.includes(`@${p.name}`)), attach.ready);
     setBusy(false);
     if (sent) {
       setText("");
       setPicked([]);
+      setLinks([]);
       attach.clear();
     }
     box.current?.focus();
@@ -111,9 +140,9 @@ export function ChatComposer({
       if (e.key === "Escape") return void (setQuery(null), setPeople([]));
     }
     const mod = e.metaKey || e.ctrlKey;
-    if (mod && ["b", "i", "k"].includes(e.key.toLowerCase())) {
+    if (mod && ["b", "i", "u", "k"].includes(e.key.toLowerCase())) {
       e.preventDefault();
-      format(({ b: "bold", i: "italic", k: "link" } as const)[e.key.toLowerCase() as "b" | "i" | "k"]);
+      format(({ b: "bold", i: "italic", u: "underline", k: "link" } as const)[e.key.toLowerCase() as "b" | "i" | "u" | "k"]);
       return;
     }
     if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
@@ -124,72 +153,40 @@ export function ChatComposer({
 
   return (
     <div className="relative px-4 pb-4 lg:px-6">
-      {people.length > 0 && query && (
-        <ul role="listbox" aria-label="People to mention" className="absolute bottom-full left-4 z-20 mb-1 w-72 overflow-hidden rounded-xl border border-line bg-paper py-1 shadow-lg lg:left-6">
-          {people.map((p, i) => (
-            <li key={p.id} role="option" aria-selected={i === active}>
-              <button
-                type="button"
-                onMouseDown={(e) => e.preventDefault()}
-                onClick={() => pick(p)}
-                className={`flex w-full items-baseline gap-2 px-3 py-1.5 text-left text-[14px] ${i === active ? "bg-pill" : ""}`}
-              >
-                <span className="font-medium">{p.name}</span>
-                {p.campus && <span className="text-[12px] text-muted">{p.campus}</span>}
-              </button>
-            </li>
-          ))}
-        </ul>
-      )}
+      {people.length > 0 && query && <MentionList people={people} active={active} onPick={pick} />}
       <div className="rounded-xl border border-line bg-surface focus-within:border-muted">
-        <FormatBar onFormat={format} disabled={busy} />
+        {formatting && <FormatBar onFormat={format} disabled={busy} />}
         <AttachmentChips files={attach.files} onRemove={attach.remove} />
-        <div className="flex items-end gap-2 px-3 pb-2">
-          <input
-            ref={picker}
-            type="file"
-            multiple
-            accept={CHAT_FILE_ACCEPT}
-            className="sr-only"
-            tabIndex={-1}
-            aria-hidden
-            onChange={(e) => (void attach.add(e.target.files), (e.target.value = ""))}
-          />
-          <button
-            type="button"
-            onClick={() => picker.current?.click()}
-            disabled={busy}
-            aria-label="Attach a file (PDF, Word or image, up to 25 MB)"
-            title="Attach a file"
-            className="mb-1 flex size-9 shrink-0 items-center justify-center rounded-lg text-muted hover:bg-pill hover:text-ink"
-          >
-            <Icon name="paperclip" size={18} />
-          </button>
-          <label htmlFor={`${id}-box`} className="sr-only">
-            Message {groupName}
-          </label>
-          <textarea
-            id={`${id}-box`}
-            ref={box}
-            rows={1}
-            value={text}
-            maxLength={4000}
-            placeholder={`Message ${groupName}`}
-            onChange={(e) => (setText(e.target.value), readMention(e.target.value, e.target.selectionStart))}
-            onKeyDown={onKeyDown}
-            className="min-h-[40px] flex-1 resize-none bg-transparent py-2 text-[16px] leading-[1.5] outline-none placeholder:text-muted lg:text-[15px]"
-          />
-          <button
-            type="button"
-            onClick={() => void send()}
-            disabled={busy || attach.uploading || (!text.trim() && attach.ready.length === 0)}
-            aria-label="Send message"
-            className="mb-1 flex size-9 shrink-0 items-center justify-center rounded-lg bg-ink text-on-ink disabled:bg-pill disabled:text-muted"
-          >
-            <Icon name="send" size={18} />
-          </button>
-        </div>
+        <label htmlFor={`${id}-box`} className="sr-only">
+          Message {groupName}
+        </label>
+        <textarea
+          id={`${id}-box`}
+          ref={box}
+          rows={1}
+          value={text}
+          maxLength={4000}
+          placeholder={`Message ${groupName}`}
+          onChange={(e) => (setText(e.target.value), readMention(e.target.value, e.target.selectionStart))}
+          onKeyDown={onKeyDown}
+          className="block min-h-[40px] w-full resize-none bg-transparent px-3 py-2 text-[16px] leading-[1.5] outline-none placeholder:text-muted lg:text-[15px]"
+        />
+        <LinkNote links={links.filter((l) => text.includes(l.label))} />
+        <ComposerBar
+          busy={busy}
+          canSend={!busy && !attach.uploading && (Boolean(text.trim()) || attach.ready.length > 0)}
+          formatting={formatting}
+          onFiles={(files) => void attach.add(files)}
+          onToggleFormatting={() => setFormatting((v) => !v)}
+          onInsert={(v) => insert(v)}
+          onMention={() => {
+            insert("@", true);
+            setQuery(null);
+          }}
+          onSend={() => void send()}
+        />
       </div>
+      {linkBox && <LinkDialog initialText={linkBox.text} onSave={addLink} onClose={() => setLinkBox(null)} />}
       <div className="flex min-h-5 items-start justify-between gap-3 pt-1 text-[12px] text-muted">
         {error || attach.problem ? (
           <p role="alert" className="text-warning">

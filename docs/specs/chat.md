@@ -74,6 +74,18 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
    - Admin → Chat checks: the "Open chat to students" switch (`chat_settings.open_to_students`),
      reported messages (`chat_report_queue`, admins only; "Dealt with" folded below), then
      verification requests. Open it after counsel reviews the terms and paid plans are on.
+3b. **Slack-style look (founder, 2026-11-06; option A, no new library):** migration 58.
+   - Message box: formatting row (Bold, Italic, Underline `++x++`, Strike, Link, lists, Quote, Code)
+     that **Aa** hides or shows; under the text, **+** attach, **Aa**, an emoji panel (40 everyday
+     emojis, Lawdeck's own list), **@** mention, and Send on the right. Video and audio clips, slash
+     commands and paragraph styles are left out.
+   - **Add link** box (Text and Link, Cancel and Save): the message box shows only the words; the
+     address is listed under the text and joined on sending. Only web addresses (https:// added when
+     left out).
+   - Group header: name, member count (`chat_member_counts()`: verified members who accepted the
+     rules, a number only), search inside the group (`/chat/search?in=group`), and the **Messages**
+     and **Files & links** tabs (`/chat/[group]/files`: files and web links shared in the group,
+     newest first).
 4. **Later (after the pilot):** direct messages, private groups, reactions, threads.
 
 ## Tests
@@ -89,5 +101,6 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
 - `tests/permissions/sql/9zf_chat_files_reports_test.sql` (files only in your own folder of your own
   groups, others' groups unreadable, file details checked, filters on file names, one report per
   person, reports private, only admins hide, show or list reports, the open switch admins only),
-  `tests/unit/chatFiles.test.ts`; `tests/voice/chat.spec.ts` checks file cards, the paperclip and the
+  `tests/unit/chatFiles.test.ts`; `tests/permissions/sql/9zg_chat_member_counts_test.sql` (counts only
+  for the groups you can see, verified members only, nothing for free accounts); `tests/voice/chat.spec.ts` checks file cards, the paperclip and the
   report form.

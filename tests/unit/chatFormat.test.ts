@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { linkMentions, messageTags, parseInline, parseMessage, plainText } from "@/lib/chatFormat";
+import { linkMentions, linksIn, messageTags, parseInline, parseMessage, plainText } from "@/lib/chatFormat";
 
 const ADA = "00000000-0000-4000-8000-0000000007a1";
 
@@ -59,5 +59,15 @@ describe("chat message formatting", () => {
 
   it("gives a plain one-line preview", () => {
     expect(plainText(`**Bold** _it_ [link](https://x.com) @[Ada](${ADA})\n\`code\``)).toBe("Bold it link @Ada code");
+  });
+
+  it("reads ++underline++ and lists a message's links with their words", () => {
+    expect(parseInline("++key++")).toEqual([{ t: "underline", c: [{ t: "text", v: "key" }] }]);
+    expect(plainText("++key++ point")).toBe("key point");
+    expect(linksIn("See [the notes](https://a.ng/n) and https://b.ng\n- **[bold link](https://c.ng)**")).toEqual([
+      { href: "https://a.ng/n", label: "the notes" },
+      { href: "https://b.ng", label: "https://b.ng" },
+      { href: "https://c.ng", label: "bold link" },
+    ]);
   });
 });

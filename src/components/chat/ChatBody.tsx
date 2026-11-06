@@ -13,6 +13,12 @@ function inline(items: Inline[], key = ""): ReactNode[] {
         return <strong key={k} className="font-semibold">{inline(item.c, `${k}-`)}</strong>;
       case "italic":
         return <em key={k}>{inline(item.c, `${k}-`)}</em>;
+      case "underline":
+        return (
+          <u key={k} className="underline-offset-2">
+            {inline(item.c, `${k}-`)}
+          </u>
+        );
       case "strike":
         return <s key={k}>{inline(item.c, `${k}-`)}</s>;
       case "code":

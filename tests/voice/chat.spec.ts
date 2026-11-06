@@ -39,6 +39,11 @@ for (const width of [360, 1280]) {
     await expect(files.getByText("Order 3 handout.pdf")).toBeVisible();
     await expect(files.getByText("PDF · 471 KB · not available")).toBeVisible();
     await expect(page.getByRole("button", { name: /Attach a file/ })).toBeVisible();
+
+    // The header: members (a number only), search in this group, and the two tabs.
+    await expect(page.getByText("42 members", { exact: true })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Files & links" })).toHaveAttribute("href", "/chat/lagos/files");
+    await expect(page.getByRole("link", { name: "Messages" })).toHaveAttribute("aria-current", "page");
     // Other people's messages can be reported with a reason; your own can be deleted, not reported.
     const handout = list.getByRole("listitem").filter({ hasText: "Here is the class handout." });
     await handout.hover();
@@ -50,6 +55,29 @@ for (const width of [360, 1280]) {
     await report.getByRole("button", { name: "Cancel" }).click();
     await expect(report).toHaveCount(0);
     await expect(page.getByRole("button", { name: "Hide this message" })).toHaveCount(0);
+    // Add link: the words show in the box; the address is kept until sending.
+    await box.fill("See ");
+    await page.getByRole("button", { name: "Link" }).click();
+    const dialog = page.getByRole("dialog", { name: "Add link" });
+    await dialog.getByLabel("Text").fill("Test");
+    await dialog.getByLabel("Link").fill("javascript:alert(1)");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await expect(dialog.getByRole("alert")).toContainText("web address");
+    await dialog.getByLabel("Link").fill("mylawdeck.com");
+    await dialog.getByRole("button", { name: "Save" }).click();
+    await expect(dialog).toHaveCount(0);
+    await expect(box).toHaveValue("See Test");
+    await expect(page.getByLabel("Links in this message")).toContainText("https://mylawdeck.com");
+    // Aa hides and shows the formatting row; the emoji button adds an emoji; @ starts a mention.
+    await page.getByRole("button", { name: "Hide formatting" }).click();
+    await expect(page.getByRole("toolbar", { name: "Formatting" })).toHaveCount(0);
+    await page.getByRole("button", { name: "Show formatting" }).click();
+    await expect(page.getByRole("button", { name: "Underline" })).toBeVisible();
+    await page.getByRole("button", { name: "Add an emoji" }).click();
+    await page.getByRole("button", { name: "thank you" }).click();
+    await expect(box).toHaveValue("See Test🙏");
+    await page.getByRole("button", { name: "Mention someone" }).click();
+    await expect(box).toHaveValue("See Test🙏 @");
     // Sending needs an account on the test page.
     await box.press("Enter");
     await expect(page.getByRole("alert").filter({ hasText: /sign in|isn’t open/i })).toBeVisible();
@@ -73,6 +101,20 @@ for (const width of [360, 1280]) {
     await expect(page.getByLabel("Your campus")).toHaveCount(0);
     await expect(page.getByLabel("Your university matriculation number")).toBeVisible();
     await expect(page.getByLabel(/university ID or final-year letter/).first()).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
+
+// A group's Files & links tab lists the files and links shared there.
+for (const width of [360, 1280]) {
+  test(`a group's Files & links lists shared files and links (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 860 });
+    await page.goto("/test-pages/chat-files");
+    await expect(page.getByRole("link", { name: "Files & links" })).toHaveAttribute("aria-current", "page");
+    const list = page.getByRole("list", { name: "Files and links in Lagos" });
+    await expect(list.getByText("Order 3 handout.pdf")).toBeVisible();
+    await expect(list.getByRole("link", { name: "the summary" })).toHaveAttribute("href", "https://mylawdeck.com/diary");
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);
   });
