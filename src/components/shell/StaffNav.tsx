@@ -28,6 +28,12 @@ export function StaffNav({ isAdmin = false }: { isAdmin?: boolean }) {
         <Icon name="document" size={NAV_ICON_SIZE} />
         <span className={collapsed ? "sr-only" : ""}>Templates</span>
       </NavLink>
+      {isAdmin && (
+        <NavLink href="/admin/chat" onNavigate={onNavigate} className={itemClass} match="prefix">
+          <Icon name="chat" size={NAV_ICON_SIZE} />
+          <span className={collapsed ? "sr-only" : ""}>Chat checks</span>
+        </NavLink>
+      )}
       <NavLink href="/admin/reports" onNavigate={onNavigate} className={itemClass} match="prefix">
         <Icon name="bookmark" size={NAV_ICON_SIZE} />
         <span className={collapsed ? "sr-only" : ""}>Reports</span>
