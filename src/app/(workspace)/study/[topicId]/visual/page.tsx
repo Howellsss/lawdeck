@@ -13,7 +13,7 @@ export const metadata: Metadata = { title: "Visual revision · Lawdeck" };
 // Visual Revision Mode (docs/specs/remembrance.md, Phase 3b): a topic's marked points, filtered.
 export default function VisualRevisionPage({ params }: PageProps<"/study/[topicId]/visual">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 lg:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the points to revise" />}>
         <Visual params={params} />
       </Suspense>

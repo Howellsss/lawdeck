@@ -19,7 +19,7 @@ const CONTEXT: Record<string, string> = { reading: "while reading", test: "topic
 // remembrance tools, my recall performance, what I need to revisit, and my notes.
 export default function DiaryEntryPage({ params }: PageProps<"/diary/[sessionId]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 lg:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the entry" />}>
         <Entry params={params} />
       </Suspense>

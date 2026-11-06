@@ -19,7 +19,7 @@ export async function BeforeYouMoveOn({ compact = false }: { compact?: boolean }
   return (
     <section
       aria-labelledby="before-you-move-on"
-      className={`flex w-full flex-col gap-2 rounded-2xl border border-line bg-surface ${compact ? "p-4" : "max-w-[44rem] p-5"}`}
+      className={`flex w-full flex-col gap-2 rounded-2xl border border-line bg-surface ${compact ? "p-4" : "p-5"}`}
     >
       <p id="before-you-move-on" className="text-xs uppercase tracking-[0.14em] text-muted">
         Before you move on…

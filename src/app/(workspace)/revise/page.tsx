@@ -11,7 +11,7 @@ export const metadata: Metadata = { title: "Memory challenge · Lawdeck" };
 // "Before you move on" (docs/specs/remembrance.md, Phase 1d): the questions due for revision.
 export default function RevisePage() {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 lg:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading your revision" />}>
         <Revise />
       </Suspense>

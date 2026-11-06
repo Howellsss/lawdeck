@@ -38,7 +38,7 @@ async function TestDiary() {
   if (!testPagesEnabled()) notFound();
   const entries = [entry(1, "2026-11-05", "due"), entry(2, "2026-11-05", "upcoming"), entry(3, "2026-11-04", "none")];
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10">
       <h1 className="font-serif text-3xl font-normal text-greeting">Study Diary</h1>
       <DiaryStats totals={{ topics: 3, completed: 1, minutes: 104, answered: 24, correct: 17, dueNow: 4 }} />
       <DiaryFilters filter={{}} courses={[{ slug: "civil-litigation", name: "Civil Litigation" }]} topics={entries.map((e) => ({ id: e.topicId, name: e.topicName }))} />
