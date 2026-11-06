@@ -105,8 +105,16 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      the database checks study group only, one per message, 2 minutes and 5 MB. Played with play,
      pause, progress and 1x / 1.5x / 2x. Security headers allow the microphone on Lawdeck and
      playback from the Supabase store.
-   - **4c Group quiz (Kahoot-style):** from approved recall questions (no AI cost), live timer,
-     points and leaderboard.
+   - **4c Group quiz, like Kahoot (built, migration 61):** a Quiz tab in each study group. A member
+     hosts: a topic (only topics whose approved lesson has at least 3 multiple-choice recall
+     questions), 3 to 10 questions, 10 to 60 seconds each; the group gets a message. Members join in
+     the lobby; the host starts and moves on. Each question shows a timer and large A–D buttons; the
+     right answer and explanation stay in the database until the question closes (time up or
+     everyone answered). A right answer scores 500 to 1000 points (faster scores more); a
+     leaderboard follows each question and ends the quiz. One quiz at a time per group (an open quiz
+     older than 3 hours counts as finished); the host or the group's creator can end it early.
+     Screens check for changes every second while a quiz is on (no live connection, no library).
+     No AI cost. All reads and changes go through database functions.
    - **4d Study together:** share topic lessons as cards; "This week's topic".
    - **4e Polls** in groups (founder chose polls over an ideas board).
    - **4f Group calls with LiveKit** (founder's choice): needs a LiveKit account and approval of its
@@ -137,3 +145,6 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
 - `tests/permissions/sql/9zi_chat_voice_notes_test.sql` (study groups only, 5 MB, 2 minutes, audio
   only, one per message); unit checks of audio types in `tests/unit/chatFiles.test.ts`; test page
   `/test-pages/chat-study` (voice note player, record button only in study groups).
+- `tests/permissions/sql/9zj_chat_quizzes_test.sql` (study groups only, members only, one quiz at a
+  time, answer hidden until the question closes, one answer each, the timer, host-only controls,
+  scoring, no direct table access); `tests/unit/quiz.test.ts`; test page `/test-pages/chat-quiz`.

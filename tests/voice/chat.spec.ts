@@ -176,3 +176,38 @@ for (const width of [360, 1280]) {
     await expect(page.getByRole("button", { name: "Record a voice note" })).toHaveCount(0);
   });
 }
+
+// Group quiz like Kahoot (founder, 2026-11-06): host form, a timed question, the reveal and results.
+for (const width of [360, 1280]) {
+  test(`group quiz: host, answer, reveal and results (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 900 });
+    await page.goto("/test-pages/chat-quiz");
+    await expect(page.getByRole("link", { name: "Quiz" })).toHaveAttribute("aria-current", "page");
+    const setup = page.getByRole("form", { name: "Host a quiz" });
+    await expect(setup.getByRole("button", { name: "Create quiz" })).toBeDisabled();
+    await setup.getByLabel("Topic").selectOption({ label: "Bail (6 questions)" });
+    await expect(setup.getByRole("button", { name: "Create quiz" })).toBeEnabled();
+
+    await page.goto("/test-pages/chat-quiz?s=live");
+    const question = page.getByRole("region", { name: "Question 2 of 5" });
+    await expect(question.getByText("12s")).toBeVisible();
+    await expect(question.getByText("1 of 3 answered.")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Next question" })).toBeDisabled();
+    // Answering needs an account here: the student is told, nothing is made up.
+    await question.getByRole("button", { name: /Originating summons/ }).click();
+    await expect(page.getByRole("alert").filter({ hasText: /sign in/i })).toBeVisible();
+
+    await page.goto("/test-pages/chat-quiz?s=closed");
+    await expect(page.getByText("Correct! +860 points")).toBeVisible();
+    await expect(page.getByText("Right answer")).toBeVisible();
+    await expect(page.getByRole("region", { name: "Leaderboard" }).getByText("1st")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Next question" })).toBeEnabled();
+
+    await page.goto("/test-pages/chat-quiz?s=done");
+    const results = page.getByRole("region", { name: "Final leaderboard" });
+    await expect(results.getByText("Ada Wombat")).toBeVisible();
+    await expect(results.getByText("(you)")).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}
