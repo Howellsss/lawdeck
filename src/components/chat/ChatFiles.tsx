@@ -1,6 +1,7 @@
 import { Icon } from "@/components/ui/Icon";
 import { fileSize, isImage, kindLabel } from "@/lib/chatFiles";
 import type { ChatFile } from "@/server/chat/data";
+import { VoiceNote } from "./VoiceNote";
 
 // Files in a message: pictures as small previews, documents as cards with name, kind and size.
 // Links are short-lived and private to people in the group.
@@ -10,7 +11,9 @@ export function ChatFiles({ files }: { files: ChatFile[] }) {
     <ul className="mt-1.5 flex flex-wrap gap-2" aria-label="Attached files">
       {files.map((f, i) => (
         <li key={`${f.name}-${i}`}>
-          {isImage(f.kind) && f.url ? (
+          {f.kind === "voice" ? (
+            <VoiceNote url={f.url} seconds={f.seconds ?? 0} />
+          ) : isImage(f.kind) && f.url ? (
             <a href={f.url} target="_blank" rel="noopener noreferrer" className="block overflow-hidden rounded-lg border border-line" aria-label={`Open picture ${f.name}`}>
               {/* eslint-disable-next-line @next/next/no-img-element -- private short-lived links; not optimisable */}
               <img src={f.url} alt={f.name} className="max-h-60 max-w-[min(18rem,70vw)] object-cover" loading="lazy" />

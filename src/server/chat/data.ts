@@ -19,7 +19,7 @@ export type ChatGroup = {
 };
 export type ChatInvite = { groupId: string; groupName: string; invitedBy: string };
 export type ChatPerson = { id: string; name: string; campus: string | null };
-export type ChatFile = { name: string; kind: "pdf" | "docx" | "png" | "jpeg"; size: number; url: string | null };
+export type ChatFile = { name: string; kind: "pdf" | "docx" | "png" | "jpeg" | "voice"; size: number; url: string | null; seconds?: number };
 export type ChatMessage = { id: string; groupId: string; body: string; createdAt: string; author: ChatPerson; mine: boolean; files: ChatFile[] };
 export type MessageRow = { id: string; group_id: string; owner_id: string; body: string; created_at: string; attachments: Json };
 export const MESSAGE_COLUMNS = "id, group_id, owner_id, body, created_at, attachments";
@@ -34,12 +34,15 @@ export async function chatAllowed(db?: Db): Promise<boolean> {
   return !error && data === true;
 }
 
-function filesOf(value: Json): { path: string; name: string; kind: ChatFile["kind"]; size: number }[] {
+type StoredFile = { path: string; name: string; kind: ChatFile["kind"]; size: number; seconds?: number };
+
+function filesOf(value: Json): StoredFile[] {
   if (!Array.isArray(value)) return [];
-  return value.flatMap((f) => {
+  return value.flatMap((f): StoredFile[] => {
     if (!f || typeof f !== "object" || Array.isArray(f)) return [];
-    const { path, name, kind, size } = f as Record<string, unknown>;
+    const { path, name, kind, size, seconds } = f as Record<string, unknown>;
     if (typeof path !== "string" || typeof name !== "string" || typeof size !== "number") return [];
+    if (kind === "voice") return [{ path, name, kind, size, seconds: typeof seconds === "number" ? seconds : 0 }];
     if (kind !== "pdf" && kind !== "docx" && kind !== "png" && kind !== "jpeg") return [];
     return [{ path, name, kind, size }];
   });

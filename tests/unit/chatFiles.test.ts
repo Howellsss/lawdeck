@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vitest";
-import { CHAT_MAX_FILES, chatFileProblem, fileSize, isImage, kindLabel } from "@/lib/chatFiles";
+import { CHAT_MAX_FILES, chatFileProblem, clock, detectAudioKind, fileSize, isImage, kindLabel, voiceFormatFor } from "@/lib/chatFiles";
 
 describe("chat files", () => {
   it("accepts PDF, Word, PNG and JPEG up to 25 MB", () => {
@@ -21,5 +21,21 @@ describe("chat files", () => {
     expect(isImage("jpeg")).toBe(true);
     expect(isImage("pdf")).toBe(false);
     expect(kindLabel("docx")).toBe("Word");
+  });
+
+  it("knows voice notes by their first bytes, never their name", () => {
+    expect(detectAudioKind(new Uint8Array([0x1a, 0x45, 0xdf, 0xa3, 1, 2]))).toBe("webm");
+    expect(detectAudioKind(new Uint8Array([0x4f, 0x67, 0x67, 0x53, 0]))).toBe("ogg");
+    expect(detectAudioKind(new Uint8Array([0, 0, 0, 0x20, 0x66, 0x74, 0x79, 0x70, 0x4d, 0x34, 0x41]))).toBe("m4a");
+    expect(detectAudioKind(new TextEncoder().encode("%PDF-1.7"))).toBeNull();
+  });
+  it("names the recording format each browser makes, and shows lengths as m:ss", () => {
+    expect(voiceFormatFor("audio/webm;codecs=opus")).toBe("webm");
+    expect(voiceFormatFor("audio/mp4")).toBe("m4a");
+    expect(voiceFormatFor("audio/ogg; codecs=opus")).toBe("ogg");
+    expect(voiceFormatFor("audio/wav")).toBeNull();
+    expect(clock(65.4)).toBe("1:05");
+    expect(clock(120)).toBe("2:00");
+    expect(kindLabel("voice")).toBe("Voice note");
   });
 });

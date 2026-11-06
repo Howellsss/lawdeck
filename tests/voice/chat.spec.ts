@@ -155,3 +155,24 @@ for (const width of [360, 1280]) {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+// Voice notes (founder, 2026-11-06): study groups only; up to 2 minutes.
+for (const width of [360, 1280]) {
+  test(`voice notes show in study groups, with a record button only there (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 860 });
+    await page.goto("/test-pages/chat-study");
+    await expect(page.getByText("Voice note · 0:42 · not available")).toBeVisible();
+    await page.getByRole("button", { name: "Record a voice note" }).click();
+    // The test browser has no microphone: the student is told what to do instead of a silent failure.
+    const voice = page.getByRole("group", { name: "Voice note" });
+    await expect(voice.getByRole("alert")).toContainText("microphone");
+    await voice.getByRole("button", { name: "Cancel" }).click();
+    await expect(voice).toHaveCount(0);
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+
+    await page.goto("/test-pages/chat");
+    await expect(page.getByRole("button", { name: "Attach a file (PDF, Word or image, up to 25 MB)" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "Record a voice note" })).toHaveCount(0);
+  });
+}
