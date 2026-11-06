@@ -31,10 +31,12 @@ type SidebarProps = {
   recents?: React.ReactNode;
   // The Library link for reviewers and admins (see StaffNavSlot).
   staffNav?: React.ReactNode;
+  // Campus chat, for people it is open to (see ChatNavSlot).
+  chatNav?: React.ReactNode;
   // The reading voice choice for signed-in people (see VoiceSlot).
 };
 
-export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav }: SidebarProps) {
+export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, closeButton, account, recents, staffNav, chatNav }: SidebarProps) {
   const itemClass = (active: boolean) => navItemClass(active, collapsed);
   const label = (text: string) => <span className={collapsed ? "sr-only" : ""}>{text}</span>;
 
@@ -82,6 +84,7 @@ export function Sidebar({ collapsed = false, onToggleCollapse, onNavigate, close
                 {label(link.label)}
               </NavLink>
             ))}
+            {chatNav}
           </div>
           {staffNav}
 

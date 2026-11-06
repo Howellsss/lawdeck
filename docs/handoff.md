@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat Phase 1).
+Last updated: 2026-11-06 (campus chat Phase 2).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-06 (campus chat Phase 1).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **54** (`20261106005400_campuses.sql`, campus chat Phase 1).
+  merge only after that. The latest is **55** (`20261106005500_campus_chat.sql`, campus chat Phase 2).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -32,8 +32,9 @@ Last updated: 2026-11-06 (campus chat Phase 1).
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
-  Phase 1 campus choice built (migration 54, draft campus list awaiting the founder's confirmation).
-  Next: Phase 2 campus groups (admins only), Phase 3 files and safety, then open to students.
+  Phase 1 campus choice (migration 54, live; seven campuses + aspirant). Phase 2 campus groups
+  built (migration 55; staff only). Next: Phase 3 files, Report and admin Hide, an admin switch to
+  open chat to students (`chat_settings.open_to_students`), then open.
 - **Plans, credits and Flutterwave payments:** being built in a separate session; check its branch
   and pull request before touching `src/server/limits` or billing.
 
