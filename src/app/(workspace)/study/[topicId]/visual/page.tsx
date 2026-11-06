@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
 import { VisualRevision } from "@/components/study/VisualRevision";
+import { TopicStories } from "@/components/study/TopicStories";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { topicIdSchema } from "@/schemas/lesson";
@@ -37,6 +38,7 @@ async function Visual({ params }: { params: Promise<{ topicId: string }> }) {
         <h1 className="font-serif text-3xl font-normal text-greeting">Revise visually: {data.topic.name}</h1>
         <p className="text-muted">The important points of this topic, each in its own sentence, without rereading every paragraph.</p>
       </div>
+      {data.lesson && <TopicStories stories={data.stories} authorityNames={new Map(data.authorities.map((a) => [a.key, a.name]))} />}
       {data.lesson ? (
         <VisualRevision topicId={data.topic.id} content={data.lesson.content} annotations={data.annotations} authorities={data.authorities} />
       ) : (

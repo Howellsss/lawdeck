@@ -158,6 +158,13 @@ learning record is its owner's alone (staff do not read them); one session per t
 - Tests: `tests/unit/progress.test.ts`; `tests/voice/progress.spec.ts` (360 px and desktop); e2e:
   `/progress` asks visitors to sign in.
 
+## Stories easy to find (founder, 2026-11-06)
+- **Stories in this topic (n)** at the top of a topic's lesson and of Revise visually lists every
+  approved story (`TopicStories`), open by default; each opens in place with its quick question.
+- Under a section, a story is a card of its own (book symbol, "Story" or "Case story", title,
+  "Read it ›") instead of a plain button. Same stories, no AI, no database change.
+- Tests: `tests/voice/lessonAids.spec.ts` (test page `/test-pages/topic-stories`, 360 px and desktop).
+
 ## Writing and approving many lessons (founder, 2026-11-05)
 - **Write all missing lessons** (Admin → Lessons): for all courses or one, writes every topic that
   has no lesson, 2 at a time, through the same route as a single lesson. Shows the estimated cost

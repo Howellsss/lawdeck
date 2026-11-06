@@ -6,6 +6,7 @@ import { BeforeYouMoveOn } from "@/components/study/BeforeYouMoveOn";
 import { BulkApprovedNote } from "@/components/study/BulkApprovedNote";
 import { LessonReader } from "@/components/study/LessonReader";
 import { SavedAids } from "@/components/study/SavedAids";
+import { TopicStories } from "@/components/study/TopicStories";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { topicIdSchema } from "@/schemas/lesson";
@@ -49,6 +50,7 @@ async function Study({ params }: { params: Promise<{ topicId: string }> }) {
         <BeforeYouMoveOn compact />
       </Suspense>
       {data.lesson?.bulkApproved && <BulkApprovedNote lessonId={data.lesson.id} />}
+      {data.lesson && <TopicStories stories={data.stories} authorityNames={new Map(data.authorities.map((a) => [a.key, a.name]))} />}
       <SavedAids aids={data.savedAids} />
       {data.lesson ? (
         <LessonReader data={{ ...data, lesson: data.lesson }} />

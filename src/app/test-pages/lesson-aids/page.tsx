@@ -4,6 +4,7 @@ import { Suspense } from "react";
 import { SavedAids } from "@/components/study/SavedAids";
 import { SectionExtras } from "@/components/study/SectionExtras";
 import { testPagesEnabled } from "../sample";
+import { sampleStories } from "../sampleStories";
 
 // Memory aids and stories as students see them (tests/voice/lessonAids.spec.ts): made-up law about
 // made-up places, not legal content. "Not found" unless LAWDECK_TEST_PAGES=1.
@@ -47,30 +48,7 @@ async function TestLessonAids() {
             saved: false,
           },
         ]}
-        stories={[
-          {
-            id: id(3),
-            afterSection: 0,
-            kind: "everyday",
-            title: "Chidi's poultry licence",
-            authorityKey: null,
-            parts: [{ heading: "What happened", text: "Chidi in Ibadan paid ₦50,000 but no officer came to inspect his made-up farm." }],
-            takeaway: "No inspection, no valid licence.",
-            question: "Is Chidi's made-up licence valid?",
-            choices: ["Yes", "No"],
-          },
-          {
-            id: id(4),
-            afterSection: 0,
-            kind: "case",
-            title: "The farm that was never inspected",
-            authorityKey: "quokka-v-numbat",
-            parts: [{ heading: "The decision", text: "A made-up court held the made-up licence void." }],
-            takeaway: "Inspection is a condition of validity.",
-            question: null,
-            choices: null,
-          },
-        ]}
+        stories={sampleStories}
       />
     </div>
   );
