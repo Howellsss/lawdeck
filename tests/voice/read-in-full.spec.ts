@@ -18,6 +18,9 @@ for (const width of [360, 1200]) {
     await expect(page.getByText("Still to tick: section 2, the test.")).toBeVisible();
     await expect(page.getByRole("button", { name: "Approve as read in full" })).toBeDisabled();
     await expect(page.getByRole("button", { name: "Send back for a fix" })).toHaveCount(0);
+    // One click per lesson: at the top (always in view) and at the end.
+    await expect(page.getByRole("button", { name: "All correct: approve and next" })).toBeVisible();
+    await expect(page.getByRole("button", { name: "All correct: tick everything, approve and go to the next lesson" })).toBeVisible();
 
     // A problem needs a note before it can be saved.
     await page.getByRole("button", { name: "Problem…" }).first().click();

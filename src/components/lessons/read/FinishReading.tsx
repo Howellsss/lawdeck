@@ -6,6 +6,7 @@ import { useState } from "react";
 import { FormAlert } from "@/components/ui/FormAlert";
 import { compactPrimaryButton, compactSecondaryButton } from "@/components/ui/buttons";
 import type { ReadingState } from "@/lib/readInFull";
+import { CheckAllButton } from "./CheckAllButton";
 import { finishReading } from "@/server/lessons/readInFull";
 
 // The end of a lesson read in full: approve (every section checked) or send it back with the
@@ -56,6 +57,7 @@ export function FinishReading({
           Everything is checked. Memory aids and stories are reviewed separately on the lesson&rsquo;s full page.
         </p>
       )}
+      {state.missing.length > 0 && state.problems.length === 0 && <CheckAllButton lessonId={lessonId} version={version} />}
       <div className="flex flex-wrap items-center gap-2">
         <button type="button" disabled={busy || !state.canApprove} onClick={() => void finish("approve")} className={compactPrimaryButton}>
           Approve as read in full

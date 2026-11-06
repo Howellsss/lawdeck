@@ -6,6 +6,7 @@ import { LessonBody } from "@/components/lessons/LessonBody";
 import { authorityKeysInSection, partsToRead, readingState, type SectionTick as Tick } from "@/lib/readInFull";
 import type { LessonContent } from "@/schemas/lesson";
 import type { Authority, Checkpoint } from "@/server/db/lessons";
+import { CheckAllButton } from "./CheckAllButton";
 import { FinishReading } from "./FinishReading";
 import { SectionEvidence } from "./SectionEvidence";
 import { SectionTick } from "./SectionTick";
@@ -39,10 +40,13 @@ export function ReadInFull({
 
   return (
     <div className="flex flex-col gap-6">
-      <p className="sticky top-0 z-10 -mx-4 border-b border-line bg-paper/95 px-4 py-2 text-sm backdrop-blur" aria-live="polite">
-        {state.checked + state.problems.length} of {state.sections} ticked
-        {state.problems.length ? <span className="text-warning"> · {state.problems.length} problem{state.problems.length === 1 ? "" : "s"}</span> : ""}
-      </p>
+      <div className="sticky top-0 z-10 -mx-4 flex flex-wrap items-center justify-between gap-2 border-b border-line bg-paper/95 px-4 py-2 backdrop-blur">
+        <p className="text-sm" aria-live="polite">
+          {state.checked + state.problems.length} of {state.sections} ticked
+          {state.problems.length ? <span className="text-warning"> · {state.problems.length} problem{state.problems.length === 1 ? "" : "s"}</span> : ""}
+        </p>
+        {state.problems.length === 0 && <CheckAllButton lessonId={lessonId} version={version} compact />}
+      </div>
       <HighlightFrame>
         <LessonBody
           content={content}

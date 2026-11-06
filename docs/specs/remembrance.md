@@ -183,6 +183,10 @@ learning record is its owner's alone (staff do not read them); one session per t
   approves and clears the course mark, so students' "Not yet read in full" note disappears. **Send
   back for a fix** (any problem) rejects the lesson with the problems, by section, as its note. The
   server re-reads the ticks before either (`src/server/lessons/readInFull.ts`). No AI cost.
+- **One click per lesson** (founder, 2026-11-06, chosen over a course-wide "read in full" that
+  nobody read): "All correct: approve and next", always in view at the top and at the end, ticks
+  every section not yet ticked as checked by this reviewer, approves as read in full and opens the
+  next lesson. Not offered, and refused by the server, while any section is marked a problem.
 - Tests: `tests/unit/readInFull.test.ts`; `tests/permissions/sql/9zb_lesson_section_checks_test.sql`;
   `tests/voice/read-in-full.spec.ts` (360 px and desktop); e2e: the page is hidden from visitors.
 
