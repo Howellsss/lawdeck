@@ -45,6 +45,11 @@ const PATHS = {
   expand: "M12 3.5h4.5V8M16.5 3.5L11 9M8 16.5H3.5V12M3.5 16.5L9 11",
   collapse: "M11.5 4v4.5H16M11.5 8.5L17 3M8.5 16v-4.5H4M8.5 11.5L3 17",
   more: "M4 10a1 1 0 102 0 1 1 0 10-2 0zM9 10a1 1 0 102 0 1 1 0 10-2 0zM14 10a1 1 0 102 0 1 1 0 10-2 0z",
+  // Study group calls.
+  phone: "M5.5 3h2.5l1.5 4-2 1.5a8 8 0 004 4l1.5-2 4 1.5v2.5a1.5 1.5 0 01-1.5 1.5A13.5 13.5 0 014 4.5 1.5 1.5 0 015.5 3z",
+  video: "M2.5 5.5h10v9h-10zM12.5 8.5l5-3v9l-5-3",
+  videoOff: "M2.5 5.5h10v9h-10zM12.5 8.5l5-3v9l-5-3M2 3l16 14",
+  micOff: "M10 2.5a2.5 2.5 0 00-2.5 2.5v5a2.5 2.5 0 005 0V5A2.5 2.5 0 0010 2.5zM5 9.5a5 5 0 0010 0M10 14.5v3M7 17.5h6M3 3l14 14",
 } as const;
 
 export type IconName = keyof typeof PATHS;

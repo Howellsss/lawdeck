@@ -12,6 +12,7 @@ import { z } from "@/lib/zod";
 import { getCurrentAccount } from "@/server/auth/session";
 import { getSupabaseConfig } from "@/server/auth/config";
 import { chatAllowed, getChatRoom } from "@/server/chat/data";
+import { callsEnabled } from "@/server/chat/livekit";
 
 export const metadata: Metadata = { title: "Campus chat · Lawdeck" };
 
@@ -42,6 +43,7 @@ async function Group({ params }: { params: Promise<{ group: string }> }) {
           studyGroup={room.group.kind === "study"}
           canSetWeekTopic={room.group.kind === "study" && room.group.mine}
           initialWeekTopic={room.weekTopic}
+          calls={room.group.kind === "study" && callsEnabled()}
         />
       ) : (
         <ChatRules />

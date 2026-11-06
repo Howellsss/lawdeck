@@ -10,9 +10,11 @@ for (const path of ["/", "/sign-in", "/sign-up", "/takedown", "/courses"]) {
     expect(headers["x-frame-options"]).toBe("DENY");
     expect(headers["x-content-type-options"]).toBe("nosniff");
     expect(headers["referrer-policy"]).toBe("strict-origin-when-cross-origin");
-    expect(headers["permissions-policy"]).toContain("camera=()");
-    // The microphone only on Lawdeck's own pages, for speaking a question; never for other sites.
+    // The camera and microphone only on Lawdeck's own pages (speaking a question, voice notes and
+    // study group calls); never for other sites. Location, payment and USB stay off.
+    expect(headers["permissions-policy"]).toContain("camera=(self)");
     expect(headers["permissions-policy"]).toContain("microphone=(self)");
+    expect(headers["permissions-policy"]).toContain("geolocation=()");
     expect(headers["strict-transport-security"]).toContain("max-age=");
     expect(headers["content-security-policy-report-only"]).toContain("frame-ancestors 'none'");
   });

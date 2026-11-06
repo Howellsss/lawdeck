@@ -142,8 +142,19 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      go through the word filter, contact-details check and posting limit; Report and admin Hide work
      on the message, and deleting it deletes the poll. Open polls on screen refresh every few
      seconds. Poll tables are read and written only through checked database functions.
-   - **4f Group calls with LiveKit** (founder's choice): needs a LiveKit account and approval of its
-     library and costs.
+   - **4f Group calls (built, migration 65; founder approved LiveKit Cloud, the `livekit-client`
+     library and starting on LiveKit's free plan):** study groups only. A call line at the top of
+     the group: "Start a call", or "Call in progress" with who is in it and Join (checked every 10
+     seconds). In the call: a tile per person (initials, or video when their camera is on; a ring
+     while speaking), Mute, Camera on/off and Leave. Audio first: everyone joins with the camera
+     off. At most 15 people; a call lasts up to 3 hours; never recorded. The server checks the
+     student is a member, then gives a 10-minute pass for that call's room only (signed on the
+     server; LiveKit keys only in Vercel settings, `src/server/chat/livekit.ts`). The browser checks
+     in every 30 seconds; minutes are counted per person for a monthly limit (Admin -> Chat, default
+     4,500, just under the free plan's 5,000), and when it is reached calls end and none start until
+     the 1st (West Africa Time). LiveKit's code loads only when a student joins a call. The camera
+     is now allowed on Lawdeck's own pages (security headers), as the microphone already was.
+     Until the three LiveKit settings are added in Vercel, the call line stays hidden.
    - Later still: direct messages, reactions, threads, editing a sent message, notifications
      outside Lawdeck.
 
