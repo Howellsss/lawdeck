@@ -148,7 +148,7 @@ for (const width of [360, 1280]) {
     await expect(page.getByRole("heading", { name: /Members \(2\)/ })).toContainText("1 invited");
     await expect(page.getByText("Created the group")).toBeVisible();
     await expect(page.getByRole("button", { name: "Remove" })).toHaveCount(2);
-    await expect(page.getByLabel("Group name")).toHaveValue("Civil Lit squad");
+    await expect(page.getByRole("textbox", { name: "Group name" })).toHaveValue("Civil Lit squad");
     await expect(page.getByRole("button", { name: "Delete group" })).toBeVisible();
     await expect(page.getByRole("searchbox", { name: /Type a name/ })).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);

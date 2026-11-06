@@ -16,6 +16,7 @@ export function ChatMessages({
   onHide,
   isAdmin,
   groupName,
+  welcome = groupName,
 }: {
   messages: ChatMessage[];
   hasOlder: boolean;
@@ -25,11 +26,12 @@ export function ChatMessages({
   onHide: (id: string) => void;
   isAdmin: boolean;
   groupName: string;
+  welcome?: string;
 }) {
   if (messages.length === 0)
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-1 px-6 py-16 text-center">
-        <p className="font-serif text-2xl">Welcome to {groupName}</p>
+        <p className="font-serif text-2xl">Welcome to {welcome}</p>
         <p className="max-w-md text-[15px] text-muted">No messages yet. Say hello, ask a question about a topic, or share a tip from class.</p>
       </div>
     );

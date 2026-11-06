@@ -70,7 +70,7 @@ export function NewGroupButton() {
               </p>
             )}
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => dialog.current?.close()} className={compactSecondaryButton}>
+              <button type="button" onClick={() => (dialog.current?.close(), setOpen(false))} className={compactSecondaryButton}>
                 Cancel
               </button>
               <button type="submit" disabled={busy} className={compactPrimaryButton}>

@@ -7,6 +7,7 @@ import { ChatRules } from "@/components/chat/ChatRules";
 import { ChatShell } from "@/components/chat/ChatShell";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
+import { welcomeName } from "@/lib/chatGroupName";
 import { z } from "@/lib/zod";
 import { getCurrentAccount } from "@/server/auth/session";
 import { getSupabaseConfig } from "@/server/auth/config";
@@ -36,7 +37,7 @@ async function Group({ params }: { params: Promise<{ group: string }> }) {
   return (
     <ChatShell groups={room.groups} group={room.group} ownCampusName={room.me.campus} invites={room.invites}>
       {room.member ? (
-        <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} initial={room.messages} initialHasOlder={room.hasOlder} isAdmin={room.isAdmin} voiceNotes={room.group.kind === "study"} apiKey={getSupabaseConfig()?.key ?? ""} />
+        <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} welcome={welcomeName(room.group.kind, room.group.name)} initial={room.messages} initialHasOlder={room.hasOlder} isAdmin={room.isAdmin} voiceNotes={room.group.kind === "study"} apiKey={getSupabaseConfig()?.key ?? ""} />
       ) : (
         <ChatRules />
       )}
