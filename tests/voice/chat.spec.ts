@@ -124,3 +124,34 @@ for (const width of [360, 1280]) {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+// Study groups (founder, 2026-11-06): private groups in the list, invitations, a New study group box,
+// and the Members tab with invite by name and the creator's settings.
+for (const width of [360, 1280]) {
+  test(`study groups: list, invitations, new group and members (${width}px)`, async ({ page }) => {
+    await page.setViewportSize({ width, height: 860 });
+    await page.goto("/test-pages/chat-members");
+    if (width < 768) await page.getByLabel("Choose a group").click();
+    const nav = page.getByRole("navigation", { name: "Chat groups" }).first();
+    await expect(nav.getByRole("heading", { name: "Study groups" })).toBeVisible();
+    await expect(nav.getByRole("link", { name: /Civil Lit squad/ })).toBeVisible();
+    await expect(nav.getByRole("list", { name: "Invitations" })).toContainText("Tunde Quokka invited you to Criminal Lit night class");
+    await expect(nav.getByRole("button", { name: "Join" })).toBeVisible();
+    await nav.getByRole("button", { name: "New study group" }).click();
+    const dialog = page.getByRole("dialog", { name: "New study group" });
+    await expect(dialog.getByLabel("Group name")).toBeFocused();
+    await dialog.getByRole("button", { name: "Cancel" }).click();
+    await expect(dialog).toHaveCount(0);
+    if (width < 768) await page.getByLabel("Choose a group").click();
+
+    await expect(page.getByRole("link", { name: "Members" })).toHaveAttribute("aria-current", "page");
+    await expect(page.getByRole("heading", { name: /Members \(2\)/ })).toContainText("1 invited");
+    await expect(page.getByText("Created the group")).toBeVisible();
+    await expect(page.getByRole("button", { name: "Remove" })).toHaveCount(2);
+    await expect(page.getByLabel("Group name")).toHaveValue("Civil Lit squad");
+    await expect(page.getByRole("button", { name: "Delete group" })).toBeVisible();
+    await expect(page.getByRole("searchbox", { name: /Type a name/ })).toBeVisible();
+    const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+    expect(overflow).toBeLessThanOrEqual(0);
+  });
+}

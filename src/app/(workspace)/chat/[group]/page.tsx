@@ -34,7 +34,7 @@ async function Group({ params }: { params: Promise<{ group: string }> }) {
   const room = await getChatRoom(key.data);
   if (!room) notFound();
   return (
-    <ChatShell groups={room.groups} group={room.group} ownCampusName={room.me.campus}>
+    <ChatShell groups={room.groups} group={room.group} ownCampusName={room.me.campus} invites={room.invites}>
       {room.member ? (
         <ChatRoom key={room.group.id} groupId={room.group.id} groupName={room.group.name} initial={room.messages} initialHasOlder={room.hasOlder} isAdmin={room.isAdmin} apiKey={getSupabaseConfig()?.key ?? ""} />
       ) : (

@@ -33,7 +33,7 @@ async function Shared({ params }: { params: Promise<{ group: string }> }) {
   if (!shared) notFound();
   const campusName = shared.groups.find((g) => g.key === campus)?.name ?? null;
   return (
-    <ChatShell groups={shared.groups} group={shared.group} tab="files" ownCampusName={campusName}>
+    <ChatShell groups={shared.groups} group={shared.group} tab="files" ownCampusName={campusName} invites={shared.invites}>
       <SharedList items={shared.items} groupName={shared.group.name} />
     </ChatShell>
   );

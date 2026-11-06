@@ -269,7 +269,23 @@ export type Database = {
         Relationships: [];
       };
       chat_groups: {
-        Row: { id: string; key: string; name: string; kind: "all" | "campus" | "aspirants"; campus_key: string | null; position: number };
+        Row: {
+          id: string;
+          key: string;
+          name: string;
+          kind: "all" | "campus" | "aspirants" | "study";
+          campus_key: string | null;
+          position: number | null;
+          owner_id: string | null;
+          audience: "student" | "aspirant" | null;
+          created_at: string;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      chat_group_members: {
+        Row: { group_id: string; owner_id: string; status: "invited" | "member"; invited_by: string | null; created_at: string };
         Insert: never;
         Update: never;
         Relationships: [];
@@ -1404,6 +1420,20 @@ export type Database = {
       chat_unread_counts: { Args: Record<string, never>; Returns: { group_id: string; unread: number }[] };
       chat_people: { Args: { people: string[] }; Returns: { id: string; name: string; campus: string | null }[] };
       chat_people_search: { Args: { q: string }; Returns: { id: string; name: string; campus: string | null }[] };
+      // Study groups (migration 59).
+      chat_create_study_group: { Args: { group_name: string }; Returns: string };
+      chat_invite: { Args: { g: string; person: string }; Returns: "ok" | "not_allowed" | "already" | "full" };
+      chat_invite_search: { Args: { g: string; q: string }; Returns: { id: string; name: string; campus: string | null }[] };
+      chat_my_invites: { Args: Record<string, never>; Returns: { group_id: string; group_name: string; invited_by: string; created_at: string }[] };
+      chat_answer_invite: { Args: { g: string; accept: boolean }; Returns: "ok" | "not_allowed" | "not_found" };
+      chat_leave_group: { Args: { g: string }; Returns: "ok" | "owner" | "not_found" };
+      chat_remove_member: { Args: { g: string; person: string }; Returns: "ok" | "not_allowed" | "not_found" };
+      chat_rename_group: { Args: { g: string; group_name: string }; Returns: "ok" | "not_allowed" | "bad_name" };
+      chat_delete_group: { Args: { g: string }; Returns: "ok" | "not_allowed" };
+      chat_group_people: {
+        Args: { g: string };
+        Returns: { id: string; name: string; campus: string | null; status: "invited" | "member"; is_owner: boolean }[];
+      };
       redeem_invite: { Args: { code: string }; Returns: "ok" | "already" | "invalid" | "used_up" };
       set_pilot_access: { Args: { person: string; allow: boolean; days?: number | null }; Returns: "ok" | "not_found" };
       // Registered emails and the invite link (migration 36). The first three are admins only.

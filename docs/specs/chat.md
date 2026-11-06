@@ -88,7 +88,25 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      rules, a number only), search inside the group (`/chat/search?in=group`), and the **Messages**
      and **Files & links** tabs (`/chat/[group]/files`: files and web links shared in the group,
      newest first).
-4. **Later (after the pilot):** direct messages, private groups, reactions, threads.
+4. **Study together (founder, 2026-11-06), built in this order, one pull request each:**
+   - **4a Study groups (built, migration 59):** a verified chat member creates a private group
+     (2–60 characters, word and contact filters, at most 10 each) and invites chat members by name
+     (`chat_invite_search`, never email or phone): students with students, aspirants with aspirants,
+     up to 15 people counting invitations. Invitations show in the group list with Join and Decline.
+     Only members see the group, its messages and files (staff too: moderation is through reports).
+     The creator renames it, removes people or deletes it (messages go with it; its files can no
+     longer be opened); others leave. Members tab: members, invited, invite by name, settings. All
+     changes go through database functions; nobody writes the tables directly.
+   - **4b Voice notes:** study groups only (founder: audio can't be word-filtered); audio up to
+     2 minutes and 5 MB, real type checked.
+   - **4c Group quiz (Kahoot-style):** from approved recall questions (no AI cost), live timer,
+     points and leaderboard.
+   - **4d Study together:** share topic lessons as cards; "This week's topic".
+   - **4e Polls** in groups (founder chose polls over an ideas board).
+   - **4f Group calls with LiveKit** (founder's choice): needs a LiveKit account and approval of its
+     library and costs.
+   - Later still: direct messages, reactions, threads, editing a sent message, notifications
+     outside Lawdeck.
 
 ## Tests
 - `tests/permissions/sql/9zc_campuses_test.sql`, `tests/unit/campus.test.ts`,
@@ -106,3 +124,7 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
   `tests/unit/chatFiles.test.ts`; `tests/permissions/sql/9zg_chat_member_counts_test.sql` (counts only
   for the groups you can see, verified members only, nothing for free accounts); `tests/voice/chat.spec.ts` checks file cards, the paperclip and the
   report form.
+- `tests/permissions/sql/9zh_chat_study_groups_test.sql` (private to members, invitations, same side
+  only, 15 people and 10 groups, creator-only rename, remove and delete, leave, name filter, visitors);
+  `tests/voice/chat.spec.ts` checks the Study groups list, invitations, New study group and Members
+  (test page `/test-pages/chat-members`).

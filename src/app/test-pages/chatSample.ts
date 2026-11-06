@@ -1,12 +1,13 @@
-import type { ChatGroup, ChatMessage } from "@/server/chat/data";
+import type { ChatGroup, ChatInvite, ChatMessage } from "@/server/chat/data";
 
 // Made-up groups, people and messages for the campus chat test pages.
 export const groupId = "00000000-0000-4000-8000-000000000801";
 export const groups: ChatGroup[] = [
-  { id: "00000000-0000-4000-8000-000000000800", key: "all-campuses", name: "All campuses", kind: "all", unread: 3, members: 214 },
-  { id: groupId, key: "lagos", name: "Lagos", kind: "campus", unread: 0, members: 42 },
-  { id: "00000000-0000-4000-8000-000000000802", key: "abuja", name: "Abuja", kind: "campus", unread: 12, members: 38 },
-  { id: "00000000-0000-4000-8000-000000000803", key: "aspirant", name: "Aspirants", kind: "aspirants", unread: 0, members: 17 },
+  { id: "00000000-0000-4000-8000-000000000800", key: "all-campuses", name: "All campuses", kind: "all", unread: 3, members: 214, mine: false },
+  { id: groupId, key: "lagos", name: "Lagos", kind: "campus", unread: 0, members: 42, mine: false },
+  { id: "00000000-0000-4000-8000-000000000802", key: "abuja", name: "Abuja", kind: "campus", unread: 12, members: 38, mine: false },
+  { id: "00000000-0000-4000-8000-000000000803", key: "aspirant", name: "Aspirants", kind: "aspirants", unread: 0, members: 17, mine: false },
+  { id: "00000000-0000-4000-8000-000000000804", key: "s-civillitxx", name: "Civil Lit squad", kind: "study", unread: 2, members: 5, mine: true },
 ];
 const ada = { id: "00000000-0000-4000-8000-000000000811", name: "Ada Wombat", campus: "Lagos" };
 const tunde = { id: "00000000-0000-4000-8000-000000000812", name: "Tunde Quokka", campus: "Abuja" };
@@ -34,3 +35,5 @@ export const messages: ChatMessage[] = [
     ],
   },
 ];
+
+export const invites: ChatInvite[] = [{ groupId: "00000000-0000-4000-8000-000000000805", groupName: "Criminal Lit night class", invitedBy: "Tunde Quokka" }];

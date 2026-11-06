@@ -1,20 +1,33 @@
 import Link from "next/link";
 import { Icon } from "@/components/ui/Icon";
-import type { ChatGroup } from "@/server/chat/data";
+import type { ChatGroup, ChatInvite } from "@/server/chat/data";
 import { ChatGroupNav } from "./ChatGroupNav";
 
 export const SUBTITLES: Record<ChatGroup["kind"], (name: string) => string> = {
   all: () => "Students from every campus · everyone can read and post",
   campus: (name) => `${name} campus · everyone can read and post`,
   aspirants: () => "Final-year students preparing for Law School",
+  study: () => "Private study group · only members can see it",
 };
 
-export type ChatTab = "messages" | "files";
+export type ChatTab = "messages" | "files" | "members";
 
 // The top of a group, as in Slack: its name and how many members it has (a number only, never a
 // list), search inside the group, and the Messages and Files & links tabs.
-export function ChatHeader({ groups, group, ownCampusName, tab }: { groups: ChatGroup[]; group: ChatGroup; ownCampusName: string | null; tab: ChatTab }) {
-  const unreadElsewhere = groups.filter((g) => g.key !== group.key).reduce((n, g) => n + g.unread, 0);
+export function ChatHeader({
+  groups,
+  group,
+  ownCampusName,
+  invites,
+  tab,
+}: {
+  groups: ChatGroup[];
+  group: ChatGroup;
+  ownCampusName: string | null;
+  invites: ChatInvite[];
+  tab: ChatTab;
+}) {
+  const unreadElsewhere = groups.filter((g) => g.key !== group.key).reduce((n, g) => n + g.unread, 0) + invites.length;
   const tabClass = (on: boolean) =>
     `flex items-center gap-1.5 border-b-2 px-1 pb-2 pt-1 text-[14px] no-underline ${on ? "border-ink font-medium text-ink" : "border-transparent text-muted hover:text-ink"}`;
   return (
@@ -25,13 +38,13 @@ export function ChatHeader({ groups, group, ownCampusName, tab }: { groups: Chat
             <Icon name="hash" size={14} />
             {unreadElsewhere > 0 && <span className="rounded-full bg-ink px-1.5 text-[11px] font-semibold text-on-ink">{unreadElsewhere}</span>}
           </summary>
-          <div className="absolute left-0 top-11 z-30 w-64 rounded-xl border border-line bg-paper shadow-lg">
-            <ChatGroupNav groups={groups} current={group.key} ownCampusName={ownCampusName} />
+          <div className="absolute left-0 top-11 z-30 max-h-[70vh] w-72 overflow-y-auto rounded-xl border border-line bg-paper shadow-lg">
+            <ChatGroupNav groups={groups} current={group.key} ownCampusName={ownCampusName} invites={invites} />
           </div>
         </details>
         <div className="min-w-0 flex-1">
           <h1 className="flex items-center gap-1 truncate text-[17px] font-semibold">
-            <Icon name="hash" size={16} />
+            <Icon name={group.kind === "study" ? "users" : "hash"} size={16} />
             {group.name}
           </h1>
           <p className="truncate text-[12px] text-muted">{SUBTITLES[group.kind](group.name)}</p>
@@ -58,7 +71,7 @@ export function ChatHeader({ groups, group, ownCampusName, tab }: { groups: Chat
           <Icon name="search" size={16} />
         </Link>
       </div>
-      <nav aria-label="Group pages" className="-mb-px flex gap-5">
+      <nav aria-label="Group pages" className="-mb-px flex gap-5 overflow-x-auto whitespace-nowrap">
         <Link href={`/chat/${group.key}`} aria-current={tab === "messages" ? "page" : undefined} className={tabClass(tab === "messages")}>
           <Icon name="chat" size={15} />
           Messages
@@ -67,6 +80,12 @@ export function ChatHeader({ groups, group, ownCampusName, tab }: { groups: Chat
           <Icon name="paperclip" size={15} />
           Files &amp; links
         </Link>
+        {group.kind === "study" && (
+          <Link href={`/chat/${group.key}/members`} aria-current={tab === "members" ? "page" : undefined} className={tabClass(tab === "members")}>
+            <Icon name="users" size={15} />
+            Members
+          </Link>
+        )}
       </nav>
     </header>
   );
