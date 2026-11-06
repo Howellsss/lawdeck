@@ -1430,6 +1430,15 @@ export type Database = {
       chat_remove_member: { Args: { g: string; person: string }; Returns: "ok" | "not_allowed" | "not_found" };
       chat_rename_group: { Args: { g: string; group_name: string }; Returns: "ok" | "not_allowed" | "bad_name" };
       chat_delete_group: { Args: { g: string }; Returns: "ok" | "not_allowed" };
+      // Group quizzes (migration 61).
+      chat_quiz_topics: { Args: Record<string, never>; Returns: { topic_id: string; course: string; topic: string; questions: number }[] };
+      chat_quiz_create: { Args: { g: string; topic: string; how_many: number; secs: number }; Returns: string };
+      chat_quiz_join: { Args: { q: string }; Returns: "ok" | "not_allowed" };
+      chat_quiz_next: { Args: { q: string }; Returns: "ok" | "done" | "not_allowed" };
+      chat_quiz_end: { Args: { q: string }; Returns: "ok" | "not_allowed" };
+      chat_quiz_answer: { Args: { q: string; question: number; choice: number }; Returns: "ok" | "late" | "already" | "not_allowed" };
+      chat_quiz_state: { Args: { q: string }; Returns: Json | null };
+      chat_quiz_latest: { Args: { g: string }; Returns: string | null };
       chat_group_people: {
         Args: { g: string };
         Returns: { id: string; name: string; campus: string | null; status: "invited" | "member"; is_owner: boolean }[];

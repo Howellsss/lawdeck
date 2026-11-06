@@ -10,7 +10,7 @@ export const SUBTITLES: Record<ChatGroup["kind"], (name: string) => string> = {
   study: () => "Private study group · only members can see it",
 };
 
-export type ChatTab = "messages" | "files" | "members";
+export type ChatTab = "messages" | "files" | "members" | "quiz";
 
 // The top of a group, as in Slack: its name and how many members it has (a number only, never a
 // list), search inside the group, and the Messages and Files & links tabs.
@@ -80,6 +80,12 @@ export function ChatHeader({
           <Icon name="paperclip" size={15} />
           Files &amp; links
         </Link>
+        {group.kind === "study" && (
+          <Link href={`/chat/${group.key}/quiz`} aria-current={tab === "quiz" ? "page" : undefined} className={tabClass(tab === "quiz")}>
+            <Icon name="check" size={15} />
+            Quiz
+          </Link>
+        )}
         {group.kind === "study" && (
           <Link href={`/chat/${group.key}/members`} aria-current={tab === "members" ? "page" : undefined} className={tabClass(tab === "members")}>
             <Icon name="users" size={15} />
