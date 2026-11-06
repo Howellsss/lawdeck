@@ -8,7 +8,10 @@ for (const width of [360, 1200]) {
     await expect(page.getByText("Recall accuracy", { exact: true })).toBeVisible();
     await expect(page.getByText("71%")).toBeVisible();
     await expect(page.getByRole("form", { name: "Filter the diary" })).toBeVisible();
-    await expect(page.getByRole("list", { name: "Study timeline" }).getByRole("link")).toHaveCount(3);
+    const timeline = page.getByRole("list", { name: "Study timeline" });
+    await expect(timeline.getByRole("link", { name: "Revise visually" })).toHaveCount(3);
+    await expect(timeline.getByRole("link", { name: "Revise visually" }).first()).toHaveAttribute("href", /^\/study\/[^/]+\/visual$/);
+    await expect(timeline.getByRole("link")).toHaveCount(6);
     await expect(page.getByText("Due for revision now", { exact: true }).first()).toBeVisible();
     const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
     expect(overflow).toBeLessThanOrEqual(0);

@@ -30,7 +30,7 @@ const KIND_LABELS: Record<Checkpoint["kind"], string> = {
 // recall question with its answer, the passages it rests on, and the decision.
 export default function LessonReviewPage({ params }: PageProps<"/admin/lessons/[topicId]">) {
   return (
-    <div className="mx-auto flex w-full max-w-3xl flex-col gap-6 px-4 py-10 lg:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <Suspense fallback={<LoadingRows label="Loading the lesson" />}>
         <Review params={params} />
       </Suspense>

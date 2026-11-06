@@ -16,7 +16,7 @@ export const metadata: Metadata = { title: "Study Diary · Lawdeck" };
 // recalled it and what to revisit, assembled from their own study records.
 export default function DiaryPage({ searchParams }: PageProps<"/diary">) {
   return (
-    <div className="mx-auto flex w-full max-w-4xl flex-col gap-6 px-4 py-10 lg:px-8">
+    <div className="mx-auto flex w-full max-w-6xl flex-col gap-6 px-4 py-10 lg:px-8">
       <h1 className="font-serif text-3xl font-normal text-greeting">Study Diary</h1>
       <Suspense fallback={<LoadingRows label="Loading your diary" />}>
         <Diary searchParams={searchParams} />

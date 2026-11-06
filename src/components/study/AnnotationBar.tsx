@@ -45,7 +45,7 @@ export function AnnotationBar({
 
   return (
     <div role="dialog" aria-label={editing ? "Your mark" : "Mark these words"} className="fixed inset-x-0 bottom-0 z-40 border-t border-line bg-paper px-4 py-3 shadow-lg">
-      <div className="mx-auto flex max-w-3xl flex-col gap-2">
+      <div className="mx-auto flex max-w-6xl flex-col gap-2">
         <div className="flex items-start justify-between gap-3">
           <p className="min-w-0 text-sm text-muted">
             {editing ? "Your mark on" : "Mark"} &ldquo;{quote}&rdquo;

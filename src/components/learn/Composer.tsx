@@ -107,7 +107,7 @@ export function Composer({ voice = false }: { voice?: boolean }) {
   }
 
   return (
-    <div className="flex w-full max-w-[44rem] flex-col gap-3">
+    <div className="flex w-full max-w-5xl flex-col gap-4">
       <form
         onSubmit={(event) => void submit(event)}
         // The box outlines itself while the student types (visible keyboard focus, WCAG 2.4.7).

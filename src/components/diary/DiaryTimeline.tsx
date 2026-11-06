@@ -30,6 +30,9 @@ export function DiaryTimeline({ entries }: { entries: DiaryEntrySummary[] }) {
                         ? `Next revision ${formatWat(entry.revision.dueAt)}`
                         : "No revision scheduled"}
                   </span>
+                  <Link href={`/study/${entry.topicId}/visual`} className="self-start text-sm">
+                    Revise visually
+                  </Link>
                 </li>
               ))}
           </ul>
