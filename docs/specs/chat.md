@@ -76,8 +76,10 @@ and post in, with Slack-style formatting, @mentions, #hashtags, links and files.
      verification requests. Open it after counsel reviews the terms and paid plans are on.
 3b. **Slack-style look (founder, 2026-11-06; option A, no new library):** migration 58.
    - Message box: formatting row (Bold, Italic, Underline `++x++`, Strike, Link, lists, Quote, Code)
-     that **Aa** hides or shows; under the text, **+** attach, **Aa**, an emoji panel (40 everyday
-     emojis, Lawdeck's own list), **@** mention, and Send on the right. Video and audio clips, slash
+     that **Aa** hides or shows; under the text, **+** attach, **Aa**, an emoji panel (every standard
+     emoji up to Emoji 15.1, 1,898, in `src/lib/emojiData.ts`, made once from the MIT-licensed
+     unicode-emoji-json data, loaded only when the panel opens; search by name, a tab per group,
+     recently used kept in the browser), **@** mention, and Send on the right. Video and audio clips, slash
      commands and paragraph styles are left out.
    - **Add link** box (Text and Link, Cancel and Save): the message box shows only the words; the
      address is listed under the text and joined on sending. Only web addresses (https:// added when

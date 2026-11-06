@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-06 (campus chat Slack-style message box, header and Files & links).
+Last updated: 2026-11-06 (campus chat full emoji pack).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
