@@ -24,19 +24,17 @@ export type DueRevision = {
   lastStudied: { topicName: string; date: string } | null;
 };
 
-export async function getDueRevision(at?: Date): Promise<Loaded<DueRevision>> {
+// `topicId` limits the round to one topic ("Revise now" on My progress).
+export async function getDueRevision(at?: Date, topicId?: string): Promise<Loaded<DueRevision>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   // Read the clock only after the request is known (Next.js would otherwise freeze it at build time).
   const now = at ?? new Date();
   const db = await createSupabaseServerClient();
   const today = lagosDate(now);
+  let dueQuery = db.from("review_items").select("checkpoint_id, topic_id, due_at, ease, lapses, last_outcome").lte("due_at", now.toISOString());
+  if (topicId) dueQuery = dueQuery.eq("topic_id", topicId);
   const [due, doneToday] = await Promise.all([
-    db
-      .from("review_items")
-      .select("checkpoint_id, topic_id, due_at, ease, lapses, last_outcome")
-      .lte("due_at", now.toISOString())
-      .order("due_at")
-      .limit(500),
+    dueQuery.order("due_at").limit(500),
     db.from("recall_attempts").select("id", { count: "exact", head: true }).eq("context", "revision").gte("created_at", lagosDayStart(today)),
   ]);
   if (due.error || doneToday.error) throw new Error("revision read failed");
