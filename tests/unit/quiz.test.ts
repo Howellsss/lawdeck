@@ -49,8 +49,9 @@ describe("group quiz", () => {
     expect(musicFor("live", 2, false, 20)).toBeNull();
     expect(musicFor("live", 0, false, 12)).toBe("question");
     expect(musicFor("live", 0, false, 4)).toBe("hurry");
-    // The last seconds keep the same pace as the rest of the question (founder, 2026-11-06).
+    // One steady pace: lobby, questions and the last seconds (founder, 2026-11-06).
     expect(musicTempo("hurry")).toBe(musicTempo("question"));
+    expect(musicTempo("question")).toBe(musicTempo("lobby"));
     expect(musicFor("live", 0, true, 0)).toBeNull();
     expect(musicFor("done", 0, true, 0)).toBeNull();
   });

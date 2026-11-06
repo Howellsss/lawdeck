@@ -14,9 +14,9 @@ function readOn(): boolean {
   }
 }
 
-// Plays the quiz music and sounds as the quiz moves on: lobby music, "3, 2, 1" beeps, steady
-// question music that keeps its pace to the end, a chime or a low tone when the answer shows, and a fanfare for the
-// final leaderboard. Sound on or off is remembered on this phone.
+// Plays the quiz music and sounds as the quiz moves on: lobby music, "3, 2, 1" beeps, question
+// music at the lobby's steady pace, a chime or a low tone when the answer shows, and a fanfare for
+// the final leaderboard. Sound on or off is remembered on this phone.
 export function useQuizSound(quiz: QuizState | null) {
   const sound = useRef<QuizSound | null>(null);
   const [on, setOn] = useState(readOn);

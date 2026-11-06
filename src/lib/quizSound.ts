@@ -4,8 +4,9 @@
 // from a tap; everything is quiet until then.
 
 type Mode = "lobby" | "question" | "hurry" | null;
-// Overall loudness (founder, 2026-11-06: the music was too quiet; it was 0.18).
-const MUSIC_VOLUME = 0.45;
+// Overall loudness (founder, 2026-11-06: still too quiet at 0.45). Notes are held and louder, and a
+// limiter (compressor) keeps the loud parts from crackling on phone speakers.
+const MUSIC_VOLUME = 1;
 
 const hz = (midi: number) => 440 * 2 ** ((midi - 69) / 12);
 
@@ -43,7 +44,13 @@ export class QuizSound {
       this.ctx = new Ctor();
       this.master = this.ctx.createGain();
       this.master.gain.value = this.muted ? 0 : MUSIC_VOLUME;
-      this.master.connect(this.ctx.destination);
+      const limiter = this.ctx.createDynamicsCompressor();
+      limiter.threshold.value = -14;
+      limiter.knee.value = 10;
+      limiter.ratio.value = 6;
+      limiter.attack.value = 0.003;
+      limiter.release.value = 0.2;
+      this.master.connect(limiter).connect(this.ctx.destination);
     }
     if (this.ctx.state === "suspended") void this.ctx.resume();
   }
@@ -57,7 +64,7 @@ export class QuizSound {
     if (this.master && this.ctx) this.master.gain.setTargetAtTime(muted ? 0 : MUSIC_VOLUME, this.ctx.currentTime, 0.05);
   }
 
-  // Background music: lobby (relaxed) or question (steady, also in the last seconds); null stops it.
+  // Background music: lobby or question (other chords, same pace and rhythm); null stops it.
   music(mode: Mode) {
     if (mode === this.mode) return;
     this.mode = mode;
@@ -77,7 +84,7 @@ export class QuizSound {
   private schedule() {
     const ctx = this.ctx;
     if (!ctx || !this.mode) return;
-        const bpm = musicTempo(this.mode);
+    const bpm = musicTempo(this.mode);
     const eighth = 60 / bpm / 2;
     while (this.nextTime < ctx.currentTime + 0.12) {
       const bars = this.mode === "lobby" ? LOBBY : QUESTION;
@@ -85,11 +92,10 @@ export class QuizSound {
       const tones = [0, chord.minor ? 3 : 4, 7, 12];
       const beat = this.step % 8;
       // Melody: an arpeggio an octave and a half up.
-      this.note(hz(chord.root + 24 + tones[ARP[beat]]), this.nextTime, eighth * 0.9, "triangle", 0.5);
-      // Bass on beats 1 and 3 (every beat when the clock is running).
-      if (this.mode !== "lobby" ? beat % 2 === 0 : beat % 4 === 0) this.note(hz(chord.root - 12 + (beat === 4 ? 7 : 0)), this.nextTime, eighth * 1.6, "square", 0.22);
-      // A tick on every beat while a question is open.
-      if (this.mode !== "lobby" && beat % 2 === 0) this.tick(this.nextTime);
+      this.note(hz(chord.root + 24 + tones[ARP[beat]]), this.nextTime, eighth * 0.95, "triangle", 0.9);
+      // Bass on beats 1 and 3, the same in the lobby and during questions, so the pace never changes
+      // (founder, 2026-11-06: the music sped up when the game started).
+      if (beat % 4 === 0) this.note(hz(chord.root - 12 + (beat === 4 ? 7 : 0)), this.nextTime, eighth * 3, "square", 0.35);
       this.nextTime += eighth;
       this.step += 1;
     }
@@ -102,17 +108,16 @@ export class QuizSound {
     const gain = ctx.createGain();
     osc.type = type;
     osc.frequency.setValueAtTime(freq, at);
+    // Rise quickly, hold most of the note, then fade (a note that fades at once sounds quiet).
     gain.gain.setValueAtTime(0.0001, at);
     gain.gain.exponentialRampToValueAtTime(level, at + 0.01);
+    gain.gain.setValueAtTime(level, at + length * 0.6);
     gain.gain.exponentialRampToValueAtTime(0.0001, at + length);
     osc.connect(gain).connect(this.master);
     osc.start(at);
     osc.stop(at + length + 0.02);
   }
 
-  private tick(at: number) {
-    this.note(2400, at, 0.03, "square", 0.08);
-  }
 
   private play(notes: [number, number, number][], type: OscillatorType = "triangle", level = 0.6) {
     const ctx = this.ctx;
@@ -168,10 +173,11 @@ export class QuizSound {
 }
 
 // What should be heard for a quiz moment (pure, so it can be tested).
-// Beats a minute. The last seconds keep the question's pace (founder, 2026-11-06: speeding up
-// caused panic).
+// Beats a minute: one steady pace in the lobby, during questions and in the last seconds (founder,
+// 2026-11-06: speeding up caused panic).
 export function musicTempo(mode: Exclude<Mode, null>): number {
-  return mode === "lobby" ? 112 : 132;
+  void mode;
+  return 112;
 }
 
 export function musicFor(status: "lobby" | "live" | "done", readyIn: number, closed: boolean, secondsLeft: number): Mode {
