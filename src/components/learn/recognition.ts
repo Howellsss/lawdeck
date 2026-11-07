@@ -1,6 +1,7 @@
 "use client";
 
 import { useSyncExternalStore } from "react";
+import { audioSessionFor } from "./speaker";
 
 // The browser's own speech recognition (Chrome sends the audio to Google, Safari to Apple, to
 // turn it into words). Lawdeck never receives or stores the recording, only the words.
@@ -78,6 +79,7 @@ export function listenOnce(cancel?: AbortSignal): Promise<string> {
     };
     const stop = () => recognition.stop();
     cancel?.addEventListener("abort", stop);
+    audioSessionFor("play-and-record");
     recognition.start();
   });
 }
@@ -147,6 +149,7 @@ export function dictate(
         finish();
       }
     };
+    audioSessionFor("play-and-record");
     recognition.start();
   };
 
