@@ -1,4 +1,4 @@
-import { expect, test } from "@playwright/test";
+import { chromium, expect, test } from "@playwright/test";
 
 // Campus chat layout (docs/specs/chat.md, PRD v2.1 CH-03 to CH-07) on the test-only page.
 for (const width of [360, 1280]) {
@@ -384,3 +384,37 @@ for (const width of [360, 1280]) {
     expect(overflow).toBeLessThanOrEqual(0);
   });
 }
+
+// Quiz sound on phones (founder, 2026-11-07): a tap (not just the start of a touch) wakes the sound.
+test("a tap on a phone starts the quiz sound", async ({ browserName }, testInfo) => {
+  // Like a real phone: sound may only start after a tap (test browsers allow it without one).
+  const browser = await chromium.launch({
+    executablePath: process.env.PLAYWRIGHT_CHROMIUM_PATH || undefined,
+    args: ["--autoplay-policy=user-gesture-required"],
+  });
+  const context = await browser.newContext({
+    baseURL: testInfo.project.use.baseURL,
+    viewport: { width: 390, height: 844 },
+    hasTouch: true,
+    isMobile: true,
+  });
+  const page = await context.newPage();
+  await page.addInitScript(() => {
+    const Real = window.AudioContext;
+    const made: AudioContext[] = [];
+    (window as unknown as { __audio: AudioContext[] }).__audio = made;
+    window.AudioContext = class extends Real {
+      constructor(options?: AudioContextOptions) {
+        super(options);
+        made.push(this);
+      }
+    } as typeof AudioContext;
+  });
+  await page.goto("/test-pages/chat-quiz?s=live");
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __audio: AudioContext[] }).__audio.length)).toBe(0);
+  await page.getByRole("region", { name: "Question 2 of 5" }).getByText("Question 2 of 5").tap();
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __audio: AudioContext[] }).__audio.length)).toBe(1);
+  await expect.poll(() => page.evaluate(() => (window as unknown as { __audio: AudioContext[] }).__audio[0].state)).toBe("running");
+  await browser.close();
+  expect(browserName).toBe("chromium");
+});
