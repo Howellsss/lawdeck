@@ -9,6 +9,11 @@ voices) and that students choose the voice.
   sending. It keeps listening through pauses until the student taps Stop (founder, 2026-11-06:
   "it stops at some point"); when the browser ends a listening session on its own, a new one
   starts at once and the words so far are kept; after 30 seconds of silence it switches off.
+- **Loud on phones** (founder, 2026-11-06: "a very low voice"): the voice files are already at
+  Azure's full volume, so playback goes through a gain of 2 and a limiter (about 2.5 times louder,
+  no crackle), set up from the tap that starts voice mode. On iPhones (Safari 16.4+) Lawdeck asks for
+  normal playback before speaking and for recording before listening, so replies come from the
+  loudspeaker rather than quietly as in a phone call.
 - **Read** on every Learn answer: reads the whole answer, with Pause, Resume and Stop.
 - **Voice mode** (sound-wave button on the home screen and in a chat), like ChatGPT's voice mode
   (founder, 2026-10-28: "you press it, say something, it responds immediately there; it doesn't

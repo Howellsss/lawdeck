@@ -28,6 +28,47 @@ let run = 0;
 let finishPart: ((outcome: SpeakOutcome) => void) | null = null;
 let urls: string[] = [];
 
+// Louder on phones (founder, 2026-11-06: "the voice is very low"). The voice files are already at
+// Azure's full volume, so playback goes through a gain (about twice as loud) and a limiter that
+// stops it crackling. Set up from a tap (unlock); if it cannot be, the plain player is used.
+const BOOST = 2;
+let ctx: AudioContext | null = null;
+
+function boost(element: HTMLAudioElement) {
+  if (ctx || typeof window === "undefined") return;
+  const Ctor = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  if (!Ctor) return;
+  try {
+    const context = new Ctor();
+    const source = context.createMediaElementSource(element);
+    const gain = context.createGain();
+    gain.gain.value = BOOST;
+    const limiter = context.createDynamicsCompressor();
+    limiter.threshold.value = -6;
+    limiter.knee.value = 6;
+    limiter.ratio.value = 12;
+    limiter.attack.value = 0.003;
+    limiter.release.value = 0.15;
+    source.connect(gain).connect(limiter).connect(context.destination);
+    ctx = context;
+    void context.resume().catch(() => {});
+  } catch {
+    // Older browsers: the plain player still works.
+  }
+}
+
+// iPhone (Safari 16.4+): after listening, the phone stays in "call" mode and plays quietly, as if
+// through the earpiece. Asking for normal playback first sends the voice to the loudspeaker.
+type AudioSessionNavigator = Navigator & { audioSession?: { type: string } };
+export function audioSessionFor(kind: "playback" | "play-and-record") {
+  try {
+    const session = (navigator as AudioSessionNavigator).audioSession;
+    if (session) session.type = kind;
+  } catch {
+    // Not supported: nothing to do.
+  }
+}
+
 function set(next: SpeakerState) {
   state = next;
   listeners.forEach((listener) => listener());
@@ -48,6 +89,7 @@ export const speaker = {
   // Call during a tap, before audio that will start later.
   unlock() {
     const element = player();
+    boost(element);
     element.src = SILENCE;
     void element.play().catch(() => {});
   },
@@ -187,6 +229,8 @@ async function fetchPart(
 }
 
 function playUrl(url: string): Promise<SpeakOutcome> {
+  audioSessionFor("playback");
+  if (ctx && ctx.state !== "running") void ctx.resume().catch(() => {});
   return new Promise((resolve) => {
     const element = player();
     finishPart = resolve;
