@@ -50,7 +50,7 @@ export function QuizPanel({ groupId, initial, topics }: { groupId: string; initi
   };
 
   return (
-    <div onPointerDown={sound.unlock} className="relative flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 lg:px-6">
+    <div onClickCapture={sound.unlock} onTouchEndCapture={sound.unlock} onKeyDownCapture={sound.unlock} className="relative flex min-h-0 flex-1 flex-col gap-6 overflow-y-auto px-4 py-5 lg:px-6">
       <button
         type="button"
         onClick={sound.toggle}

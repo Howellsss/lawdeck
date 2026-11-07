@@ -1,7 +1,8 @@
 // Lawdeck's own quiz music and sound effects (founder, 2026-11-06): original tunes written as notes
 // and played by the browser's Web Audio, so there are no music files and no library. Kahoot's music
 // is not used (it belongs to Kahoot). Phones only allow sound after a tap, so `unlock()` is called
-// from a tap; everything is quiet until then.
+// from a tap (the end of a touch or a click: phones do not count the start of a touch); everything is
+// quiet until then.
 
 type Mode = "lobby" | "question" | "hurry" | null;
 // Overall loudness (founder, 2026-11-06: still too quiet at 0.45). Notes are held and louder, and a
@@ -52,7 +53,25 @@ export class QuizSound {
       limiter.release.value = 0.2;
       this.master.connect(limiter).connect(this.ctx.destination);
     }
-    if (this.ctx.state === "suspended") void this.ctx.resume();
+    // iPhones mute web audio with the silent switch unless the page asks to play like media; the
+    // quiz's own sound button is how students turn it off.
+    const session = (navigator as unknown as { audioSession?: { type: string } }).audioSession;
+    if (session && !this.muted) session.type = "playback";
+    if (this.ctx.state !== "running") void this.ctx.resume();
+    // A silent blip inside the tap wakes audio on phones (iOS needs a sound started by a tap).
+    const blip = this.ctx.createBufferSource();
+    blip.buffer = this.ctx.createBuffer(1, 1, this.ctx.sampleRate);
+    blip.connect(this.ctx.destination);
+    blip.start(0);
+    // Music that was due before sound could start begins now.
+    if (this.mode && this.timer === null) this.startTimer();
+  }
+
+  private startTimer() {
+    if (!this.ctx) return;
+    this.step = 0;
+    this.nextTime = this.ctx.currentTime + 0.05;
+    this.timer = window.setInterval(() => this.schedule(), 50);
   }
 
   get ready() {
@@ -74,11 +93,7 @@ export class QuizSound {
       return;
     }
     if (!this.ctx) return;
-    if (this.timer === null) {
-      this.step = 0;
-      this.nextTime = this.ctx.currentTime + 0.05;
-      this.timer = window.setInterval(() => this.schedule(), 50);
-    }
+    if (this.timer === null) this.startTimer();
   }
 
   private schedule() {
