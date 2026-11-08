@@ -18,11 +18,11 @@ import type { ChatSource } from "@/server/db/workspace";
 import { searchForAnswer, searchForQuestion, type SearchHit, type SearchResult } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 import { limitReachedMessage } from "@/lib/allowance";
-import { isSmallTalk } from "@/lib/smallTalk";
+import { greetingName, isSmallTalk, quickReply, withoutName } from "@/lib/smallTalk";
 import { talkSearchText } from "@/lib/talkSearch";
 import { recordUsage } from "@/server/ai/usage";
 import { speechConfigured } from "@/server/ai/speech";
-import type { Voice } from "@/schemas/voice";
+import { DEFAULT_VOICE, VOICE_FIRST_NAMES, type Voice } from "@/schemas/voice";
 import { LiveSpeech, type LiveSpeechEvent } from "./liveSpeech";
 import { dailyLimit } from "./speech";
 import {
@@ -94,7 +94,7 @@ export async function answerQuestion(input: {
   const { db, send } = input;
   // Independent reads run together, so the answer starts sooner (voice mode, founder 2026-10-28:
   // "it responded but really slow").
-  const [chat, allowance, earlier] = await Promise.all([
+  const [chat, allowance, earlier, profile] = await Promise.all([
     db.from("conversations").select("id, title, course_id, use_uploads").eq("id", input.chatId).maybeSingle(),
     // Rule K-01: the monthly limit is checked before anything is saved or any AI is called.
     getAllowance(db),
@@ -104,6 +104,11 @@ export async function answerQuestion(input: {
       .eq("conversation_id", input.chatId)
       .order("created_at", { ascending: false })
       .limit(HISTORY_MESSAGES),
+    // Voice mode greets the student by first name. The name stays on Lawdeck's side: it is only
+    // used in replies Lawdeck writes itself, never sent to the AI (rule G-06).
+    input.level === "talk"
+      ? db.from("profiles").select("full_name").eq("id", input.userId).maybeSingle()
+      : null,
   ]);
   if (chat.error || !chat.data)
     return send({ type: "error", message: "That chat could not be found." });
@@ -120,7 +125,8 @@ export async function answerQuestion(input: {
   // Rule G-06: nothing that looks like an email address or phone number leaves Lawdeck.
   const question = redactPersonalData(input.question);
   // The student's own Ready uploads join the library unless this chat has them turned off (6c).
-  const history = historyTurns(earlier.data);
+  const name = greetingName(profile?.data?.full_name);
+  const history = historyTurns(earlier.data).map((turn) => ({ ...turn, text: withoutName(turn.text, name) }));
   // Voice mode: a short reply ("yes, go on") is searched together with the recent conversation.
   const searchText = input.level === "talk" ? talkSearchText(question, history) : question;
   // Voice-mode small talk ("Hey, what's up?") is answered straight away, without searching.
@@ -205,6 +211,21 @@ export async function answerQuestion(input: {
             : "Lawdeck’s voice is not available right now. The reply is in the chat.",
       });
   }
+  // Voice mode: a clear greeting ("Hey Ryan, what's up?") is answered at once by Lawdeck itself,
+  // with the student's first name; no AI is called (founder, 2026-11-08).
+  const quick = smallTalk ? quickReply(question, name, Date.now()) : null;
+  if (quick) {
+    send({ type: "text", text: quick });
+    live?.push(quick);
+    await live?.end();
+    const quickId = await saveAnswer(db, input.chatId, quick, input.level, null, []);
+    if (!quickId)
+      return send({
+        type: "error",
+        message: "The answer was not saved. Please try again.",
+      });
+    return send({ type: "done", messageId: quickId, text: quick, sources: [], notEnough: false, level: input.level });
+  }
   const composed = await composeAnswer({
     db,
     hits: found.hits,
@@ -215,6 +236,7 @@ export async function answerQuestion(input: {
     userId: input.userId,
     // Voice mode answers with the fastest model, so it starts speaking sooner.
     model: input.level === "talk" ? MODELS.voice : undefined,
+    assistantName: input.level === "talk" ? VOICE_FIRST_NAMES[input.voice ?? DEFAULT_VOICE] : undefined,
     onText: (text) => {
       send({ type: "text", text });
       live?.push(text);
@@ -279,6 +301,8 @@ export async function composeAnswer(input: {
   onText: (text: string) => void;
   signal?: AbortSignal;
   model?: ExplainModel;
+  // Voice mode: the chosen voice's name, which the student may call the assistant by.
+  assistantName?: string;
 }): Promise<ComposedAnswer> {
   const hits = input.hits.map((hit, index) => ({ ...hit, label: index + 1 }));
   // The citation check matches authorities against the library only: a case or statute found only
@@ -303,7 +327,7 @@ export async function composeAnswer(input: {
     ...input.history,
     {
       role: "user",
-      text: questionMessage(passages, input.question, input.level),
+      text: questionMessage(passages, input.question, input.level, input.assistantName),
     },
   ];
 

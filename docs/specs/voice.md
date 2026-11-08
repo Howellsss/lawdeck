@@ -72,3 +72,16 @@ voices) and that students choose the voice.
 
 The free tier allows a limited number of requests a minute; move to **Standard S0** in Azure
 (Pricing tier) when many students use voice at once.
+
+## Names and quick greetings (founder, 2026-11-08)
+- The assistant answers to the name of the chosen voice: Sonia, Ryan, Ava, Andrew, Ezinne or Abeo.
+  "Hey Ryan" counts as a greeting, and the voice model is told its name (prompt explain-v10).
+- Clear greetings, "how are you", "I'm good", thanks and goodbyes are answered at once by Lawdeck
+  itself, with the student's first name from their profile: "Hey Ryan" → "Hey Howells, what's up?";
+  "Hey Ryan, what's up?" → "I'm good, Howells, how about you?". A few wordings rotate. No AI call,
+  no credit. Without a saved name the reply leaves the name out. Anything less clear goes to the
+  voice model as before. Code: `quickReply` and `greetingName` in `src/lib/smallTalk.ts`.
+- The name is spoken by Azure (it is in the reply text) but never sent to Claude or Voyage: earlier
+  replies have it taken out (`withoutName`) before they go to the AI or the search as context.
+- Listening: the turn ends after 0.7 s of quiet (was 1.1 s). If the phone switches the microphone
+  off by itself before anything is heard, it is switched straight back on, for up to 15 seconds.

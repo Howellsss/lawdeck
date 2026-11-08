@@ -15,6 +15,12 @@ describe("answer levels", () => {
 });
 
 describe("voice-mode conversation (founder, 2026-10-28)", () => {
+  it("tells the voice model its name is the chosen voice's, in voice mode only (founder, 2026-11-08)", () => {
+    expect(questionMessage([], "Hey Ryan, what is hearsay?", "talk", "Ryan")).toContain("your name is Ryan");
+    expect(questionMessage([], "Why?", "talk")).not.toContain("your name is");
+    expect(questionMessage([], "Why?", "exam", "Ryan")).not.toContain("your name is");
+  });
+
   it("replies in a few spoken sentences that end with a question back to the student", () => {
     const talk = LEVEL_INSTRUCTIONS.talk;
     expect(questionMessage([], "Why?", "talk")).toContain(talk);

@@ -16,6 +16,16 @@ export const VOICE_LABELS: Record<Voice, string> = {
   "ng-male": "Nigerian English, male (Abeo)",
 };
 
+// Voice mode: the assistant answers to the name of the voice the student chose ("Hey Ryan").
+export const VOICE_FIRST_NAMES: Record<Voice, string> = {
+  "uk-female": "Sonia",
+  "uk-male": "Ryan",
+  "us-female": "Ava",
+  "us-male": "Andrew",
+  "ng-female": "Ezinne",
+  "ng-male": "Abeo",
+};
+
 // What to read: the whole answer, only its "Short answer" (voice conversations), or the rest
 // after the short answer (when the student says "yes, read the rest").
 export const SPEECH_SCOPES = ["full", "short", "rest"] as const;

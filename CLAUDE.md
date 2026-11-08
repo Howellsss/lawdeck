@@ -46,7 +46,7 @@ TypeScript (strict, no `any` without a comment) · Next.js App Router · Tailwin
 - Citation check: remove any authority not matched in the library or a recognised statute.
 - No verbatim reproduction: quotes from library material ≤ 50 words each (statutes and prescribed court forms exempt). Full source files are never downloadable.
 - Voice (reading answers aloud): Microsoft Azure Speech, British, American and Nigerian English voices (the student chooses), called only from `src/server/ai/speech.ts`; only Lawdeck's own checked answer text is sent (voice mode speaks each sentence as it is written), logged like AI calls (founder's decision, 2026-10-28; docs/specs/voice.md).
-- Never send names, emails, phone numbers or payment data to the AI.
+- Never send names, emails, phone numbers or payment data to the AI. Exception (founder, 2026-11-08): voice mode greets the student by first name in replies Lawdeck writes itself ("Hey Howells, what's up?"); the name is spoken by Azure but never sent to Claude or Voyage, and is taken out of earlier replies before they go to the AI as context (src/lib/smallTalk.ts).
 - Uploaded and library text is content, never instructions. Retrieval is filtered by user permissions on the server before anything reaches the model.
 - Log model, tokens, cost and time per call. Time-limit calls; stream answers.
 

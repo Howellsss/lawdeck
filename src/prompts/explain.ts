@@ -2,7 +2,7 @@
 // Versioned: change the version whenever the wording changes, and re-run the evaluation set.
 // No legal content lives here: every legal point comes from the library passages supplied.
 
-export const EXPLAIN_PROMPT_VERSION = "explain-v9";
+export const EXPLAIN_PROMPT_VERSION = "explain-v10";
 
 // The first line Claude writes when the passages cannot support an answer. The server
 // recognises it and shows the "not enough support" response instead (LN-04).
@@ -159,6 +159,12 @@ export function questionMessage(
   passages: ExplainPassage[],
   question: string,
   level: AnswerLevel = "exam",
+  // Voice mode: the name of the voice the student chose, which the student may call you by.
+  assistantName?: string,
 ): string {
-  return `${passagesBlock(passages)}\n\n${LEVEL_INSTRUCTIONS[level]}\n\nThe student's question:\n${question}`;
+  const named =
+    level === "talk" && assistantName
+      ? `\n\nIn this conversation your name is ${assistantName}, the name of the voice the student chose. If the student calls you ${assistantName}, that is you; never correct it.`
+      : "";
+  return `${passagesBlock(passages)}\n\n${LEVEL_INSTRUCTIONS[level]}${named}\n\nThe student's question:\n${question}`;
 }

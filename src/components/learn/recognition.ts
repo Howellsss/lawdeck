@@ -39,8 +39,8 @@ export function voiceErrorMessage(code: string): string {
 
 
 // How long a pause means the student has finished speaking (voice mode), and how long to wait
-// for them to start before listening afresh.
-export const END_OF_TURN_MS = 1100;
+// for them to start before listening afresh. 0.7 s (founder, 2026-11-08: "faster"); was 1.1 s.
+export const END_OF_TURN_MS = 700;
 const WAIT_FOR_SPEECH_MS = 15_000;
 
 // Listens for one turn of a conversation and returns its words (voice mode). Short pauses
@@ -71,6 +71,23 @@ export function listenOnce(cancel?: AbortSignal): Promise<string> {
       if (words.trim() ? quiet >= END_OF_TURN_MS : Date.now() - started >= WAIT_FOR_SPEECH_MS) recognition.stop();
     }, 200);
     recognition.onend = () => {
+      // Phones often switch the microphone off by themselves after a few quiet seconds. While
+      // nothing has been heard yet, it is switched straight back on, up to WAIT_FOR_SPEECH_MS
+      // (founder, 2026-11-08: "more sensitive").
+      const quietRestart =
+        !words.trim() &&
+        !cancel?.aborted &&
+        (failed === "" || failed === "no-speech") &&
+        Date.now() - started < WAIT_FOR_SPEECH_MS;
+      if (quietRestart) {
+        try {
+          failed = "";
+          recognition.start();
+          return;
+        } catch {
+          // The browser would not restart it: end the turn as before.
+        }
+      }
       clearInterval(timer);
       cancel?.removeEventListener("abort", stop);
       if (cancel?.aborted) reject(new Error("aborted"));
