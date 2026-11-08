@@ -27,7 +27,7 @@ Last updated: 2026-11-06 (study group invite links and the ID test switch).
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
 - **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
-  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links · #178 call Leave fix · #179 dictation, MCQ up to 30, quiz music. #180 quiz music louder and steady. #181 smooth quiz bass. Louder voice mode on phones is the open pull request after #181. Pitch deck (pre-seed, $120,000 ask) made outside the repo in /home/user/lawdeck-proposal/pitch-deck.html.
+  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links · #178 call Leave fix · #179 dictation, MCQ up to 30, quiz music. #180 quiz music louder and steady. #181 smooth quiz bass. #183 louder voice mode. Library Drive links and Apply to all is the open pull request after #183 (founder to add GOOGLE_DRIVE_SERVER_KEY in Vercel). Pitch deck (pre-seed, $120,000 ask) made outside the repo in /home/user/lawdeck-proposal/pitch-deck.html.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):

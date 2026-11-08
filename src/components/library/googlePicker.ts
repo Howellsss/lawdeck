@@ -11,6 +11,8 @@ const ACCEPTED_TYPES = [
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "image/png",
   "image/jpeg",
+  // Google Docs are saved as PDF when imported (founder, 2026-11-08).
+  "application/vnd.google-apps.document",
 ].join(",");
 
 // The small part of Google's scripts that Lawdeck uses.
@@ -85,7 +87,9 @@ function requestToken(google: GoogleGlobal, clientId: string): Promise<string> {
       callback: (response) => (response.access_token ? resolve(response.access_token) : reject(new Error(response.error ?? "token"))),
       error_callback: (error) => reject(new Error(error.type)),
     });
-    client.requestAccessToken({ prompt: "" });
+    // Google asks which account to use every time, so files in another Drive can be picked
+    // (founder, 2026-11-08: "it's in a different drive altogether").
+    client.requestAccessToken({ prompt: "select_account" });
   });
 }
 

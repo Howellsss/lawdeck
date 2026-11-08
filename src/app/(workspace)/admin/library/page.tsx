@@ -12,6 +12,7 @@ import { getRecheckReasons } from "@/server/db/lawChanges";
 import { getStaffRole } from "@/server/auth/roles";
 import { getSupabaseConfig } from "@/server/auth/config";
 import { listLibraryItems } from "@/server/db/library";
+import { driveServerKey } from "@/server/library/drive";
 import { getDrivePickerConfig } from "@/server/library/driveConfig";
 import { listCourses } from "@/server/db/workspace";
 import { EMBEDDING_MODEL } from "@/server/retrieval/settings";
@@ -41,6 +42,8 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
   const items = filter === "recheck" ? allItems.filter((item) => recheck.has(item.id)) : allItems;
   const apiKey = getSupabaseConfig()?.key ?? "";
   const drive = role === "admin" ? getDrivePickerConfig() : null;
+  // Pasting Drive links needs the server-only Google key (GOOGLE_DRIVE_SERVER_KEY).
+  const driveLinks = role === "admin" && driveServerKey() !== null;
 
   return (
     <>
@@ -59,7 +62,7 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
           </Link>
         </p>
       </div>
-      {drive && courses.status === "ok" && <DriveImport config={drive} courses={courses.data} />}
+      {(drive || driveLinks) && courses.status === "ok" && <DriveImport config={drive} courses={courses.data} links={driveLinks} />}
       {role === "admin" && courses.status === "ok" && <UploadForm courses={courses.data} apiKey={apiKey} />}
       <section aria-labelledby="library-items" className="flex flex-col gap-3">
         <h2 id="library-items" className="text-lg font-medium">
