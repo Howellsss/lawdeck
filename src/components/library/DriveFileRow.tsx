@@ -11,6 +11,7 @@ export type DriveRow = {
   sizeBytes: number;
   title: string;
   courseId: string;
+  type: string;
   year: string;
   status: "ready" | "importing" | "reading" | "done" | "skipped" | "failed";
   message?: string;
@@ -51,7 +52,7 @@ export function DriveFileRow({
           <SelectField
             label="Type"
             name={`type-${index}`}
-            defaultValue="course_material"
+            defaultValue={row.type}
             error={row.errors?.type}
             options={Object.entries(KB_ITEM_TYPES)}
           />

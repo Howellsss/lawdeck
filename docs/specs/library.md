@@ -98,6 +98,19 @@ Tests: `tests/permissions/sql/40_library_search_test.sql` (15 checks), `tests/un
 
 Tests: `tests/unit/driveImport.test.ts` (12 checks), `tests/unit/drivePicker.test.ts` (4 checks).
 
+### Faster imports (founder, 2026-11-08: "a lot of documents, in a different drive")
+- **Choose the Google account:** the picker asks which Google account to use every time
+  (`prompt: "select_account"`), so files in any of the admin's Drives can be picked.
+- **Paste Drive links:** a box for many links at once (files or whole folders, one per line). The
+  server reads them with `GOOGLE_DRIVE_SERVER_KEY` (server-only, restricted to the Drive API), so
+  they must be shared as "Anyone with the link can view". A folder brings its PDF, Word, Google Doc,
+  PNG and JPEG files and those in sub-folders two levels down, up to 100 at a time. Only Google's
+  own addresses are accepted (`src/lib/driveLinks.ts`).
+- **Google Docs** are saved as PDF on the way in (picker or link); Sheets and Slides are refused.
+- **Apply to all:** course, type and year set once for every file; each can still be changed.
+- Every file is still checked like an upload (admin only, real type, 25 MB, duplicates) and lands
+  "awaiting review".
+
 ### Founder steps for the Drive import (Google Cloud, same project as Google sign-in)
 
 1. APIs & Services > Library: enable **Google Picker API** and **Google Drive API**.

@@ -8,7 +8,10 @@ import { compactPrimaryButton, compactSecondaryButton } from "@/components/ui/bu
 import { driveWorksHere } from "@/lib/driveOrigin";
 import { guessCourse, guessYear, titleFromFileName } from "@/lib/driveGuess";
 import { importFromDrive } from "@/server/library/driveActions";
+import type { DriveListed } from "@/server/library/drive";
+import { ApplyToAll, type AllDetails } from "./ApplyToAll";
 import { DriveFileRow, type DriveRow } from "./DriveFileRow";
+import { DriveLinks } from "./DriveLinks";
 import { pickDriveFiles, type PickerConfig } from "./googlePicker";
 import { readAndIndex } from "./readItem";
 
@@ -18,37 +21,68 @@ type Courses = { id: string; name: string }[];
 const noChange = () => () => {};
 const pageOrigin = () => window.location.origin;
 
-// Admins pick several files in Google Drive, check the suggested details, and import them.
+// Admins pick several files in Google Drive (choosing which Google account), or paste Drive links
+// to files or whole folders, check the suggested details (or set them for all), and import them.
 // Each file is fetched by the server, checked like an upload, then read and indexed.
-export function DriveImport({ config, courses }: { config: PickerConfig; courses: Courses }) {
+export function DriveImport({
+  config,
+  courses,
+  links = false,
+  initialFiles,
+}: {
+  config: PickerConfig | null;
+  courses: Courses;
+  links?: boolean;
+  // Test pages only: files already found from links.
+  initialFiles?: DriveListed[];
+}) {
   const router = useRouter();
-  const [token, setToken] = useState<string | null>(null);
-  const [rows, setRows] = useState<DriveRow[]>([]);
+  const toRows = (files: { id: string; name: string; sizeBytes: number }[]): DriveRow[] =>
+    files.map((file) => ({
+      fileId: file.id,
+      fileName: file.name,
+      sizeBytes: file.sizeBytes,
+      title: titleFromFileName(file.name),
+      courseId: guessCourse(file.name, courses) ?? "",
+      type: "course_material",
+      year: guessYear(file.name),
+      status: "ready",
+    }));
+
+  // The picker's token, or "link" for files found from pasted links (the server's key is used).
+  const [token, setToken] = useState<string | null>(initialFiles ? "link" : null);
+  const [rows, setRows] = useState<DriveRow[]>(() => (initialFiles ? toRows(initialFiles) : []));
+  // Bumped when "Apply to all" changes the rows, so their fields show the new values.
+  const [version, setVersion] = useState(0);
   const [busy, setBusy] = useState(false);
   const [notice, setNotice] = useState<{ tone: "warning" | "success"; message: string } | null>(null);
   const origin = useSyncExternalStore(noChange, pageOrigin, () => null);
-  const elsewhere = origin !== null && !driveWorksHere(origin, config.liveOrigin);
+  const elsewhere = config !== null && origin !== null && !driveWorksHere(origin, config.liveOrigin);
+
+  const fromLinks = (files: DriveListed[]) => {
+    setNotice(null);
+    setToken("link");
+    setRows(toRows(files));
+    setVersion((v) => v + 1);
+  };
+
+  const applyAll = (details: AllDetails) => {
+    setRows((current) => current.map((row) => (row.status === "done" || row.status === "skipped" ? row : { ...row, ...details })));
+    setVersion((v) => v + 1);
+  };
 
   const update = (index: number, change: Partial<DriveRow>) =>
     setRows((current) => current.map((row, i) => (i === index ? { ...row, ...change } : row)));
 
   async function choose() {
+    if (!config) return;
     setNotice(null);
     try {
       const picked = await pickDriveFiles(config);
       if (picked.files.length === 0) return;
       setToken(picked.token);
-      setRows(
-        picked.files.map((file) => ({
-          fileId: file.id,
-          fileName: file.name,
-          sizeBytes: file.sizeBytes,
-          title: titleFromFileName(file.name),
-          courseId: guessCourse(file.name, courses) ?? "",
-          year: guessYear(file.name),
-          status: "ready",
-        })),
-      );
+      setRows(toRows(picked.files));
+      setVersion((v) => v + 1);
     } catch (error) {
       setNotice({
         tone: "warning",
@@ -72,7 +106,7 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
       if (row.status === "done" || row.status === "skipped") continue;
       update(index, { status: "importing", message: "Fetching from Google Drive…", errors: undefined });
       const result = await importFromDrive({
-        accessToken: token,
+        accessToken: token === "link" ? undefined : token,
         fileId: row.fileId,
         details: {
           title: text(`title-${index}`),
@@ -112,13 +146,13 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
       <h2 id="drive-import" className="text-lg font-medium">
         Import from Google Drive
       </h2>
-      <p className="text-sm text-muted">
+      {config && <p className="text-sm text-muted">
         Choose several files at once (PDF, Word, PNG or JPEG, up to 25 MB each): in Google&rsquo;s window, hold{" "}
         <kbd>Cmd</kbd> (Mac) or <kbd>Ctrl</kbd> (Windows) and click each file, or hold <kbd>Shift</kbd> to pick a run of
-        files, then click <strong>Select</strong>. Lawdeck can open only the files you choose, and only for about an hour.
-      </p>
+        files, then click <strong>Select</strong>. Google asks which account to use, so you can pick from any of your Drives. Lawdeck can open only the files you choose, and only for about an hour.
+      </p>}
       <FormAlert message={notice?.message} tone={notice?.tone} />
-      {elsewhere ? (
+      {!config ? null : elsewhere ? (
         // Google would block the picker on this address, so send the admin to the live one instead.
         <p className="text-sm">
           Google Drive import works only on Lawdeck&rsquo;s main address.{" "}
@@ -131,11 +165,13 @@ export function DriveImport({ config, courses }: { config: PickerConfig; courses
           </button>
         </div>
       )}
+      {links && <DriveLinks disabled={busy} onFound={fromLinks} />}
       {rows.length > 0 && (
         <form onSubmit={importAll} noValidate className="flex flex-col gap-4">
+          {rows.length > 1 && <ApplyToAll courses={courses} disabled={busy} onApply={applyAll} />}
           <ul aria-label="Files to import" className="flex flex-col divide-y divide-line rounded-2xl border border-line">
             {rows.map((row, index) => (
-              <DriveFileRow key={row.fileId} row={row} index={index} courses={courses} disabled={busy} />
+              <DriveFileRow key={`${row.fileId}-${version}`} row={row} index={index} courses={courses} disabled={busy} />
             ))}
           </ul>
           <div className="grid gap-3 sm:grid-cols-2">
