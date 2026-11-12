@@ -2,7 +2,7 @@
 // Versioned: change the version whenever the wording changes, and re-run the evaluation set.
 // No legal content lives here: every legal point comes from the library passages supplied.
 
-export const EXPLAIN_PROMPT_VERSION = "explain-v10";
+export const EXPLAIN_PROMPT_VERSION = "explain-v11";
 
 // The first line Claude writes when the passages cannot support an answer. The server
 // recognises it and shows the "not enough support" response instead (LN-04).
@@ -66,9 +66,11 @@ Use these sections instead, each starting with a heading line beginning "## ":
 ## Exam tip
 ## Authorities
 (as described above)
-- Work through every issue in the list; do not stop at the first one.
+- If the question is set out in parts ((a), (b), (c)... or (i), (ii)...), answer every part, in order, each under its own heading "## Part (a): <the part in a few words>", in place of the "## Issue" sections; keep "## The facts in brief" first and "## Advice", "## Exam tip" and "## Authorities" last.
+- Work through every issue and every part; do not stop at the first one.
 - Give full, valuable detail under every issue, not a summary: an examiner rewards depth of analysis and accurate authority.
-- If the passages support some issues but not others, answer the supported ones and, under each unsupported issue, say in one sentence that the Lawdeck library does not cover it yet. Use ${NOT_ENOUGH_MARKER} only if the passages support none of the issues.
+- If the passages support some issues or parts but not others, answer the supported ones in full and, under each unsupported one, say in one sentence that the Lawdeck library does not cover it yet. A problem question is never declined as a whole when any passage bears on any of its issues or parts: never write ${NOT_ENOUGH_MARKER} for it then.
+- If a part asks you to draft or prepare a court process or document (for example a writ of summons or a statement of claim), set out from the passages what it must contain, its form and the rules that govern it, and add that the student can draft it in full with Lawdeck's Drafting catalogue. Never refuse a part because no template is among the passages.
 - Never fill a gap with outside knowledge or an authority that is not in the passages.
 
 When the passages are not enough:
@@ -155,16 +157,22 @@ export function isScenario(question: string): boolean {
   return question.trim().split(/\s+/).filter(Boolean).length >= SCENARIO_MIN_WORDS;
 }
 
+// Sent once, only when a problem question with passages was declined as a whole (founder,
+// 2026-11-12: "never, ever"): the answer is asked for again, part by part.
+export const ANSWER_EVERY_PART_NOTE = `Your first reply declined this whole problem question, but the library passages above were found for it. Do not write ${NOT_ENOUGH_MARKER}. Answer every issue and every part from the passages, and under any issue or part the passages do not cover, say in one sentence that the Lawdeck library does not cover it yet.`;
+
 export function questionMessage(
   passages: ExplainPassage[],
   question: string,
   level: AnswerLevel = "exam",
   // Voice mode: the name of the voice the student chose, which the student may call you by.
   assistantName?: string,
+  // Added only for the one repeat of a declined problem question.
+  note?: string,
 ): string {
   const named =
     level === "talk" && assistantName
       ? `\n\nIn this conversation your name is ${assistantName}, the name of the voice the student chose. If the student calls you ${assistantName}, that is you; never correct it.`
       : "";
-  return `${passagesBlock(passages)}\n\n${LEVEL_INSTRUCTIONS[level]}${named}\n\nThe student's question:\n${question}`;
+  return `${passagesBlock(passages)}\n\n${LEVEL_INSTRUCTIONS[level]}${named}\n\nThe student's question:\n${question}${note ? `\n\n${note}` : ""}`;
 }

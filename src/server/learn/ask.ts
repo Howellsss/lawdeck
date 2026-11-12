@@ -1,6 +1,7 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import {
+  ANSWER_EVERY_PART_NOTE,
   isScenario,
   questionMessage,
   type AnswerLevel,
@@ -313,7 +314,6 @@ export async function composeAnswer(input: {
     input.courseId,
   );
   context.labels = new Set(hits.map((hit) => hit.label));
-  const filter = new AnswerFilter(context);
   const passages: ExplainPassage[] = hits.map((hit) => ({
     label: hit.label,
     itemTitle: hit.itemTitle,
@@ -323,41 +323,71 @@ export async function composeAnswer(input: {
     origin: hit.origin ?? "library",
     sourceKind: hit.sourceKind,
   }));
-  const turns: ExplainTurn[] = [
-    ...input.history,
-    {
-      role: "user",
-      text: questionMessage(passages, input.question, input.level, input.assistantName),
-    },
-  ];
+  const long = input.level !== "talk" && isScenario(input.question);
 
-  let shown = "";
-  let raw = "";
-  const show = (text: string) => {
-    if (!text) return;
-    shown += text;
-    input.onText(text);
+  // One answer from Claude, checked as it streams. `hold` keeps a whole-question "not enough"
+  // off the screen, so it can be asked again instead.
+  const attempt = async (note: string | undefined, hold: boolean) => {
+    const filter = new AnswerFilter(context);
+    const turns: ExplainTurn[] = [
+      ...input.history,
+      {
+        role: "user",
+        text: questionMessage(passages, input.question, input.level, input.assistantName, note),
+      },
+    ];
+    let shown = "";
+    let raw = "";
+    const show = (text: string) => {
+      if (!text || (hold && filter.notEnough)) return;
+      shown += text;
+      input.onText(text);
+    };
+    // The check may ask the library before letting a sentence through, so pieces are checked one
+    // after another, in order.
+    let checking: Promise<void> = Promise.resolve();
+    const result = await streamExplanation({
+      turns,
+      userId: input.userId,
+      onText: (text) => {
+        raw += text;
+        checking = checking.then(async () => show(await filter.push(text)));
+      },
+      signal: input.signal,
+      model: input.model,
+      long,
+      short: input.level === "talk",
+      // Voice mode records the call below, once it knows whether the reply taught from the library;
+      // a problem question below too, so a repeat still counts as one question.
+      record: input.level !== "talk" && !long,
+    });
+    await checking;
+    if (result.ok) show(await filter.end());
+    return { filter, shown, raw, result };
   };
-  // The check may ask the library before letting a sentence through, so pieces are checked one
-  // after another, in order.
-  let checking: Promise<void> = Promise.resolve();
-  const result = await streamExplanation({
-    turns,
-    userId: input.userId,
-    onText: (text) => {
-      raw += text;
-      checking = checking.then(async () => show(await filter.push(text)));
-    },
-    signal: input.signal,
-    model: input.model,
-    long: input.level !== "talk" && isScenario(input.question),
-    short: input.level === "talk",
-    // Voice mode records the call below, once it knows whether the reply taught from the library.
-    record: input.level !== "talk",
-  });
-  await checking;
+
+  // A problem question with library passages is never declined as a whole (founder, 2026-11-12):
+  // if Claude does, the answer is asked for once more, part by part. The student sees only that.
+  const first = await attempt(undefined, long);
+  let { filter, shown, raw, result } = first;
+  if (long && result.ok && filter.notEnough)
+    ({ filter, shown, raw, result } = await attempt(ANSWER_EVERY_PART_NOTE, false));
+  if (long) {
+    const calls = [first.result, ...(result === first.result ? [] : [result])].filter(
+      (call): call is Extract<ExplainResult, { ok: true }> => call.ok,
+    );
+    const last = calls.at(-1);
+    if (last)
+      await recordUsage({
+        kind: "explain",
+        model: last.model,
+        tokensIn: calls.reduce((sum, call) => sum + call.tokensIn, 0),
+        tokensOut: calls.reduce((sum, call) => sum + call.tokensOut, 0),
+        costUsd: calls.some((call) => call.costUsd === null) ? null : calls.reduce((sum, call) => sum + (call.costUsd ?? 0), 0),
+        ms: calls.reduce((sum, call) => sum + call.ms, 0),
+      });
+  }
   if (!result.ok) return { ok: false, reason: result.reason };
-  show(await filter.end());
   if (!shown.trim()) return { ok: false, reason: "unavailable" };
 
   const cited = filter.notEnough
