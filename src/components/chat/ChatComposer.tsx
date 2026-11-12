@@ -11,6 +11,7 @@ import { applyFormat, FormatBar, type Format } from "./FormatBar";
 import { LinkDialog } from "./LinkDialog";
 import { VoiceRecorder } from "./VoiceRecorder";
 import { useAttachments, type Attached } from "./useAttachments";
+import { isTouchOnly, sendsChatMessage } from "@/lib/enterKey";
 
 export type { Attached };
 
@@ -153,7 +154,7 @@ export function ChatComposer({
       format(({ b: "bold", i: "italic", u: "underline", k: "link" } as const)[e.key.toLowerCase() as "b" | "i" | "u" | "k"]);
       return;
     }
-    if (e.key === "Enter" && !e.shiftKey && !e.nativeEvent.isComposing) {
+    if (sendsChatMessage(e, isTouchOnly())) {
       e.preventDefault();
       void send();
     }
