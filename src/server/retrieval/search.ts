@@ -2,6 +2,8 @@ import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { isScenario } from "@/prompts/explain";
 import { listIssues } from "@/server/ai/issues";
+import { partSearches, splitParts } from "@/lib/questionParts";
+import { MAX_ISSUES } from "@/prompts/issues";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import type { Database, SourceKind } from "@/server/db/types";
 import { passageSearchText } from "./indexJob";
@@ -132,9 +134,12 @@ export async function searchForQuestion(input: {
   recordUsage?: boolean;
 }): Promise<SearchResult> {
   if (!isScenario(input.question)) return searchForAnswer({ ...input, results: SEARCH_RESULTS });
+  // A question set out in lettered parts is searched part by part, with no AI call; otherwise
+  // Claude lists its issues (founder, 2026-11-12: every part must be searched).
+  const parts = splitParts(input.question);
   const [whole, issues] = await Promise.all([
     searchForAnswer({ ...input, results: SCENARIO_SEARCH_RESULTS, rerankTimeoutMs: SCENARIO_RERANK_TIMEOUT_MS, retryRerank: true }),
-    listIssues(input.question, input.recordUsage ?? true),
+    parts ? partSearches(parts.parts, MAX_ISSUES) : listIssues(input.question, input.recordUsage ?? true),
   ]);
   if (!whole.ok || issues.length === 0) return whole;
   const perIssue = await Promise.all(

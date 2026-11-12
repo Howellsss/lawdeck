@@ -1,3 +1,4 @@
+import { sampleNow } from "./sampleNow";
 import type { ChatGroup, ChatInvite, ChatMessage } from "@/server/chat/data";
 
 // Made-up groups, people and messages for the campus chat test pages.
@@ -22,7 +23,7 @@ const msg = (n: number, author: typeof ada, at: string, body: string, mine = fal
   lesson: null,
   poll: null,
 });
-const now = Date.now();
+const now = sampleNow();
 const today = (minutesAgo: number) => new Date(now - minutesAgo * 60_000).toISOString();
 export const messages: ChatMessage[] = [
   msg(1, tunde, new Date(now - 26 * 3_600_000).toISOString(), "Has anyone got the **Civil Litigation** notes on _Order 3_? #civil"),
