@@ -62,8 +62,42 @@ const REPLACEMENTS: [RegExp, string][] = [
   ]),
 ];
 
+// Bracketed parts of a provision are read the way a lawyer says them (founder, 2026-11-12):
+// "section 46(1)(a)" is "section 46, subsection 1, paragraph A"; a further "(ii)" is
+// "subparagraph 2". For rules of court, "rule 4(2)(b)" is "rule 4, sub-rule 2, paragraph B".
+const ROMAN: Record<string, number> = { i: 1, ii: 2, iii: 3, iv: 4, v: 5, vi: 6, vii: 7, viii: 8, ix: 9, x: 10, xi: 11, xii: 12 };
+const PART = String.raw`\(\s*(?:\d+[A-Za-z]?|[a-zA-Z]{1,4})\s*\)`;
+const REFERENCE = String.raw`\d+[A-Z]?(?:\s*${PART})+`;
+const PROVISION = new RegExp(
+  String.raw`\b(sections?|rules?)\s+(${REFERENCE}(?:(?:\s*,\s*|\s+(?:and|or|to)\s+)(?:${REFERENCE}|\d+[A-Z]?))*)`,
+  "g",
+);
+
+function spokenParts(kind: "section" | "rule", reference: string): string {
+  const [, number, rest] = reference.match(/^(\d+[A-Z]?)([^]*)$/) ?? [];
+  if (!number) return reference;
+  const parts = [...(rest ?? "").matchAll(/\(\s*([^)\s]+)\s*\)/g)].map((m) => m[1]);
+  const spoken = parts.map((part, index) => {
+    if (/^\d+[A-Za-z]?$/.test(part)) return `${index === 0 ? (kind === "section" ? "subsection" : "sub-rule") : "paragraph"} ${part}`;
+    const roman = ROMAN[part.toLowerCase()];
+    // A letter is a paragraph; a small Roman numeral after a paragraph is a subparagraph.
+    if (roman && (index > 0 && /^[a-z]$/i.test(parts[index - 1] ?? "") || part.length > 1))
+      return `subparagraph ${roman}`;
+    return `paragraph ${part.toUpperCase()}`;
+  });
+  return [number, ...spoken].join(", ");
+}
+
+function readProvisions(line: string): string {
+  return line.replace(PROVISION, (_match, word: string, list: string) => {
+    const kind = word.toLowerCase().startsWith("section") ? "section" : "rule";
+    const read = list.replace(new RegExp(REFERENCE, "g"), (reference) => spokenParts(kind, reference));
+    return `${word} ${read},`;
+  }).replace(/,(\s*[.;:!?)]|$)/g, "$1").replace(/,,/g, ",");
+}
+
 function readLegal(line: string): string {
-  return REPLACEMENTS.reduce((out, [pattern, value]) => out.replace(pattern, value), line);
+  return readProvisions(REPLACEMENTS.reduce((out, [pattern, value]) => out.replace(pattern, value), line));
 }
 
 // One line of the answer as a spoken sentence.

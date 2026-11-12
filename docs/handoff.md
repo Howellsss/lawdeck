@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-08 (voice mode greets students by name).
+Last updated: 2026-11-12 (voice reads provisions in full).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -27,7 +27,7 @@ Last updated: 2026-11-08 (voice mode greets students by name).
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
 - **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
-  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links · #178 call Leave fix · #179 dictation, MCQ up to 30, quiz music. #180 quiz music louder and steady. #181 smooth quiz bass. #183 louder voice mode. #184 library Drive links and Apply to all (founder to add GOOGLE_DRIVE_SERVER_KEY in Vercel). Voice mode by name (instant greetings with the student's first name, quicker listening, prompt explain-v10) is the open pull request after #184; re-run the explanations eval after it merges. Pitch deck (pre-seed, $120,000 ask) made outside the repo in /home/user/lawdeck-proposal/pitch-deck.html.
+  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links · #178 call Leave fix · #179 dictation, MCQ up to 30, quiz music. #180 quiz music louder and steady. #181 smooth quiz bass. #183 louder voice mode. #184 library Drive links and Apply to all (founder to add GOOGLE_DRIVE_SERVER_KEY in Vercel). Voice mode by name (instant greetings with the student's first name, quicker listening, prompt explain-v10) merged as #185. Voice reading provisions in full ("section 46, subsection 1, paragraph A") is the open pull request after #185. The explanations eval run after #185 stopped halfway: the Anthropic account ran out of credit (founder to top up, then re-run only cases Q46-Q52 on claude-haiku-5-5). Pitch deck (pre-seed, $120,000 ask) made outside the repo in /home/user/lawdeck-proposal/pitch-deck.html.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
