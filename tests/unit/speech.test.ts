@@ -43,7 +43,7 @@ describe("reading like a lawyer", () => {
   });
 
   it("reads sections, orders, rules and law reports aloud", () => {
-    expect(spoken).toContain("section 36(6) C.F.R.N.");
+    expect(spoken).toContain("section 36, subsection 6, C.F.R.N.");
     expect(spoken).toContain("Order 13 rule 4");
     expect(speakableText("(2001) 7 NWLR (Pt. 712) 1")).toBe("(2001) 7 N.W.L.R. part 712 1.");
     expect(speakableText("e.g. a company, i.e. a legal person")).toBe("for example a company, that is a legal person.");
@@ -101,5 +101,29 @@ describe("checks", () => {
     expect(speechRequestSchema.safeParse({ messageId: id, part: 0, voice: "female" }).success).toBe(false);
     for (const voice of ["uk-male", "us-female", "us-male", "ng-female", "ng-male"])
       expect(speechRequestSchema.safeParse({ messageId: id, part: 0, voice }).success).toBe(true);
+  });
+});
+
+describe("reading provisions the way a lawyer says them (founder, 2026-11-12)", () => {
+  it("reads subsections and paragraphs in full", () => {
+    expect(speakableText("section 46 (1) (a)")).toBe("section 46, subsection 1, paragraph A.");
+    expect(speakableText("Under section 46(1)(a) of the Constitution of the Federal Republic of Nigeria, 1999 (as amended), a person may apply.")).toBe(
+      "Under section 46, subsection 1, paragraph A, of the Constitution of the Federal Republic of Nigeria, 1999 (as amended), a person may apply.",
+    );
+    expect(speakableText("section 6(6)(b)")).toBe("section 6, subsection 6, paragraph B.");
+  });
+
+  it("reads subparagraphs, short forms and lists", () => {
+    expect(speakableText("section 36(6)(b)(ii) gives time")).toBe("section 36, subsection 6, paragraph B, subparagraph 2, gives time.");
+    expect(speakableText("See s. 36(6)(b) CFRN")).toBe("See section 36, subsection 6, paragraph B, C.F.R.N.");
+    expect(speakableText("sections 35(1) and 36(6)(b) apply")).toBe("sections 35, subsection 1 and 36, subsection 6, paragraph B, apply.");
+  });
+
+  it("reads rules of court with sub-rules", () => {
+    expect(speakableText("O. 13 r. 4(2)(b)")).toBe("Order 13 rule 4, sub-rule 2, paragraph B.");
+  });
+
+  it("leaves plain sections alone", () => {
+    expect(speakableText("section 84 of the Evidence Act")).toBe("section 84 of the Evidence Act.");
   });
 });

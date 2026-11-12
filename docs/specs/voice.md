@@ -85,3 +85,10 @@ The free tier allows a limited number of requests a minute; move to **Standard S
   replies have it taken out (`withoutName`) before they go to the AI or the search as context.
 - Listening: the turn ends after 0.7 s of quiet (was 1.1 s). If the phone switches the microphone
   off by itself before anything is heard, it is switched straight back on, for up to 15 seconds.
+
+## Reading provisions (founder, 2026-11-12)
+- Bracketed parts of a provision are read in full: "section 46(1)(a)" is spoken "section 46,
+  subsection 1, paragraph A"; a further "(ii)" is "subparagraph 2". Lists work too ("sections
+  35(1) and 36(6)(b)"). Rules of court: "O. 13 r. 4(2)(b)" is "Order 13 rule 4, sub-rule 2,
+  paragraph B". Only speech changes; the written answer is untouched. Code: `readProvisions` in
+  `src/lib/speech.ts`.
