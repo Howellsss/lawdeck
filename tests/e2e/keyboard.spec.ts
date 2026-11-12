@@ -23,3 +23,13 @@ test("the message box shows where keyboard focus is", async ({ page }) => {
     .evaluate((form) => getComputedStyle(form).outlineStyle);
   expect(outline).not.toBe("none");
 });
+
+test("Enter starts a new line in the question box instead of sending (founder, 2026-11-12)", async ({ page }) => {
+  await page.goto("/");
+  const box = page.getByLabel("What are we working on?");
+  await box.fill("First line");
+  await box.press("Enter");
+  await box.pressSequentially("Second line");
+  await expect(box).toHaveValue("First line\nSecond line");
+  await expect(page).toHaveURL(/\/$/);
+});

@@ -11,6 +11,7 @@ import { startChat } from "@/server/learn/actions";
 import { VoiceMode } from "./VoiceMode";
 import { VoiceButton } from "./VoiceButton";
 import { openNewChat } from "./openNewChat";
+import { sendsQuestion } from "@/lib/enterKey";
 
 const MODES = ["Auto", "Learn", "Draft"] as const;
 type Mode = (typeof MODES)[number];
@@ -123,7 +124,7 @@ export function Composer({ voice = false }: { voice?: boolean }) {
           value={text}
           onChange={(event) => setText(event.target.value)}
           onKeyDown={(event) => {
-            if (event.key === "Enter" && !event.shiftKey) void submit(event);
+            if (sendsQuestion(event)) void submit(event);
           }}
           placeholder="What are we working on?"
           className="resize-none bg-transparent px-2.5 text-[16px] leading-relaxed text-ink outline-none placeholder:text-muted"
