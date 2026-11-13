@@ -294,6 +294,8 @@ test("Anyone can read the Privacy Notice and Terms of Service, linked from sign-
   await page.getByRole("contentinfo").getByRole("link", { name: "Terms of Service" }).click();
   await expect(page.getByRole("heading", { level: 1, name: "Terms of Service" })).toBeVisible();
   await expect(page.getByText("Lawdeck is a study aid. It is not a law firm")).toBeVisible();
+  await page.goto("/terms-of-use");
+  await expect(page).toHaveURL(/\/terms$/);
   const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
   expect(overflow).toBeLessThanOrEqual(0);
 });

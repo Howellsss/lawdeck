@@ -1,7 +1,7 @@
 # Privacy Notice and Terms of Service (founder, 2026-11-13)
 
 - Public pages, open to everyone: **/privacy** (Privacy Notice) and **/terms** (Terms of Service,
-  also called terms of use). Linked from sign-in (with Request removal), sign-up ("By creating an
+  also called Terms of Use; **/terms-of-use** redirects to it). Linked from sign-in (with Request removal), sign-up ("By creating an
   account you agree…") and each other's footer. Google's OAuth consent screen and app stores use
   https://mylawdeck.com/privacy and https://mylawdeck.com/terms.
 - The wording is data: `src/templates/policies/privacy.ts` and `terms.ts` (sections of paragraphs and

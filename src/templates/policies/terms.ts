@@ -6,7 +6,7 @@ export const TERMS_OF_SERVICE: Policy = {
   title: "Terms of Service",
   updated: "2026-11-13",
   intro: [
-    "These terms are the agreement between you and Lawdeck (mylawdeck.com) for using Lawdeck's website and services. Please read them. By creating an account or using Lawdeck, you agree to them. If you do not agree, please do not use Lawdeck.",
+    "These terms (also called our Terms of Use) are the agreement between you and Lawdeck (mylawdeck.com) for using Lawdeck's website and services. Please read them. By creating an account or using Lawdeck, you agree to them. If you do not agree, please do not use Lawdeck.",
     "How we handle your personal data is explained in our Privacy Notice, which forms part of these terms.",
   ],
   sections: [
