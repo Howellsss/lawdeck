@@ -1,4 +1,4 @@
-import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+import { beforeEach, describe, expect, it, vi } from "vitest";
 import { TERMS_REQUIRED_ERROR, TERMS_VERSION } from "@/lib/terms";
 
 // Accepting the Terms of Use and Privacy Notice (migration 67). Pretend sign-in and database.
@@ -30,25 +30,16 @@ const form = (values: Record<string, string>) => {
 };
 
 beforeEach(() => {
-  vi.stubEnv("TERMS_URL", "https://example.com/terms");
-  vi.stubEnv("PRIVACY_URL", "https://example.com/privacy");
   account = { id: "u1", email: "ada@test.invalid" };
   insert.mockReset().mockResolvedValue({ error: null });
   maybeSingle.mockReset().mockResolvedValue({ data: null, error: null });
   getClaims.mockReset().mockResolvedValue({ data: { claims: { user_metadata: {} } } });
   signUpCall.mockReset().mockResolvedValue({ data: { session: null }, error: null });
 });
-afterEach(() => vi.unstubAllEnvs());
 
-describe("the published addresses", () => {
-  it("switch acceptance on only when both are https addresses", () => {
-    expect(termsLinks()).toEqual({ terms: "https://example.com/terms", privacy: "https://example.com/privacy" });
-    vi.stubEnv("PRIVACY_URL", "");
-    expect(termsLinks()).toBeNull();
-    vi.stubEnv("PRIVACY_URL", "http://example.com/privacy");
-    expect(termsLinks()).toBeNull();
-    vi.stubEnv("PRIVACY_URL", "javascript:alert(1)");
-    expect(termsLinks()).toBeNull();
+describe("the documents", () => {
+  it("are Lawdeck's own Terms of Service and Privacy Notice pages", () => {
+    expect(termsLinks()).toEqual({ terms: "/terms", privacy: "/privacy" });
   });
 });
 
@@ -74,10 +65,7 @@ describe("Before you continue", () => {
     expect(insert).not.toHaveBeenCalled();
   });
 
-  it("asks nobody while the addresses are not set, or when signed out", async () => {
-    vi.stubEnv("TERMS_URL", "");
-    expect(await termsToAccept()).toBeNull();
-    vi.stubEnv("TERMS_URL", "https://example.com/terms");
+  it("asks nobody who is signed out", async () => {
     account = null;
     expect(await termsToAccept()).toBeNull();
   });
@@ -110,10 +98,4 @@ describe("sign-up", () => {
     expect(signUpCall.mock.calls[0][0].options.data).toMatchObject({ terms_version: TERMS_VERSION });
   });
 
-  it("needs no box while the addresses are not set", async () => {
-    vi.stubEnv("TERMS_URL", "");
-    const state = await signUp({ status: "idle" }, form(details));
-    expect(state.status).toBe("sent");
-    expect(signUpCall.mock.calls[0][0].options.data.terms_version).toBeUndefined();
-  });
 });

@@ -24,7 +24,9 @@ export default function SignInPage() {
       <p className="text-sm text-muted">
         New to Lawdeck? <SignUpLink />
       </p>
-      <p className="text-sm text-muted">
+      <p className="flex flex-wrap justify-center gap-x-4 gap-y-1 text-sm text-muted">
+        <Link href="/privacy">Privacy Notice</Link>
+        <Link href="/terms">Terms of Service</Link>
         <Link href="/takedown">Request removal of material</Link>
       </p>
     </>

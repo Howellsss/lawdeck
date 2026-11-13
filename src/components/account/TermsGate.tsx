@@ -8,7 +8,7 @@ import { TermsCheckbox } from "./TermsCheckbox";
 
 const initial: TermsState = { status: "idle" };
 
-// "Before you continue": shown once to anyone signed in who has not accepted the current Terms of Use
+// "Before you continue": shown once to anyone signed in who has not accepted the current Terms of Service
 // and Privacy Notice (for example after Google sign-in, or when the documents change).
 export function TermsGate({ terms, privacy }: { terms: string; privacy: string }) {
   const [state, action, pending] = useActionState(acceptTerms, initial);
@@ -18,7 +18,7 @@ export function TermsGate({ terms, privacy }: { terms: string; privacy: string }
         <h2 id="terms-title" className="font-serif text-2xl text-ink">
           Before you continue
         </h2>
-        <p className="mt-2 text-[15px] text-muted">Please read and accept Lawdeck’s Terms of Use and Privacy Notice. We record the date you accept.</p>
+        <p className="mt-2 text-[15px] text-muted">Please read and accept Lawdeck’s Terms of Service and Privacy Notice. We record the date you accept.</p>
         <form action={action} className="mt-5 flex flex-col gap-4">
           <FormAlert message={state.message} />
           <TermsCheckbox terms={terms} privacy={privacy} />

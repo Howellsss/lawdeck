@@ -1,4 +1,4 @@
-// The "I agree" tick box for the Terms of Use and Privacy Notice (migration 67). Both open in a new tab.
+// The "I agree" tick box for the Terms of Service and Privacy Notice (migration 67). Both open in a new tab.
 export function TermsCheckbox({ terms, privacy, error }: { terms: string; privacy: string; error?: string }) {
   return (
     <div className="flex flex-col gap-1">
@@ -15,7 +15,7 @@ export function TermsCheckbox({ terms, privacy, error }: { terms: string; privac
         <span>
           I am 18 or over, and I agree to Lawdeck’s{" "}
           <a href={terms} target="_blank" rel="noopener noreferrer">
-            Terms of Use
+            Terms of Service
           </a>{" "}
           and{" "}
           <a href={privacy} target="_blank" rel="noopener noreferrer">

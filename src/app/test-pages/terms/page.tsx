@@ -7,7 +7,7 @@ import { testPagesEnabled } from "../sample";
 
 // Terms acceptance test only (tests/voice/terms.spec.ts): the sign-up tick box and "Before you
 // continue". Sending needs an account. "Not found" unless LAWDECK_TEST_PAGES=1 (never set on the live site).
-const links = { terms: "https://example.com/terms", privacy: "https://example.com/privacy" };
+const links = { terms: "/terms", privacy: "/privacy" };
 
 export default function TestTermsPage() {
   return (

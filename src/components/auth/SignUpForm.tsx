@@ -14,7 +14,7 @@ import { TermsCheckbox } from "@/components/account/TermsCheckbox";
 
 const initialState: AuthFormState = { status: "idle" };
 
-export function SignUpForm({ terms }: { terms: { terms: string; privacy: string } | null }) {
+export function SignUpForm({ terms }: { terms: { terms: string; privacy: string } }) {
   const [state, formAction, pending] = useActionState(signUp, initialState);
   // Where to go once the account is ready (for example a study group invite link).
   const next = safeNextPath(useQuery().get("next"));
@@ -62,7 +62,7 @@ export function SignUpForm({ terms }: { terms: { terms: string; privacy: string 
         hint={`At least ${PASSWORD_MIN} characters. A short sentence is easy to remember.`}
         error={state.fieldErrors?.password}
       />
-      {terms && <TermsCheckbox terms={terms.terms} privacy={terms.privacy} error={state.fieldErrors?.agree} />}
+      <TermsCheckbox terms={terms.terms} privacy={terms.privacy} error={state.fieldErrors?.agree} />
       <button type="submit" disabled={pending} className={primaryButton}>
         {pending ? "Creating your account…" : "Create account"}
       </button>

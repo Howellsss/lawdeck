@@ -1,21 +1,17 @@
 import "server-only";
-import { z } from "@/lib/zod";
 import { TERMS_VERSION } from "@/lib/terms";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 
-// Acceptance of the Terms of Use and Privacy Notice (founder, 2026-11-13; questionnaire Q86).
-// Switched on only when both published addresses are set, so it never asks students to accept
-// documents they cannot open.
+// Acceptance of the Terms of Service and Privacy Notice (founder, 2026-11-13; questionnaire Q86).
+// Both are Lawdeck's own public pages (docs/specs/legal-pages.md).
 
 export type TermsLinks = { terms: string; privacy: string };
 
-const httpsUrl = z.url({ protocol: /^https$/ });
+const LINKS: TermsLinks = { terms: "/terms", privacy: "/privacy" };
 
-export function termsLinks(): TermsLinks | null {
-  const terms = httpsUrl.safeParse(process.env.TERMS_URL?.trim());
-  const privacy = httpsUrl.safeParse(process.env.PRIVACY_URL?.trim());
-  return terms.success && privacy.success ? { terms: terms.data, privacy: privacy.data } : null;
+export function termsLinks(): TermsLinks {
+  return LINKS;
 }
 
 // Records the signed-in person's acceptance of the current version (the database sets who and when).
@@ -34,7 +30,6 @@ export async function recordAcceptance(): Promise<boolean> {
 // at sign-up (kept with the account as the version they accepted) is recorded here without asking again.
 export async function termsToAccept(): Promise<TermsLinks | null> {
   const links = termsLinks();
-  if (!links) return null;
   const account = await getCurrentAccount();
   if (!account) return null;
   const supabase = await createSupabaseServerClient();
