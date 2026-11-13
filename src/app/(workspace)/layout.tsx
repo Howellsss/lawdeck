@@ -6,6 +6,7 @@ import { RecentsPlaceholder } from "@/components/shell/RecentsList";
 import { RecentsSlot } from "@/components/shell/RecentsSlot";
 import { ChatNavSlot } from "@/components/shell/ChatNavSlot";
 import { StaffNavSlot } from "@/components/shell/StaffNavSlot";
+import { TermsGateSlot } from "@/components/account/TermsGateSlot";
 
 export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
   return (
@@ -33,6 +34,9 @@ export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
       }
     >
       {children}
+      <Suspense fallback={null}>
+        <TermsGateSlot />
+      </Suspense>
     </AppShell>
   );
 }

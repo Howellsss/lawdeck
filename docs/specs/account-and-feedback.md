@@ -22,3 +22,12 @@ Founder approved 2026-10-23. PRD AC-05, FB-01, FB-03. Migration 28.
 
 ## Tests
 `tests/permissions/sql/9j_account_reports_takedowns_test.sql` (30 checks) · `tests/unit/deleteAccount.test.ts` · e2e visitor check for `/account`.
+
+## Accepting the Terms of Service and Privacy Notice (migration 67, founder approved 2026-11-13)
+- The documents are Lawdeck's own pages, /terms and /privacy (docs/specs/legal-pages.md). On from the start.
+- Sign-up: a required tick box, "I am 18 or over, and I agree to Lawdeck's Terms of Service and Privacy Notice" (checked on the server). The accepted version is kept with the new account and recorded at first sign-in.
+- Everyone else signed in (Google sign-in, existing students, or anyone after the documents change) sees "Before you continue" once and must tick and accept.
+- `terms_acceptances`: who, which version (`TERMS_VERSION` in `src/lib/terms.ts`), and when (set by the database). Own rows only; admins read all as evidence; nobody changes or deletes a record; removed with the account.
+- When either document changes (its `updated` date in `src/templates/policies`), set `TERMS_VERSION` to the new date: everyone accepts again, once.
+- Tests: `tests/permissions/sql/9zp_terms_acceptances_test.sql`, `tests/unit/termsAcceptance.test.ts`, `tests/voice/terms.spec.ts`.
+

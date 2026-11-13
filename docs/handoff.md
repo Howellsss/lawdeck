@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-13 (Privacy Notice and Terms of Service pages).
+Last updated: 2026-11-13 (consent record for the Terms of Service and Privacy Notice, migration 67).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -15,7 +15,7 @@ Last updated: 2026-11-13 (Privacy Notice and Terms of Service pages).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **66** (`20261106006600_chat_invite_links.sql`, invite links and the ID test switch; 65 is group calls).
+  merge only after that. The latest is **67** (`20261113006700_terms_acceptances.sql`, consent record; 66 is invite links).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
@@ -27,7 +27,7 @@ Last updated: 2026-11-13 (Privacy Notice and Terms of Service pages).
 - **Stories:** a folded "Stories in this topic (n)" line at the top of each lesson (open on Revise
   visually) and a story card under its section.
 - **Last merged pull requests:** … #160 stories box folded · then campus chat up to #172 group quiz ·
-  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links · #178 call Leave fix · #179 dictation, MCQ up to 30, quiz music. #180 quiz music louder and steady. #181 smooth quiz bass. #183 louder voice mode. #184 library Drive links and Apply to all (founder to add GOOGLE_DRIVE_SERVER_KEY in Vercel). Voice mode by name (instant greetings with the student's first name, quicker listening, prompt explain-v10) merged as #185. Voice reading provisions in full ("section 46, subsection 1, paragraph A") merged as #186. Enter-key fix (new line in the question box) merged as #187. Problem-question fix (parts searched one by one, prompt explain-v11, server guard that asks once more instead of showing a whole-question "Not enough"; `src/lib/questionParts.ts`, `composeAnswer` in `src/server/learn/ask.ts`) is the pull request after #187; the explanations eval must be re-run for explain-v11 once the Anthropic account has credit (founder's approval needed: it costs API money). Next asked by the founder: rename and delete a study group from a ⋯ menu in the group header (the server functions and a Members-tab version already exist; a header menu was drafted but set aside). The explanations eval run after #185 stopped halfway: the Anthropic account ran out of credit (founder to top up, then re-run only cases Q46-Q52 on claude-haiku-5-5). Pitch deck (pre-seed, $120,000 ask) made outside the repo in /home/user/lawdeck-proposal/pitch-deck.html.
+  #173 quiz extras · #174 study together · #175 polls · #176 group calls · #177 invite links · #178 call Leave fix · #179 dictation, MCQ up to 30, quiz music. #180 quiz music louder and steady. #181 smooth quiz bass. #183 louder voice mode. #184 library Drive links and Apply to all (founder to add GOOGLE_DRIVE_SERVER_KEY in Vercel). Voice mode by name (instant greetings with the student's first name, quicker listening, prompt explain-v10) merged as #185. Voice reading provisions in full ("section 46, subsection 1, paragraph A") merged as #186. Enter-key fix (new line in the question box) merged as #187. Problem-question fix (parts searched one by one, prompt explain-v11, server guard that asks once more instead of showing a whole-question "Not enough"; `src/lib/questionParts.ts`, `composeAnswer` in `src/server/learn/ask.ts`) merged as #188; the explanations eval must be re-run for explain-v11 once the Anthropic account has credit (founder's approval needed: it costs API money). Privacy Notice and Terms pages merged as #190. Consent record (sign-up tick box, one-time "Before you continue", migration 67 applied by the founder 2026-11-13) merged as #189. Data protection questionnaire answered (outside the repo); founder still to opt out of Voyage training if wanted and switch on two-step login. Next asked by the founder: rename and delete a study group from a ⋯ menu in the group header (the server functions and a Members-tab version already exist; a header menu was drafted but set aside). The explanations eval run after #185 stopped halfway: the Anthropic account ran out of credit (founder to top up, then re-run only cases Q46-Q52 on claude-haiku-5-5). Pitch deck (pre-seed, $120,000 ask) made outside the repo in /home/user/lawdeck-proposal/pitch-deck.html.
 
 ## In progress
 - **Campus chat** (PRD v2.1 https://claude.ai/artifact/2FvRggzURzxJ3kQcpiWzM2; `docs/specs/chat.md`):
