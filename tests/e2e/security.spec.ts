@@ -3,7 +3,7 @@ import { expect, test } from "@playwright/test";
 // Security headers (step 7g, rule P-05): on every page, and the content security policy (still
 // "report only") would block nothing on the public pages.
 
-for (const path of ["/", "/sign-in", "/sign-up", "/takedown", "/courses"]) {
+for (const path of ["/", "/sign-in", "/sign-up", "/takedown", "/courses", "/privacy", "/terms"]) {
   test(`${path} sends the security headers`, async ({ request }) => {
     const response = await request.get(path);
     const headers = response.headers();
