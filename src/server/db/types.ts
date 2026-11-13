@@ -239,6 +239,13 @@ export type Database = {
         };
         Relationships: [];
       };
+      // Acceptances of the Terms of Use and Privacy Notice (migration 67). Own rows; admins read all.
+      terms_acceptances: {
+        Row: { id: string; owner_id: string; terms_version: string; accepted_at: string };
+        Insert: { terms_version: string };
+        Update: never;
+        Relationships: [];
+      };
       // Who is on which paid plan (migration 34). Written only by the payment provider's admin job.
       subscriptions: {
         Row: Timestamps & {

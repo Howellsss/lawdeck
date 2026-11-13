@@ -3,6 +3,7 @@ import { GoogleButton, OrDivider } from "@/components/auth/GoogleButton";
 import { isGoogleSignInEnabled } from "@/server/auth/config";
 import { AuthHero } from "@/components/auth/AuthHero";
 import { SignUpForm } from "@/components/auth/SignUpForm";
+import { termsLinks } from "@/server/account/terms";
 
 export const metadata: Metadata = { title: "Create your account · Lawdeck" };
 
@@ -16,7 +17,7 @@ export default function SignUpPage() {
           <OrDivider />
         </div>
       )}
-      <SignUpForm />
+      <SignUpForm terms={termsLinks()} />
     </>
   );
 }

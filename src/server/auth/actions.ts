@@ -1,6 +1,8 @@
 "use server";
 
 import { claimPilotInvite } from "@/server/pilot/invite";
+import { termsLinks } from "@/server/account/terms";
+import { TERMS_REQUIRED_ERROR, TERMS_VERSION } from "@/lib/terms";
 import { redirect } from "next/navigation";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
 import { safeNextPath } from "@/lib/safeNextPath";
@@ -69,7 +71,13 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
   const rawName = formData.get("name");
   const name = typeof rawName === "string" ? rawName.slice(0, 200) : "";
   const parsed = signUpSchema.safeParse({ name, email, password: formData.get("password") });
-  if (!parsed.success) return { status: "error", fieldErrors: fieldErrorsFrom(parsed.error), email, name };
+  // Once the Terms and Privacy Notice are published, accepting them is required (migration 67).
+  const mustAgree = termsLinks() !== null && formData.get("agree") !== "yes";
+  if (!parsed.success || mustAgree) {
+    const fieldErrors = parsed.success ? {} : fieldErrorsFrom(parsed.error);
+    if (mustAgree) fieldErrors.agree = TERMS_REQUIRED_ERROR;
+    return { status: "error", fieldErrors, email, name };
+  }
   if (!getSupabaseConfig()) return { ...notConfigured, email, name };
   const limited = await limit("sign_up", parsed.data.email, email);
   if (limited) return { ...limited, name };
@@ -81,7 +89,7 @@ export async function signUp(_prev: AuthFormState, formData: FormData): Promise<
   const { data, error } = await supabase.auth.signUp({
     email: parsed.data.email,
     password: parsed.data.password,
-    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`, data: { full_name: parsed.data.name } },
+    options: { emailRedirectTo: `${await siteOrigin()}/auth/confirm?next=${encodeURIComponent(next)}`, data: { full_name: parsed.data.name, ...(termsLinks() ? { terms_version: TERMS_VERSION } : {}) } },
   });
   if (error) {
     logAuthFailure("signUp", error.code);
