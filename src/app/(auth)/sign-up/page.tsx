@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { GoogleButton, OrDivider } from "@/components/auth/GoogleButton";
 import { isGoogleSignInEnabled } from "@/server/auth/config";
 import { AuthHero } from "@/components/auth/AuthHero";
@@ -17,6 +18,10 @@ export default function SignUpPage() {
         </div>
       )}
       <SignUpForm />
+      <p className="text-center text-sm text-muted">
+        By creating an account you agree to Lawdeck’s <Link href="/terms">Terms of Service</Link> and confirm you have read the{" "}
+        <Link href="/privacy">Privacy Notice</Link>.
+      </p>
     </>
   );
 }

@@ -285,3 +285,15 @@ for (const path of ["/test-pages/revise", "/test-pages/bulk-lessons", "/test-pag
     await expect(page.getByRole("heading", { name: "Page not found" })).toBeVisible();
   });
 }
+
+test("Anyone can read the Privacy Notice and Terms of Service, linked from sign-in", async ({ page }) => {
+  await page.goto("/sign-in");
+  await page.getByRole("link", { name: "Privacy Notice" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Privacy Notice" })).toBeVisible();
+  await expect(page.getByRole("link", { name: "privacy@mylawdeck.com" }).first()).toHaveAttribute("href", "mailto:privacy@mylawdeck.com");
+  await page.getByRole("contentinfo").getByRole("link", { name: "Terms of Service" }).click();
+  await expect(page.getByRole("heading", { level: 1, name: "Terms of Service" })).toBeVisible();
+  await expect(page.getByText("Lawdeck is a study aid. It is not a law firm")).toBeVisible();
+  const overflow = await page.evaluate(() => document.documentElement.scrollWidth - window.innerWidth);
+  expect(overflow).toBeLessThanOrEqual(0);
+});
