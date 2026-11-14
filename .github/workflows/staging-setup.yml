@@ -37,6 +37,11 @@ jobs:
           if [ -z "$url" ]; then echo "Set STAGING_DB_URL in GitHub > Settings > Secrets > Actions (docs/specs/staging.md)."; exit 1; fi
           case "$url" in postgres://*|postgresql://*) ;; *) echo "STAGING_DB_URL must start with postgresql://"; exit 1 ;; esac
           if printf '%s' "$url" | grep -q 'YOUR-PASSWORD'; then echo "Replace [YOUR-PASSWORD] in STAGING_DB_URL with the staging database password."; exit 1; fi
+          rest="${url#*://}"
+          ats=$(printf '%s' "$rest" | tr -cd '@' | wc -c)
+          if [ "$ats" -ne 1 ]; then
+            echo "STAGING_DB_URL has $ats @ signs; it needs exactly one, just before the server name. Choose a staging database password with letters and numbers only (Supabase > staging project > Project Settings > Database > Reset database password), then update the secret."; exit 1
+          fi
           # Never the live project: compare the project part of both addresses (the user name holds it).
           live_user="$(printf '%s' "$LIVE_DB_URL" | sed -E 's#^[a-z]+://([^:@]+).*#\1#')"
           staging_user="$(printf '%s' "$url" | sed -E 's#^[a-z]+://([^:@]+).*#\1#')"
