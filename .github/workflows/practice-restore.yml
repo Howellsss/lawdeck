@@ -1,0 +1,67 @@
+# Practice restore (step 7d, founder approved 2026-11-14). ADMIN JOB: takes the latest encrypted
+# weekly backup, decrypts it with BACKUP_PASSPHRASE, restores it into a throwaway PostgreSQL that
+# exists only inside this job, checks it, and throws it away. Real data never goes anywhere else.
+# The repository and its logs are public, so nothing from the data is ever printed: only PASS/FAIL.
+name: Practice restore
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 1 * *" # First of each month, 03:17 UTC (04:17 in Lagos)
+
+permissions:
+  contents: read
+  actions: read
+
+concurrency:
+  group: practice-restore
+  cancel-in-progress: false
+
+jobs:
+  drill:
+    name: Restore the latest backup and check it
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    services:
+      postgres:
+        image: pgvector/pgvector:pg17
+        env:
+          POSTGRES_PASSWORD: drill
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U postgres" --health-interval 5s --health-timeout 5s --health-retries 20
+    env:
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+      GH_TOKEN: ${{ github.token }}
+      PGHOST: localhost
+      PGPORT: "5432"
+      PGUSER: postgres
+      PGPASSWORD: drill
+    steps:
+      - uses: actions/checkout@v4
+      - name: Check the passphrase is set
+        run: |
+          if [ -z "$BACKUP_PASSPHRASE" ]; then echo "Set BACKUP_PASSPHRASE in GitHub > Settings > Secrets > Actions."; exit 1; fi
+      - name: Install the PostgreSQL 17 tools
+        run: |
+          sudo apt-get install -y --no-install-recommends postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y --no-install-recommends postgresql-client-17
+      - name: Download the latest backup
+        run: |
+          set -euo pipefail
+          run_id=$(gh run list --repo "$GITHUB_REPOSITORY" --workflow weekly-backup.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')
+          if [ -z "$run_id" ]; then echo "No successful weekly backup found."; exit 1; fi
+          gh run download "$run_id" --repo "$GITHUB_REPOSITORY" --name lawdeck-database-backup --dir backup
+          echo "Using the backup from run $run_id: $(ls backup)"
+      - name: Decrypt, restore and check
+        run: |
+          set -euo pipefail
+          umask 077
+          file=$(ls backup/*.dump.gpg | head -1)
+          gpg --batch --yes --pinentry-mode loopback --passphrase-fd 3 --decrypt --output lawdeck.dump "$file" 3<<<"$BACKUP_PASSPHRASE" 2>/dev/null
+          echo "Decrypted: $(du -h lawdeck.dump | cut -f1)"
+          PATH="/usr/lib/postgresql/17/bin:$PATH" scripts/backup/practice-restore.sh lawdeck.dump
+      - name: Remove the decrypted copy
+        if: always()
+        run: rm -rf lawdeck.dump backup

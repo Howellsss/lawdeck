@@ -37,3 +37,6 @@ Rehearsed on 2026-10-23 with the test database: dump, encrypt, decrypt and resto
 2. update the GitHub secret.
 
 It is listed in the breach response plan's key table.
+
+## Practice restore
+Run monthly and on demand by the **Practice restore** workflow (docs/specs/staging.md): the latest backup is restored into a throwaway database inside GitHub and checked; nothing is kept.
