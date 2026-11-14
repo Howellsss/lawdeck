@@ -39,7 +39,7 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 1b. Supabase project `lawdeck-dev` created (West EU, Ireland; free plan)
 ✅ 1b. Sign-in code merged and live; Supabase settings added to Vercel
 ✅ 1b. Supabase: site address and allowed return addresses set; minimum password length 10
-⬜ Before launch: connect an email service (SMTP) so sign-in emails can be edited and work across devices — founder decision on a domain name
+✅ Email service: Resend, sending as Lawdeck <no-reply@mail.mylawdeck.com> through Supabase custom SMTP; confirm and reset emails edited so links work on any device (2026-11-14)
 ✅ 1b. First real sign-up test on lawdeck.vercel.app (founder)
 ✅ 1c. Database tables written as migrations: profiles, plans, courses, topics, projects, conversations, messages, usage_events, audit_log — row-level security on every table
 ✅ 1c. Permission tests pass on a local copy (29 checks; deliberately broken rules are caught)
@@ -139,10 +139,10 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 ✅ 6f. Delete account (AC-05), report a problem (FB-01), takedown request route (FB-03) (migration 28 applied by founder 2026-10-23)
 
 ### Phase 7. Pre-pilot hardening
-⬜ 7a. Supabase Pro and Vercel Pro; separate staging and production keys (B-04, R-01): ⚠️ founder: not upgrading yet (2026-10-23)
+⬜ 7a. Supabase Pro ✅ (2026-11-13) and Vercel Pro ⬜; separate staging and production keys (B-04, R-01) ⬜
 ⬜ 7b. Payments with a Nigerian provider; plans and limits enforced (AC-03, AC-04, K-01): ⚠️ founder: provider, prices, free-tier limits
 ✅ 7c. Login, sign-up and reset limits (C-04, K-02) (migration 29 applied by founder 2026-10-23)
-⬜ 7d. Daily backups and a practice restore into staging (Q-01, Q-02): needs 7a
+⬜ 7d. Daily backups ✅ (Supabase Pro, 7 days, plus the weekly encrypted copy, 30 days; manual run with SSL enforced succeeded 2026-11-14); practice restore into staging ⬜ (needs staging)
 ✅ 7e. Error monitoring and unusual-access alerts (I-04, P-03): Sentry free plan (no library) + hourly GitHub check; migration 31 applied by founder 2026-10-23; SENTRY_DSN to set (founder)
 ✅ 7f. Breach response plan (P-04, Appendix D): docs/breach-response-plan.md; founder is incident lead; practice drill with the founder to do; legal duties to be confirmed by counsel with 7i
 ✅ 7g. Security review of permissions, secrets and uploads (P-05): findings fixed (docs/security-review.md); migration 30 applied by founder 2026-10-23; follow-up (migration 33, print-page fix) applied by founder 2026-10-23; content security policy in report-only mode until the live reports are checked
@@ -368,3 +368,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-11-12: Problem questions never declined as a whole (founder: a six-part Undefended List question got "Not enough in the Lawdeck library"). Causes: only 4 issues were searched for 6 parts; the AI declined the whole question though passages were found; it said there was no writ template. Fixes: lettered parts are searched part by part with no AI call (saves the issue-listing call; no more searches than before); prompt explain-v11 answers every part under its own heading and never declines a problem question that has passages; drafting parts are answered with contents and rules plus the Drafting catalogue; a server guard hides a whole-question decline and asks once more, part by part (counted as one question). Tests added. Eval to be re-run when the Anthropic account has credit. No database change.
 - 2026-11-13: Privacy Notice and Terms of Service (founder): public pages at mylawdeck.com/privacy and mylawdeck.com/terms, written from how Lawdeck works under the NDPA 2023; linked from sign-in and sign-up. Contact privacy@mylawdeck.com (founder to set up). No database change. docs/specs/legal-pages.md.
 - 2026-11-13: Consent record (founder approved; data protection questionnaire Q86): sign-up tick box for the Terms of Service and Privacy Notice (/terms and /privacy) (18 or over), a one-time "Before you continue" for everyone else, and a record of who accepted which version and when (migration 67). Also fixed: chat test pages no longer fail just after midnight WAT.
+- 2026-11-14: Supabase Pro settings (founder): daily backups checked, leaked-password protection on, sign-out after 7 days of inactivity (rule C-03), spend cap on, SSL enforced, two-step login on the founder's Supabase account. Security Advisor: 0 errors; 110 warnings reviewed (106 functions signed-in students may run and 3 for visitors, all by design and covered by permission tests; leaked-password protection, now on). Auth rate limits: emails 30/hour, sign-ups/sign-ins and link checks 100 per 5 minutes (a lecture hall shares one IP). Email: Resend on mail.mylawdeck.com; confirm and reset templates use Lawdeck's /auth/confirm link, so they work on any device and keep invite links. Google sign-in published (In production), restricted Drive scope removed (only drive.file is used). No code change.

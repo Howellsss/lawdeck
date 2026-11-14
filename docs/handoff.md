@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-13 (consent record for the Terms of Service and Privacy Notice, migration 67).
+Last updated: 2026-11-14 (Supabase Pro settings, Resend email, Google sign-in published).
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
@@ -55,11 +55,11 @@ Last updated: 2026-11-13 (consent record for the Terms of Service and Privacy No
 - ⬜ Pilot: invite 10–20 students (Admin → Pilot is built) — recommended next; needs the
   founder's go-ahead and AI budget.
 - ⚠️ Payments (7b): founder to choose a Nigerian provider, prices and free-tier limits.
-- ⬜ Sign-in emails before launch: founder to choose a domain name and email service.
+- ✅ Sign-in emails: Resend (free plan, 100 a day; upgrade before a big campaign), sender no-reply@mail.mylawdeck.com, templates in Supabase (docs/specs/sign-in.md).
 - ⚠️ Legal reviewer: approve the first drafting templates, check the 52 test questions, write
   marking guides, recheck the library.
 - ⚠️ Privacy Notice and Terms of Use: review by counsel.
-- ⬜ Supabase and Vercel paid plans, backups to staging, load test (founder: not yet).
+- ✅ Supabase Pro and its settings (2026-11-14, see progress). ⬜ Vercel Pro, staging project with a practice restore, load test. ⬜ Google branding verification (domain proof in Search Console, then resubmit). ⬜ Voyage training opt-out decision; ⬜ privacy@mylawdeck.com mailbox (ImprovMX forwarding) or switch the policies to lawdeck01@gmail.com; ⬜ policies say under-18 with consent and "university students and lawyers", founder said 18+ only, Law School students and applicants in Nigeria.
 - Idea, not approved: lessons written in the background (less needed now all are written).
 
 ## Positioning (founder's research question, 2026-11-06)

@@ -42,8 +42,8 @@ Rules: Engineering Rules C-01 to C-04; PRD AC-01; System Design §2 (Supabase Au
 
 ## Known limits (tracked)
 
-- Until the templates can be edited, Supabase's standard email links only finish signing in when opened in the same browser that asked for them. Otherwise Lawdeck explains what to do (`?error=browser`): an email confirmation has usually worked, so the student signs in; a reset link must be reopened in the right browser or requested again.
+- Emails (2026-11-14): custom SMTP through Resend (`smtp.resend.com`, port 465, user `resend`, the key only in Supabase), sender Lawdeck <no-reply@mail.mylawdeck.com>, domain `mail.mylawdeck.com` verified in Resend. Templates (Supabase → Authentication → Emails): Confirm signup links to `{{ .RedirectTo }}&token_hash={{ .TokenHash }}&type=email`, Reset password to `…&type=recovery`. `RedirectTo` is always `/auth/confirm?next=…` (src/server/auth/actions.ts), so links work on any device and keep where the student was going. The `?error=browser` message stays for old links.
 
-- Supabase's built-in email sender allows only a few emails an hour and is for testing. Before real students arrive, connect a proper email service (custom SMTP). Needs a decision and an account.
+- Limits: Resend's free plan sends 100 emails a day; Supabase sends at most 30 an hour. Upgrade Resend ($20/month) before a big sign-up campaign. Auth rate limits for sign-ups/sign-ins and link checks are 100 per 5 minutes per IP (students on campus Wi-Fi share one).
 - Sign-in attempt limits use Supabase's built-in protection for now. The extra per-address check (rule C-04/K-02) needs the database tables from step 1c.
-- Signing out after a period of inactivity (rule C-03) is a Supabase setting that may need a paid plan. To confirm when setting up.
+- Signing out after inactivity (rule C-03): Supabase Pro, Authentication → Sessions, inactivity timeout 7 days (set 2026-11-14). Leaked-password protection is on.
