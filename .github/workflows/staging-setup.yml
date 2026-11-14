@@ -1,0 +1,58 @@
+# Staging set-up (step 7a, founder approved 2026-11-14). ADMIN JOB on the STAGING project only:
+# applies every Lawdeck migration that staging does not have yet, in order, and records each one in
+# staging_admin.applied_migrations so a second run adds only new ones. Needs STAGING_DB_URL
+# (the staging project's Session pooler address). Refuses to run if that address is the live database.
+name: Staging set-up
+
+on:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: staging-setup
+  cancel-in-progress: false
+
+jobs:
+  migrate:
+    name: Bring staging up to date
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      STAGING_DB_URL: ${{ secrets.STAGING_DB_URL }}
+      LIVE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install the PostgreSQL 17 tools
+        run: |
+          sudo apt-get install -y --no-install-recommends postgresql-common
+          sudo /usr/share/postgresql-common/pgdg/apt.postgresql.org.sh -y
+          sudo apt-get install -y --no-install-recommends postgresql-client-17
+      - name: Apply the migrations
+        run: |
+          set -euo pipefail
+          url="$(printf '%s' "$STAGING_DB_URL" | tr -d '\r\n' | sed -e "s/^[[:space:]\"']*//" -e "s/[[:space:]\"']*$//")"
+          echo "::add-mask::$url"
+          if [ -z "$url" ]; then echo "Set STAGING_DB_URL in GitHub > Settings > Secrets > Actions (docs/specs/staging.md)."; exit 1; fi
+          case "$url" in postgres://*|postgresql://*) ;; *) echo "STAGING_DB_URL must start with postgresql://"; exit 1 ;; esac
+          if printf '%s' "$url" | grep -q 'YOUR-PASSWORD'; then echo "Replace [YOUR-PASSWORD] in STAGING_DB_URL with the staging database password."; exit 1; fi
+          # Never the live project: compare the project part of both addresses (the user name holds it).
+          live_user="$(printf '%s' "$LIVE_DB_URL" | sed -E 's#^[a-z]+://([^:@]+).*#\1#')"
+          staging_user="$(printf '%s' "$url" | sed -E 's#^[a-z]+://([^:@]+).*#\1#')"
+          if [ -n "$live_user" ] && [ "$live_user" = "$staging_user" ]; then
+            echo "STAGING_DB_URL points at the LIVE project. Use the staging project's address."; exit 1
+          fi
+          PSQL="/usr/lib/postgresql/17/bin/psql"
+          "$PSQL" "$url" -q -X -v ON_ERROR_STOP=1 -c "create schema if not exists staging_admin; revoke all on schema staging_admin from public, anon, authenticated; create table if not exists staging_admin.applied_migrations (file text primary key, applied_at timestamptz not null default now())"
+          applied=0
+          for file in supabase/migrations/*.sql; do
+            name="$(basename "$file")"
+            done_already=$("$PSQL" "$url" -q -X -t -A -c "select count(*) from staging_admin.applied_migrations where file = '$name'")
+            if [ "$done_already" = "1" ]; then continue; fi
+            echo "Applying $name"
+            "$PSQL" "$url" -q -X -v ON_ERROR_STOP=1 -1 -f "$file" -c "insert into staging_admin.applied_migrations (file) values ('$name')" > /dev/null
+            applied=$((applied + 1))
+          done
+          total=$("$PSQL" "$url" -q -X -t -A -c "select count(*) from staging_admin.applied_migrations")
+          echo "Staging is up to date: $applied new migration(s) applied, $total in all."

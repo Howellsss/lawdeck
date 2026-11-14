@@ -5,6 +5,7 @@ import { failureDetails, getClaude, MissingKeyError } from "./client";
 import { costUsd } from "./costs";
 import { EXPLAIN_SETTINGS, MODELS, type ExplainModel } from "./models";
 import { recordUsage } from "./usage";
+import { PRETEND_MODEL, PRETEND_TOKENS, pretendAiOn, streamPretendAnswer } from "./pretend";
 
 export type ExplainTurn = { role: "user" | "assistant"; text: string };
 
@@ -49,6 +50,19 @@ export async function streamExplanation(input: {
   record?: boolean;
 }): Promise<ExplainResult> {
   const started = Date.now();
+  // Staging load test only: a pretend Claude, at no AI cost (src/server/ai/pretend.ts).
+  if (pretendAiOn()) {
+    let firstTextMs: number | null = null;
+    const done = await streamPretendAnswer((text) => {
+      firstTextMs ??= Date.now() - started;
+      input.onText(text);
+    }, input.signal);
+    if (!done) return { ok: false, reason: "cancelled" };
+    const ms = Date.now() - started;
+    if (input.record !== false)
+      await recordUsage({ kind: "explain", model: PRETEND_MODEL, tokensIn: PRETEND_TOKENS.in, tokensOut: PRETEND_TOKENS.out, costUsd: 0, ms });
+    return { ok: true, model: PRETEND_MODEL, tokensIn: PRETEND_TOKENS.in, tokensOut: PRETEND_TOKENS.out, costUsd: 0, stop: "end_turn", firstTextMs, ms };
+  }
   const model = input.model ?? MODELS.explain;
   const settings = EXPLAIN_SETTINGS[model];
   let firstTextMs: number | null = null;
