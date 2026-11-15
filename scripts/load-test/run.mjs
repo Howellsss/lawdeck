@@ -165,6 +165,10 @@ async function visit(student, i) {
 async function preflight(student) {
   const home = await fetch(`${SITE}/`, { headers: headers(student.cookie) });
   const html = await home.text();
+  const isLawdeck = /<title>[^<]*Lawdeck/i.test(html);
+  console.log(`Bypass secret for Vercel's preview lock: ${BYPASS ? "set" : "NOT SET"}.`);
+  console.log(`Home page is Lawdeck: ${isLawdeck ? "yes" : `no (HTTP ${home.status}; probably Vercel's login page: check VERCEL_BYPASS_SECRET)`}.`);
+  if (!isLawdeck) throw new Error("The staging site shows Vercel's preview lock, not Lawdeck: set VERCEL_BYPASS_SECRET (docs/specs/staging.md).");
   const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1]).slice(0, 40);
   const refs = new Set();
   for (const src of scripts) {
