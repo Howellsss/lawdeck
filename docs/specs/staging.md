@@ -21,3 +21,18 @@
   (tables, row-level security, accounts and profiles, courses, access rules, functions) and throws it away.
 - Logs are public, so it prints only counts of problems and PASS/FAIL lines, never data.
 - Locally: `scripts/backup/practice-restore.sh <decrypted dump>` with `PGHOST`/`PGPORT`/`PGUSER` of a local PostgreSQL.
+
+## Load test (launch task 7)
+- GitHub → Actions → **Load test** → Run workflow (students, default 500; arrival time, default 30 s).
+- Runs only against the staging site (`https://lawdeck-git-staging-howells1.vercel.app`, the `staging` branch) and
+  refuses the live site and database. Each made-up student signs in, opens the home page, asks a question (the
+  pretend AI answers, no AI cost; the library search uses Voyage, a few cents) and opens the chat.
+- It adds 5 made-up library items and the students, and **deletes them all at the end**, even when the test fails.
+- Report (job summary): successes and timings (typical and slowest 5%) per step, PASS/FAIL against the 3-second
+  budgets, and the kinds of problems. No content is printed.
+- Secrets: `STAGING_SUPABASE_URL`, `STAGING_PUBLISHABLE_KEY`, `STAGING_SECRET_KEY`, `VERCEL_BYPASS_SECRET`.
+- Vercel: the `staging` branch's Preview variables point at the staging project and set `APP_ENV=staging` and
+  `LAWDECK_PRETEND_AI=1` (never on Production).
+- Staging only: Supabase → Authentication → Rate Limits, "sign-ups and sign-ins" at 1000 per 5 minutes, because
+  all made-up students sign in from GitHub's one address.
+
