@@ -36,15 +36,24 @@
 - Staging only: Supabase → Authentication → Rate Limits, "sign-ups and sign-ins" at 1000 per 5 minutes, because
   all made-up students sign in from GitHub's one address.
 
-### Results (2026-11-15, staging on Supabase Micro, Vercel Hobby, pretend AI)
+### Results 1 (2026-11-15, staging on Supabase Nano, the smallest size, below live Micro; Vercel Hobby, pretend AI)
 | Students arriving within 30 s | Outcome |
 |---|---|
 | 50 | all succeeded; home p95 2.1 s, first words p95 3.2 s |
 | 100 | all succeeded; home p95 0.6 s, first words p95 1.7 s |
 | 200 | about 60% succeeded; the rest timed out or got Vercel 504s while waiting for the database |
 | 500 | almost nothing succeeded; the staging database had to be restarted |
-- Limit today: about 100 students starting at once. The database (Micro size) is the bottleneck: pages and answers
-  wait on it, and clean-up slowed from seconds to minutes. The live project is the same size.
+- On Nano: about 100 students starting at once. The database size is the bottleneck: pages and answers wait on it,
+  and clean-up slowed from seconds to minutes. (Correction: these runs were on Nano, not on the live Micro size.)
+
+### Results 2 (2026-11-15, staging on Supabase Medium; Vercel Hobby, pretend AI)
+| Students arriving within 30 s | Outcome (slowest 5%) |
+|---|---|
+| 200 | all succeeded: home 0.67 s, first answer words 1.68 s, whole answer 2.32 s, chat 0.74 s (PASS; run 43690675524) |
+| 500 | all 500 succeeded: home 1.29 s, first words 3.17 s (just over the 3 s budget), whole answer 4.26 s, chat 2.06 s (run 43691241909) |
+- Medium holds 500 students arriving within 30 s with no failures; only the first-words time drifts just past
+  3 seconds for the slowest 5%.
+- Still to run: 200 students on Micro (the live size), after the founder switches staging to Micro.
 - Supabase lets about 30 password sign-ins per 5 minutes through from one address whatever the setting, so the
   test uses 25 accounts shared by the students (each with their own chat).
 - Every request has a time limit (30 s pages, 130 s answers) and the visit phase stops after 12 minutes; a run
