@@ -1,0 +1,45 @@
+# Load test (launch task 7, founder approved 2026-11-14): made-up students use the STAGING copy of
+# Lawdeck at once; the pretend AI answers, so there is no AI cost. Everything it creates is deleted.
+# Needs: STAGING_SUPABASE_URL, STAGING_PUBLISHABLE_KEY, STAGING_SECRET_KEY, VERCEL_BYPASS_SECRET.
+# Prints only counts and timings (the logs are public). docs/specs/staging.md.
+name: Load test
+
+on:
+  workflow_dispatch:
+    inputs:
+      students:
+        description: "How many made-up students (up to 1000)"
+        default: "500"
+      ramp_seconds:
+        description: "Seconds over which they arrive"
+        default: "30"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: load-test
+  cancel-in-progress: false
+
+jobs:
+  load:
+    name: Students on staging at once
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      STAGING_SUPABASE_URL: ${{ secrets.STAGING_SUPABASE_URL }}
+      STAGING_PUBLISHABLE_KEY: ${{ secrets.STAGING_PUBLISHABLE_KEY }}
+      STAGING_SECRET_KEY: ${{ secrets.STAGING_SECRET_KEY }}
+      VERCEL_BYPASS_SECRET: ${{ secrets.VERCEL_BYPASS_SECRET }}
+      STAGING_SITE_URL: https://lawdeck-git-staging-howells1.vercel.app
+      STUDENTS: ${{ inputs.students }}
+      RAMP_SECONDS: ${{ inputs.ramp_seconds }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - name: Run the load test
+        run: node scripts/load-test/run.mjs
