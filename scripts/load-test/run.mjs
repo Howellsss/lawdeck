@@ -160,6 +160,26 @@ async function visit(student, i) {
   return { home, answer, chat, firstWords };
 }
 
+// --- Before the test: is the staging site using the staging database, and does it accept the sign-in? ---
+// Database addresses (project refs) are not secret; no keys or content are printed.
+async function preflight(student) {
+  const home = await fetch(`${SITE}/`, { headers: headers(student.cookie) });
+  const html = await home.text();
+  const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1]).slice(0, 40);
+  const refs = new Set();
+  for (const src of scripts) {
+    const js = await (await fetch(new URL(src, SITE), { headers: headers("") })).text().catch(() => "");
+    for (const m of js.matchAll(/https:\/\/([a-z0-9]{20})\.supabase\.co/g)) refs.add(m[1]);
+  }
+  // The account page shows the signed-in person's (made-up) email address; signed out, it asks to sign in.
+  const account = await fetch(`${SITE}/account`, { headers: headers(student.cookie) });
+  const signedIn = (await account.text()).includes(student.email);
+  console.log(`Staging site uses database: ${[...refs].join(", ") || "not found"} (staging is ${REF}${refs.has(LIVE_PROJECT) ? "; THE LIVE DATABASE IS IN USE" : ""}).`);
+  console.log(`Staging site accepts the test sign-in: ${signedIn ? "yes" : `no (HTTP ${account.status})`}.`);
+  if (refs.has(LIVE_PROJECT)) throw new Error("The staging site points at the live database: fix the Vercel variables for the staging branch.");
+  if (!signedIn) throw new Error("The staging site does not accept the staging sign-in: check the staging branch's Vercel variables (docs/specs/staging.md).");
+}
+
 // --- Report ------------------------------------------------------------------------------------
 const pct = (values, p) => {
   if (!values.length) return null;
@@ -219,6 +239,7 @@ try {
   );
   for (const s of ready) if (s.error) setupErrors.push(s.error);
   const students = ready.filter((s) => s.cookie);
+  if (students.length) await preflight(students[0]);
   console.log(`${students.length} students signed in. Starting the test (ramp ${RAMP_MS / 1000} s)…`);
   const results = await Promise.all(students.map((s, i) => visit(s, i)));
   passed = report(results, setupErrors);
