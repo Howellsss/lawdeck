@@ -5,7 +5,31 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-14 (Supabase Pro settings, Resend email, Google sign-in published).
+Last updated: 2026-11-15 (staging, practice restore, load test; mid-way through the Medium re-test).
+
+## In progress right now (2026-11-15) — read this first
+- **Launch list (17 tasks):** done 1 (Resend email), 2 (ID test switch off), 3 (Anthropic limit), 4 (Google sign-in published;
+  branding verification still needs the Search Console TXT record + resubmit), 5 (Supabase Pro settings), 6 (staging +
+  monthly practice restore), 10 partly (/privacy, /terms, consent record migration 67). Open: 7 (load test, finishing),
+  8 Vercel Pro, 9 Sentry DSN check, 11–14 legal reviewer, 15–16 payments/limits decisions, 17 pilot.
+- **Staging:** Supabase project `lawdeck-staging` (ref drnqgbtrutlhhcsacqll), moved into the Howells **Pro** org on
+  2026-11-15 and set to **Medium** compute for a re-test (≈$59/month if left on — **set it back to Micro or Nano after
+  testing**). Vercel branch `staging` → https://lawdeck-git-staging-howells1.vercel.app with Preview-only vars
+  (staging keys, APP_ENV=staging, LAWDECK_PRETEND_AI=1). GitHub secrets: STAGING_DB_URL, STAGING_SUPABASE_URL,
+  STAGING_PUBLISHABLE_KEY, STAGING_SECRET_KEY, VERCEL_BYPASS_SECRET. Workflows: Staging set-up, Practice restore,
+  Load test (docs/specs/staging.md).
+- **Load test results so far (staging was on NANO, smaller than live Micro):** 50 and 100 students arriving within 30 s
+  all passed; 200 ≈60%; 500 failed and needed a staging restart. docs/specs/staging.md wrongly says staging matched the
+  live size: correct it (it was Nano). **Next:** read the 200-student run on Medium (started 2026-11-15 ~02:20 UTC),
+  run 500 on Medium, then ask the founder to set staging to Micro (same as live) and run 200; then report options
+  (live on Micro ≈ today; Small +$5/month; Medium +$50/month; billed hourly, can upgrade just for launch week) and
+  remind the founder to step staging down.
+- **Policy fixes waiting on the founder:** Voyage training opt-out (email sent to Voyage support; update Privacy
+  Notice/questionnaire Q34–37, Q59 when they reply); contact email privacy@mylawdeck.com vs lawdeck01@gmail.com;
+  policies say "18+ or parental consent" and "university students and lawyers" but the founder said 18+ only, Law
+  School students and applicants, Nigeria only (fix unless they object).
+- Data protection questionnaire answers (Word) were built outside the repo in the old session; regenerate from
+  docs if needed.
 
 ## The founder
 - Not a developer. Plain language, short messages, the ✅ / ⬜ / ⚠️ format with **Impact** and
