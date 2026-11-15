@@ -36,3 +36,17 @@
 - Staging only: Supabase → Authentication → Rate Limits, "sign-ups and sign-ins" at 1000 per 5 minutes, because
   all made-up students sign in from GitHub's one address.
 
+### Results (2026-11-15, staging on Supabase Micro, Vercel Hobby, pretend AI)
+| Students arriving within 30 s | Outcome |
+|---|---|
+| 50 | all succeeded; home p95 2.1 s, first words p95 3.2 s |
+| 100 | all succeeded; home p95 0.6 s, first words p95 1.7 s |
+| 200 | about 60% succeeded; the rest timed out or got Vercel 504s while waiting for the database |
+| 500 | almost nothing succeeded; the staging database had to be restarted |
+- Limit today: about 100 students starting at once. The database (Micro size) is the bottleneck: pages and answers
+  wait on it, and clean-up slowed from seconds to minutes. The live project is the same size.
+- Supabase lets about 30 password sign-ins per 5 minutes through from one address whatever the setting, so the
+  test uses 25 accounts shared by the students (each with their own chat).
+- Every request has a time limit (30 s pages, 130 s answers) and the visit phase stops after 12 minutes; a run
+  first removes leftovers of a stopped run.
+
