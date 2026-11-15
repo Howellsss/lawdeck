@@ -26,6 +26,9 @@ const RAMP_MS = Number(process.env.RAMP_SECONDS || 30) * 1000;
 // like one person on a phone and a laptop. Each student still gets their own chat. 20 questions per
 // account stays inside the free plan's 30 a month and the search limit of 40 an hour.
 const ACCOUNTS = Math.min(STUDENTS, 25);
+// A request that takes longer than this is counted as "timed out" (a student would have given up).
+const PAGE_TIMEOUT_MS = 30_000;
+const ANSWER_TIMEOUT_MS = 130_000;
 
 // Never the live site or the live database.
 if (SUPABASE_URL.includes(LIVE_PROJECT) || /mylawdeck\.com/.test(SITE) || !/\.vercel\.app$|localhost/.test(new URL(SITE).host))
@@ -56,6 +59,21 @@ const pool = async (items, size, work) => {
   );
   return results;
 };
+
+// --- Leftovers from a run that was stopped before it could clean up --------------------------------
+async function removeLeftovers() {
+  let removed = 0;
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error || !data.users.length) break;
+    const old = data.users.filter((u) => u.email?.endsWith("@loadtest.invalid"));
+    await pool(old, 10, (u) => admin.auth.admin.deleteUser(u.id));
+    removed += old.length;
+    if (data.users.length < 1000) break;
+  }
+  await admin.from("kb_items").delete().like("title", "Load test notes%");
+  if (removed) console.log(`Removed ${removed} made-up students left by an earlier run.`);
+}
 
 // --- Made-up library content, so the search has something to find --------------------------------
 async function seedLibrary() {
@@ -126,14 +144,15 @@ async function timed(fn) {
     const result = await fn();
     return { ms: performance.now() - start, ...result };
   } catch (error) {
-    return { ms: performance.now() - start, error: `network: ${error?.cause?.code ?? error?.name ?? "error"}` };
+    const kind = error?.name === "TimeoutError" ? "timed out" : `network ${error?.cause?.code ?? error?.name ?? "error"}`;
+    return { ms: performance.now() - start, error: kind };
   }
 }
 
 async function visit(student, i) {
   await new Promise((r) => setTimeout(r, (RAMP_MS * i) / STUDENTS));
   const home = await timed(async () => {
-    const res = await fetch(`${SITE}/`, { headers: headers(student.cookie) });
+    const res = await fetch(`${SITE}/`, { headers: headers(student.cookie), signal: AbortSignal.timeout(PAGE_TIMEOUT_MS) });
     await res.arrayBuffer();
     return res.ok ? {} : { error: `home: HTTP ${res.status}` };
   });
@@ -144,6 +163,7 @@ async function visit(student, i) {
       method: "POST",
       headers: headers(student.cookie, { origin: SITE, "content-type": "application/json" }),
       body: JSON.stringify({ question: QUESTIONS[i % QUESTIONS.length], level: "exam" }),
+      signal: AbortSignal.timeout(ANSWER_TIMEOUT_MS),
     });
     if (!res.ok || !res.body) return { error: `answer: HTTP ${res.status}` };
     let buffer = "";
@@ -163,7 +183,7 @@ async function visit(student, i) {
     return outcome;
   });
   const chat = await timed(async () => {
-    const res = await fetch(`${SITE}/chats/${student.chatId}`, { headers: headers(student.cookie) });
+    const res = await fetch(`${SITE}/chats/${student.chatId}`, { headers: headers(student.cookie), signal: AbortSignal.timeout(PAGE_TIMEOUT_MS) });
     await res.arrayBuffer();
     return res.ok ? {} : { error: `chat page: HTTP ${res.status}` };
   });
@@ -242,6 +262,7 @@ let items = [];
 let passed = false;
 try {
   console.log(`Preparing ${STUDENTS} made-up students on staging…`);
+  await removeLeftovers();
   items = await seedLibrary();
   const made = await pool([...Array(ACCOUNTS).keys()], 10, createStudent);
   for (const s of made) if (s.id) created.push(s.id);
