@@ -21,6 +21,11 @@ const SITE = env("STAGING_SITE_URL").replace(/\/$/, "");
 const BYPASS = (process.env.VERCEL_BYPASS_SECRET ?? "").trim();
 const STUDENTS = Math.min(Number(process.env.STUDENTS || 500), 1000);
 const RAMP_MS = Number(process.env.RAMP_SECONDS || 30) * 1000;
+// Supabase lets about 30 password sign-ins through per 5 minutes from one address (GitHub's), whatever
+// the project's setting, so up to 25 accounts sign in and each is used by several students at once,
+// like one person on a phone and a laptop. Each student still gets their own chat. 20 questions per
+// account stays inside the free plan's 30 a month and the search limit of 40 an hour.
+const ACCOUNTS = Math.min(STUDENTS, 25);
 
 // Never the live site or the live database.
 if (SUPABASE_URL.includes(LIVE_PROJECT) || /mylawdeck\.com/.test(SITE) || !/\.vercel\.app$|localhost/.test(new URL(SITE).host))
@@ -102,9 +107,14 @@ async function signIn(student) {
   const client = createClient(SUPABASE_URL, PUBLISHABLE, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data, error } = await client.auth.signInWithPassword({ email: student.email, password: student.password });
   if (error) return { error: `sign-in: ${error.status ?? error.code ?? "error"}` };
-  const { data: chat, error: ce } = await client.from("conversations").insert({ title: "Load test" }).select("id").single();
-  if (ce) return { error: `new chat: ${ce.code ?? "error"}` };
-  return { cookie: sessionCookie(data.session), chatId: chat.id };
+  return { cookie: sessionCookie(data.session), client };
+}
+
+// Each student's own chat, made through their account's sign-in (the database's own rules apply).
+async function newChat(account) {
+  const { data, error } = await account.client.from("conversations").insert({ title: "Load test" }).select("id").single();
+  if (error) return { error: `new chat: ${error.code ?? "error"}` };
+  return { chatId: data.id, cookie: account.cookie, email: account.email };
 }
 
 // --- One student's visit -----------------------------------------------------------------------
@@ -193,7 +203,7 @@ const pct = (values, p) => {
 const sec = (ms) => (ms === null ? "–" : `${(ms / 1000).toFixed(2)} s`);
 
 function report(results, setupErrors) {
-  const lines = [`## Load test: ${STUDENTS} students on staging`, ""];
+  const lines = [`## Load test: ${STUDENTS} students on staging (${ACCOUNTS} accounts)`, ""];
   const step = (label, key, budget) => {
     const done = results.filter((r) => r[key] && !r[key].error);
     const times = done.map((r) => r[key].ms);
@@ -233,18 +243,22 @@ let passed = false;
 try {
   console.log(`Preparing ${STUDENTS} made-up students on staging…`);
   items = await seedLibrary();
-  const made = await pool([...Array(STUDENTS).keys()], 10, createStudent);
+  const made = await pool([...Array(ACCOUNTS).keys()], 10, createStudent);
   for (const s of made) if (s.id) created.push(s.id);
   const setupErrors = made.filter((s) => s.error).map((s) => s.error);
-  const ready = await pool(
+  const signedIn = await pool(
     made.filter((s) => s.id),
-    20,
+    5,
     async (s) => ({ ...s, ...(await signIn(s)) }),
   );
-  for (const s of ready) if (s.error) setupErrors.push(s.error);
-  const students = ready.filter((s) => s.cookie);
-  if (students.length) await preflight(students[0]);
-  console.log(`${students.length} students signed in. Starting the test (ramp ${RAMP_MS / 1000} s)…`);
+  for (const s of signedIn) if (s.error) setupErrors.push(s.error);
+  const accounts = signedIn.filter((s) => s.cookie);
+  if (!accounts.length) throw new Error("No test account could sign in.");
+  await preflight({ ...accounts[0], email: accounts[0].email });
+  const chats = await pool([...Array(STUDENTS).keys()], 20, (i) => newChat(accounts[i % accounts.length]));
+  for (const c of chats) if (c.error) setupErrors.push(c.error);
+  const students = chats.filter((c) => c.chatId);
+  console.log(`${accounts.length} accounts signed in for ${students.length} students. Starting the test (ramp ${RAMP_MS / 1000} s)…`);
   const results = await Promise.all(students.map((s, i) => visit(s, i)));
   passed = report(results, setupErrors);
 } finally {
