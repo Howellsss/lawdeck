@@ -21,6 +21,14 @@ const SITE = env("STAGING_SITE_URL").replace(/\/$/, "");
 const BYPASS = (process.env.VERCEL_BYPASS_SECRET ?? "").trim();
 const STUDENTS = Math.min(Number(process.env.STUDENTS || 500), 1000);
 const RAMP_MS = Number(process.env.RAMP_SECONDS || 30) * 1000;
+// Supabase lets about 30 password sign-ins through per 5 minutes from one address (GitHub's), whatever
+// the project's setting, so up to 25 accounts sign in and each is used by several students at once,
+// like one person on a phone and a laptop. Each student still gets their own chat. 20 questions per
+// account stays inside the free plan's 30 a month and the search limit of 40 an hour.
+const ACCOUNTS = Math.min(STUDENTS, 25);
+// A request that takes longer than this is counted as "timed out" (a student would have given up).
+const PAGE_TIMEOUT_MS = 30_000;
+const ANSWER_TIMEOUT_MS = 130_000;
 
 // Never the live site or the live database.
 if (SUPABASE_URL.includes(LIVE_PROJECT) || /mylawdeck\.com/.test(SITE) || !/\.vercel\.app$|localhost/.test(new URL(SITE).host))
@@ -38,6 +46,13 @@ const QUESTIONS = [
   "What is the undefended list procedure?",
 ];
 
+const began = Date.now();
+const step = (what) => console.log(`[${((Date.now() - began) / 1000).toFixed(0)} s] ${what}`);
+// The whole test stops after this long, reports what it has, and cleans up.
+const WATCHDOG_MS = 12 * 60_000;
+const withWatchdog = (promise, fallback) =>
+  Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback()), WATCHDOG_MS - (Date.now() - began)))]);
+
 const pool = async (items, size, work) => {
   const results = [];
   let next = 0;
@@ -51,6 +66,21 @@ const pool = async (items, size, work) => {
   );
   return results;
 };
+
+// --- Leftovers from a run that was stopped before it could clean up --------------------------------
+async function removeLeftovers() {
+  let removed = 0;
+  for (let page = 1; page <= 20; page++) {
+    const { data, error } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+    if (error || !data.users.length) break;
+    const old = data.users.filter((u) => u.email?.endsWith("@loadtest.invalid"));
+    await pool(old, 10, (u) => admin.auth.admin.deleteUser(u.id));
+    removed += old.length;
+    if (data.users.length < 1000) break;
+  }
+  await admin.from("kb_items").delete().like("title", "Load test notes%");
+  if (removed) console.log(`Removed ${removed} made-up students left by an earlier run.`);
+}
 
 // --- Made-up library content, so the search has something to find --------------------------------
 async function seedLibrary() {
@@ -102,9 +132,14 @@ async function signIn(student) {
   const client = createClient(SUPABASE_URL, PUBLISHABLE, { auth: { persistSession: false, autoRefreshToken: false } });
   const { data, error } = await client.auth.signInWithPassword({ email: student.email, password: student.password });
   if (error) return { error: `sign-in: ${error.status ?? error.code ?? "error"}` };
-  const { data: chat, error: ce } = await client.from("conversations").insert({ title: "Load test" }).select("id").single();
-  if (ce) return { error: `new chat: ${ce.code ?? "error"}` };
-  return { cookie: sessionCookie(data.session), chatId: chat.id };
+  return { cookie: sessionCookie(data.session), client };
+}
+
+// Each student's own chat, made through their account's sign-in (the database's own rules apply).
+async function newChat(account) {
+  const { data, error } = await account.client.from("conversations").insert({ title: "Load test" }).select("id").single();
+  if (error) return { error: `new chat: ${error.code ?? "error"}` };
+  return { chatId: data.id, cookie: account.cookie, email: account.email };
 }
 
 // --- One student's visit -----------------------------------------------------------------------
@@ -116,14 +151,15 @@ async function timed(fn) {
     const result = await fn();
     return { ms: performance.now() - start, ...result };
   } catch (error) {
-    return { ms: performance.now() - start, error: `network: ${error?.cause?.code ?? error?.name ?? "error"}` };
+    const kind = error?.name === "TimeoutError" ? "timed out" : `network ${error?.cause?.code ?? error?.name ?? "error"}`;
+    return { ms: performance.now() - start, error: kind };
   }
 }
 
 async function visit(student, i) {
   await new Promise((r) => setTimeout(r, (RAMP_MS * i) / STUDENTS));
   const home = await timed(async () => {
-    const res = await fetch(`${SITE}/`, { headers: headers(student.cookie) });
+    const res = await fetch(`${SITE}/`, { headers: headers(student.cookie), signal: AbortSignal.timeout(PAGE_TIMEOUT_MS) });
     await res.arrayBuffer();
     return res.ok ? {} : { error: `home: HTTP ${res.status}` };
   });
@@ -134,6 +170,7 @@ async function visit(student, i) {
       method: "POST",
       headers: headers(student.cookie, { origin: SITE, "content-type": "application/json" }),
       body: JSON.stringify({ question: QUESTIONS[i % QUESTIONS.length], level: "exam" }),
+      signal: AbortSignal.timeout(ANSWER_TIMEOUT_MS),
     });
     if (!res.ok || !res.body) return { error: `answer: HTTP ${res.status}` };
     let buffer = "";
@@ -153,11 +190,35 @@ async function visit(student, i) {
     return outcome;
   });
   const chat = await timed(async () => {
-    const res = await fetch(`${SITE}/chats/${student.chatId}`, { headers: headers(student.cookie) });
+    const res = await fetch(`${SITE}/chats/${student.chatId}`, { headers: headers(student.cookie), signal: AbortSignal.timeout(PAGE_TIMEOUT_MS) });
     await res.arrayBuffer();
     return res.ok ? {} : { error: `chat page: HTTP ${res.status}` };
   });
   return { home, answer, chat, firstWords };
+}
+
+// --- Before the test: is the staging site using the staging database, and does it accept the sign-in? ---
+// Database addresses (project refs) are not secret; no keys or content are printed.
+async function preflight(student) {
+  const home = await fetch(`${SITE}/`, { headers: headers(student.cookie) });
+  const html = await home.text();
+  const isLawdeck = /<title>[^<]*Lawdeck/i.test(html);
+  console.log(`Bypass secret for Vercel's preview lock: ${BYPASS ? "set" : "NOT SET"}.`);
+  console.log(`Home page is Lawdeck: ${isLawdeck ? "yes" : `no (HTTP ${home.status}; probably Vercel's login page: check VERCEL_BYPASS_SECRET)`}.`);
+  if (!isLawdeck) throw new Error("The staging site shows Vercel's preview lock, not Lawdeck: set VERCEL_BYPASS_SECRET (docs/specs/staging.md).");
+  const scripts = [...html.matchAll(/<script[^>]+src="([^"]+)"/g)].map((m) => m[1]).slice(0, 40);
+  const refs = new Set();
+  for (const src of scripts) {
+    const js = await (await fetch(new URL(src, SITE), { headers: headers("") })).text().catch(() => "");
+    for (const m of js.matchAll(/https:\/\/([a-z0-9]{20})\.supabase\.co/g)) refs.add(m[1]);
+  }
+  // The account page shows the signed-in person's (made-up) email address; signed out, it asks to sign in.
+  const account = await fetch(`${SITE}/account`, { headers: headers(student.cookie) });
+  const signedIn = (await account.text()).includes(student.email);
+  console.log(`Staging site uses database: ${[...refs].join(", ") || "not found"} (staging is ${REF}${refs.has(LIVE_PROJECT) ? "; THE LIVE DATABASE IS IN USE" : ""}).`);
+  console.log(`Staging site accepts the test sign-in: ${signedIn ? "yes" : `no (HTTP ${account.status})`}.`);
+  if (refs.has(LIVE_PROJECT)) throw new Error("The staging site points at the live database: fix the Vercel variables for the staging branch.");
+  if (!signedIn) throw new Error("The staging site does not accept the staging sign-in: check the staging branch's Vercel variables (docs/specs/staging.md).");
 }
 
 // --- Report ------------------------------------------------------------------------------------
@@ -169,7 +230,7 @@ const pct = (values, p) => {
 const sec = (ms) => (ms === null ? "–" : `${(ms / 1000).toFixed(2)} s`);
 
 function report(results, setupErrors) {
-  const lines = [`## Load test: ${STUDENTS} students on staging`, ""];
+  const lines = [`## Load test: ${STUDENTS} students on staging (${ACCOUNTS} accounts)`, ""];
   const step = (label, key, budget) => {
     const done = results.filter((r) => r[key] && !r[key].error);
     const times = done.map((r) => r[key].ms);
@@ -208,22 +269,41 @@ let items = [];
 let passed = false;
 try {
   console.log(`Preparing ${STUDENTS} made-up students on staging…`);
+  step("Removing leftovers from earlier runs");
+  await removeLeftovers();
+  step("Adding made-up library items");
   items = await seedLibrary();
-  const made = await pool([...Array(STUDENTS).keys()], 10, createStudent);
+  step("Creating test accounts");
+  const made = await pool([...Array(ACCOUNTS).keys()], 10, createStudent);
   for (const s of made) if (s.id) created.push(s.id);
   const setupErrors = made.filter((s) => s.error).map((s) => s.error);
-  const ready = await pool(
+  step("Signing in");
+  const signedIn = await pool(
     made.filter((s) => s.id),
-    20,
+    5,
     async (s) => ({ ...s, ...(await signIn(s)) }),
   );
-  for (const s of ready) if (s.error) setupErrors.push(s.error);
-  const students = ready.filter((s) => s.cookie);
-  console.log(`${students.length} students signed in. Starting the test (ramp ${RAMP_MS / 1000} s)…`);
-  const results = await Promise.all(students.map((s, i) => visit(s, i)));
+  for (const s of signedIn) if (s.error) setupErrors.push(s.error);
+  const accounts = signedIn.filter((s) => s.cookie);
+  if (!accounts.length) throw new Error("No test account could sign in.");
+  step("Checking the staging site");
+  await preflight({ ...accounts[0], email: accounts[0].email });
+  step("Creating a chat for each student");
+  const chats = await pool([...Array(STUDENTS).keys()], 20, (i) => newChat(accounts[i % accounts.length]));
+  for (const c of chats) if (c.error) setupErrors.push(c.error);
+  const students = chats.filter((c) => c.chatId);
+  console.log(`${accounts.length} accounts signed in for ${students.length} students. Starting the test (ramp ${RAMP_MS / 1000} s)…`);
+  const finished = [];
+  const all = Promise.all(students.map((s, i) => visit(s, i).then((r) => (finished[i] = r))));
+  const progress = setInterval(() => step(`${finished.filter(Boolean).length}/${students.length} students finished`), 15_000);
+  const results = await withWatchdog(all, () => {
+    step("Time is up: reporting the students who finished");
+    return students.map((_, i) => finished[i] ?? { home: { error: "did not finish within 12 minutes" }, answer: { error: "did not finish within 12 minutes" }, chat: { error: "did not finish within 12 minutes" }, firstWords: null });
+  });
+  clearInterval(progress);
   passed = report(results, setupErrors);
 } finally {
-  console.log("Removing the made-up students and library items…");
+  step("Removing the made-up students and library items");
   await pool(created, 10, (id) => admin.auth.admin.deleteUser(id));
   if (items.length) await admin.from("kb_items").delete().in("id", items);
   console.log(`Removed ${created.length} students and ${items.length} library items.`);
