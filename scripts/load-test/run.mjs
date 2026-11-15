@@ -46,6 +46,13 @@ const QUESTIONS = [
   "What is the undefended list procedure?",
 ];
 
+const began = Date.now();
+const step = (what) => console.log(`[${((Date.now() - began) / 1000).toFixed(0)} s] ${what}`);
+// The whole test stops after this long, reports what it has, and cleans up.
+const WATCHDOG_MS = 12 * 60_000;
+const withWatchdog = (promise, fallback) =>
+  Promise.race([promise, new Promise((resolve) => setTimeout(() => resolve(fallback()), WATCHDOG_MS - (Date.now() - began)))]);
+
 const pool = async (items, size, work) => {
   const results = [];
   let next = 0;
@@ -262,11 +269,15 @@ let items = [];
 let passed = false;
 try {
   console.log(`Preparing ${STUDENTS} made-up students on staging…`);
+  step("Removing leftovers from earlier runs");
   await removeLeftovers();
+  step("Adding made-up library items");
   items = await seedLibrary();
+  step("Creating test accounts");
   const made = await pool([...Array(ACCOUNTS).keys()], 10, createStudent);
   for (const s of made) if (s.id) created.push(s.id);
   const setupErrors = made.filter((s) => s.error).map((s) => s.error);
+  step("Signing in");
   const signedIn = await pool(
     made.filter((s) => s.id),
     5,
@@ -275,15 +286,24 @@ try {
   for (const s of signedIn) if (s.error) setupErrors.push(s.error);
   const accounts = signedIn.filter((s) => s.cookie);
   if (!accounts.length) throw new Error("No test account could sign in.");
+  step("Checking the staging site");
   await preflight({ ...accounts[0], email: accounts[0].email });
+  step("Creating a chat for each student");
   const chats = await pool([...Array(STUDENTS).keys()], 20, (i) => newChat(accounts[i % accounts.length]));
   for (const c of chats) if (c.error) setupErrors.push(c.error);
   const students = chats.filter((c) => c.chatId);
   console.log(`${accounts.length} accounts signed in for ${students.length} students. Starting the test (ramp ${RAMP_MS / 1000} s)…`);
-  const results = await Promise.all(students.map((s, i) => visit(s, i)));
+  const finished = [];
+  const all = Promise.all(students.map((s, i) => visit(s, i).then((r) => (finished[i] = r))));
+  const progress = setInterval(() => step(`${finished.filter(Boolean).length}/${students.length} students finished`), 15_000);
+  const results = await withWatchdog(all, () => {
+    step("Time is up: reporting the students who finished");
+    return students.map((_, i) => finished[i] ?? { home: { error: "did not finish within 12 minutes" }, answer: { error: "did not finish within 12 minutes" }, chat: { error: "did not finish within 12 minutes" }, firstWords: null });
+  });
+  clearInterval(progress);
   passed = report(results, setupErrors);
 } finally {
-  console.log("Removing the made-up students and library items…");
+  step("Removing the made-up students and library items");
   await pool(created, 10, (id) => admin.auth.admin.deleteUser(id));
   if (items.length) await admin.from("kb_items").delete().in("id", items);
   console.log(`Removed ${created.length} students and ${items.length} library items.`);
