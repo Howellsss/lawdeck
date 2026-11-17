@@ -53,7 +53,18 @@
 | 500 | all 500 succeeded: home 1.29 s, first words 3.17 s (just over the 3 s budget), whole answer 4.26 s, chat 2.06 s (run 43691241909) |
 - Medium holds 500 students arriving within 30 s with no failures; only the first-words time drifts just past
   3 seconds for the slowest 5%.
-- Still to run: 200 students on Micro (the live size), after the founder switches staging to Micro.
+
+### Results 3 (2026-11-17, staging on Supabase Micro, the live size; Vercel Hobby, pretend AI)
+| Students arriving within 30 s | Outcome (slowest 5%) |
+|---|---|
+| 200 | all succeeded: home 0.89 s, first words 1.99 s, whole answer 2.66 s, chat 0.98 s (PASS; run 44093755780) |
+| 500 | all succeeded: home 1.00 s, first words 2.34 s, whole answer 3.10 s, chat 1.30 s (PASS; run 44094420843) |
+| 1,000 | failed: 321 home pages, 62 first words, 20 whole answers, 0 chat pages; 1,679 time-outs and 909 HTTP 504s; clean-up took 4.5 minutes (run 44095164337) |
+- The live size (Micro) holds 500 students arriving within 30 s; 1,000 at once overwhelms it.
+- Timings vary from run to run (Micro 500 was faster than Medium 500 two days earlier), so treat each figure as
+  "about".
+- Staging is Vercel Hobby; the 504s at 1,000 may partly be Vercel's limits as well as the database. A 1,000 run on a
+  bigger database (Medium or Large) would separate the two.
 - Supabase lets about 30 password sign-ins per 5 minutes through from one address whatever the setting, so the
   test uses 25 accounts shared by the students (each with their own chat).
 - Every request has a time limit (30 s pages, 130 s answers) and the visit phase stops after 12 minutes; a run
