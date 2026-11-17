@@ -16,11 +16,13 @@ import { MODELS, type ExplainModel } from "@/server/ai/models";
 import { pagesLabel } from "@/lib/pages";
 import type { Database } from "@/server/db/types";
 import type { ChatSource } from "@/server/db/workspace";
-import { searchForAnswer, searchForQuestion, type SearchHit, type SearchResult } from "@/server/retrieval/search";
+import { mergeHits, searchForAnswer, searchForQuestion, type SearchHit, type SearchResult } from "@/server/retrieval/search";
 import { SCENARIO_SEARCH_RESULTS, SEARCH_RESULTS } from "@/server/retrieval/settings";
 import { limitReachedMessage } from "@/lib/allowance";
 import { greetingName, isSmallTalk, quickReply, withoutName } from "@/lib/smallTalk";
 import { talkSearchText } from "@/lib/talkSearch";
+import { bestHeard, namesLibraryTopic } from "@/lib/legalWords";
+import { voiceVocabulary } from "./vocabulary";
 import { recordUsage } from "@/server/ai/usage";
 import { speechConfigured } from "@/server/ai/speech";
 import { DEFAULT_VOICE, VOICE_FIRST_NAMES, type Voice } from "@/schemas/voice";
@@ -52,6 +54,8 @@ export type SourceSummary = ChatSource;
 export type AnswerEvent =
   // The library search finished, with this many passages (shown before the answer starts).
   | { type: "found"; count: number }
+  // Voice mode: what Lawdeck understood was said, after correcting misheard law words.
+  | { type: "heard"; text: string }
   | { type: "text"; text: string }
   | {
       type: "done";
@@ -89,13 +93,15 @@ export async function answerQuestion(input: {
   level: AnswerLevel;
   // Voice mode: speak the reply sentence by sentence in this voice as it is written.
   voice?: Voice;
+  // Voice mode: the browser's other guesses of what was said.
+  alternatives?: string[];
   send: (event: AnswerEvent) => void;
   signal?: AbortSignal;
 }): Promise<void> {
   const { db, send } = input;
   // Independent reads run together, so the answer starts sooner (voice mode, founder 2026-10-28:
   // "it responded but really slow").
-  const [chat, allowance, earlier, profile] = await Promise.all([
+  const [chat, allowance, earlier, profile, vocabulary] = await Promise.all([
     db.from("conversations").select("id, title, course_id, use_uploads").eq("id", input.chatId).maybeSingle(),
     // Rule K-01: the monthly limit is checked before anything is saved or any AI is called.
     getAllowance(db),
@@ -110,6 +116,8 @@ export async function answerQuestion(input: {
     input.level === "talk"
       ? db.from("profiles").select("full_name").eq("id", input.userId).maybeSingle()
       : null,
+    // Voice mode: Lawdeck's own law words, to correct what the browser misheard.
+    input.level === "talk" ? voiceVocabulary(db) : null,
   ]);
   if (chat.error || !chat.data)
     return send({ type: "error", message: "That chat could not be found." });
@@ -124,7 +132,11 @@ export async function answerQuestion(input: {
     });
 
   // Rule G-06: nothing that looks like an email address or phone number leaves Lawdeck.
-  const question = redactPersonalData(input.question);
+  // Voice mode (founder, 2026-11-17: "I tell it mortgage it hears mod gauge"): misheard law words
+  // are corrected against the library's own course, topic and book names.
+  const said = vocabulary ? bestHeard(input.question, input.alternatives ?? [], vocabulary) : input.question;
+  if (vocabulary) send({ type: "heard", text: said });
+  const question = redactPersonalData(said);
   // The student's own Ready uploads join the library unless this chat has them turned off (6c).
   const name = greetingName(profile?.data?.full_name);
   const history = historyTurns(earlier.data).map((turn) => ({ ...turn, text: withoutName(turn.text, name) }));
@@ -139,22 +151,15 @@ export async function answerQuestion(input: {
     db.from("messages").insert({
       conversation_id: input.chatId,
       role: "user",
-      content: { text: input.question, level: input.level },
+      content: { text: said, level: input.level },
     }),
     title
-      ? db.from("conversations").update({ title: titleFrom(input.question) }).eq("id", input.chatId)
+      ? db.from("conversations").update({ title: titleFrom(said) }).eq("id", input.chatId)
       : null,
     smallTalk
       ? ({ ok: true, hits: [], meaningUsed: true, reranked: false } satisfies SearchResult)
       : input.level === "talk"
-        ? // Voice mode stays one quick search, so the reply starts fast.
-          searchForAnswer({
-            question: searchText,
-            courseId: chat.data.course_id,
-            includePending: false,
-            useUploads: chat.data.use_uploads,
-            results: isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS,
-          })
+        ? talkSearch(question, searchText, vocabulary ? namesLibraryTopic(question, vocabulary) : false, chat.data)
         : // A problem question is also searched issue by issue (founder, 2026-11-02).
           searchForQuestion({
             question: searchText,
@@ -213,8 +218,9 @@ export async function answerQuestion(input: {
       });
   }
   // Voice mode: a clear greeting ("Hey Ryan, what's up?") is answered at once by Lawdeck itself,
-  // with the student's first name; no AI is called (founder, 2026-11-08).
-  const quick = smallTalk ? quickReply(question, name, Date.now()) : null;
+  // with the student's first name; no AI is called (founder, 2026-11-08). A busy library search
+  // is said so plainly, never as "the library doesn't cover it" (founder, 2026-11-17).
+  const quick = smallTalk ? quickReply(question, name, Date.now()) : unsure ? TALK_SEARCH_BUSY : null;
   if (quick) {
     send({ type: "text", text: quick });
     live?.push(quick);
@@ -271,6 +277,50 @@ export async function answerQuestion(input: {
     notEnough,
     level: input.level,
   });
+}
+
+// Voice mode, when the library search could not run properly: spoken, then Lawdeck listens again.
+export const TALK_SEARCH_BUSY = "Sorry, I couldn’t search the library just then. Could you say that again?";
+// A short turn's own best passages lead, then those found with the conversation take turns.
+const TALK_OWN_LEAD = 5;
+
+// Voice mode's search (founder, 2026-11-17: "it says it doesn't have materials … when I do a
+// normal search I see everything"). A full question is searched as it is; if nothing is found,
+// it is searched once more the way the chat screen searches. A short turn is searched both on
+// its own and with the recent conversation: when it names a library topic ("explain probate
+// practice") its own passages lead, otherwise ("yes, go on") the conversation's do.
+async function talkSearch(
+  question: string,
+  searchText: string,
+  newTopic: boolean,
+  chat: { course_id: string | null; use_uploads: boolean },
+): Promise<SearchResult> {
+  const base = { courseId: chat.course_id, includePending: false, useUploads: chat.use_uploads };
+  const results = isScenario(question) ? SCENARIO_SEARCH_RESULTS : SEARCH_RESULTS;
+  const own = () => searchForAnswer({ ...base, question, results });
+  if (searchText === question) {
+    const found = await own();
+    return found.ok && found.hits.length === 0 ? searchForQuestion({ ...base, question }) : found;
+  }
+  const [alone, together] = await Promise.all([own(), searchForAnswer({ ...base, question: searchText, results })]);
+  if (!alone.ok) return together;
+  if (!together.ok) return alone;
+  return combineTalkHits(alone, together, newTopic, results);
+}
+
+export function combineTalkHits(
+  alone: Extract<SearchResult, { ok: true }>,
+  together: Extract<SearchResult, { ok: true }>,
+  newTopic: boolean,
+  max: number,
+): SearchResult {
+  const [first, second] = newTopic ? [alone, together] : [together, alone];
+  return {
+    ok: true,
+    meaningUsed: alone.meaningUsed || together.meaningUsed,
+    reranked: first.reranked,
+    hits: mergeHits(first.hits.slice(0, TALK_OWN_LEAD), [second.hits, first.hits.slice(TALK_OWN_LEAD)], max),
+  };
 }
 
 export type ComposedAnswer =

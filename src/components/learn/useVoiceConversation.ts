@@ -76,7 +76,7 @@ export function useVoiceConversation(options: {
   }
 
   // One reply: asks, and plays each spoken sentence as it arrives. False when voice mode ends.
-  async function reply(question: string): Promise<boolean> {
+  async function reply(question: string, alternatives: string[]): Promise<boolean> {
     if (!chatId.current) {
       const chat = await optionsRef.current.chatFor(question);
       if (!on.current) return false;
@@ -98,7 +98,9 @@ export function useVoiceConversation(options: {
       question,
       "talk",
       (event) => {
-        if (event.type === "audio") {
+        // What Lawdeck understood, after correcting misheard law words.
+        if (event.type === "heard") setHeard(event.text);
+        else if (event.type === "audio") {
           spoken = true;
           audio.push(event.data);
         } else if (event.type === "audio_error") failure = event.message;
@@ -106,6 +108,7 @@ export function useVoiceConversation(options: {
       },
       controller.signal,
       readVoice(),
+      alternatives,
     );
     audio.end();
     if (!on.current) return false;
@@ -129,8 +132,9 @@ export function useVoiceConversation(options: {
       listening.current = controller;
       const startedAt = Date.now();
       let question: string;
+      let alternatives: string[];
       try {
-        question = await listenOnce(controller.signal);
+        ({ words: question, alternatives } = await listenOnce(controller.signal));
       } catch (error) {
         if (!on.current) return;
         const code = (error as Error).message;
@@ -146,7 +150,7 @@ export function useVoiceConversation(options: {
       quickFailures = 0;
       setHeard(question);
       const leaving = GOODBYE.test(question);
-      if (!(await reply(question))) return;
+      if (!(await reply(question, alternatives))) return;
       if (leaving) return end();
     }
   }

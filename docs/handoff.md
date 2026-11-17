@@ -5,9 +5,12 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-17 (load test: 1,000 on Large).
+Last updated: 2026-11-17 (voice mode hears law words).
 
 ## In progress right now (2026-11-15) — read this first
+- **Voice mode hearing (2026-11-17):** Step 1 built (law-word correction, new-topic search, busy reply; docs/specs/voice.md).
+  Founder to test by voice. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
+  goes to Microsoft, ≈₦1,400/hour, new library.
 - **Launch list (17 tasks):** done 1 (Resend email), 2 (ID test switch off), 3 (Anthropic limit), 4 (Google sign-in published;
   branding verification still needs the Search Console TXT record + resubmit), 5 (Supabase Pro settings), 6 (staging +
   monthly practice restore), 10 partly (/privacy, /terms, consent record migration 67). Open: 7 (load test, finishing),
