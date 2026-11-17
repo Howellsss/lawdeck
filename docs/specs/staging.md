@@ -86,3 +86,16 @@
 - An answer is about 8,000 tokens in and 1,500 out, so about 600 answers a minute fit. Above that, students see
   "Lawdeck is busy right now. Please try again in a minute." The load test (pretend AI) does not measure this.
 - The credit balance was $4.31 (about 130 answers): top up and turn on auto-reload before launch.
+
+### Results 5 (2026-11-17, 1,000 students on Large; Vercel Hobby, pretend AI; run 44112182906)
+| Step | Succeeded | Typical | Slowest 5% |
+|---|---|---|---|
+| Home page | 1000/1000 | 13.7 s | 18.6 s |
+| First answer words | 1000/1000 | 14.2 s | 29.3 s |
+| Whole answer | 1000/1000 | 23.3 s | 34.8 s |
+| Chat page | 1000/1000 | 13.1 s | 15.8 s |
+- Large (dedicated 2 CPUs, 8 GB) served everyone (Medium dropped 238 home pages) but waits stayed 13 to 30 s, and in
+  both runs nothing finished for the first minute. A database twice as big barely helped, so the limit at 1,000 is
+  now elsewhere: Vercel Hobby (how many requests run at once), the work each page does (sign-in checks on every page),
+  or the single GitHub machine sending all 1,000 students. Next: Vercel Pro and re-test; then measure page work.
+- Do not buy Large for launch on this evidence; Medium for launch week is enough with staggered announcements.
