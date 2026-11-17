@@ -63,8 +63,18 @@
 - The live size (Micro) holds 500 students arriving within 30 s; 1,000 at once overwhelms it.
 - Timings vary from run to run (Micro 500 was faster than Medium 500 two days earlier), so treat each figure as
   "about".
-- Staging is Vercel Hobby; the 504s at 1,000 may partly be Vercel's limits as well as the database. A 1,000 run on a
-  bigger database (Medium or Large) would separate the two.
+- Staging is Vercel Hobby; the 504s at 1,000 may partly be Vercel's limits as well as the database.
+
+### Results 4 (2026-11-17, 1,000 students on Medium; Vercel Hobby, pretend AI; run 44101849082)
+| Step | Succeeded | Typical | Slowest 5% |
+|---|---|---|---|
+| Home page | 762/1000 (238 timed out) | 22.7 s | 29.4 s |
+| First answer words | 1000/1000 | 16.6 s | 25.3 s |
+| Whole answer | 1000/1000 | 26.1 s | 31.2 s |
+| Chat page | 1000/1000 | 16.2 s | 19.5 s |
+- Medium keeps everyone working (no 504s, every answer delivered, unlike Micro) but 1,000 arriving within 30 s wait
+  15 to 30 seconds. Avoid a single 1,000-person spike: stagger announcements (campus by campus, group by group) so
+  arrivals stay near 500 a half-minute, which both Micro and Medium handle within budget.
 - Supabase lets about 30 password sign-ins per 5 minutes through from one address whatever the setting, so the
   test uses 25 accounts shared by the students (each with their own chat).
 - Every request has a time limit (30 s pages, 130 s answers) and the visit phase stops after 12 minutes; a run
