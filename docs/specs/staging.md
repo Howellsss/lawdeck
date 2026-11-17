@@ -70,3 +70,9 @@
 - Every request has a time limit (30 s pages, 130 s answers) and the visit phase stops after 12 minutes; a run
   first removes leftovers of a stopped run.
 
+### The AI limit (Anthropic, checked 2026-11-17)
+- Anthropic Build tier. Claude Sonnet 5.5 (answers): 5M input tokens, 1M output tokens and 10,000 requests a minute;
+  Haiku and Opus have their own separate allowances of the same size.
+- An answer is about 8,000 tokens in and 1,500 out, so about 600 answers a minute fit. Above that, students see
+  "Lawdeck is busy right now. Please try again in a minute." The load test (pretend AI) does not measure this.
+- The credit balance was $4.31 (about 130 answers): top up and turn on auto-reload before launch.

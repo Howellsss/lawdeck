@@ -21,7 +21,7 @@ Last updated: 2026-11-17 (load test on Micro: 500 passed, 1,000 failed).
 - **Load test results:** Nano: 100 passed, 200 ≈60%, 500 failed. Medium: 200 passed, 500 all in (first words 3.17 s).
   **Micro (live size), 2026-11-17: 200 and 500 passed; 1,000 failed** (runs 44093755780, 44094420843, 44095164337).
   Staging is now on Micro. Open: founder decides whether to test 1,000 on a bigger size, the live size for launch
-  week, and the Anthropic tier (requests per minute) for real AI under a rush.
+  week, Anthropic is Build tier (about 600 answers a minute on Sonnet, enough); its credit balance was $4.31 on 2026-11-17: founder to top up and turn on auto-reload.
 - **Policy fixes waiting on the founder:** Voyage training opt-out (email sent to Voyage support; update Privacy
   Notice/questionnaire Q34–37, Q59 when they reply); contact email privacy@mylawdeck.com vs lawdeck01@gmail.com;
   policies say "18+ or parental consent" and "university students and lawyers" but the founder said 18+ only, Law
