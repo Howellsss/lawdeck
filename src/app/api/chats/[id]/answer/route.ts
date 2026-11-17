@@ -55,6 +55,7 @@ export async function POST(request: NextRequest, ctx: RouteContext<"/api/chats/[
           question: body.data.question,
           level: body.data.level,
           voice: body.data.voice,
+          alternatives: body.data.alternatives,
           send,
           signal: stop.signal,
         });

@@ -92,3 +92,24 @@ The free tier allows a limited number of requests a minute; move to **Standard S
   35(1) and 36(6)(b)"). Rules of court: "O. 13 r. 4(2)(b)" is "Order 13 rule 4, sub-rule 2,
   paragraph B". Only speech changes; the written answer is untouched. Code: `readProvisions` in
   `src/lib/speech.ts`.
+
+## Hearing law words, and finding the topic (founder, 2026-11-17)
+The founder: "I tell it mortgage it hears mod gauge … probate practice, it hears private practice …
+many times it says it doesn't have materials … when I do a normal search I see everything".
+- **Misheard law words are corrected** (`src/lib/legalWords.ts`, `src/server/learn/vocabulary.ts`).
+  The browser's speech recognition is asked for up to 5 guesses of each turn; the server picks the guess
+  with the most of Lawdeck's own words, then replaces phrases that *sound* like a library name: course,
+  topic and reviewed book titles, read from the database (no legal content in code) and kept 10 minutes.
+  "mod gauge" → "mortgage", "wheels and codesels" → "wills and codicils", "private practice" →
+  "probate practice". Words the library itself uses are never changed. The voice screen and the saved
+  chat show the corrected words (`heard` event), so the student sees what Lawdeck understood.
+- **A short turn that names a new topic is searched on its own.** Before, any turn under 8 words was
+  searched together with the whole previous answer, which swamped a new topic. Now a short turn is
+  searched both alone and with the conversation; its own passages lead when it names a library topic,
+  the conversation's lead for follow-ups ("yes, go on").
+- **A busy search is said plainly** ("Sorry, I couldn't search the library just then. Could you say that
+  again?"), never as "the library doesn't cover it".
+- **Nothing found → one more try** with the same full search the chat screen uses.
+- Not done (founder's decision needed): Azure speech-to-text with a law phrase list would hear better
+  still, but sends the student's voice to Microsoft, costs about ₦1,400 an hour of listening and needs a
+  new library (Privacy Notice and CLAUDE.md would change).

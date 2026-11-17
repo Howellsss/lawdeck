@@ -12,6 +12,8 @@ type SpeechResultList = ArrayLike<{ isFinal: boolean } & ArrayLike<{ transcript:
 export type Recognition = {
   lang: string;
   interimResults: boolean;
+  // How many guesses of each phrase the browser offers (some browsers give only one).
+  maxAlternatives?: number;
   continuous: boolean;
   onresult: ((event: { resultIndex: number; results: SpeechResultList }) => void) | null;
   onerror: ((event: { error: string }) => void) | null;
@@ -43,10 +45,34 @@ export function voiceErrorMessage(code: string): string {
 export const END_OF_TURN_MS = 700;
 const WAIT_FOR_SPEECH_MS = 15_000;
 
+// How many guesses of what was said voice mode asks for; Lawdeck picks the one that names a law
+// topic (src/lib/legalWords.ts; founder, 2026-11-17: "I tell it mortgage it hears mod gauge").
+export const HEARD_GUESSES = 5;
+
+export type Heard = { words: string; alternatives: string[] };
+
+// The browser's other guesses of the whole turn: guess k of each phrase (or its best guess when
+// it has fewer), leaving out any that match the best guess.
+export function otherGuesses(results: SpeechResultList, best: string): string[] {
+  const guesses = new Set<string>();
+  for (let k = 1; k < HEARD_GUESSES; k++) {
+    let text = "";
+    let differs = false;
+    for (let i = 0; i < results.length; i++) {
+      const guess = results[i][k]?.transcript;
+      if (guess !== undefined) differs = true;
+      text += guess ?? results[i][0]?.transcript ?? "";
+    }
+    const trimmed = text.trim();
+    if (differs && trimmed && trimmed !== best) guesses.add(trimmed);
+  }
+  return [...guesses];
+}
+
 // Listens for one turn of a conversation and returns its words (voice mode). Short pauses
 // mid-sentence do not end the turn: it ends once the student has been quiet for END_OF_TURN_MS.
 // Rejects with the browser's error code ("no-speech", "not-allowed" …); `cancel` stops early.
-export function listenOnce(cancel?: AbortSignal): Promise<string> {
+export function listenOnce(cancel?: AbortSignal): Promise<Heard> {
   return new Promise((resolve, reject) => {
     const Constructor = recognitionConstructor();
     if (!Constructor) return reject(new Error("unsupported"));
@@ -54,13 +80,16 @@ export function listenOnce(cancel?: AbortSignal): Promise<string> {
     recognition.lang = "en-NG";
     recognition.interimResults = true;
     recognition.continuous = true;
+    recognition.maxAlternatives = HEARD_GUESSES;
     let words = "";
+    let results: SpeechResultList = [];
     let failed = "";
     let lastHeard = Date.now();
     const started = Date.now();
     recognition.onresult = (event) => {
       words = "";
       for (let i = 0; i < event.results.length; i++) words += event.results[i][0]?.transcript ?? "";
+      results = event.results;
       lastHeard = Date.now();
     };
     recognition.onerror = (event) => {
@@ -91,7 +120,7 @@ export function listenOnce(cancel?: AbortSignal): Promise<string> {
       clearInterval(timer);
       cancel?.removeEventListener("abort", stop);
       if (cancel?.aborted) reject(new Error("aborted"));
-      else if (words.trim()) resolve(words.trim());
+      else if (words.trim()) resolve({ words: words.trim(), alternatives: otherGuesses(results, words.trim()) });
       else reject(new Error(failed || "no-speech"));
     };
     const stop = () => recognition.stop();

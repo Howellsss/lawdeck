@@ -11,13 +11,15 @@ export async function askQuestion(
   signal?: AbortSignal,
   // Voice mode: the server speaks the reply in this voice as it writes it ("audio" events).
   voice?: string,
+  // Voice mode: the browser's other guesses of what was said.
+  alternatives?: string[],
 ): Promise<void> {
   let response: Response;
   try {
     response = await fetch(`/api/chats/${chatId}/answer`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ question, level, voice }),
+      body: JSON.stringify({ question, level, voice, alternatives }),
       signal,
     });
   } catch {

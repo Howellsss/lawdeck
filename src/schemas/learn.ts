@@ -19,7 +19,12 @@ const question = z
 export const levelSchema = z.enum(["simple", "exam", "talk"]).default("exam");
 
 // A question sent to the answer route, with the answer level (PRD LN-02).
-export const askSchema = z.object({ question, level: levelSchema, voice: z.enum(VOICES).optional() });
+// Voice mode: the browser's other guesses of what was said (up to five), so Lawdeck can pick the
+// one that names a law topic (src/lib/legalWords.ts).
+export const HEARD_ALTERNATIVES_MAX = 5;
+const alternatives = z.array(z.string().max(QUESTION_MAX_CHARS)).max(HEARD_ALTERNATIVES_MAX).optional();
+
+export const askSchema = z.object({ question, level: levelSchema, voice: z.enum(VOICES).optional(), alternatives });
 
 // Starting a chat from the home composer or a course hub: the course is a slug, or "all".
 // "auto" asks the router whether it is a Learn or a Draft request (PRD WS-03).
