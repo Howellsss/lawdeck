@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-15 (load test on Medium: 200 passed, 500 nearly).
+Last updated: 2026-11-17 (load test on Micro: 500 passed, 1,000 failed).
 
 ## In progress right now (2026-11-15) — read this first
 - **Launch list (17 tasks):** done 1 (Resend email), 2 (ID test switch off), 3 (Anthropic limit), 4 (Google sign-in published;
@@ -18,10 +18,10 @@ Last updated: 2026-11-15 (load test on Medium: 200 passed, 500 nearly).
   (staging keys, APP_ENV=staging, LAWDECK_PRETEND_AI=1). GitHub secrets: STAGING_DB_URL, STAGING_SUPABASE_URL,
   STAGING_PUBLISHABLE_KEY, STAGING_SECRET_KEY, VERCEL_BYPASS_SECRET. Workflows: Staging set-up, Practice restore,
   Load test (docs/specs/staging.md).
-- **Load test results:** on Nano (smaller than live Micro): 50 and 100 passed, 200 ≈60%, 500 failed. On Medium:
-  200 passed (run 43690675524), 500 all succeeded with first words 3.17 s for the slowest 5% (run 43691241909).
-  docs/specs/staging.md corrected. **Next:** founder switches staging to Micro, then run 200 on Micro; give the
-  live-size recommendation; founder steps staging down to Micro/Nano afterwards (Medium ≈$59/month).
+- **Load test results:** Nano: 100 passed, 200 ≈60%, 500 failed. Medium: 200 passed, 500 all in (first words 3.17 s).
+  **Micro (live size), 2026-11-17: 200 and 500 passed; 1,000 failed** (runs 44093755780, 44094420843, 44095164337).
+  Staging is now on Micro. Open: founder decides whether to test 1,000 on a bigger size, the live size for launch
+  week, Anthropic is Build tier (about 600 answers a minute on Sonnet, enough); its credit balance was $4.31 on 2026-11-17: founder to top up and turn on auto-reload.
 - **Policy fixes waiting on the founder:** Voyage training opt-out (email sent to Voyage support; update Privacy
   Notice/questionnaire Q34–37, Q59 when they reply); contact email privacy@mylawdeck.com vs lawdeck01@gmail.com;
   policies say "18+ or parental consent" and "university students and lawyers" but the founder said 18+ only, Law
