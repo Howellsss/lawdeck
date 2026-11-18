@@ -5,16 +5,19 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-17 (voice mode hears law words).
+Last updated: 2026-11-18 (launch list review; branding resubmitted; staging on Micro).
 
 ## In progress right now (2026-11-15) — read this first
 - **Voice mode hearing (2026-11-17):** Step 1 built (law-word correction, new-topic search, busy reply; docs/specs/voice.md).
   Founder to test by voice. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
   goes to Microsoft, ≈₦1,400/hour, new library.
-- **Launch list (17 tasks):** done 1 (Resend email), 2 (ID test switch off), 3 (Anthropic limit), 4 (Google sign-in published;
-  branding verification still needs the Search Console TXT record + resubmit), 5 (Supabase Pro settings), 6 (staging +
-  monthly practice restore), 10 partly (/privacy, /terms, consent record migration 67). Open: 7 (load test, finishing),
-  8 Vercel Pro, 9 Sentry DSN check, 11–14 legal reviewer, 15–16 payments/limits decisions, 17 pilot.
+- **Launch list (17 tasks), reviewed with the founder 2026-11-18:** done 1 (Resend email), 2 (ID test switch off),
+  3 (Anthropic limit), 5 (Supabase Pro settings), 6 (staging + monthly practice restore), 7 (load test: ~500 at once on
+  Micro; re-test 1,000 after Vercel Pro), 10 partly (/privacy, /terms, consent record migration 67). 4: Google sign-in
+  published; domain verified in Search Console (sc-domain:mylawdeck.com) and branding **resubmitted 2026-11-18**, Google
+  answers in 2–3 working days. Open: 8 Vercel Pro, 9 Sentry DSN check, 10 lawyer review + wording decisions, 11–14 legal
+  reviewer (library recheck, test questions/ratings, templates + marking guides, marking agreement), 15 payment provider,
+  16 final prices/free limits, 17 pilot.
 - **Staging:** Supabase project `lawdeck-staging` (ref drnqgbtrutlhhcsacqll), moved into the Howells **Pro** org on
   2026-11-15 and set to **Medium** compute for a re-test (≈$59/month if left on — **set it back to Micro or Nano after
   testing**). Vercel branch `staging` → https://lawdeck-git-staging-howells1.vercel.app with Preview-only vars
@@ -24,7 +27,7 @@ Last updated: 2026-11-17 (voice mode hears law words).
 - **Load test results:** Nano: 100 passed, 200 ≈60%, 500 failed. Medium: 200 passed, 500 all in (first words 3.17 s).
   **Micro (live size), 2026-11-17: 200 and 500 passed; 1,000 failed** (runs 44093755780, 44094420843, 44095164337).
   1,000 on Medium (run 44101849082): all answered but 15–30 s waits. Large 1,000 (run 44112182906): everyone served, 13–30 s waits; database no longer the limit, next Vercel Pro then
-  re-test. Staging was set to **Large** for that run: **founder to switch it back to Micro**. Recommendation given: Micro day to day, Medium for launch week, stagger announcements; Anthropic is Build tier (about 600 answers a minute on Sonnet, enough); its credit balance was $4.31 on 2026-11-17: founder to top up and turn on auto-reload.
+  re-test. Staging was set to Large for that run; **founder switched it back to Micro (2026-11-18)**. Recommendation given: Micro day to day, Medium for launch week, stagger announcements; Anthropic is Build tier (about 600 answers a minute on Sonnet, enough); its credit balance was $4.31 on 2026-11-17: founder to top up and turn on auto-reload.
 - **Policy fixes waiting on the founder:** Voyage training opt-out (email sent to Voyage support; update Privacy
   Notice/questionnaire Q34–37, Q59 when they reply); contact email privacy@mylawdeck.com vs lawdeck01@gmail.com;
   policies say "18+ or parental consent" and "university students and lawyers" but the founder said 18+ only, Law
