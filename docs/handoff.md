@@ -5,17 +5,17 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-18 (launch list review; branding resubmitted; staging on Micro).
+Last updated: 2026-11-18 (Sentry switched on; voice test passed).
 
 ## In progress right now (2026-11-15) — read this first
 - **Voice mode hearing (2026-11-17):** Step 1 built (law-word correction, new-topic search, busy reply; docs/specs/voice.md).
-  Founder to test by voice. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
+  Founder tested by voice 2026-11-18: works well. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
   goes to Microsoft, ≈₦1,400/hour, new library.
 - **Launch list (17 tasks), reviewed with the founder 2026-11-18:** done 1 (Resend email), 2 (ID test switch off),
   3 (Anthropic limit), 5 (Supabase Pro settings), 6 (staging + monthly practice restore), 7 (load test: ~500 at once on
   Micro; re-test 1,000 after Vercel Pro), 10 partly (/privacy, /terms, consent record migration 67). 4: Google sign-in
   published; domain verified in Search Console (sc-domain:mylawdeck.com) and branding **resubmitted 2026-11-18**, Google
-  answers in 2–3 working days. Open: 8 Vercel Pro, 9 Sentry DSN check, 10 lawyer review + wording decisions, 11–14 legal
+  answers in 2–3 working days. 9 done 2026-11-18 (Sentry org "LawDeck", EU region, SENTRY_DSN in Vercel Production, redeployed; first event not yet seen). Open: 8 Vercel Pro, 10 lawyer review + wording decisions, 11–14 legal
   reviewer (library recheck, test questions/ratings, templates + marking guides, marking agreement), 15 payment provider,
   16 final prices/free limits, 17 pilot.
 - **Staging:** Supabase project `lawdeck-staging` (ref drnqgbtrutlhhcsacqll), moved into the Howells **Pro** org on
