@@ -65,6 +65,12 @@ export function StaffNav({ isAdmin = false, chatWaiting = 0 }: { isAdmin?: boole
           <span className={collapsed ? "sr-only" : ""}>Pilot</span>
         </NavLink>
       )}
+      {isAdmin && (
+        <NavLink href="/admin/plans" onNavigate={onNavigate} className={itemClass} match="prefix">
+          <Icon name="cards" size={NAV_ICON_SIZE} />
+          <span className={collapsed ? "sr-only" : ""}>Plans</span>
+        </NavLink>
+      )}
     </SidebarSection>
   );
 }

@@ -43,17 +43,18 @@ export const CLOSED_PILOT_MESSAGE =
 export function limitReachedMessage(a: Allowance, now: Date = new Date()): string {
   if (a.limit === 0) return CLOSED_PILOT_MESSAGE;
   if (monthlyLeft(a) === 0 || !a.window)
-    return `You’ve used all ${a.limit} questions for this month. You can ask again from ${resetDay(now)}.`;
+    return `You’ve used all ${a.limit} credits for this month. You can ask again from ${resetDay(now)}.`;
   const when = a.window.resetsAt ? lagosTime(a.window.resetsAt, now) : null;
   const again = !when ? "Please try again later." : `You can ask again ${when.startsWith("tomorrow") ? when : `at ${when}`}.`;
   return `You’ve used your ${a.window.limit} question${a.window.limit === 1 ? "" : "s"} for now. ${again}`;
 }
 
-// The note under the question box, e.g. "12 of 30 questions left this month", or with a short-term
+// The note under the question box, e.g. "12 of 30 credits left this month", or with a short-term
 // limit "3 of 5 questions left for now · 18 of 25 this month".
 export function allowanceNote(a: Allowance): string | null {
   if (a.unlimited) return null;
-  const month = `${monthlyLeft(a)} of ${a.limit} question${a.limit === 1 ? "" : "s"} left this month`;
+  // Credits since migration 68: a problem question, marking or a draft uses 3, a brief 2.
+  const month = `${monthlyLeft(a)} of ${a.limit} credit${a.limit === 1 ? "" : "s"} left this month`;
   const inWindow = windowLeft(a);
   if (inWindow === null || !a.window) return month;
   return `${inWindow} of ${a.window.limit} left for now · ${monthlyLeft(a)} of ${a.limit} this month`;

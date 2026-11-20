@@ -49,7 +49,7 @@ reset role;
 -- A brief counts as one question this month; the owner deletes their brief --------------------
 select test.as_user('cccccccc-0000-0000-0000-000000000181');
 select public.record_ai_usage('brief', 'claude-sonnet-5-5', 100, 50, 0.03, 1000);
-select test.check((select used from public.question_allowance()) = 1, 'a brief counts toward the monthly allowance');
+select test.check((select used from public.question_allowance()) = 2, 'a brief counts toward the monthly allowance: 2 credits (migration 68)');
 delete from public.briefs;
 select test.check((select count(*) from public.briefs) = 0, 'a student deletes their own brief');
 reset role;

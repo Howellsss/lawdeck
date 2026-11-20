@@ -11,7 +11,7 @@ select test.check((select used from public.question_allowance()) = 0, 'a new stu
 select public.record_ai_usage('draft_pick', 'claude-haiku-5-5', 40, 5, 0.0001, 300);
 select test.check((select used from public.question_allowance()) = 0, 'matching a request to a template is free');
 select public.record_ai_usage('draft', 'claude-opus-5-5', 3000, 2000, 0.05, 20000);
-select test.check((select used from public.question_allowance()) = 1, 'a written draft counts as one question');
+select test.check((select used from public.question_allowance()) = 3, 'a written draft counts toward the allowance: 3 credits (migration 68)');
 select test.check((select count(*) from public.usage_events) = 2, 'both drafting calls are recorded for the student');
 do $$
 begin

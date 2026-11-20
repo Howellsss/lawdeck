@@ -115,7 +115,7 @@ describe("a problem question with library passages is never declined as a whole"
     expect(composed.ok && composed.shown).toContain("## The facts in brief");
     // Both tries count as one question, with both costs logged.
     expect(recordUsage).toHaveBeenCalledTimes(1);
-    expect(recordUsage.mock.calls[0][0]).toMatchObject({ kind: "explain", tokensIn: 200, tokensOut: 20, costUsd: 0.02 });
+    expect(recordUsage.mock.calls[0][0]).toMatchObject({ kind: "problem", tokensIn: 200, tokensOut: 20, costUsd: 0.02 });
     // Neither try records a question on its own.
     for (const call of streamExplanation.mock.calls) expect(call[0].record).toBe(false);
   });

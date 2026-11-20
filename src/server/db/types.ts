@@ -214,6 +214,9 @@ export type Database = {
           monthly_message_limit: number | null;
           upload_limit: number | null;
           monthly_scan_page_limit: number | null;
+          // Migration 68: order on the Plans page, and whether students can buy it.
+          position: number;
+          on_sale: boolean;
           created_at: string;
         };
         Insert: never;
@@ -493,8 +496,16 @@ export type Database = {
           tokens_out: number | null;
           cost_usd: number | null;
           duration_ms: number | null;
+          // Migration 68: the credits this request cost (null before then: counts 1).
+          credits: number | null;
           created_at: string;
         };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      credit_costs: {
+        Row: { kind: string; credits: number; updated_at: string };
         Insert: never;
         Update: never;
         Relationships: [];
@@ -1596,6 +1607,11 @@ export type Database = {
           window_resets_at: string | null;
         }[];
       };
+      my_plan: {
+        Args: Record<string, never>;
+        Returns: { plan_id: string; name: string; price_ngn: number | null; credits: number | null; period_end: string | null }[];
+      };
+      save_plan: { Args: { plan: string; price: number; credits: number }; Returns: undefined };
       speech_used_today: { Args: Record<string, never>; Returns: { used: number; unlimited: boolean }[] };
       is_admin: { Args: Record<string, never>; Returns: boolean };
       is_reviewer: { Args: Record<string, never>; Returns: boolean };

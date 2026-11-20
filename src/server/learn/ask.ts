@@ -429,7 +429,7 @@ export async function composeAnswer(input: {
     const last = calls.at(-1);
     if (last)
       await recordUsage({
-        kind: "explain",
+        kind: "problem",
         model: last.model,
         tokensIn: calls.reduce((sum, call) => sum + call.tokensIn, 0),
         tokensOut: calls.reduce((sum, call) => sum + call.tokensOut, 0),

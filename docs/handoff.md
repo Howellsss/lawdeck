@@ -5,9 +5,16 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-18 (Sentry switched on; voice test passed).
+Last updated: 2026-11-20 (Anthropic key rotated; payments part 1).
 
 ## In progress right now (2026-11-15) — read this first
+- **Anthropic key (2026-11-20):** the old personal keys all expired 21 Nov 2026. New key `lawdeck-production-2` (scope
+  Lawdeck API workspace, no expiry) is in Vercel and the GitHub secret; founder tested an answer on the live site. The
+  live site had been using `lawdeck production 2` in the Default workspace (outside the Lawdeck API spending limit); the
+  new key is inside it. Old keys left to expire. Credit balance was $4.07: founder to top up and turn on auto-reload.
+- **Payments (launch task 15, docs/specs/payments.md):** founder chose Flutterwave, pay each month, ₦3,999 / ₦8,499 /
+  ₦13,999. Part 1 (migration 68: paid plans, credits, Admin → Plans) built; the founder pastes migration 68 before it
+  merges. Part 2 (Flutterwave checkout) needs the founder's Flutterwave test keys; part 3 reminders + Terms wording.
 - **Voice mode hearing (2026-11-17):** Step 1 built (law-word correction, new-topic search, busy reply; docs/specs/voice.md).
   Founder tested by voice 2026-11-18: works well. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
   goes to Microsoft, ≈₦1,400/hour, new library.
@@ -43,7 +50,7 @@ Last updated: 2026-11-18 (Sentry switched on; voice test passed).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **67** (`20261113006700_terms_acceptances.sql`, consent record; 66 is invite links).
+  merge only after that. The latest is **68** (`20261118006800_paid_plans_and_credits.sql`, paid plans and credits; 67 is the consent record).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
