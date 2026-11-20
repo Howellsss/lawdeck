@@ -5,9 +5,13 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-18 (payments part 1: plans and credits, migration 68).
+Last updated: 2026-11-20 (Anthropic key rotated; payments part 1).
 
 ## In progress right now (2026-11-15) — read this first
+- **Anthropic key (2026-11-20):** the old personal keys all expired 21 Nov 2026. New key `lawdeck-production-2` (scope
+  Lawdeck API workspace, no expiry) is in Vercel and the GitHub secret; founder tested an answer on the live site. The
+  live site had been using `lawdeck production 2` in the Default workspace (outside the Lawdeck API spending limit); the
+  new key is inside it. Old keys left to expire. Credit balance was $4.07: founder to top up and turn on auto-reload.
 - **Payments (launch task 15, docs/specs/payments.md):** founder chose Flutterwave, pay each month, ₦3,999 / ₦8,499 /
   ₦13,999. Part 1 (migration 68: paid plans, credits, Admin → Plans) built; the founder pastes migration 68 before it
   merges. Part 2 (Flutterwave checkout) needs the founder's Flutterwave test keys; part 3 reminders + Terms wording.
