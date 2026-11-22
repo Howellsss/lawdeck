@@ -1,16 +1,18 @@
 import "server-only";
 import { z } from "@/lib/zod";
-import { LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
+import { ADMIN_LIBRARY_MAX_BYTES, OLD_POWERPOINT_MESSAGE } from "@/lib/libraryFiles";
 
 // Fetches one Drive file for the library, in one of two ways:
 // - picked in Google's file picker: the picker's short-lived token ("drive.file" access: only the
 //   files the admin picked). The token is used once and never stored or logged.
 // - pasted as a link (founder, 2026-11-08): a server-only Google key that reads only files shared
 //   as "Anyone with the link" (GOOGLE_DRIVE_SERVER_KEY, never sent to the browser).
-// Google Docs are saved as PDF on the way in.
+// Google Docs are saved as PDF and Google Slides as PowerPoint (.pptx) on the way in. Library files
+// may be up to 100 MB (founder, 2026-11-22).
 const DRIVE_FILES = "https://www.googleapis.com/drive/v3/files";
-// A stuck download never holds the request for more than this (25 MB on a slow link).
-const TIMEOUT_MS = 90_000;
+// A stuck download never holds the request for more than this (100 MB on a slow link).
+const TIMEOUT_MS = 180_000;
+const TOO_BIG = "Library files must be 100 MB or smaller.";
 
 const metadataSchema = z.object({
   name: z.string().min(1),
@@ -22,6 +24,9 @@ export type DriveFile = { ok: true; name: string; bytes: Uint8Array } | { ok: fa
 export type DriveAuth = { token: string } | { key: string };
 
 const GOOGLE_DOC = "application/vnd.google-apps.document";
+const GOOGLE_SLIDES = "application/vnd.google-apps.presentation";
+const PPTX = "application/vnd.openxmlformats-officedocument.presentationml.presentation";
+const OLD_PPT = "application/vnd.ms-powerpoint";
 const FOLDER = "application/vnd.google-apps.folder";
 
 // The server-only key for pasted links; null until it is set in Vercel.
@@ -58,20 +63,28 @@ export async function fetchDriveFile(auth: DriveAuth, fileId: string): Promise<D
     const parsed = metadataSchema.safeParse(await meta.json());
     if (!parsed.success) return explain(502, "metadata", viaLink);
     const doc = parsed.data.mimeType === GOOGLE_DOC;
-    if (!doc && parsed.data.mimeType.startsWith("application/vnd.google-apps.")) {
-      return { ok: false, message: "Google Sheets, Slides and folders can't be imported as files. Use Google Docs, PDF, Word (DOCX), PNG or JPEG." };
+    const slides = parsed.data.mimeType === GOOGLE_SLIDES;
+    if (parsed.data.mimeType === OLD_PPT) return { ok: false, message: OLD_POWERPOINT_MESSAGE };
+    if (!doc && !slides && parsed.data.mimeType.startsWith("application/vnd.google-apps.")) {
+      return { ok: false, message: "Google Sheets and folders can't be imported as files. Use Google Docs, Google Slides, PDF, Word (DOCX), PowerPoint (PPTX), PNG or JPEG." };
     }
-    if ((parsed.data.size ?? 0) > LIBRARY_MAX_BYTES) return { ok: false, message: "Files must be 25 MB or smaller." };
+    if ((parsed.data.size ?? 0) > ADMIN_LIBRARY_MAX_BYTES) return { ok: false, message: TOO_BIG };
 
-    // A Google Doc is saved as PDF; anything else is downloaded as it is.
-    const [url, init] = doc
-      ? request(auth, `/${encodeURIComponent(fileId)}/export`, { mimeType: "application/pdf" })
+    // A Google Doc is saved as PDF, Google Slides as PowerPoint; anything else is downloaded as it is.
+    const exportAs = doc ? "application/pdf" : slides ? PPTX : null;
+    const [url, init] = exportAs
+      ? request(auth, `/${encodeURIComponent(fileId)}/export`, { mimeType: exportAs })
       : request(auth, `/${encodeURIComponent(fileId)}`, { alt: "media" });
     const media = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
     if (!media.ok || !media.body) return explain(media.status, "download", viaLink);
-    const bytes = await readCapped(media.body, LIBRARY_MAX_BYTES);
-    if (!bytes) return { ok: false, message: "Files must be 25 MB or smaller." };
-    const name = doc && !/\.pdf$/i.test(parsed.data.name) ? `${parsed.data.name}.pdf` : parsed.data.name;
+    const bytes = await readCapped(media.body, ADMIN_LIBRARY_MAX_BYTES);
+    if (!bytes) return { ok: false, message: TOO_BIG };
+    const name =
+      doc && !/\.pdf$/i.test(parsed.data.name)
+        ? `${parsed.data.name}.pdf`
+        : slides && !/\.pptx$/i.test(parsed.data.name)
+          ? `${parsed.data.name}.pptx`
+          : parsed.data.name;
     return { ok: true, name, bytes };
   } catch (error) {
     console.error("drive import failed", { step: "fetch", name: (error as Error)?.name });
@@ -90,6 +103,10 @@ const ACCEPTED = new Set([
   "image/png",
   "image/jpeg",
   GOOGLE_DOC,
+  GOOGLE_SLIDES,
+  PPTX,
+  // Listed so the admin sees why it was not imported (OLD_POWERPOINT_MESSAGE).
+  OLD_PPT,
 ]);
 
 // What a pasted link points to: one file, or the importable files in a shared folder (its
@@ -107,7 +124,7 @@ export async function resolveDriveLink(
       const parsed = metadataSchema.safeParse(await meta.json());
       if (!parsed.success) return { ok: false, message: "Google Drive did not respond. Try again in a minute." };
       if (parsed.data.mimeType === FOLDER) return resolveDriveLink(key, { id: link.id, folder: true }, limit);
-      if (!ACCEPTED.has(parsed.data.mimeType)) return { ok: false, message: `“${parsed.data.name}” is not a Google Doc, PDF, Word, PNG or JPEG file.` };
+      if (!ACCEPTED.has(parsed.data.mimeType)) return { ok: false, message: `“${parsed.data.name}” is not a Google Doc, Google Slides, PDF, Word, PowerPoint, PNG or JPEG file.` };
       return { ok: true, files: [{ id: link.id, name: parsed.data.name, sizeBytes: parsed.data.size ?? 0 }] };
     }
     const files: DriveListed[] = [];

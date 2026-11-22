@@ -43,8 +43,10 @@ export function DriveLinks({ disabled, onFound }: { disabled: boolean; onFound: 
         />
       </label>
       <p className="text-sm text-muted">
-        Works with any Google account: share the files or folder as <strong>Anyone with the link can view</strong>. A folder brings in every PDF, Word, Google
-        Doc, PNG and JPEG inside it, up to 100 at a time. Google Docs are saved as PDF.
+        Works with any Google account: share the files or folder as <strong>Anyone with the link can view</strong>. A folder brings in every PDF, Word, PowerPoint, Google
+        Doc, Google Slides, PNG and JPEG inside it (up to 100 MB each, 100 files at a time), and two levels of folders
+        below it. Google Docs are saved as PDF and Google Slides as PowerPoint. Old PowerPoint (.ppt) files are listed
+        but need saving as .pptx first.
       </p>
       <div>
         <button type="button" onClick={() => void find()} disabled={disabled || busy || !text.trim()} className={compactSecondaryButton}>

@@ -4,7 +4,7 @@ import type { PageRow, ReadStore } from "@/server/library/reader";
 // A pretend Claude and search service: nothing is spent. Made-up text only.
 const transcribePages = vi.fn();
 const embedTexts = vi.fn();
-vi.mock("@/server/ai/transcribe", () => ({ transcribePages }));
+vi.mock("@/server/ai/transcribe", () => ({ transcribePages, SCAN_MAX_BASE64_CHARS: 30_000_000 }));
 vi.mock("@/server/retrieval/voyage", () => ({
   EMBED_BATCH: 64,
   fitTokenBudget: (texts: string[]) => texts.length,
@@ -131,7 +131,7 @@ describe("the shared reader", () => {
       }),
     });
     await expect(readWithStore(mem.store, "u1")).rejects.toMatchObject({
-      userMessage: "The file is not a PDF, Word, PNG or JPEG file.",
+      userMessage: "The file is not a PDF, Word, PowerPoint, PNG or JPEG file.",
     });
   });
 });

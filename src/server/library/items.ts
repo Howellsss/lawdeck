@@ -1,6 +1,6 @@
 import "server-only";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { LIBRARY_FILE_TYPES, type LibraryFileKind } from "@/lib/libraryFiles";
+import { ADMIN_LIBRARY_FILE_TYPES, type AdminLibraryFileKind } from "@/lib/libraryFiles";
 import type { Database } from "@/server/db/types";
 
 export const LIBRARY_BUCKET = "library";
@@ -19,7 +19,7 @@ export type ItemDetails = {
 export async function recordLibraryItem(
   db: SupabaseClient<Database>,
   details: ItemDetails,
-  file: { path: string; fileName: string; kind: LibraryFileKind; size: number },
+  file: { path: string; fileName: string; kind: AdminLibraryFileKind; size: number },
 ): Promise<{ ok: true; id: string } | { ok: false; code: string | undefined }> {
   const { data, error } = await db
     .from("kb_items")
@@ -32,7 +32,7 @@ export async function recordLibraryItem(
       source: details.source,
       storage_path: file.path,
       file_name: file.fileName,
-      mime_type: LIBRARY_FILE_TYPES[file.kind].mime,
+      mime_type: ADMIN_LIBRARY_FILE_TYPES[file.kind].mime,
       size_bytes: file.size,
     })
     .select("id")

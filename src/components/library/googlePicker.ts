@@ -13,6 +13,8 @@ const ACCEPTED_TYPES = [
   "image/jpeg",
   // Google Docs are saved as PDF when imported (founder, 2026-11-08).
   "application/vnd.google-apps.document",
+  "application/vnd.openxmlformats-officedocument.presentationml.presentation",
+  "application/vnd.google-apps.presentation",
 ].join(",");
 
 // The small part of Google's scripts that Lawdeck uses.

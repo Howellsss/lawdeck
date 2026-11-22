@@ -2,7 +2,7 @@
 
 import { refresh } from "next/cache";
 import type { FieldErrors } from "@/lib/fieldErrors";
-import { detectFileKind, kindFromFileName, LIBRARY_FILE_TYPES } from "@/lib/libraryFiles";
+import { ADMIN_LIBRARY_FILE_TYPES, ADMIN_LIBRARY_KINDS_TEXT, adminKindFromFileName, detectAdminLibraryKind } from "@/lib/libraryFiles";
 import { driveImportSchema } from "@/schemas/library";
 import { getStaffRole } from "@/server/auth/roles";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -41,10 +41,10 @@ export async function importFromDrive(input: {
   const file = await fetchDriveFile(auth, parsed.data.fileId);
   if (!file.ok) return file;
   if (file.name.length > 255) return { ok: false, message: "The file name is too long. Rename it in Google Drive and try again." };
-  const named = kindFromFileName(file.name);
-  const kind = detectFileKind(file.bytes);
+  const named = adminKindFromFileName(file.name);
+  const kind = detectAdminLibraryKind(file.bytes);
   if (!kind || (named && named !== kind)) {
-    return { ok: false, message: "That file is not a real PDF, Word (DOCX), PNG or JPEG file." };
+    return { ok: false, message: `That file is not a real ${ADMIN_LIBRARY_KINDS_TEXT.replace(/^a /, "")}.` };
   }
 
   const supabase = await createSupabaseServerClient();
@@ -64,7 +64,7 @@ export async function importFromDrive(input: {
   const path = `${details.courseId}/${crypto.randomUUID()}.${kind}`;
   const stored = await supabase.storage
     .from(LIBRARY_BUCKET)
-    .upload(path, file.bytes, { contentType: LIBRARY_FILE_TYPES[kind].mime, upsert: false });
+    .upload(path, file.bytes, { contentType: ADMIN_LIBRARY_FILE_TYPES[kind].mime, upsert: false });
   if (stored.error) {
     console.error("library action failed", { action: "importFromDrive.store", code: stored.error.name });
     return { ok: false, message: "The file could not be stored. Please try again." };

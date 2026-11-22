@@ -160,3 +160,24 @@ Founder step: paste `supabase/migrations/20261021001000_search_rerank.sql` into 
 - **Tests:** `tests/permissions/sql/80_recheck_and_archive_test.sql` (14 checks), `tests/unit/archive.test.ts`.
 
 Founder step: paste `supabase/migrations/20261021001100_recheck_and_archive.sql` into the Supabase SQL Editor of **lawdeck-dev** and run it.
+
+## PowerPoint slides and large files (founder, 2026-11-22; migration 69)
+The founder's knowledge-base folder holds 89 lecture slide decks and a 52.7 MB scanned book of sample drafts.
+- **Library only.** Admins may add PowerPoint (.pptx) and files up to **100 MB** (Admin → Library upload and the
+  Drive import). Students' own uploads are unchanged: PDF, Word, PNG, JPEG, 25 MB (`detectFileKind`,
+  `libraryFileSchema`, the `uploads` bucket). CLAUDE.md's upload rule records the exception.
+- **Slides** (`src/server/library/pptx.ts`): the .pptx zip is read with Node's own zlib (no library), slides in
+  presentation order; each slide is one page: its title as a heading, its text, then its speaker notes.
+  Pictures are not read. Zip-bomb guard: 20 MB per part, 80 MB in all, 2,000 slides at most.
+  Google Slides are exported as .pptx on import. Old .ppt files are listed by the Drive import with a message
+  to save them as .pptx first.
+- **Large scanned PDFs** (`src/server/library/pdfPages.ts`, **pdf-lib 1.17.1**, approved by the founder
+  2026-11-22, server-only): Claude takes about 22 MB of PDF per request, so a bigger scanned file is cut into a
+  small PDF of the 3 pages being read (1 page if 3 are still too big); page numbers are kept. Smaller files are
+  sent whole, as before (cached across batches).
+- **Storage:** migration 69 raises the `library` and `library-archive` buckets to 100 MB and allows PowerPoint;
+  `kb_items.size_bytes` up to 100 MB. Supabase's own project-wide upload limit (Storage settings) must also be
+  at least 100 MB (founder sets it).
+- **Tests:** `tests/unit/librarySlides.test.ts` (a real .pptx built in the test, file rules, students
+  unchanged), `tests/unit/libraryLargeScans.test.ts` (a scanned PDF cut into page batches),
+  `tests/unit/driveImport.test.ts` (100 MB, Google Slides, .ppt), `tests/permissions/sql/9zr_library_slides_test.sql`.

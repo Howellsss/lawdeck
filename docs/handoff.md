@@ -5,9 +5,13 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-20 (Anthropic key rotated; payments part 1).
+Last updated: 2026-11-22 (library: PowerPoint, 100 MB, large scans; migration 69).
 
 ## In progress right now (2026-11-15) — read this first
+- **Library slides and large files (2026-11-22, docs/specs/library.md):** PowerPoint (.pptx) and 100 MB library files,
+  big scanned PDFs cut into page batches with pdf-lib (founder approved the library). Migration 69. Founder: paste
+  migrations 68 and 69, raise Supabase's project upload limit to 100 MB, then import the knowledge-base folder
+  (9 links; old .ppt files must be saved as .pptx; untick EXAM SLIP.pdf, which looks like a personal document).
 - **Anthropic key (2026-11-20):** the old personal keys all expired 21 Nov 2026. New key `lawdeck-production-2` (scope
   Lawdeck API workspace, no expiry) is in Vercel and the GitHub secret; founder tested an answer on the live site. The
   live site had been using `lawdeck production 2` in the Default workspace (outside the Lawdeck API spending limit); the
@@ -50,7 +54,7 @@ Last updated: 2026-11-20 (Anthropic key rotated; payments part 1).
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **68** (`20261118006800_paid_plans_and_credits.sql`, paid plans and credits; 67 is the consent record).
+  merge only after that. The latest is **69** (`20261122006900_library_slides_and_large_files.sql`; 68 is paid plans and credits).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
