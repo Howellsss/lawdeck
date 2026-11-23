@@ -35,4 +35,4 @@ export function hasQuestionsLeft(a: Allowance): boolean {
 }
 
 export const ALLOWANCE_UNAVAILABLE =
-  "Lawdeck couldn’t check your questions left this month. Please try again in a moment.";
+  "Lawdeck couldn’t check your credits left this month. Please try again in a moment.";

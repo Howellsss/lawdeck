@@ -53,7 +53,7 @@ describe("the monthly question limit", () => {
 
   it("stops at the limit before saving the question or calling any AI", async () => {
     const { events, writes } = await ask({ data: [{ used: 30, monthly_limit: 30, unlimited: false }], error: null });
-    expect(events).toEqual([{ type: "error", message: expect.stringContaining("You’ve used all 30 questions for this month") }]);
+    expect(events).toEqual([{ type: "error", message: expect.stringContaining("You’ve used all 30 credits for this month") }]);
     expect(writes).toEqual([]);
     expect(searchLibrary).not.toHaveBeenCalled();
     expect(streamExplanation).not.toHaveBeenCalled();
@@ -61,7 +61,7 @@ describe("the monthly question limit", () => {
 
   it("does not call the AI when the limit cannot be checked", async () => {
     const { events } = await ask({ data: null, error: { code: "PGRST202" } });
-    expect(events).toEqual([{ type: "error", message: expect.stringContaining("couldn’t check your questions") }]);
+    expect(events).toEqual([{ type: "error", message: expect.stringContaining("couldn’t check your credits") }]);
     expect(streamExplanation).not.toHaveBeenCalled();
   });
 });

@@ -1,13 +1,15 @@
 import "server-only";
-import { detectFileKind, type LibraryFileKind } from "@/lib/libraryFiles";
-import { transcribePages, type ScanSource } from "@/server/ai/transcribe";
+import { detectAdminLibraryKind, type AdminLibraryFileKind } from "@/lib/libraryFiles";
+import { SCAN_MAX_BASE64_CHARS, transcribePages, type ScanSource, type TranscribeResult } from "@/server/ai/transcribe";
 import { pdfPageToBlocks, scanPageToBlocks, type Block } from "./blocks";
 import { needsScan, readDocxBlocks, readPdfText } from "./extract";
+import { openPdf, pdfOfPages, type OpenPdf } from "./pdfPages";
+import { readPptxSlides } from "./pptx";
 import { readingQuality, splitIntoPassages, type Passage } from "./split";
 
 // The one file reader, shared by library items (admins) and students' private uploads (step 6b):
-// text from Word files and PDF text layers, scanned pages and photos read by Claude a few pages at
-// a time, then split into passages. Where the pages and passages are kept is up to the store.
+// text from Word files, PowerPoint slides (library only) and PDF text layers, scanned pages and
+// photos read by Claude a few pages at a time, then split into passages. Where the pages and passages are kept is up to the store.
 
 export type PageMethod = "text" | "scan";
 export type PageRow = { page: number; text: string; method: PageMethod };
@@ -53,7 +55,7 @@ export type ReadStore = {
   // The file's bytes and how many pages are known so far (null: not looked at yet).
   open(): Promise<{ bytes: Uint8Array; pageCount: number | null } | null>;
   // Anything to do with the file before reading it (the library keeps an archive copy).
-  beforeRead?(bytes: Uint8Array, kind: LibraryFileKind): Promise<void>;
+  beforeRead?(bytes: Uint8Array, kind: AdminLibraryFileKind): Promise<void>;
   setPageCount(pageCount: number): Promise<void>;
   storedPages(): Promise<Set<number>>;
   insertPages(rows: PageRow[]): Promise<void>;
@@ -82,13 +84,16 @@ export async function readWithStore(
   const opened = await store.open();
   if (!opened) return { ok: false, message: "That file no longer exists." };
   const { bytes } = opened;
-  const kind = detectFileKind(bytes);
+  // Students can only upload PDF, Word, PNG and JPEG (checked on upload); PowerPoint is library only.
+  const kind = detectAdminLibraryKind(bytes);
   if (!kind)
     throw new ReadingError(
-      "The file is not a PDF, Word, PNG or JPEG file.",
+      "The file is not a PDF, Word, PowerPoint, PNG or JPEG file.",
       "kind",
     );
   await store.beforeRead?.(bytes, kind);
+
+  if (kind === "pptx") return readSlides(store, bytes, opened.pageCount);
 
   if (kind === "docx") {
     const blocks = await readDocxBlocks(bytes);
@@ -115,6 +120,22 @@ export async function readWithStore(
           base64: Buffer.from(bytes).toString("base64"),
           mediaType: kind === "png" ? "image/png" : "image/jpeg",
         };
+  // A scanned PDF too big to send whole is sent a few pages at a time as a small PDF (pdf-lib).
+  const cut = kind === "pdf" && source.base64.length > SCAN_MAX_BASE64_CHARS;
+  let openedPdf: OpenPdf | null = null;
+  const read = async (from: number, to: number): Promise<TranscribeResult> => {
+    if (!cut) return transcribePages(source, from, to, userId);
+    try {
+      openedPdf ??= await openPdf(bytes);
+    } catch {
+      throw new ReadingError("The PDF could not be opened. It may be damaged or password-protected.", "pdf_open");
+    }
+    const part = await pdfOfPages(openedPdf, from, to);
+    const result = await transcribePages({ kind: "pdf", base64: Buffer.from(part).toString("base64") }, 1, to - from + 1, userId);
+    if (!result.ok) return result;
+    const pages = new Map([...result.pages].map(([page, text]) => [page + from - 1, text]));
+    return { ...result, pages };
+  };
 
   let stored = await store.storedPages();
   let missing = missingPages(pageCount, stored);
@@ -129,12 +150,12 @@ export async function readWithStore(
         );
       batch = batch.slice(0, allowed);
     }
-    const result = await transcribePages(
-      source,
-      batch[0],
-      batch.at(-1) ?? batch[0],
-      userId,
-    );
+    let result = await read(batch[0], batch.at(-1) ?? batch[0]);
+    // Pages with very large pictures: try them one at a time before giving up.
+    if (!result.ok && result.reason === "too_large" && cut && batch.length > 1) {
+      batch = batch.slice(0, 1);
+      result = await read(batch[0], batch[0]);
+    }
     if (!result.ok)
       throw new ReadingError(
         SCAN_MESSAGES[result.reason],
@@ -201,6 +222,27 @@ async function storeTextLayer(
   for (let i = 0; i < rows.length; i += 200)
     await store.insertPages(rows.slice(i, i + 200));
   return pdf.pageCount;
+}
+
+// A PowerPoint: one page per slide (its title as a heading, then its text and speaker notes).
+// Slides are kept like pages so reviewers can compare a passage with its slide.
+async function readSlides(store: ReadStore, bytes: Uint8Array, known: number | null): Promise<ReadStepResult> {
+  let slides: string[];
+  try {
+    slides = readPptxSlides(bytes);
+  } catch {
+    throw new ReadingError("The PowerPoint file could not be opened. It may be damaged, password-protected or too large.", "pptx_open");
+  }
+  if (slides.length === 0) throw new ReadingError("This PowerPoint has no slides.", "no_pages");
+  if (known === null) {
+    const rows = slides.map((text, index) => ({ page: index + 1, text: text.slice(0, PAGE_TEXT_MAX_CHARS), method: "text" as const }));
+    for (let i = 0; i < rows.length; i += 200) await store.insertPages(rows.slice(i, i + 200));
+    await store.setPageCount(slides.length);
+  }
+  const blocks = slides.flatMap((text, index) => scanPageToBlocks(text, index + 1));
+  const quality = readingQuality(slides);
+  const passages = await savePassages(store, blocks, "text", quality, slides.length);
+  return { ok: true, done: true, pagesRead: slides.length, pageCount: slides.length, passages };
 }
 
 async function savePassages(

@@ -1,5 +1,5 @@
 import { z } from "@/lib/zod";
-import { LIBRARY_FILE_TYPES, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
+import { ADMIN_LIBRARY_FILE_TYPES, ADMIN_LIBRARY_MAX_BYTES, LIBRARY_FILE_TYPES, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
 import { KB_ITEM_TYPES, SOURCE_KIND_LABELS, SOURCE_RIGHTS_LABELS, type SourceKindKey, type SourceRightsKey } from "@/lib/libraryLabels";
 
 const optionalText = (max: number, message: string) =>
@@ -47,11 +47,25 @@ export const libraryFileSchema = z.object({
   }),
 });
 
+// A library file added by an admin: also PowerPoint, and up to 100 MB (founder, 2026-11-22).
+// Students' uploads keep libraryFileSchema above (25 MB, no slides).
+export const adminLibraryFileSchema = z.object({
+  fileName: z.string().min(1).max(255, { error: "The file name is too long. Rename it and try again." }),
+  size: z
+    .number()
+    .int()
+    .positive({ error: "That file is empty." })
+    .max(ADMIN_LIBRARY_MAX_BYTES, { error: "Library files must be 100 MB or smaller." }),
+  kind: z.enum(Object.keys(ADMIN_LIBRARY_FILE_TYPES) as [keyof typeof ADMIN_LIBRARY_FILE_TYPES], {
+    error: "Upload a PDF, Word (DOCX), PowerPoint (PPTX), PNG or JPEG file.",
+  }),
+});
+
 export const libraryItemIdSchema = z.uuid({ error: "That item could not be found." });
 // Where a file is stored: course id / item id . extension (set by the server, checked again on finish).
 export const libraryPathSchema = z
   .string()
-  .regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|docx|png|jpeg)$/, { error: "Upload not recognised." });
+  .regex(/^[0-9a-f-]{36}\/[0-9a-f-]{36}\.(pdf|docx|png|jpeg|pptx)$/, { error: "Upload not recognised." });
 
 // A reviewer's test search on the Library search page.
 export const librarySearchSchema = z.object({

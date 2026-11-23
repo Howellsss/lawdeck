@@ -143,7 +143,7 @@ describe("fetching from Google Drive", () => {
     );
   });
 
-  it("refuses Google Sheets and files over 25 MB without downloading them", async () => {
+  it("refuses Google Sheets and files over 100 MB without downloading them (library limit, founder 2026-11-22)", async () => {
     const fetchSpy = vi
       .fn()
       .mockResolvedValue(
@@ -155,18 +155,27 @@ describe("fetching from Google Drive", () => {
       meta({
         name: "big.pdf",
         mimeType: "application/pdf",
-        size: String(26 * 1024 * 1024),
+        size: String(101 * 1024 * 1024),
       }),
     );
     expect(await fetchDriveFile({ token: "t" }, "fileid12345")).toEqual({
       ok: false,
-      message: "Files must be 25 MB or smaller.",
+      message: "Library files must be 100 MB or smaller.",
     });
     expect(fetchSpy).toHaveBeenCalledTimes(2);
   });
 
-  it("stops a download that turns out larger than 25 MB", async () => {
-    const big = new Uint8Array(26 * 1024 * 1024);
+  it("stops a download that turns out larger than 100 MB", async () => {
+    // 1 MB pieces, more than 100 of them: the download stops as soon as it passes the limit.
+    let sent = 0;
+    const chunk = new Uint8Array(1024 * 1024);
+    const endless = new ReadableStream<Uint8Array>({
+      pull(controller) {
+        sent++;
+        controller.enqueue(chunk);
+        if (sent > 120) controller.close();
+      },
+    });
     vi.stubGlobal(
       "fetch",
       vi
@@ -174,12 +183,27 @@ describe("fetching from Google Drive", () => {
         .mockResolvedValueOnce(
           meta({ name: "a.pdf", mimeType: "application/pdf" }),
         )
-        .mockResolvedValueOnce(new Response(big)),
+        .mockResolvedValueOnce(new Response(endless)),
     );
     expect(await fetchDriveFile({ token: "t" }, "fileid12345")).toEqual({
       ok: false,
-      message: "Files must be 25 MB or smaller.",
+      message: "Library files must be 100 MB or smaller.",
     });
+    expect(sent).toBeLessThanOrEqual(102);
+  });
+
+  it("saves Google Slides as PowerPoint, and explains old .ppt files (founder, 2026-11-22)", async () => {
+    const fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(meta({ name: "Week 6 Sale of Land", mimeType: "application/vnd.google-apps.presentation" }))
+      .mockResolvedValueOnce(new Response(new Uint8Array([1, 2])));
+    vi.stubGlobal("fetch", fetchSpy);
+    expect(await fetchDriveFile({ token: "t" }, "fileid12345")).toEqual({ ok: true, name: "Week 6 Sale of Land.pptx", bytes: new Uint8Array([1, 2]) });
+    expect(fetchSpy.mock.calls[1][0]).toContain("/export?mimeType=application%2Fvnd.openxmlformats-officedocument.presentationml.presentation");
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(meta({ name: "CHARGES.ppt", mimeType: "application/vnd.ms-powerpoint" })));
+    const old = await fetchDriveFile({ token: "t" }, "fileid12345");
+    expect(old.ok).toBe(false);
+    expect(old.ok ? "" : old.message).toMatch(/\.pptx/);
   });
 
   it("saves a Google Doc as PDF (founder, 2026-11-08)", async () => {

@@ -2,8 +2,8 @@
 
 import { refresh } from "next/cache";
 import { fieldErrorsFrom, type FieldErrors } from "@/lib/fieldErrors";
-import { detectFileKind, LIBRARY_FILE_TYPES, LIBRARY_MAX_BYTES, type LibraryFileKind } from "@/lib/libraryFiles";
-import { libraryDetailsSchema, libraryFileSchema, libraryItemIdSchema, libraryPathSchema } from "@/schemas/library";
+import { ADMIN_LIBRARY_FILE_TYPES, ADMIN_LIBRARY_KINDS_TEXT, ADMIN_LIBRARY_MAX_BYTES, detectAdminLibraryKind, type AdminLibraryFileKind } from "@/lib/libraryFiles";
+import { adminLibraryFileSchema, libraryDetailsSchema, libraryItemIdSchema, libraryPathSchema } from "@/schemas/library";
 import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
@@ -41,7 +41,7 @@ function logFailure(action: string, code: string | undefined) {
 
 function parseDetails(input: UploadDetails) {
   const details = libraryDetailsSchema.safeParse(input);
-  const file = libraryFileSchema.safeParse({ fileName: input.fileName, size: input.size, kind: input.kind });
+  const file = adminLibraryFileSchema.safeParse({ fileName: input.fileName, size: input.size, kind: input.kind });
   if (!details.success || !file.success) {
     return {
       ok: false as const,
@@ -90,12 +90,12 @@ export async function finishLibraryUpload(input: UploadDetails & { path: string 
     return { ok: false, message: "The file did not arrive. Please upload it again." };
   }
   const bytes = new Uint8Array(await download.data.arrayBuffer());
-  const realKind: LibraryFileKind | null = detectFileKind(bytes);
-  if (realKind !== parsed.file.kind || bytes.length > LIBRARY_MAX_BYTES) {
+  const realKind: AdminLibraryFileKind | null = detectAdminLibraryKind(bytes);
+  if (realKind !== parsed.file.kind || bytes.length > ADMIN_LIBRARY_MAX_BYTES) {
     await supabase.storage.from(BUCKET).remove([path.data]);
     return {
       ok: false,
-      message: `That file is not a real ${LIBRARY_FILE_TYPES[parsed.file.kind].label}. Upload a PDF, Word (DOCX), PNG or JPEG file.`,
+      message: `That file is not a real ${ADMIN_LIBRARY_FILE_TYPES[parsed.file.kind].label}. Upload ${ADMIN_LIBRARY_KINDS_TEXT}.`,
     };
   }
 

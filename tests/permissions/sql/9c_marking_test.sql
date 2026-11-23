@@ -34,7 +34,7 @@ select test.as_user('cccccccc-0000-0000-0000-000000000201');
 select test.check((select count(*) from public.marking_guide((select id from test.marking))) = 0,
   'a draft guide is never given out for marking');
 select public.record_ai_usage('marking', 'claude-opus-5-5', 100, 50, 0.08, 1000);
-select test.check((select used from public.question_allowance()) = 1, 'a marked answer counts toward the monthly allowance');
+select test.check((select used from public.question_allowance()) = 3, 'a marked answer counts toward the monthly allowance: 3 credits (migration 68)');
 reset role;
 
 -- Withdrawing a guide takes it out of marking at once ----------------------------------------

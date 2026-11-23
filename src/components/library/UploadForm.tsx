@@ -6,7 +6,7 @@ import { FormAlert } from "@/components/ui/FormAlert";
 import { TextField } from "@/components/ui/TextField";
 import { compactPrimaryButton } from "@/components/ui/buttons";
 import type { FieldErrors } from "@/lib/fieldErrors";
-import { kindFromFileName, LIBRARY_ACCEPT, LIBRARY_MAX_BYTES } from "@/lib/libraryFiles";
+import { ADMIN_LIBRARY_ACCEPT, ADMIN_LIBRARY_MAX_BYTES, adminKindFromFileName, isOldPowerPoint, OLD_POWERPOINT_MESSAGE } from "@/lib/libraryFiles";
 import { KB_ITEM_TYPES } from "@/lib/libraryLabels";
 import { finishLibraryUpload, startLibraryUpload, type UploadDetails } from "@/server/library/actions";
 import { readAndIndex } from "./readItem";
@@ -30,9 +30,10 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
     const form = new FormData(event.currentTarget);
     const file = form.get("file");
     if (!(file instanceof File) || file.size === 0) return setErrors({ file: "Choose a file to upload." });
-    if (file.size > LIBRARY_MAX_BYTES) return setErrors({ file: "Files must be 25 MB or smaller." });
-    const kind = kindFromFileName(file.name);
-    if (!kind) return setErrors({ file: "Upload a PDF, Word (DOCX), PNG or JPEG file." });
+    if (file.size > ADMIN_LIBRARY_MAX_BYTES) return setErrors({ file: "Library files must be 100 MB or smaller." });
+    if (isOldPowerPoint(file.name)) return setErrors({ file: OLD_POWERPOINT_MESSAGE });
+    const kind = adminKindFromFileName(file.name);
+    if (!kind) return setErrors({ file: "Upload a PDF, Word (DOCX), PowerPoint (PPTX), PNG or JPEG file." });
 
     const text = (key: string) => String(form.get(key) ?? "");
     const details: UploadDetails = {
@@ -99,14 +100,14 @@ export function UploadForm({ courses, apiKey }: { courses: { id: string; name: s
           id="library-file"
           name="file"
           type="file"
-          accept={LIBRARY_ACCEPT}
+          accept={ADMIN_LIBRARY_ACCEPT}
           required
           aria-describedby="library-file-hint"
           aria-invalid={errors.file ? true : undefined}
           className="rounded-2xl border border-line bg-sidebar px-4 py-3 text-sm file:mr-3 file:rounded-full file:border-0 file:bg-pill file:px-4 file:py-2 file:text-ink"
         />
         <p id="library-file-hint" className={`px-1 text-sm ${errors.file ? "text-warning" : "text-muted"}`}>
-          {errors.file ?? "PDF, Word (DOCX), PNG or JPEG, up to 25 MB."}
+          {errors.file ?? "PDF, Word (DOCX), PowerPoint (PPTX), PNG or JPEG, up to 100 MB."}
         </p>
       </div>
       <TextField label="Title" name="title" required maxLength={300} error={errors.title} />

@@ -1,18 +1,18 @@
 import "server-only";
 import { createHash } from "node:crypto";
 import type { SupabaseClient } from "@supabase/supabase-js";
-import { LIBRARY_FILE_TYPES, type LibraryFileKind } from "@/lib/libraryFiles";
+import { ADMIN_LIBRARY_FILE_TYPES, type AdminLibraryFileKind } from "@/lib/libraryFiles";
 import type { Database } from "@/server/db/types";
 
 // The archive of original library files (rule Q-03, migration 11): a separate private store that
 // nobody can overwrite or delete from, so the library can be rebuilt from scratch. Never searched.
 export const ARCHIVE_BUCKET = "library-archive";
 
-const EXTENSIONS: Record<LibraryFileKind, string> = { pdf: "pdf", docx: "docx", png: "png", jpeg: "jpg" };
+const EXTENSIONS: Record<AdminLibraryFileKind, string> = { pdf: "pdf", docx: "docx", png: "png", jpeg: "jpg", pptx: "pptx" };
 
 // Each file is stored under its content fingerprint (SHA-256), so a changed file is a new
 // version beside the old one, and the same file is never stored twice.
-export function archivePath(courseId: string, itemId: string, sha256: string, kind: LibraryFileKind): string {
+export function archivePath(courseId: string, itemId: string, sha256: string, kind: AdminLibraryFileKind): string {
   return `${courseId}/${itemId}/${sha256}.${EXTENSIONS[kind]}`;
 }
 
@@ -26,12 +26,12 @@ export async function archiveOriginal(
   db: SupabaseClient<Database>,
   item: { id: string; courseId: string },
   bytes: Uint8Array,
-  kind: LibraryFileKind,
+  kind: AdminLibraryFileKind,
 ): Promise<boolean> {
   const path = archivePath(item.courseId, item.id, sha256Hex(bytes), kind);
   const uploaded = await db.storage
     .from(ARCHIVE_BUCKET)
-    .upload(path, bytes, { contentType: LIBRARY_FILE_TYPES[kind].mime, upsert: false });
+    .upload(path, bytes, { contentType: ADMIN_LIBRARY_FILE_TYPES[kind].mime, upsert: false });
   // Already archived (the same file read again) is fine: the copy is there.
   const alreadyThere = uploaded.error && /exists|duplicate/i.test(uploaded.error.message);
   if (uploaded.error && !alreadyThere) {

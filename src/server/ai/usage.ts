@@ -1,7 +1,8 @@
 import "server-only";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 
-export type UsageKind = "explain" | "route" | "transcribe" | "practice" | "brief" | "marking" | "draft" | "draft_pick" | "speech" | "talk_chat" | "memory_aid";
+// "problem": a problem question's answer, which costs more credits (migration 68).
+export type UsageKind = "explain" | "problem" | "route" | "transcribe" | "practice" | "brief" | "marking" | "draft" | "draft_pick" | "speech" | "talk_chat" | "memory_aid";
 
 // Saves one AI call to usage_events for the signed-in person (rules G-08, K-01): model, tokens,
 // cost and time, never the question or the answer. The database takes the owner from the
