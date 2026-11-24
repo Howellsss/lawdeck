@@ -50,7 +50,9 @@ export function guessYear(fileName: string, now = new Date()): string {
 export function titleFromFileName(fileName: string): string {
   return (
     fileName
-      .replace(/\.[a-z0-9]{2,5}$/i, "")
+      // Names saved from a web address keep "%20" for spaces (e.g. "REVIEW%20PROF%20ETHICS…").
+      .replace(/%20/gi, " ")
+      .replace(/(\.[a-z0-9]{2,5})+$/i, "")
       .replace(/\(\d+\)|\[\d+\]/g, " ")
       .replace(/[_+]+/g, " ")
       .replace(/\s*-\d+\s*$/, "")

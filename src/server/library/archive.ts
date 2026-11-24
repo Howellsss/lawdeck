@@ -39,6 +39,8 @@ export async function archiveOriginal(
     return false;
   }
   const recorded = await db.from("kb_items").update({ archive_path: path }).eq("id", item.id).is("archive_path", null);
+  // Its fingerprint too, for items added before migration 71 (duplicate checks).
+  await db.from("kb_items").update({ content_sha256: sha256Hex(bytes) }).eq("id", item.id).is("content_sha256", null);
   if (recorded.error) {
     console.error("archive failed", { itemId: item.id, step: "record", code: recorded.error.code });
     return false;

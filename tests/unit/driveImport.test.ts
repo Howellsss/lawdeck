@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, it, vi } from "vitest";
 import { guessCourse, guessYear, titleFromFileName } from "@/lib/driveGuess";
 import { driveImportSchema } from "@/schemas/library";
-import { fetchDriveFile, resolveDriveLink } from "@/server/library/drive";
+import { fetchDriveFile, nameFromDisposition, resolveDriveLink } from "@/server/library/drive";
 
 const courses = [
   { id: "civ", name: "Civil Litigation" },
@@ -87,6 +87,8 @@ describe("suggestions from the file name", () => {
       titleFromFileName("+++PROPERTY LAW PRACTICE HANDBOOK 2025 REVIEW.docx"),
     ).toBe("PROPERTY LAW PRACTICE HANDBOOK 2025 REVIEW");
     expect(titleFromFileName(".docx")).toBe("Untitled");
+    expect(titleFromFileName("REVIEW%20PROF%20ETHICS%20HANDBOOK%202025%20NEW.pdf.pdf")).toBe("REVIEW PROF ETHICS HANDBOOK 2025 NEW");
+    expect(titleFromFileName("S.A NOTE - ETHICS.pdf")).toBe("S.A NOTE - ETHICS");
   });
 });
 
@@ -286,6 +288,47 @@ describe("fetching from Google Drive", () => {
     const file = await fetchDriveFile({ key: "server-key" }, "fileid12345");
     expect(file.ok).toBe(false);
     if (!file.ok) expect(file.message).toContain("Anyone with the link");
+  });
+
+  it("falls back to Google's ordinary download when the key is refused for a public file (founder, 2026-11-24)", async () => {
+    const refused = () => new Response(JSON.stringify({ error: { errors: [{ reason: "notFound" }] } }), { status: 404 });
+    const pdf = (headers: Record<string, string>) => new Response(new Uint8Array([37, 80, 68, 70]), { headers });
+    // The key can't even read the file's details: the name comes from Google's download.
+    let fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(refused())
+      .mockResolvedValueOnce(pdf({ "content-type": "application/pdf", "content-disposition": "attachment; filename=\"x\"; filename*=UTF-8''RPC%202023.pdf" }));
+    vi.stubGlobal("fetch", fetchSpy);
+    expect(await fetchDriveFile({ key: "k" }, "fileid12345")).toEqual({ ok: true, name: "RPC 2023.pdf", bytes: new Uint8Array([37, 80, 68, 70]) });
+    expect(fetchSpy.mock.calls[1][0]).toBe("https://drive.usercontent.google.com/download?id=fileid12345&export=download&confirm=t");
+    // The key read the details but the download was refused: the name from the details is kept.
+    fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(meta({ name: "S.A NOTE - ETHICS.pdf", mimeType: "application/pdf" }))
+      .mockResolvedValueOnce(new Response("{}", { status: 403 }))
+      .mockResolvedValueOnce(pdf({ "content-type": "application/octet-stream" }));
+    vi.stubGlobal("fetch", fetchSpy);
+    expect(await fetchDriveFile({ key: "k" }, "fileid12345")).toMatchObject({ ok: true, name: "S.A NOTE - ETHICS.pdf" });
+  });
+
+  it("still says 'share it' when the ordinary download gives a sign-in page, and never falls back for picked files", async () => {
+    let fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(new Response("{}", { status: 404 }))
+      .mockResolvedValueOnce(new Response("<html>Sign in</html>", { headers: { "content-type": "text/html; charset=utf-8" } }));
+    vi.stubGlobal("fetch", fetchSpy);
+    const file = await fetchDriveFile({ key: "k" }, "fileid12345");
+    expect(file.ok ? "" : file.message).toMatch(/Anyone with the link/);
+    fetchSpy = vi.fn().mockResolvedValue(new Response("", { status: 404 }));
+    vi.stubGlobal("fetch", fetchSpy);
+    await fetchDriveFile({ token: "t" }, "fileid12345");
+    expect(fetchSpy).toHaveBeenCalledTimes(1);
+  });
+
+  it("names a download from Google's header", () => {
+    expect(nameFromDisposition("attachment; filename=\"a b.pdf\"")).toBe("a b.pdf");
+    expect(nameFromDisposition("attachment; filename*=UTF-8''%E2%80%9CEthics%E2%80%9D.pdf")).toBe("“Ethics”.pdf");
+    expect(nameFromDisposition(null)).toBeNull();
   });
 
   it("lists the importable files in a shared folder and its sub-folders, up to the limit", async () => {

@@ -10,7 +10,7 @@ import { findDriveLinkFiles } from "@/server/library/driveActions";
 export function DriveLinks({ disabled, onFound }: { disabled: boolean; onFound: (files: DriveListed[]) => void }) {
   const [text, setText] = useState("");
   const [busy, setBusy] = useState(false);
-  const [notes, setNotes] = useState<{ error?: string; problems: string[]; info?: string }>({ problems: [] });
+  const [notes, setNotes] = useState<{ error?: string; problems: string[]; info?: string; already?: string[] }>({ problems: [] });
 
   async function find() {
     setBusy(true);
@@ -21,9 +21,15 @@ export function DriveLinks({ disabled, onFound }: { disabled: boolean; onFound: 
     setNotes({
       problems: result.problems,
       info: result.files.length
-        ? `Found ${result.files.length} ${result.files.length === 1 ? "file" : "files"}${result.capped ? " (the first 100; import these, then paste again for the rest)" : ""}. Check the details below, then import.`
+        ? `Found ${result.files.length} new ${result.files.length === 1 ? "file" : "files"}${result.capped ? " (the first 100; import these, then paste again for the rest)" : ""}. Check the details below, then import.`
         : undefined,
-      error: result.files.length ? undefined : "No files to import were found in those links.",
+      error: result.files.length
+        ? undefined
+        : result.already.length
+          ? "Every file in those links is already in the library. Nothing new to import."
+          : "No files to import were found in those links.",
+      // Files already in the library are never imported again (founder, 2026-11-24).
+      already: result.already.map((f) => `${f.name} (in the library as “${f.existingTitle}”)`),
     });
     if (result.files.length) onFound(result.files);
   }
@@ -62,6 +68,18 @@ export function DriveLinks({ disabled, onFound }: { disabled: boolean; onFound: 
         <p role="status" className="text-sm text-muted">
           {notes.info}
         </p>
+      )}
+      {notes.already && notes.already.length > 0 && (
+        <details className="text-sm text-muted">
+          <summary className="cursor-pointer">
+            {notes.already.length} {notes.already.length === 1 ? "file is" : "files are"} already in the library and will be skipped
+          </summary>
+          <ul aria-label="Already in the library" className="mt-1 flex list-disc flex-col gap-1 pl-5">
+            {notes.already.slice(0, 200).map((line, i) => (
+              <li key={i}>{line}</li>
+            ))}
+          </ul>
+        </details>
       )}
       {notes.problems.length > 0 && (
         <ul aria-label="Links that could not be used" className="flex list-disc flex-col gap-1 pl-5 text-sm text-warning">

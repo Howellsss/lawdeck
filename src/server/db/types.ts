@@ -547,11 +547,16 @@ export type Database = {
           display_topic: string | null;
           rights_status: SourceRights;
           rights_note: string | null;
+          // Migration 71: the Drive file it came from and a fingerprint of its contents (set once).
+          drive_file_id: string | null;
+          content_sha256: string | null;
         };
         Insert: {
           title: string;
           type: KbItemType;
           course_id: string;
+          drive_file_id?: string | null;
+          content_sha256?: string | null;
           topic_ids?: string[];
           campus?: string | null;
           year?: number | null;
@@ -565,6 +570,7 @@ export type Database = {
           review_status?: ReviewStatus;
           review_note?: string | null;
           law_current_as_of?: string | null;
+          content_sha256?: string | null;
           title?: string;
           type?: KbItemType;
           topic_ids?: string[];
