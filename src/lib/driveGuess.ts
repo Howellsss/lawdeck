@@ -20,6 +20,10 @@ function distance(a: string, b: string): number {
   return row[b.length];
 }
 
+// Words in a course or section name that say nothing about its subject ("Drafts and precedents
+// (all courses)" must not catch "Course outline.docx").
+const GENERIC_WORDS = new Set(["course", "courses"]);
+
 // The course whose own distinctive word (one no other course name uses) appears in the file
 // name, allowing one slip in longer words. No guess when none, or more than one, matches.
 export function guessCourse(fileName: string, courses: Course[]): string | null {
@@ -28,7 +32,7 @@ export function guessCourse(fileName: string, courses: Course[]): string | null 
   for (const course of courses) for (const word of new Set(words(course.name))) counts.set(word, (counts.get(word) ?? 0) + 1);
   const matches = courses.filter((course) =>
     words(course.name)
-      .filter((word) => counts.get(word) === 1 && word.length >= 4)
+      .filter((word) => counts.get(word) === 1 && word.length >= 4 && !GENERIC_WORDS.has(word))
       .some((word) => nameWords.some((w) => w === word || (word.length >= 6 && distance(w, word) <= 1))),
   );
   return matches.length === 1 ? matches[0].id : null;

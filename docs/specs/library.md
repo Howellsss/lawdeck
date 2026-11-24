@@ -181,3 +181,15 @@ The founder's knowledge-base folder holds 89 lecture slide decks and a 52.7 MB s
 - **Tests:** `tests/unit/librarySlides.test.ts` (a real .pptx built in the test, file rules, students
   unchanged), `tests/unit/libraryLargeScans.test.ts` (a scanned PDF cut into page batches),
   `tests/unit/driveImport.test.ts` (100 MB, Google Slides, .ppt), `tests/permissions/sql/9zr_library_slides_test.sql`.
+
+## Drafts and precedents (all courses) (founder, 2026-11-24; migration 70)
+"One more option for drafts asides the Law school courses." A library **section** that is not a Law
+School course: `courses.shared = true`, slug `drafts-and-precedents`.
+- Admin → Library, its search page and the Drive import list it as a course choice
+  (`listCourses({ withLibrarySections: true })`). The Drive import suggests it for files named like
+  drafts or precedents; a course's own drafts ("DRAFTS ON CIVIL LITIGATION") get no guess, so the admin chooses.
+- Students never see it as a course: the course list, course hubs, Study Diary, documents, lessons and
+  marking-guide lists leave shared sections out.
+- `search_library` returns its **approved** passages with every course's questions (typed, voice and
+  problem questions). Material awaiting review stays hidden; other courses stay apart.
+- Tests: `tests/permissions/sql/9zs_drafts_section_test.sql`, `tests/unit/driveImport.test.ts`.

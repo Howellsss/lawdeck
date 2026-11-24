@@ -76,7 +76,7 @@ export async function listCatalogue(): Promise<Loaded<CatalogueCourse[]>> {
   const supabase = await createSupabaseServerClient();
   const [templates, courses] = await Promise.all([
     supabase.from("templates").select("slug, title, course_id").eq("status", "approved").order("title").limit(500),
-    supabase.from("courses").select("id, slug, name, position").order("position"),
+    supabase.from("courses").select("id, slug, name, position").eq("shared", false).order("position"),
   ]);
   if (templates.error) failed("templates", templates.error.code);
   if (courses.error) failed("courses", courses.error.code);

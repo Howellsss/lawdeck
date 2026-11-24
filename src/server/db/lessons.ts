@@ -41,7 +41,7 @@ export async function listLessonOverview(): Promise<LessonOverview | null> {
   if (!(await getStaffRole())) return null;
   const db = await createSupabaseServerClient();
   const [courses, topics, lessons, extras] = await Promise.all([
-    db.from("courses").select("id, name, position").order("position"),
+    db.from("courses").select("id, name, position").eq("shared", false).order("position"),
     db.from("topics").select("id, name, course_id, position").order("position"),
     db.from("topic_lessons").select("id, topic_id, status, version, updated_at, bulk_approved, replaced_by, new_material_at").is("replaced_by", null),
     db.from("lesson_extras").select("lesson_id, status, bulk_approved"),

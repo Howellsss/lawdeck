@@ -10,7 +10,8 @@ Last updated: 2026-11-22 (library: PowerPoint, 100 MB, large scans; migration 69
 ## In progress right now (2026-11-15) — read this first
 - **Deeper answers (2026-11-24):** 16 passages per answer (was 8), problem questions up to 30. About ₦20 more AI per
   answer (≈ ₦65 per credit). Answer test waived by the founder (no Anthropic credit); run it on Sonnet (≈ $4) when credit returns.
-  Not yet approved/built: "Drafts and precedents (all courses)" library section (plan given 2026-11-24).
+- **Drafts and precedents (all courses) (2026-11-24, migration 70):** a library section beside the five courses; searched
+  with every course's questions; never shown to students as a course. Founder pastes migration 70 before merge.
 - **Library slides and large files (2026-11-22, docs/specs/library.md):** PowerPoint (.pptx) and 100 MB library files,
   big scanned PDFs cut into page batches with pdf-lib (founder approved the library). Migration 69. Founder: paste
   migrations 68 and 69, raise Supabase's project upload limit to 100 MB, then import the knowledge-base folder
@@ -57,7 +58,7 @@ Last updated: 2026-11-22 (library: PowerPoint, 100 MB, large scans; migration 69
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **69** (`20261122006900_library_slides_and_large_files.sql`; 68 is paid plans and credits).
+  merge only after that. The latest is **70** (`20261124007000_drafts_section.sql`; 69 is library slides and large files).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
