@@ -193,3 +193,10 @@ School course: `courses.shared = true`, slug `drafts-and-precedents`.
 - `search_library` returns its **approved** passages with every course's questions (typed, voice and
   problem questions). Material awaiting review stays hidden; other courses stay apart.
 - Tests: `tests/permissions/sql/9zs_drafts_section_test.sql`, `tests/unit/driveImport.test.ts`.
+
+## Drive import: Google's real reason (founder, 2026-11-24)
+Shared files were reported as "not shared" when Google refused the download for another reason. The
+importer now reads Google's short reason code (logged as `reason`, never file content) and says what
+happened: Google limiting downloads (one automatic retry after 5 s, then "wait an hour, or use Choose
+different files"), the owner turning off downloads, or Lawdeck's key being refused; "share it as Anyone with
+the link" only when that is the problem. Imports pause 1.5 s between files.

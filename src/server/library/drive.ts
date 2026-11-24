@@ -13,6 +13,8 @@ const DRIVE_FILES = "https://www.googleapis.com/drive/v3/files";
 // A stuck download never holds the request for more than this (100 MB on a slow link).
 const TIMEOUT_MS = 180_000;
 const TOO_BIG = "Library files must be 100 MB or smaller.";
+// How long to wait before the one retry when Google is limiting downloads.
+export const RETRY_WAIT_MS = 5_000;
 
 const metadataSchema = z.object({
   name: z.string().min(1),
@@ -47,8 +49,36 @@ function driveFetch(auth: DriveAuth, path: string, params: Record<string, string
 const EXPIRED = "Google access has ended. Choose the files again with “Import from Google Drive”.";
 const NOT_SHARED = "Lawdeck can't open this file. In Google Drive, share it (or its folder) as “Anyone with the link can view”.";
 
-function explain(status: number, step: string, viaLink = false): DriveFile {
-  console.error("drive import failed", { step, status });
+// Google's own reason for refusing (founder, 2026-11-24: shared files were reported as "not shared"
+// when Google was limiting downloads). Only Google's short code is read; never the file.
+export async function driveReason(res: Response): Promise<string | null> {
+  try {
+    const body = (await res.clone().json()) as { error?: { errors?: { reason?: string }[]; status?: string } };
+    return body.error?.errors?.[0]?.reason ?? body.error?.status ?? null;
+  } catch {
+    return null;
+  }
+}
+
+const LIMITED = new Set(["downloadQuotaExceeded", "userRateLimitExceeded", "rateLimitExceeded", "dailyLimitExceeded", "quotaExceeded", "RESOURCE_EXHAUSTED"]);
+const TOO_MANY_DOWNLOADS =
+  "Google is limiting downloads of this file right now (too many recent downloads). Wait an hour and try again, or import it with “Choose different files” instead.";
+const NO_DOWNLOAD =
+  "The file's owner has turned off downloading for viewers. In Google Drive, open Share → ⚙ settings and tick “Viewers and commenters can see the option to download”, or import it with “Choose different files”.";
+const KEY_REFUSED =
+  "Google refused Lawdeck's Drive key. In Google Cloud, check the key has no application restriction and is allowed to use the Google Drive API.";
+
+// Whether Google said to slow down (worth one more try after a short wait).
+export function isRateLimit(status: number, reason: string | null): boolean {
+  return status === 429 || (reason !== null && LIMITED.has(reason));
+}
+
+function explain(status: number, step: string, viaLink = false, reason: string | null = null): DriveFile {
+  console.error("drive import failed", { step, status, reason });
+  if (isRateLimit(status, reason)) return { ok: false, message: TOO_MANY_DOWNLOADS };
+  if (reason === "cannotDownloadFile") return { ok: false, message: NO_DOWNLOAD };
+  if (reason === "keyInvalid" || reason === "ipRefererBlocked" || reason === "accessNotConfigured" || (reason === "forbidden" && step !== "download"))
+    return { ok: false, message: KEY_REFUSED };
   if (status === 401 || status === 403) return { ok: false, message: viaLink ? NOT_SHARED : EXPIRED };
   if (viaLink && status === 404) return { ok: false, message: NOT_SHARED };
   if (status === 404) return { ok: false, message: "That file is no longer in Google Drive, or Lawdeck was not given access to it." };
@@ -59,7 +89,7 @@ export async function fetchDriveFile(auth: DriveAuth, fileId: string): Promise<D
   const viaLink = "key" in auth;
   try {
     const meta = await driveFetch(auth, `/${encodeURIComponent(fileId)}`, { fields: "name,mimeType,size" });
-    if (!meta.ok) return explain(meta.status, "metadata", viaLink);
+    if (!meta.ok) return explain(meta.status, "metadata", viaLink, await driveReason(meta));
     const parsed = metadataSchema.safeParse(await meta.json());
     if (!parsed.success) return explain(502, "metadata", viaLink);
     const doc = parsed.data.mimeType === GOOGLE_DOC;
@@ -75,8 +105,13 @@ export async function fetchDriveFile(auth: DriveAuth, fileId: string): Promise<D
     const [url, init] = exportAs
       ? request(auth, `/${encodeURIComponent(fileId)}/export`, { mimeType: exportAs })
       : request(auth, `/${encodeURIComponent(fileId)}`, { alt: "media" });
-    const media = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
-    if (!media.ok || !media.body) return explain(media.status, "download", viaLink);
+    let media = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
+    // Google asked to slow down: wait a moment and try once more before giving up.
+    if (!media.ok && isRateLimit(media.status, await driveReason(media))) {
+      await new Promise((resolve) => setTimeout(resolve, RETRY_WAIT_MS));
+      media = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
+    }
+    if (!media.ok || !media.body) return explain(media.status, "download", viaLink, await driveReason(media));
     const bytes = await readCapped(media.body, ADMIN_LIBRARY_MAX_BYTES);
     if (!bytes) return { ok: false, message: TOO_BIG };
     const name =
@@ -120,7 +155,7 @@ export async function resolveDriveLink(
   try {
     if (!link.folder) {
       const meta = await driveFetch(auth, `/${encodeURIComponent(link.id)}`, { fields: "name,mimeType,size" });
-      if (!meta.ok) return explain(meta.status, "link", true) as { ok: false; message: string };
+      if (!meta.ok) return explain(meta.status, "link", true, await driveReason(meta)) as { ok: false; message: string };
       const parsed = metadataSchema.safeParse(await meta.json());
       if (!parsed.success) return { ok: false, message: "Google Drive did not respond. Try again in a minute." };
       if (parsed.data.mimeType === FOLDER) return resolveDriveLink(key, { id: link.id, folder: true }, limit);
@@ -142,7 +177,7 @@ export async function resolveDriveLink(
         };
         if (pageToken) params.pageToken = pageToken;
         const res = await driveFetch(auth, "", params);
-        if (!res.ok) return explain(res.status, "folder", true) as { ok: false; message: string };
+        if (!res.ok) return explain(res.status, "folder", true, await driveReason(res)) as { ok: false; message: string };
         const page = listSchema.safeParse(await res.json());
         if (!page.success) return { ok: false, message: "Google Drive did not respond. Try again in a minute." };
         for (const f of page.data.files) {
