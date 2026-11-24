@@ -133,7 +133,9 @@ describe("roles, reference data and records", () => {
   });
 
   it("students can read the courses but not change them", async () => {
-    expect((await b.client.from("courses").select("slug")).data).toHaveLength(5);
+    // The five Law School courses, plus the shared "Drafts and precedents" library section (migration 70).
+    expect((await b.client.from("courses").select("slug").eq("shared", false)).data).toHaveLength(5);
+    expect((await b.client.from("courses").select("slug")).data).toHaveLength(6);
     expect((await b.client.from("courses").insert({ slug: "fake", name: "Fake" })).error).not.toBeNull();
   });
 
