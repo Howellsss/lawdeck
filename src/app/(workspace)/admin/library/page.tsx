@@ -38,7 +38,7 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
   if (!role) notFound();
   const filter = libraryFilterSchema.parse((await searchParams).status);
   const status = filter === "recheck" ? undefined : filter;
-  const [allItems, courses, recheck] = await Promise.all([listLibraryItems(status), listCourses(), getRecheckReasons()]);
+  const [allItems, courses, recheck] = await Promise.all([listLibraryItems(status), listCourses({ withLibrarySections: true }), getRecheckReasons()]);
   const items = filter === "recheck" ? allItems.filter((item) => recheck.has(item.id)) : allItems;
   const apiKey = getSupabaseConfig()?.key ?? "";
   const drive = role === "admin" ? getDrivePickerConfig() : null;

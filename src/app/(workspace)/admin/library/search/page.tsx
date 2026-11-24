@@ -23,7 +23,7 @@ export default function LibrarySearchPage() {
 // Reviewers and admins only; everyone else gets "page not found".
 async function SearchPage() {
   if (!(await getStaffRole())) notFound();
-  const courses = await listCourses();
+  const courses = await listCourses({ withLibrarySections: true });
 
   return (
     <>

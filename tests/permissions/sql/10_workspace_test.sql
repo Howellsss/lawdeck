@@ -28,7 +28,9 @@ insert into public.messages (conversation_id, role, content)
 select test.check((select count(*) from public.projects) = 1, 'A sees their own project');
 select test.check((select count(*) from public.messages) = 1, 'A sees their own message');
 select test.check((select count(*) from public.profiles) = 1, 'A sees only their own profile');
-select test.check((select count(*) from public.courses) = 5, 'signed-in students can read the five courses');
+select test.check((select count(*) from public.courses where not shared) = 5, 'signed-in students can read the five courses');
+-- Migration 70: plus the shared "Drafts and precedents (all courses)" library section.
+select test.check((select count(*) from public.courses) = 6, 'and the one shared library section');
 update public.profiles set full_name = 'Student A' where id = auth.uid();
 select test.check((select full_name from public.profiles) = 'Student A', 'A can edit their own name');
 reset role;

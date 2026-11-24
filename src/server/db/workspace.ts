@@ -124,13 +124,14 @@ export async function listRecentChats(
   };
 }
 
-export async function listCourses(): Promise<Loaded<CourseSummary[]>> {
+// The Law School courses. Library sections that are not courses (migration 70: "Drafts and
+// precedents (all courses)") are left out unless asked for (Admin → Library only).
+export async function listCourses(options: { withLibrarySections?: boolean } = {}): Promise<Loaded<CourseSummary[]>> {
   if (!(await getCurrentAccount())) return { status: "signed-out" };
   const supabase = await createSupabaseServerClient();
-  const { data, error } = await supabase
-    .from("courses")
-    .select("id, slug, name")
-    .order("position");
+  let query = supabase.from("courses").select("id, slug, name").order("position");
+  if (!options.withLibrarySections) query = query.eq("shared", false);
+  const { data, error } = await query;
   if (error) failed("courses", error.code);
   return { status: "ok", data };
 }
@@ -155,6 +156,7 @@ export async function getCourseHub(
     .from("courses")
     .select("id, slug, name")
     .eq("slug", slug)
+    .eq("shared", false)
     .maybeSingle();
   if (course.error) failed("course", course.error.code);
   if (!course.data) return { status: "ok", data: null };

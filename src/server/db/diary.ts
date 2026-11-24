@@ -54,7 +54,7 @@ export async function getDiaryOverview(): Promise<Loaded<DiaryOverview>> {
     db.from("recall_attempts").select("session_id, outcome").limit(5000),
     db.from("review_items").select("topic_id, due_at").order("due_at"),
     lessonIds.length ? db.from("lesson_authorities").select("lesson_id, name").in("lesson_id", lessonIds) : empty<{ lesson_id: string; name: string }>(),
-    db.from("courses").select("id, slug, name, position").order("position"),
+    db.from("courses").select("id, slug, name, position").eq("shared", false).order("position"),
   ]);
   const now = Date.now();
   const topicName = new Map((topics.data ?? []).map((t) => [t.id, t]));

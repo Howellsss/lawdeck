@@ -374,6 +374,8 @@ export type Database = {
           slug: string;
           name: string;
           position: number;
+          // Migration 70: a library section that is not a Law School course (drafts and precedents).
+          shared: boolean;
           created_at: string;
         };
         Insert: never;

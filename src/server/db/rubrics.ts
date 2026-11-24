@@ -82,7 +82,7 @@ export async function getRubric(id: string): Promise<RubricView | null> {
 export async function listCourseTopics(): Promise<CourseTopics> {
   const supabase = await createSupabaseServerClient();
   const [courses, topics] = await Promise.all([
-    supabase.from("courses").select("id, name, position").order("position"),
+    supabase.from("courses").select("id, name, position").eq("shared", false).order("position"),
     supabase.from("topics").select("id, name, course_id, position").order("position"),
   ]);
   if (courses.error) failed("courses", courses.error.code);

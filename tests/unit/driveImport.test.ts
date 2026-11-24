@@ -33,6 +33,15 @@ describe("suggestions from the file name", () => {
     ).toBe("corp");
   });
 
+  it("suggests the drafts section for drafts, never for a course outline (migration 70)", () => {
+    const withDrafts = [...courses, { id: "drafts", name: "Drafts and precedents (all courses)" }];
+    expect(guessCourse("6 Sample Draft.pdf", withDrafts)).toBe("drafts");
+    expect(guessCourse("PRECEDENTS FOR AFFIDAVITS.pdf", withDrafts)).toBe("drafts");
+    expect(guessCourse("1. CIVIL LITIGATION COURSE OUTLINE AND INTRODUCTORY NOTE.docx", withDrafts)).toBe("civ");
+    // A course's own drafts: two places fit, so the admin chooses.
+    expect(guessCourse("DRAFTS ON CIVIL LITIGATION.pdf", withDrafts)).toBeNull();
+  });
+
   it("makes no guess when the name doesn't say, or says two courses", () => {
     expect(
       guessCourse("REVIEW PROF ETHICS HANDBOOK 2025 NEW.docx", courses),
