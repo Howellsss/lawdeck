@@ -11,8 +11,8 @@ Last updated: 2026-11-24 (library: no duplicates, migration 71 pasted; public Dr
 - **Library duplicates and Drive downloads (2026-11-24, migration 71, pasted by the founder):** pasted links skip files
   already in the library (same Drive file, contents, or name and size). When Google refuses Lawdeck's key for a file shared
   "Anyone with the link" (the Professional Ethics folder), the import uses Google's ordinary download address instead.
-  Founder to re-import the Professional Ethics link. Admin → Library page crash still open: waiting for the screenshot with
-  the Reference code (the error page shows it).
+  Founder to re-import the Professional Ethics link. Admin → Library list failed with code 57014 (too slow): fixed by migration 72
+  (`20261124007200_library_list_counts.sql`), founder pastes it before merge.
 - **Deeper answers (2026-11-24):** 16 passages per answer (was 8), problem questions up to 30. About ₦20 more AI per
   answer (≈ ₦65 per credit). Answer test waived by the founder (no Anthropic credit); run it on Sonnet (≈ $4) when credit returns.
 - **Drafts and precedents (all courses) (2026-11-24, migration 70):** a library section beside the five courses; searched
@@ -63,7 +63,7 @@ Last updated: 2026-11-24 (library: no duplicates, migration 71 pasted; public Dr
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **71** (`20261124007100_library_duplicates.sql`, no duplicate library files; 70 is the drafts section).
+  merge only after that. The latest is **72** (`20261124007200_library_list_counts.sql`, fast library list; 71 is no duplicate library files).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full

@@ -1619,6 +1619,7 @@ export type Database = {
         Args: Record<string, never>;
         Returns: { plan_id: string; name: string; price_ngn: number | null; credits: number | null; period_end: string | null }[];
       };
+      library_item_counts: { Args: { items: string[] }; Returns: { item_id: string; passages: number; pages: number }[] };
       save_plan: { Args: { plan: string; price: number; credits: number }; Returns: undefined };
       speech_used_today: { Args: Record<string, never>; Returns: { used: number; unlimited: boolean }[] };
       is_admin: { Args: Record<string, never>; Returns: boolean };

@@ -26,7 +26,7 @@ export type LibraryItemSummary = {
 };
 
 const ITEM_COLUMNS =
-  "id, title, type, course_id, year, review_status, file_name, size_bytes, created_at, reading_status, reading_method, reading_quality, page_count, reading_error, indexed_passages, index_model, indexed_at, review_note, law_current_as_of, reviewed_at, kb_passages(count), kb_item_pages(count)";
+  "id, title, type, course_id, year, review_status, file_name, size_bytes, created_at, reading_status, reading_method, reading_quality, page_count, reading_error, indexed_passages, index_model, indexed_at, review_note, law_current_as_of, reviewed_at";
 
 // The library list for reviewers and admins, optionally one review status only. Callers check
 // the role first; row-level security also limits what each person can see.
@@ -41,7 +41,25 @@ export async function listLibraryItems(status?: LibraryItemSummary["reviewStatus
     throw new Error(`The library list could not load (database code ${code}).`);
   }
   const courseNames = new Map(courses.data.map((course) => [course.id, course.name]));
-  return items.data.map((item) => toSummary(item, courseNames));
+  const counts = await itemCounts(supabase, items.data.map((item) => item.id));
+  return items.data.map((item) => toSummary(item, courseNames, counts.get(item.id)));
+}
+
+// Passages and pages read per item, counted in the database in one go (migration 72: counting
+// them through row-level security for hundreds of items ran past the time limit, code 57014).
+async function itemCounts(
+  supabase: Awaited<ReturnType<typeof createSupabaseServerClient>>,
+  ids: string[],
+): Promise<Map<string, Counts>> {
+  const counts = new Map<string, Counts>();
+  if (ids.length === 0) return counts;
+  const { data, error } = await supabase.rpc("library_item_counts", { items: ids });
+  if (error) {
+    console.error("library read failed", { code: error.code, step: "counts" });
+    throw new Error(`The library list could not load (database code ${error.code ?? "unknown"}).`);
+  }
+  for (const row of data ?? []) counts.set(row.item_id, { passages: row.passages, pages: row.pages });
+  return counts;
 }
 
 // One item, or null when it does not exist (or the person may not see it).
@@ -56,7 +74,8 @@ export async function getLibraryItem(id: string): Promise<LibraryItemSummary | n
     throw new Error("Could not load the library item.");
   }
   if (!item.data) return null;
-  return toSummary(item.data, new Map(courses.data.map((course) => [course.id, course.name])));
+  const counts = await itemCounts(supabase, [item.data.id]);
+  return toSummary(item.data, new Map(courses.data.map((course) => [course.id, course.name])), counts.get(item.data.id));
 }
 
 export type ReviewPassage = {
@@ -124,11 +143,11 @@ type ItemRow = {
   review_note: string | null;
   law_current_as_of: string | null;
   reviewed_at: string | null;
-  kb_passages: { count: number }[];
-  kb_item_pages: { count: number }[];
 };
 
-function toSummary(item: ItemRow, courseNames: Map<string, string>): LibraryItemSummary {
+type Counts = { passages: number; pages: number };
+
+function toSummary(item: ItemRow, courseNames: Map<string, string>, counts?: Counts): LibraryItemSummary {
   return {
     id: item.id,
     title: item.title,
@@ -144,8 +163,8 @@ function toSummary(item: ItemRow, courseNames: Map<string, string>): LibraryItem
       method: item.reading_method,
       quality: item.reading_quality === null ? null : Number(item.reading_quality),
       pageCount: item.page_count,
-      pagesRead: item.kb_item_pages[0]?.count ?? 0,
-      passages: item.kb_passages[0]?.count ?? 0,
+      pagesRead: counts?.pages ?? 0,
+      passages: counts?.passages ?? 0,
       error: item.reading_error,
     },
     search: { indexed: item.indexed_passages, model: item.index_model, indexedAt: item.indexed_at },
