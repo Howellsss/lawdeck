@@ -5,6 +5,8 @@ import { StateMessage } from "@/components/ui/StateMessage";
 
 // Standard error screen (rule I-01): a plain message and a next step, never a blank page.
 export default function WorkspaceError({ error, retry }: { error: unknown; retry: () => void }) {
+  // The server's reference for this error (no details), so a log line can be found (founder, 2026-11-24).
+  const digest = (error as { digest?: string } | null)?.digest;
   useEffect(() => {
     const err = error as { name?: string; message?: string; digest?: string } | null;
     console.error("Workspace error", { name: err?.name });
@@ -33,6 +35,7 @@ export default function WorkspaceError({ error, retry }: { error: unknown; retry
       }
     >
       This page could not load. Your work is safe. Try again, or go back to the home page.
+      {digest && <span className="mt-2 block text-xs text-muted">Reference: {digest}</span>}
     </StateMessage>
   );
 }
