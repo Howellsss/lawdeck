@@ -58,7 +58,7 @@ Last updated: 2026-11-22 (library: PowerPoint, 100 MB, large scans; migration 69
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **70** (`20261124007000_drafts_section.sql`; 69 is library slides and large files).
+  merge only after that. The latest is **71** (`20261124007100_library_duplicates.sql`, no duplicate library files; 70 is the drafts section).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full

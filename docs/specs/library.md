@@ -200,3 +200,15 @@ importer now reads Google's short reason code (logged as `reason`, never file co
 happened: Google limiting downloads (one automatic retry after 5 s, then "wait an hour, or use Choose
 different files"), the owner turning off downloads, or Lawdeck's key being refused; "share it as Anyone with
 the link" only when that is the problem. Imports pause 1.5 s between files.
+
+## No duplicates (founder, 2026-11-24; migration 71)
+"Have a set up where duplicates can not be added again, only the files that haven't been added."
+- `kb_items.drive_file_id` (the Drive file it came from) and `kb_items.content_sha256` (a fingerprint of
+  its contents), both set once, admins only. Items already read got their fingerprint from their archive
+  path in the migration; others get it when next read.
+- **Find files from links** lists files already in the library apart ("N files are already in the library
+  and will be skipped") and never offers them: same Drive file, or same file name and size in any course.
+  Up to 100 *new* files are offered per paste, looked for among up to 500.
+- **Import** (Drive or computer upload) skips a file with the same contents as one in the library, even
+  under another name: "Already in the library as “…”, so it was skipped."
+- Tests: `tests/permissions/sql/9zt_library_duplicates_test.sql`, `tests/unit/libraryDuplicates.test.ts`.

@@ -19,7 +19,7 @@ export type ItemDetails = {
 export async function recordLibraryItem(
   db: SupabaseClient<Database>,
   details: ItemDetails,
-  file: { path: string; fileName: string; kind: AdminLibraryFileKind; size: number },
+  file: { path: string; fileName: string; kind: AdminLibraryFileKind; size: number; sha256?: string; driveFileId?: string },
 ): Promise<{ ok: true; id: string } | { ok: false; code: string | undefined }> {
   const { data, error } = await db
     .from("kb_items")
@@ -34,6 +34,8 @@ export async function recordLibraryItem(
       file_name: file.fileName,
       mime_type: ADMIN_LIBRARY_FILE_TYPES[file.kind].mime,
       size_bytes: file.size,
+      content_sha256: file.sha256 ?? null,
+      drive_file_id: file.driveFileId ?? null,
     })
     .select("id")
     .single();

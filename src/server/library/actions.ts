@@ -7,6 +7,8 @@ import { adminLibraryFileSchema, libraryDetailsSchema, libraryItemIdSchema, libr
 import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { sha256Hex } from "./archive";
+import { duplicateMessage, sameFileInLibrary } from "./duplicates";
 import { LIBRARY_BUCKET as BUCKET, recordLibraryItem } from "./items";
 import { readStep, restartReading, type ReadStepResult } from "./reading";
 
@@ -99,11 +101,19 @@ export async function finishLibraryUpload(input: UploadDetails & { path: string 
     };
   }
 
+  // The same file already in the library (any course): removed again, not added twice (migration 71).
+  const sha256 = sha256Hex(bytes);
+  const existing = await sameFileInLibrary(supabase, { sha256, name: parsed.file.fileName, size: bytes.length });
+  if (existing) {
+    await supabase.storage.from(BUCKET).remove([path.data]);
+    return { ok: false, message: duplicateMessage(existing) };
+  }
   const added = await recordLibraryItem(supabase, parsed.details, {
     path: path.data,
     fileName: parsed.file.fileName,
     kind: realKind,
     size: bytes.length,
+    sha256,
   });
   if (!added.ok) {
     logFailure("finishLibraryUpload.insert", added.code);

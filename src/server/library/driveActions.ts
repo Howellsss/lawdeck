@@ -9,6 +9,8 @@ import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { parseDriveLinks } from "@/lib/driveLinks";
 import { z } from "@/lib/zod";
 import { driveServerKey, fetchDriveFile, resolveDriveLink, type DriveListed } from "./drive";
+import { sha256Hex } from "./archive";
+import { alreadyInLibrary, duplicateMessage, sameFileInLibrary, type AlreadyAdded } from "./duplicates";
 import { LIBRARY_BUCKET, recordLibraryItem } from "./items";
 
 export type DriveImportResult =
@@ -38,6 +40,10 @@ export async function importFromDrive(input: {
   const key = driveServerKey();
   const auth = parsed.data.accessToken ? { token: parsed.data.accessToken } : key ? { key } : null;
   if (!auth) return { ok: false, message: "Drive links are not switched on yet: the Google Drive server key is missing." };
+  const supabase = await createSupabaseServerClient();
+  // Already added from this Drive file: skipped without downloading it again (migration 71).
+  const fromDrive = await supabase.from("kb_items").select("title").eq("drive_file_id", parsed.data.fileId).limit(1);
+  if (fromDrive.data?.[0]) return { ok: false, duplicate: true, message: duplicateMessage(fromDrive.data[0].title) };
   const file = await fetchDriveFile(auth, parsed.data.fileId);
   if (!file.ok) return file;
   if (file.name.length > 255) return { ok: false, message: "The file name is too long. Rename it in Google Drive and try again." };
@@ -47,19 +53,12 @@ export async function importFromDrive(input: {
     return { ok: false, message: `That file is not a real ${ADMIN_LIBRARY_KINDS_TEXT.replace(/^a /, "")}.` };
   }
 
-  const supabase = await createSupabaseServerClient();
   const details = parsed.data.details;
-  // The same file (name and size) already in this course: skip it rather than add it twice.
-  const existing = await supabase
-    .from("kb_items")
-    .select("id")
-    .eq("course_id", details.courseId)
-    .eq("file_name", file.name)
-    .eq("size_bytes", file.bytes.length)
-    .limit(1);
-  if (existing.data?.length) {
-    return { ok: false, duplicate: true, message: "This file is already in the library for this course, so it was skipped." };
-  }
+  // The same file already in the library, in any course: the same contents (even under another
+  // name), or the same name and size. Skipped rather than added twice (founder, 2026-11-24).
+  const sha256 = sha256Hex(file.bytes);
+  const existing = await sameFileInLibrary(supabase, { sha256, name: file.name, size: file.bytes.length, driveFileId: parsed.data.fileId });
+  if (existing) return { ok: false, duplicate: true, message: duplicateMessage(existing) };
 
   const path = `${details.courseId}/${crypto.randomUUID()}.${kind}`;
   const stored = await supabase.storage
@@ -69,7 +68,14 @@ export async function importFromDrive(input: {
     console.error("library action failed", { action: "importFromDrive.store", code: stored.error.name });
     return { ok: false, message: "The file could not be stored. Please try again." };
   }
-  const added = await recordLibraryItem(supabase, details, { path, fileName: file.name, kind, size: file.bytes.length });
+  const added = await recordLibraryItem(supabase, details, {
+    path,
+    fileName: file.name,
+    kind,
+    size: file.bytes.length,
+    sha256,
+    driveFileId: parsed.data.fileId,
+  });
   if (!added.ok) {
     console.error("library action failed", { action: "importFromDrive.insert", code: added.code ?? "unknown" });
     return { ok: false, message: "The item was not saved. Please try again." };
@@ -78,13 +84,15 @@ export async function importFromDrive(input: {
   return { ok: true, id: added.id };
 }
 
-// At most this many files from one paste (a big folder is cut off here).
+// At most this many new files from one paste (a big folder is cut off here), looked for among at
+// most LINK_SCAN_LIMIT files, so files already added do not use up the 100.
 const LINK_IMPORT_LIMIT = 100;
+const LINK_SCAN_LIMIT = 500;
 
 // Pasted Drive links (founder, 2026-11-08): the files they point to, ready to import. A folder
 // link brings the importable files inside it (and its sub-folders). Admins only.
 export async function findDriveLinkFiles(input: { text: string }): Promise<
-  { ok: true; files: DriveListed[]; problems: string[]; capped: boolean } | { ok: false; message: string }
+  { ok: true; files: DriveListed[]; already: AlreadyAdded[]; problems: string[]; capped: boolean } | { ok: false; message: string }
 > {
   const parsed = z.object({ text: z.string().trim().min(1, { error: "Paste Google Drive links to files or folders, one per line." }).max(20_000, { error: "Paste up to about 100 links at a time." }) }).safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "Paste up to about 100 links at a time." };
@@ -97,8 +105,8 @@ export async function findDriveLinkFiles(input: { text: string }): Promise<
   const seen = new Set<string>();
   const problems = notUnderstood.map((piece) => `Not a Google Drive link: ${piece}`);
   for (const link of links) {
-    if (files.length >= LINK_IMPORT_LIMIT) break;
-    const found = await resolveDriveLink(key, link, LINK_IMPORT_LIMIT - files.length);
+    if (files.length >= LINK_SCAN_LIMIT) break;
+    const found = await resolveDriveLink(key, link, LINK_SCAN_LIMIT - files.length);
     if (!found.ok) {
       problems.push(found.message);
       continue;
@@ -109,5 +117,11 @@ export async function findDriveLinkFiles(input: { text: string }): Promise<
       files.push(f);
     }
   }
-  return { ok: true, files, problems, capped: files.length >= LINK_IMPORT_LIMIT };
+  // Files already in the library are listed apart and never imported again (migration 71); up to
+  // 100 new files are offered at a time.
+  const supabase = await createSupabaseServerClient();
+  const existing = await alreadyInLibrary(supabase, files);
+  const already: AlreadyAdded[] = files.filter((f) => existing.has(f.id)).map((f) => ({ id: f.id, name: f.name, existingTitle: existing.get(f.id) ?? "" }));
+  const fresh = files.filter((f) => !existing.has(f.id));
+  return { ok: true, files: fresh.slice(0, LINK_IMPORT_LIMIT), already, problems, capped: fresh.length > LINK_IMPORT_LIMIT || files.length >= LINK_SCAN_LIMIT };
 }
