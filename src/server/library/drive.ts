@@ -85,11 +85,68 @@ function explain(status: number, step: string, viaLink = false, reason: string |
   return { ok: false, message: "Google Drive did not respond. Try again in a minute." };
 }
 
+// Google's ordinary "download" address for a file shared as "Anyone with the link" (founder,
+// 2026-11-24: public Professional Ethics files were refused through the Drive key from Lawdeck's
+// server, though anyone could download them). Used only for pasted links, only after the key was
+// refused with "no access" (never when Google is limiting downloads or the owner turned
+// downloading off), and only for real files: a sign-in or warning page (HTML) counts as refused.
+export const PUBLIC_DOWNLOAD = "https://drive.usercontent.google.com/download";
+
+export function nameFromDisposition(header: string | null): string | null {
+  if (!header) return null;
+  const encoded = /filename\*=UTF-8''([^;]+)/i.exec(header)?.[1];
+  if (encoded) {
+    try {
+      return decodeURIComponent(encoded.trim()) || null;
+    } catch {
+      // Falls through to the plain name.
+    }
+  }
+  return /filename="([^"]+)"/i.exec(header)?.[1]?.trim() || null;
+}
+
+async function publicDownload(fileId: string, knownName: string | null): Promise<DriveFile | null> {
+  try {
+    const query = new URLSearchParams({ id: fileId, export: "download", confirm: "t" });
+    const res = await fetch(`${PUBLIC_DOWNLOAD}?${query}`, { signal: AbortSignal.timeout(TIMEOUT_MS) });
+    const type = res.headers.get("content-type") ?? "";
+    if (!res.ok || !res.body || type.includes("text/html")) {
+      await res.body?.cancel();
+      console.error("drive import failed", { step: "public", status: res.status });
+      return null;
+    }
+    const name = knownName ?? nameFromDisposition(res.headers.get("content-disposition"));
+    if (!name) {
+      await res.body.cancel();
+      return null;
+    }
+    const bytes = await readCapped(res.body, ADMIN_LIBRARY_MAX_BYTES);
+    if (!bytes) return { ok: false, message: TOO_BIG };
+    return { ok: true, name, bytes };
+  } catch (error) {
+    console.error("drive import failed", { step: "public", name: (error as Error)?.name });
+    return null;
+  }
+}
+
+// Whether a refusal through the key is worth trying Google's ordinary download address for.
+function tryPublic(status: number, reason: string | null): boolean {
+  if (isRateLimit(status, reason) || reason === "cannotDownloadFile") return false;
+  return status === 401 || status === 403 || status === 404;
+}
+
 export async function fetchDriveFile(auth: DriveAuth, fileId: string): Promise<DriveFile> {
   const viaLink = "key" in auth;
   try {
     const meta = await driveFetch(auth, `/${encodeURIComponent(fileId)}`, { fields: "name,mimeType,size" });
-    if (!meta.ok) return explain(meta.status, "metadata", viaLink, await driveReason(meta));
+    if (!meta.ok) {
+      const reason = await driveReason(meta);
+      if (viaLink && tryPublic(meta.status, reason)) {
+        const backup = await publicDownload(fileId, null);
+        if (backup) return backup;
+      }
+      return explain(meta.status, "metadata", viaLink, reason);
+    }
     const parsed = metadataSchema.safeParse(await meta.json());
     if (!parsed.success) return explain(502, "metadata", viaLink);
     const doc = parsed.data.mimeType === GOOGLE_DOC;
@@ -111,7 +168,15 @@ export async function fetchDriveFile(auth: DriveAuth, fileId: string): Promise<D
       await new Promise((resolve) => setTimeout(resolve, RETRY_WAIT_MS));
       media = await fetch(url, { ...init, signal: AbortSignal.timeout(TIMEOUT_MS) });
     }
-    if (!media.ok || !media.body) return explain(media.status, "download", viaLink, await driveReason(media));
+    if (!media.ok || !media.body) {
+      const reason = await driveReason(media);
+      // Google Docs and Slides can't come from the ordinary download address (they are exported).
+      if (viaLink && !exportAs && tryPublic(media.status, reason)) {
+        const backup = await publicDownload(fileId, parsed.data.name);
+        if (backup) return backup;
+      }
+      return explain(media.status, "download", viaLink, reason);
+    }
     const bytes = await readCapped(media.body, ADMIN_LIBRARY_MAX_BYTES);
     if (!bytes) return { ok: false, message: TOO_BIG };
     const name =
