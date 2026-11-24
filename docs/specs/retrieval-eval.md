@@ -37,4 +37,4 @@ Founder chose option (b), deeper answers for everyone, accepting about ₦20 mor
 (about ₦44 → ₦65 of AI per credit): `SEARCH_RESULTS` 8 → 16, `SCENARIO_SEARCH_RESULTS` 12 → 20,
 `ISSUE_SEARCH_RESULTS` 5 → 8, `SCENARIO_MAX_PASSAGES` 20 → 30 (voice mode included). The ranking itself
 is unchanged (same candidates, fusion and re-ranker), so the retrieval test's top-5 target is unaffected;
-the answer test (Sonnet) is run on the branch before merging.
+the answer test was **waived by the founder (2026-11-24: no Anthropic credit)**; run it on Sonnet as soon as there is credit.
