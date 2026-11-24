@@ -5,9 +5,14 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-22 (library: PowerPoint, 100 MB, large scans; migration 69).
+Last updated: 2026-11-24 (library: no duplicates, migration 71 pasted; public Drive files refused by the key now download).
 
 ## In progress right now (2026-11-15) — read this first
+- **Library duplicates and Drive downloads (2026-11-24, migration 71, pasted by the founder):** pasted links skip files
+  already in the library (same Drive file, contents, or name and size). When Google refuses Lawdeck's key for a file shared
+  "Anyone with the link" (the Professional Ethics folder), the import uses Google's ordinary download address instead.
+  Founder to re-import the Professional Ethics link. Admin → Library page crash still open: waiting for the screenshot with
+  the Reference code (the error page shows it).
 - **Deeper answers (2026-11-24):** 16 passages per answer (was 8), problem questions up to 30. About ₦20 more AI per
   answer (≈ ₦65 per credit). Answer test waived by the founder (no Anthropic credit); run it on Sonnet (≈ $4) when credit returns.
 - **Drafts and precedents (all courses) (2026-11-24, migration 70):** a library section beside the five courses; searched
