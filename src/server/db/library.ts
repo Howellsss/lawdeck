@@ -36,8 +36,9 @@ export async function listLibraryItems(status?: LibraryItemSummary["reviewStatus
   if (status) query = query.eq("review_status", status);
   const [items, courses] = await Promise.all([query, supabase.from("courses").select("id, name")]);
   if (items.error || courses.error) {
-    console.error("library read failed", { code: items.error?.code ?? courses.error?.code ?? "unknown" });
-    throw new Error("Could not load the library.");
+    const code = items.error?.code ?? courses.error?.code ?? "unknown";
+    console.error("library read failed", { code, message: items.error?.message ?? courses.error?.message });
+    throw new Error(`The library list could not load (database code ${code}).`);
   }
   const courseNames = new Map(courses.data.map((course) => [course.id, course.name]));
   return items.data.map((item) => toSummary(item, courseNames));

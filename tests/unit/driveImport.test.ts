@@ -201,6 +201,54 @@ describe("fetching from Google Drive", () => {
     expect(sent).toBeLessThanOrEqual(102);
   });
 
+  it("says when Google limits downloads, after one more try, instead of 'not shared' (founder, 2026-11-24)", async () => {
+    vi.useFakeTimers();
+    const limited = () =>
+      new Response(JSON.stringify({ error: { code: 403, errors: [{ reason: "downloadQuotaExceeded" }] } }), { status: 403 });
+    const fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(meta({ name: "PROPERTY EXAM.pdf", mimeType: "application/pdf" }))
+      .mockResolvedValueOnce(limited())
+      .mockResolvedValueOnce(limited());
+    vi.stubGlobal("fetch", fetchSpy);
+    const pending = fetchDriveFile({ key: "k" }, "fileid12345");
+    await vi.advanceTimersByTimeAsync(6_000);
+    const result = await pending;
+    vi.useRealTimers();
+    expect(fetchSpy).toHaveBeenCalledTimes(3);
+    expect(result.ok).toBe(false);
+    expect(result.ok ? "" : result.message).toMatch(/limiting downloads/);
+  });
+
+  it("succeeds when Google's limit has passed by the second try", async () => {
+    vi.useFakeTimers();
+    const fetchSpy = vi
+      .fn()
+      .mockResolvedValueOnce(meta({ name: "a.pdf", mimeType: "application/pdf" }))
+      .mockResolvedValueOnce(new Response(JSON.stringify({ error: { errors: [{ reason: "userRateLimitExceeded" }] } }), { status: 403 }))
+      .mockResolvedValueOnce(new Response(new Uint8Array([1, 2])));
+    vi.stubGlobal("fetch", fetchSpy);
+    const pending = fetchDriveFile({ key: "k" }, "fileid12345");
+    await vi.advanceTimersByTimeAsync(6_000);
+    expect(await pending).toEqual({ ok: true, name: "a.pdf", bytes: new Uint8Array([1, 2]) });
+    vi.useRealTimers();
+  });
+
+  it("explains a file whose owner turned off downloads, and still says 'share it' when that is the problem", async () => {
+    vi.stubGlobal(
+      "fetch",
+      vi
+        .fn()
+        .mockResolvedValueOnce(meta({ name: "a.pdf", mimeType: "application/pdf" }))
+        .mockResolvedValueOnce(new Response(JSON.stringify({ error: { errors: [{ reason: "cannotDownloadFile" }] } }), { status: 403 })),
+    );
+    const noDownload = await fetchDriveFile({ key: "k" }, "fileid12345");
+    expect(noDownload.ok ? "" : noDownload.message).toMatch(/turned off downloading/);
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(new Response("{}", { status: 404 })));
+    const notShared = await fetchDriveFile({ key: "k" }, "fileid12345");
+    expect(notShared.ok ? "" : notShared.message).toMatch(/Anyone with the link/);
+  });
+
   it("saves Google Slides as PowerPoint, and explains old .ppt files (founder, 2026-11-22)", async () => {
     const fetchSpy = vi
       .fn()

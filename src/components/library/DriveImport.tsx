@@ -24,6 +24,9 @@ const pageOrigin = () => window.location.origin;
 // Admins pick several files in Google Drive (choosing which Google account), or paste Drive links
 // to files or whole folders, check the suggested details (or set them for all), and import them.
 // Each file is fetched by the server, checked like an upload, then read and indexed.
+// The pause between two Drive downloads (founder, 2026-11-24: Google limited a large import).
+const BETWEEN_FILES_MS = 1500;
+
 export function DriveImport({
   config,
   courses,
@@ -102,8 +105,12 @@ export function DriveImport({
     setBusy(true);
     setNotice(null);
     let done = 0;
+    let first = true;
     for (const [index, row] of rows.entries()) {
       if (row.status === "done" || row.status === "skipped") continue;
+      // A short pause between files, so Google is less likely to limit the downloads.
+      if (!first) await new Promise((resolve) => setTimeout(resolve, BETWEEN_FILES_MS));
+      first = false;
       update(index, { status: "importing", message: "Fetching from Google Drive…", errors: undefined });
       const result = await importFromDrive({
         accessToken: token === "link" ? undefined : token,

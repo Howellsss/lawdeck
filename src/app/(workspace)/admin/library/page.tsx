@@ -38,7 +38,18 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
   if (!role) notFound();
   const filter = libraryFilterSchema.parse((await searchParams).status);
   const status = filter === "recheck" ? undefined : filter;
-  const [allItems, courses, recheck] = await Promise.all([listLibraryItems(status), listCourses({ withLibrarySections: true }), getRecheckReasons()]);
+  // Each part loads on its own, so one failure never takes down the whole page (founder,
+  // 2026-11-24): the Drive import and upload stay usable, and the failing part says why.
+  const [itemsResult, courses, recheckResult] = await Promise.all([
+    listLibraryItems(status).then(
+      (list) => ({ ok: true as const, list }),
+      (error: unknown) => ({ ok: false as const, message: error instanceof Error ? error.message : "The library list could not load." }),
+    ),
+    listCourses({ withLibrarySections: true }).catch(() => ({ status: "error" as const })),
+    getRecheckReasons().catch(() => new Map<string, never>()),
+  ]);
+  const recheck = recheckResult;
+  const allItems = itemsResult.ok ? itemsResult.list : [];
   const items = filter === "recheck" ? allItems.filter((item) => recheck.has(item.id)) : allItems;
   const apiKey = getSupabaseConfig()?.key ?? "";
   const drive = role === "admin" ? getDrivePickerConfig() : null;
@@ -80,7 +91,14 @@ async function Library({ searchParams }: Pick<PageProps<"/admin/library">, "sear
             </Link>
           ))}
         </nav>
-        <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} recheck={recheck} flags={await getSourceFlags()} />
+        {itemsResult.ok ? (
+          <LibraryList items={items} isAdmin={role === "admin"} currentModel={EMBEDDING_MODEL} recheck={recheck} flags={await getSourceFlags()} />
+        ) : (
+          <p role="alert" className="text-sm text-warning">
+            {itemsResult.message} Imports above still work. Reload the page in a minute; if it keeps happening, send this message to
+            the developer.
+          </p>
+        )}
       </section>
     </>
   );
