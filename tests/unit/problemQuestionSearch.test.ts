@@ -40,9 +40,11 @@ describe("listing the issues in a problem question", () => {
 
 describe("combining the passages for a problem question", () => {
   it("keeps the whole question's best passages first, then gives every issue a turn", () => {
-    const whole = ["w1", "w2", "w3", "w4", "w5", "w6", "w7", "w8", "w9", "w10"].map(hit);
-    const merged = mergeHits(whole, [["a1", "a2"].map(hit), ["b1", "w2", "b2"].map(hit)], 20);
-    expect(ids(merged)).toEqual(["w1", "w2", "w3", "w4", "w5", "w6", "w7", "w8", "a1", "b1", "a2", "b2", "w9", "w10"]);
+    // The whole question's top 16 lead (SEARCH_RESULTS, founder 2026-11-24), then each issue in turn.
+    const w = (from: number, to: number) => Array.from({ length: to - from + 1 }, (_, i) => `w${from + i}`);
+    const whole = w(1, 20).map(hit);
+    const merged = mergeHits(whole, [["a1", "a2"].map(hit), ["b1", "w2", "b2"].map(hit)], 30);
+    expect(ids(merged)).toEqual([...w(1, 16), "a1", "b1", "a2", "b2", ...w(17, 20)]);
   });
 
   it("never repeats a passage and stops at the maximum", () => {

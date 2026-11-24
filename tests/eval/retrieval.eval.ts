@@ -34,7 +34,7 @@ const questionsSchema = z.object({
 
 type Passage = { id: string; itemId: string; position: number; itemTitle: string; heading: string | null; text: string };
 
-// The real search hands the top 8 passages to the AI (SEARCH_RESULTS); the target is set on the top 5.
+// The real search hands the top 16 passages to the AI (SEARCH_RESULTS); the target is set on the top 5.
 const AI_RECEIVES = 8;
 
 const normalise = (text: string) => text.toLowerCase().replace(/\s+/g, " ").trim();

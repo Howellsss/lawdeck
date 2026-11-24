@@ -31,3 +31,10 @@ Re-ranking experiment, 2026-10-21 ([run](https://github.com/Howellsss/lawdeck/ac
 Recommendation: keep the exact-words search as it is ("most words" alone is worse) and add rerank-2.5 over the top 30 to the live search. Cost about $0.001 per question (first 200M tokens free). Caveat: 35 questions from one document, written by the AI; a legal reviewer's questions and other courses are needed before calling this proven.
 
 Live search check, 2026-10-21, after migration 10 ([run](https://github.com/Howellsss/lawdeck/actions/runs/39659858919)): voyage-4, top 30, then rerank-2.5. **35/35 in the top 8 and 35/35 in the top 5; exact-term questions 5/5.** Without the re-ranker (the fallback if Voyage is down) the same questions score 33/35 in the top 8 (words ranking now read 30 deep, as the database does), so the fallback is weaker and the test page warns when it is used.
+
+## 2026-11-24: more passages per answer (founder: "researches should be extensive and intensive")
+Founder chose option (b), deeper answers for everyone, accepting about ₦20 more AI per answer
+(about ₦44 → ₦65 of AI per credit): `SEARCH_RESULTS` 8 → 16, `SCENARIO_SEARCH_RESULTS` 12 → 20,
+`ISSUE_SEARCH_RESULTS` 5 → 8, `SCENARIO_MAX_PASSAGES` 20 → 30 (voice mode included). The ranking itself
+is unchanged (same candidates, fusion and re-ranker), so the retrieval test's top-5 target is unaffected;
+the answer test was **waived by the founder (2026-11-24: no Anthropic credit)**; run it on Sonnet as soon as there is credit.

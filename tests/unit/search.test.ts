@@ -33,13 +33,13 @@ describe("library search with the re-ranker", () => {
     rerankTexts.mockReset();
   });
 
-  it("asks the database for 30 candidates and keeps the re-ranker's best 8", async () => {
+  it("asks the database for 30 candidates and keeps the re-ranker's best 16 (founder, 2026-11-24)", async () => {
     rpc.mockResolvedValue({ data: rows, error: null });
-    rerankTexts.mockResolvedValue({ ok: true, order: [29, 28, 0, 1, 2, 3, 4, 5, 6, 7] });
+    rerankTexts.mockResolvedValue({ ok: true, order: [29, 28, ...Array.from({ length: 16 }, (_, i) => i)] });
     const result = await searchLibrary(input);
     expect(rpc.mock.calls[0][1].match_count).toBe(30);
     expect(result.ok && result.reranked).toBe(true);
-    expect(result.ok && result.hits.map((hit) => hit.passageId)).toEqual(["p30", "p29", "p1", "p2", "p3", "p4", "p5", "p6"]);
+    expect(result.ok && result.hits.map((hit) => hit.passageId)).toEqual(["p30", "p29", ...Array.from({ length: 14 }, (_, i) => `p${i + 1}`)]);
   });
 
   it("falls back to the search's own order when the re-ranker fails, and says so", async () => {
@@ -47,7 +47,7 @@ describe("library search with the re-ranker", () => {
     rerankTexts.mockResolvedValue({ ok: false, reason: "unavailable" });
     const result = await searchLibrary(input);
     expect(result.ok && result.reranked).toBe(false);
-    expect(result.ok && result.hits.map((hit) => hit.passageId)).toEqual(["p1", "p2", "p3", "p4", "p5", "p6", "p7", "p8"]);
+    expect(result.ok && result.hits.map((hit) => hit.passageId)).toEqual(Array.from({ length: 16 }, (_, i) => `p${i + 1}`));
   });
 
   it("explains the search limit when the database refuses", async () => {
