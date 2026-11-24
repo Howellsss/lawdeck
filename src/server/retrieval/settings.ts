@@ -18,10 +18,12 @@ export const EMBEDDING_MODEL: EmbeddingModel = "voyage-4";
 
 export const EMBEDDING_DIMENSIONS = 1024;
 
-// How many passages a search hands to the screen or the AI at most.
-export const SEARCH_RESULTS = 8;
-// A problem question (a scenario) usually raises several issues, so it gets more passages.
-export const SCENARIO_SEARCH_RESULTS = 12;
+// How many passages a search hands to the screen or the AI at most. Raised from 8 for deeper,
+// broader answers at every level (founder, 2026-11-24: "researches should be extensive and
+// intensive"; option b, about ₦20 more AI per answer, accepted).
+export const SEARCH_RESULTS = 16;
+// A problem question (a scenario) usually raises several issues, so it gets more passages (was 12).
+export const SCENARIO_SEARCH_RESULTS = 20;
 // How many candidates the database returns for the re-ranker to choose from (migration 10 caps
 // this at 30, with a search limit for students).
 export const SEARCH_CANDIDATES = 30;
@@ -52,7 +54,7 @@ export const RERANK_TIMEOUT_MS = 5_000;
 // candidates can take longer than 5 seconds.
 export const SCENARIO_RERANK_TIMEOUT_MS = 12_000;
 export const ISSUE_RERANK_TIMEOUT_MS = 8_000;
-// Passages kept from each issue's own search.
-export const ISSUE_SEARCH_RESULTS = 5;
-// The most passages a problem-question answer is given.
-export const SCENARIO_MAX_PASSAGES = 20;
+// Passages kept from each issue's own search (was 5).
+export const ISSUE_SEARCH_RESULTS = 8;
+// The most passages a problem-question answer is given (was 20).
+export const SCENARIO_MAX_PASSAGES = 30;

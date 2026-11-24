@@ -8,6 +8,9 @@ same pull request, so the next session always starts from the truth.
 Last updated: 2026-11-22 (library: PowerPoint, 100 MB, large scans; migration 69).
 
 ## In progress right now (2026-11-15) — read this first
+- **Deeper answers (2026-11-24):** 16 passages per answer (was 8), problem questions up to 30. About ₦20 more AI per
+  answer (≈ ₦65 per credit). Answer test (Sonnet, ≈ $4) must pass on the branch before merge; needs Anthropic credit.
+  Not yet approved/built: "Drafts and precedents (all courses)" library section (plan given 2026-11-24).
 - **Library slides and large files (2026-11-22, docs/specs/library.md):** PowerPoint (.pptx) and 100 MB library files,
   big scanned PDFs cut into page batches with pdf-lib (founder approved the library). Migration 69. Founder: paste
   migrations 68 and 69, raise Supabase's project upload limit to 100 MB, then import the knowledge-base folder

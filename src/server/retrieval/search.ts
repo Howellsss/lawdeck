@@ -156,7 +156,7 @@ export async function searchForQuestion(input: {
   };
 }
 
-// The whole question's best passages first (its top 8), then each issue's passages in turn, so
+// The whole question's best passages first (its top SEARCH_RESULTS), then each issue's passages in turn, so
 // every issue is represented; no passage twice, at most `max`.
 export function mergeHits(whole: SearchHit[], issues: SearchHit[][], max: number): SearchHit[] {
   const seen = new Set<string>();
