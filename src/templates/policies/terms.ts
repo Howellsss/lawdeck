@@ -4,7 +4,7 @@ import { POLICY_CONTACT_EMAIL as EMAIL, type Policy } from "./types";
 // plans, payments or features change, update this text and `updated` in the same pull request.
 export const TERMS_OF_SERVICE: Policy = {
   title: "Terms of Service",
-  updated: "2026-11-13",
+  updated: "2026-11-28",
   intro: [
     "These terms (also called our Terms of Use) are the agreement between you and Lawdeck (mylawdeck.com) for using Lawdeck's website and services. Please read them. By creating an account or using Lawdeck, you agree to them. If you do not agree, please do not use Lawdeck.",
     "How we handle your personal data is explained in our Privacy Notice, which forms part of these terms.",
@@ -43,15 +43,16 @@ export const TERMS_OF_SERVICE: Policy = {
       id: "plans",
       heading: "3. Plans, credits and payment",
       blocks: [
-        "Lawdeck has a Free plan and paid plans. Each plan gives a number of credits a month; one credit is roughly one ordinary answer, and bigger jobs (such as a problem question, marking or drafting) use more. The price, credits and limits of each plan are shown on Lawdeck before you pay.",
+        "New accounts get a 7-day free trial. After it, Lawdeck is available on paid plans. Each plan gives a number of credits; one credit is roughly one ordinary answer, and bigger jobs (such as a problem question, marking or drafting) use more. The price, credits and limits of each plan are shown on Lawdeck before you pay.",
         {
           list: [
-            "Credits reset on the 1st of each month (Lagos time). Unused credits do not carry over to the next month and have no cash value.",
-            "To keep Lawdeck fair, each plan also limits how many credits can be used within a few hours.",
-            "Paid plans are monthly subscriptions, paid in naira through Flutterwave by card, bank transfer or USSD. Prices include any charges shown at checkout; Value Added Tax is added where the law requires.",
-            "A subscription renews each month until you cancel it. You can cancel at any time; your plan then stays active until the end of the month you have paid for, and you are not charged again.",
+            "The free trial lasts 7 days from when your account is made and gives a set number of credits, shown on Lawdeck. Unused trial credits end with the trial.",
+            "A paid plan gives one month of credits, starting on the day you pay. Unused credits do not carry over to the next month and have no cash value.",
+            "To keep Lawdeck fair, each plan also limits how many credits can be used within a few hours and within each week (counted from the day you paid). Lawdeck shows how much you have left and when it refills.",
+            "Paid plans are paid one month at a time, in naira, through Flutterwave by card, bank transfer or USSD. Prices include any charges shown at checkout; Value Added Tax is added where the law requires.",
+            "Nothing renews by itself and you are never charged automatically. When a paid month ends, pay again if you want another month. If you pay before your month ends, the new month starts when the current one ends.",
             "Payments are not refundable once the month has started, except where Nigerian consumer law requires a refund, or where a fault on Lawdeck's side stopped you from using the service. In that case, email us within 14 days and we will put it right.",
-            "We may change prices or plan features. A change to the price of your plan will be shown to you at least 14 days before it applies to your next payment, and you can cancel before then.",
+            "We may change prices or plan features. A month you have already paid for keeps its price and credits; a new price applies only to payments made after it is shown on Lawdeck.",
             "Top-ups (extra credits), where offered, last for the period shown when you buy them and are not refundable once used.",
           ],
         },
@@ -112,7 +113,7 @@ export const TERMS_OF_SERVICE: Policy = {
       id: "availability",
       heading: "8. Changes to the service",
       blocks: [
-        "We are always improving Lawdeck, so features may be added, changed or removed. We aim to keep Lawdeck available at all times, but it may sometimes be unavailable, for example for maintenance or because of a provider's outage. If a change takes away a main feature of a paid plan you are using, you can cancel and we will refund the unused part of that month.",
+        "We are always improving Lawdeck, so features may be added, changed or removed. We aim to keep Lawdeck available at all times, but it may sometimes be unavailable, for example for maintenance or because of a provider's outage. If a change takes away a main feature of a paid plan you are using, you can ask us to end your plan and we will refund the unused part of that month.",
       ],
     },
     {
