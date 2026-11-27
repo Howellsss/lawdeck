@@ -2,6 +2,7 @@
 
 import { z } from "@/lib/zod";
 import { siteOrigin } from "@/server/auth/origin";
+import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { createCheckoutLink, flutterwaveConfigured } from "./flutterwave";
@@ -29,13 +30,22 @@ export async function startCheckout(input: { planId: string }): Promise<Checkout
     return { ok: false, message: "The payment could not be started. Please try again." };
   }
   const payment = data[0];
-  const url = await createCheckoutLink({
+  const link = await createCheckoutLink({
     txRef: payment.tx_ref,
     amountNgn: payment.amount_ngn,
     email: account.email,
     planName: payment.plan_name,
     redirectUrl: `${await siteOrigin()}/plans/done`,
   });
-  if (!url) return { ok: false, message: "Flutterwave could not be reached. Please try again in a minute." };
-  return { ok: true, url };
+  if (!link.ok) {
+    // Admins see Flutterwave's own reason, so the set-up can be fixed; students see a plain message.
+    const admin = (await getStaffRole()) === "admin";
+    return {
+      ok: false,
+      message: admin
+        ? `Payment could not start. ${link.reason}. Check the Flutterwave key in Vercel (live or test) and that the account is approved.`
+        : "Payments are not available right now. Please try again later; nothing was charged.",
+    };
+  }
+  return { ok: true, url: link.url };
 }

@@ -40,7 +40,7 @@ describe("starting a payment", () => {
     const fetchSpy = vi.fn().mockResolvedValue(json({ status: "success", data: { link: "https://checkout.flutterwave.com/v3/hosted/pay/abc" } }));
     vi.stubGlobal("fetch", fetchSpy);
     const link = await createCheckoutLink({ txRef: REF, amountNgn: 4999, email: "s@example.com", planName: "Standard", redirectUrl: "https://mylawdeck.com/plans/done" });
-    expect(link).toBe("https://checkout.flutterwave.com/v3/hosted/pay/abc");
+    expect(link).toEqual({ ok: true, url: "https://checkout.flutterwave.com/v3/hosted/pay/abc" });
     const [url, init] = fetchSpy.mock.calls[0];
     expect(url).toBe("https://api.flutterwave.com/v3/payments");
     expect(init.headers.Authorization).toBe("Bearer FLWSECK_TEST-abc");
@@ -48,10 +48,23 @@ describe("starting a payment", () => {
   });
 
   it("never sends the student anywhere but Flutterwave", async () => {
+    const input = { txRef: REF, amountNgn: 1, email: "s@example.com", planName: "Pro", redirectUrl: "https://mylawdeck.com/plans/done" };
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ status: "success", data: { link: "https://evil.example/pay" } })));
-    expect(await createCheckoutLink({ txRef: REF, amountNgn: 1, email: "s@example.com", planName: "Pro", redirectUrl: "https://mylawdeck.com/plans/done" })).toBeNull();
-    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ status: "error", message: "bad key" }, 401)));
-    expect(await createCheckoutLink({ txRef: REF, amountNgn: 1, email: "s@example.com", planName: "Pro", redirectUrl: "https://mylawdeck.com/plans/done" })).toBeNull();
+    expect(await createCheckoutLink(input)).toMatchObject({ ok: false, reason: expect.stringContaining("evil.example") });
+    // Flutterwave's test checkout address only with a test key.
+    vi.stubEnv("FLUTTERWAVE_SECRET_KEY", "FLWSECK-live-abc");
+    vi.stubGlobal("fetch", vi.fn().mockImplementation(async () => json({ status: "success", data: { link: "https://ravemodal-dev.herokuapp.com/v3/hosted/pay/x" } })));
+    expect(await createCheckoutLink(input)).toMatchObject({ ok: false });
+    vi.stubEnv("FLUTTERWAVE_SECRET_KEY", "FLWSECK_TEST-abc");
+    expect(await createCheckoutLink(input)).toMatchObject({ ok: true });
+  });
+
+  it("keeps Flutterwave's reason for refusing, without emails or long numbers", async () => {
+    const input = { txRef: REF, amountNgn: 1, email: "s@example.com", planName: "Pro", redirectUrl: "https://mylawdeck.com/plans/done" };
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ status: "error", message: "Invalid authorization key" }, 401)));
+    expect(await createCheckoutLink(input)).toEqual({ ok: false, reason: "Flutterwave answered 401: Invalid authorization key" });
+    vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ status: "error", message: "Customer s@example.com card 5399830000000008 declined" }, 400)));
+    expect(await createCheckoutLink(input)).toEqual({ ok: false, reason: "Flutterwave answered 400: Customer [email] card [number] declined" });
   });
 });
 

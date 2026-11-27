@@ -38,7 +38,7 @@ export async function createCheckoutLink(input: {
   email: string;
   planName: string;
   redirectUrl: string;
-}): Promise<string | null> {
+}): Promise<{ ok: true; url: string } | { ok: false; reason: string }> {
   try {
     const res = await fetch(`${API}/payments`, {
       method: "POST",
@@ -54,22 +54,42 @@ export async function createCheckoutLink(input: {
       }),
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    const parsed = linkSchema.safeParse(await res.json().catch(() => null));
+    const body: unknown = await res.json().catch(() => null);
+    const parsed = linkSchema.safeParse(body);
     if (!res.ok || !parsed.success) {
-      console.error("flutterwave checkout failed", { status: res.status });
-      return null;
+      const reason = flutterwaveMessage(body);
+      console.error("flutterwave checkout failed", { status: res.status, reason });
+      return { ok: false, reason: `Flutterwave answered ${res.status}${reason ? `: ${reason}` : ""}` };
     }
-    // Only ever send the student to Flutterwave's own checkout.
+    // Only ever send the student to Flutterwave's own checkout (in test mode Flutterwave may use its
+    // test checkout address, allowed only with a test key).
     const link = new URL(parsed.data.data.link);
-    if (link.protocol !== "https:" || !/(^|\.)flutterwave\.com$/.test(link.hostname)) {
-      console.error("flutterwave checkout failed", { reason: "unexpected link" });
-      return null;
+    if (link.protocol !== "https:" || !checkoutHostAllowed(link.hostname, secret())) {
+      console.error("flutterwave checkout failed", { reason: "unexpected link", host: link.hostname });
+      return { ok: false, reason: `Flutterwave sent an unexpected payment address (${link.hostname})` };
     }
-    return link.toString();
+    return { ok: true, url: link.toString() };
   } catch (error) {
-    console.error("flutterwave checkout failed", { name: (error as Error)?.name });
-    return null;
+    const name = (error as Error)?.name;
+    console.error("flutterwave checkout failed", { name });
+    return { ok: false, reason: name === "TimeoutError" ? "Flutterwave did not answer in time" : "Flutterwave could not be reached" };
   }
+}
+
+// Flutterwave's own short reason for refusing (for example "Invalid authorization key"), for the
+// logs. Email addresses and long numbers are removed, and it is cut short.
+export function flutterwaveMessage(body: unknown): string | null {
+  const message = (body as { message?: unknown } | null)?.message;
+  if (typeof message !== "string") return null;
+  return message
+    .replace(/[^\s@]+@[^\s@]+/g, "[email]")
+    .replace(/\d{6,}/g, "[number]")
+    .slice(0, 160);
+}
+
+export function checkoutHostAllowed(host: string, key: string): boolean {
+  if (/(^|\.)flutterwave\.com$/.test(host)) return true;
+  return key.includes("_TEST") && host === "ravemodal-dev.herokuapp.com";
 }
 
 // --- Checking a payment with Flutterwave ----------------------------------------------------
@@ -92,9 +112,10 @@ export async function verifyTransaction(transactionId: string): Promise<Verified
       headers: { Authorization: `Bearer ${secret()}` },
       signal: AbortSignal.timeout(TIMEOUT_MS),
     });
-    const parsed = verifySchema.safeParse(await res.json().catch(() => null));
+    const body: unknown = await res.json().catch(() => null);
+    const parsed = verifySchema.safeParse(body);
     if (!res.ok || !parsed.success || parsed.data.status !== "success") {
-      console.error("flutterwave verify failed", { status: res.status });
+      console.error("flutterwave verify failed", { status: res.status, reason: flutterwaveMessage(body) });
       return null;
     }
     return parsed.data.data;
