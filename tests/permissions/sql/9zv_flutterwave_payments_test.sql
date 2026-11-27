@@ -111,3 +111,23 @@ reset role;
 select test.check((select status = 'failed' from public.payments where tx_ref = test.ref73(2)), 'a failed payment is recorded as failed');
 select test.check((select count(*) = 2 from public.subscriptions where owner_id = 'a7300001-0000-0000-0000-000000000001'),
   'a failed payment gives no month');
+
+-- Migration 75: only payments still waiting count towards the 10 an hour.
+insert into auth.users (id, email) values ('a7500001-0000-0000-0000-000000000001', 'retry75@test.invalid');
+select test.as_user('a7500001-0000-0000-0000-000000000001');
+select (public.start_payment((select id from public.plans where name = 'Standard'))).tx_ref from generate_series(1, 10);
+do $$
+begin
+  perform * from public.start_payment((select id from public.plans where name = 'Standard'));
+  raise exception 'FAILED: an 11th waiting payment in an hour is refused (was allowed)';
+exception when sqlstate '54000' then
+  raise notice 'ok - an 11th waiting payment in an hour is refused (refused)';
+end $$;
+reset role;
+set role service_role;
+select public.fail_payment(tx_ref) from public.payments where owner_id = 'a7500001-0000-0000-0000-000000000001';
+reset role;
+select test.as_user('a7500001-0000-0000-0000-000000000001');
+select test.check((select count(*) = 1 from public.start_payment((select id from public.plans where name = 'Standard'))),
+  'failed attempts do not use up the hourly limit');
+reset role;
