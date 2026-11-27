@@ -265,6 +265,23 @@ export type Database = {
         Update: never;
         Relationships: [];
       };
+      // Flutterwave payments (migration 73). Written only through the database functions.
+      payments: {
+        Row: Timestamps & {
+          id: string;
+          owner_id: string;
+          plan_id: string;
+          amount_ngn: number;
+          tx_ref: string;
+          status: "pending" | "paid" | "failed";
+          provider_transaction_id: string | null;
+          subscription_id: string | null;
+          paid_at: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
       campuses: {
         Row: { key: string; name: string; kind: "campus" | "aspirant"; position: number };
         Insert: never;
@@ -1615,6 +1632,15 @@ export type Database = {
           window_resets_at: string | null;
         }[];
       };
+      start_payment: {
+        Args: { plan: string };
+        Returns: { tx_ref: string; amount_ngn: number; plan_name: string }[];
+      };
+      record_payment: {
+        Args: { ref: string; provider_id: string; paid_amount: number; paid_currency: string };
+        Returns: { plan_name: string; period_end: string }[];
+      };
+      fail_payment: { Args: { ref: string }; Returns: undefined };
       my_plan: {
         Args: Record<string, never>;
         Returns: { plan_id: string; name: string; price_ngn: number | null; credits: number | null; period_end: string | null }[];

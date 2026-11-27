@@ -25,6 +25,8 @@ const PUBLIC: Record<string, string> = {
   "src/app/test-pages/document/docx/route.ts:GET": "test-only sample file; \"not found\" unless LAWDECK_TEST_PAGES=1 (never on the live site)",
   "src/app/api/error-report/route.ts:POST": "browser error reports; any page can crash; size-limited, checked, scrubbed, rate-limited",
   "src/app/api/csp-report/route.ts:POST": "browsers' policy reports; size-limited, logs only the rule and site",
+  "src/app/api/payments/flutterwave/route.ts:POST":
+    "Flutterwave's payment notices; only with the secret FLUTTERWAVE_WEBHOOK_HASH, input checked, and every payment re-checked with Flutterwave before it counts",
 };
 
 type Fn = { file: string; name: string; params: string; body: string };

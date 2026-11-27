@@ -28,10 +28,22 @@ changeable later on Admin → Plans. Credits and the Admin → Plans page: the r
 - **Tests.** `tests/permissions/sql/9zq_paid_plans_test.sql` (21 checks); briefs, marking and drafting
   tests now expect 2, 3 and 3 credits.
 
-## Part 2: Flutterwave checkout (next)
-Plans page for students, Flutterwave's hosted payment page (card, transfer, USSD), a payment notice
-route that re-checks every payment with Flutterwave (amount, currency, reference) before a marked admin
-job records one paid month; the same payment never counts twice. Needs the founder's Flutterwave test keys.
+## Part 2: Flutterwave checkout (migration 73, built 2026-11-27)
+- **Plans page** (`/plans`; linked from Account and from "limit reached"): the paid plans on sale with a
+  Pay button each. Pay starts a payment in the database (`start_payment`: Lawdeck fixes the amount and
+  its reference `ldk_…`; at most 10 started an hour) and opens Flutterwave's own page (card, bank
+  transfer, USSD). Only flutterwave.com checkout links are followed. No Pay buttons until
+  `FLUTTERWAVE_SECRET_KEY` is set.
+- **Confirming.** `/plans/done` (Flutterwave's return address) and `/api/payments/flutterwave`
+  (Flutterwave's notices, which must carry `FLUTTERWAVE_WEBHOOK_HASH`) both ask Flutterwave by
+  transaction id (`/v3/transactions/{id}/verify`): successful, NGN, Lawdeck's reference. Then the marked
+  admin job `src/server/billing/flutterwave.ts` calls `record_payment` (service role only), which checks
+  the amount again, gives one month starting when the current paid month ends, and counts each payment
+  once (unique transaction id). Failed payments are marked failed; nothing else changes.
+- **Data.** `payments` (owner reads own, admins read all, nobody writes from the app). Logs carry only
+  Lawdeck's reference, statuses and error codes; never card, email or payment details.
+- **Not built:** refunds (in Flutterwave's dashboard by hand), automatic renewal (by design).
+- **Tests.** `tests/permissions/sql/9zv_flutterwave_payments_test.sql` (21 checks), `tests/unit/flutterwave.test.ts`.
 
 ## Part 3: reminders and wording (after part 2)
 Email 3 days before a paid month ends; Terms section 3 changed from "renews until you cancel" to

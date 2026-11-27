@@ -35,3 +35,28 @@ export async function getPlansAdmin(): Promise<PlansAdmin | null> {
     costs: costs.data,
   };
 }
+
+export type StudentPlans = {
+  plans: { id: string; name: string; priceNgn: number; credits: number }[];
+  current: { name: string; credits: number | null; periodEnd: string | null } | null;
+};
+
+// The Plans page: the paid plans on sale, cheapest first, and the student's own plan.
+export async function getPlansForStudent(): Promise<StudentPlans> {
+  const supabase = await createSupabaseServerClient();
+  const [plans, mine] = await Promise.all([
+    supabase.from("plans").select("id, name, price_ngn, monthly_message_limit, on_sale, position").eq("on_sale", true).order("position"),
+    supabase.rpc("my_plan"),
+  ]);
+  if (plans.error) {
+    console.error("plans read failed", { code: plans.error.code });
+    throw new Error("The plans could not be loaded.");
+  }
+  const own = mine.data?.[0];
+  return {
+    plans: plans.data
+      .filter((p) => (p.price_ngn ?? 0) > 0 && p.monthly_message_limit !== null)
+      .map((p) => ({ id: p.id, name: p.name, priceNgn: p.price_ngn ?? 0, credits: p.monthly_message_limit ?? 0 })),
+    current: own ? { name: own.name, credits: own.credits, periodEnd: own.period_end } : null,
+  };
+}
