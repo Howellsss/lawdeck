@@ -26,7 +26,17 @@ async function readAllowance(db: SupabaseClient<Database>): Promise<Allowance | 
   // == null also covers a database without migration 35 (no window columns yet).
   const window =
     row.window_limit == null ? null : { used: row.window_used ?? 0, limit: row.window_limit, resetsAt: row.window_resets_at };
-  return { used: row.used, limit: row.monthly_limit, unlimited: row.unlimited, window };
+  // == null also covers a database without migration 74 (no week or trial columns yet).
+  const week = row.week_limit == null ? null : { used: row.week_used ?? 0, limit: row.week_limit, resetsAt: row.week_resets_at ?? null };
+  return {
+    used: row.used,
+    limit: row.monthly_limit,
+    unlimited: row.unlimited,
+    window,
+    week,
+    periodEndsAt: row.period_ends_at ?? null,
+    trial: row.trial ?? false,
+  };
 }
 
 // Questions left this month and, during a public test, in the current short window.

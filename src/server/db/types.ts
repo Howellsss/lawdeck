@@ -217,6 +217,12 @@ export type Database = {
           // Migration 68: order on the Plans page, and whether students can buy it.
           position: number;
           on_sale: boolean;
+          // Migration 74: credits every few hours, a week, and the free trial.
+          window_credits: number | null;
+          window_hours: number;
+          weekly_credits: number | null;
+          trial_days: number | null;
+          trial_from: string | null;
           created_at: string;
         };
         Insert: never;
@@ -1630,8 +1636,15 @@ export type Database = {
           window_used: number | null;
           window_limit: number | null;
           window_resets_at: string | null;
+          // Migration 74: the weekly limit, when the paid month or trial ends, and the trial.
+          week_used?: number | null;
+          week_limit?: number | null;
+          week_resets_at?: string | null;
+          period_ends_at?: string | null;
+          trial?: boolean | null;
         }[];
       };
+      save_plan_limits: { Args: { plan: string; window_limit: number | null; weekly_limit: number | null }; Returns: undefined };
       start_payment: {
         Args: { plan: string };
         Returns: { tx_ref: string; amount_ngn: number; plan_name: string }[];

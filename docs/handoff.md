@@ -29,7 +29,7 @@ Last updated: 2026-11-27 (Flutterwave payments built, migration 73; new prices i
   2026-11-27, investor deck "Option 1"): Standard ₦4,999 / 70 credits, Pro ₦9,999 / 150, Max ₦14,999 / 230, set by the
   founder on Admin → Plans. Part 1 (migration 68) live. Part 2 (migration 73: Plans page, Flutterwave checkout, notices)
   built 2026-11-27; Pay buttons appear once FLUTTERWAVE_SECRET_KEY and FLUTTERWAVE_WEBHOOK_HASH are in Vercel. Part 3:
-  reminders + Terms wording. 7-day trial (30 credits, 7 per 3 hours) still waits for the founder's approval.
+  reminders + Terms wording. Migration 74 (same PR): 3-hour and weekly limits like Claude's, credits from the payment day, Free becomes a 7-day trial (30 credits, 7 per 3 hours), and the new prices set in the database.
 - **Voice mode hearing (2026-11-17):** Step 1 built (law-word correction, new-topic search, busy reply; docs/specs/voice.md).
   Founder tested by voice 2026-11-18: works well. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
   goes to Microsoft, ≈₦1,400/hour, new library.
@@ -65,7 +65,7 @@ Last updated: 2026-11-27 (Flutterwave payments built, migration 73; new prices i
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **73** (`20261127007300_flutterwave_payments.sql`, Flutterwave payments; 72 is the fast library list).
+  merge only after that. The latest is **74** (`20261127007400_plan_limits_and_trial.sql`, limits and the 7-day trial; 73 is Flutterwave payments).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full

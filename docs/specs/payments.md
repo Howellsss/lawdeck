@@ -45,6 +45,21 @@ changeable later on Admin → Plans. Credits and the Admin → Plans page: the r
 - **Not built:** refunds (in Flutterwave's dashboard by hand), automatic renewal (by design).
 - **Tests.** `tests/permissions/sql/9zv_flutterwave_payments_test.sql` (21 checks), `tests/unit/flutterwave.test.ts`.
 
+## Limits and the 7-day trial (migration 74, founder 2026-11-27: "reset after every three hours … weekly limit as well like claude")
+| Plan | Price | Every 3 hours | A week | Month (or trial) |
+|---|---:|---:|---:|---:|
+| Free trial | ₦0 | 7 | — | 30 in 7 days |
+| Standard | ₦4,999 | 8 | 25 | 70 |
+| Pro | ₦9,999 | 15 | 50 | 150 |
+| Max | ₦14,999 | 25 | 75 | 230 |
+- All limits count credits. The 3-hour window refills 3 hours after its first use; weeks are 7-day
+  blocks from the start of the paid month; the month's credits start on the day the student paid.
+- The Free plan is a 7-day trial from account creation (or from when migration 74 ran, for older
+  accounts); after it, no credits until the student pays. Staff are never limited.
+- Admin → Plans changes the 3-hour and weekly limits (`save_plan_limits`, audited). The Pilot page's
+  short-period limit still applies when stricter.
+- Tests: `tests/permissions/sql/9zw_plan_limits_trial_test.sql`, `tests/unit/allowance.test.ts`.
+
 ## Part 3: reminders and wording (after part 2)
 Email 3 days before a paid month ends; Terms section 3 changed from "renews until you cancel" to
 "pay each month".

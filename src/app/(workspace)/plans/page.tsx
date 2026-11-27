@@ -58,12 +58,24 @@ async function Plans() {
                 <span className="font-serif text-3xl">{naira(plan.priceNgn)}</span>
                 <span className="text-sm text-muted"> a month</span>
               </p>
-              <p className="text-sm text-muted">{plan.credits} credits a month. An ordinary question is 1 credit; a problem question, marking or a draft is 3.</p>
+              <ul className="flex flex-col gap-1 text-sm">
+                <li>{plan.credits} credits a month</li>
+                {plan.weeklyCredits !== null && <li>Up to {plan.weeklyCredits} a week</li>}
+                {plan.windowCredits !== null && (
+                  <li>
+                    Up to {plan.windowCredits} every {plan.windowHours} hours
+                  </li>
+                )}
+              </ul>
               {open && <PayButton planId={plan.id} planName={plan.name} price={naira(plan.priceNgn)} />}
             </li>
           ))}
         </ul>
       )}
+      <p className="text-sm text-muted">
+        An ordinary question is 1 credit; a brief 2; a problem question, marking an answer or a draft 3. Reading answers aloud is
+        free. The few-hours allowance refills that long after your first question; weeks count from the day you paid.
+      </p>
       <p className="text-sm text-muted">Payments are made on Flutterwave’s secure page. Lawdeck never sees or keeps your card details.</p>
     </>
   );
