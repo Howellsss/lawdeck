@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import { Suspense } from "react";
+import { PlanLimitsForm } from "@/components/billing/PlanLimitsForm";
 import { PlanPriceForm } from "@/components/billing/PlanPriceForm";
 import { LoadingRows } from "@/components/ui/LoadingRows";
 import { getPlansAdmin } from "@/server/billing/plans";
@@ -45,7 +46,7 @@ async function Plans() {
       </div>
       {data.plans.length <= 1 ? (
         <p role="alert" className="text-sm text-warning">
-          The paid plans need database update 68 first. Paste it into Supabase, then reload this page.
+          The plans need the latest database updates (68 and 74). Paste them into Supabase, then reload this page.
         </p>
       ) : (
         <div className="grid gap-4 md:grid-cols-2">
@@ -53,6 +54,22 @@ async function Plans() {
             <PlanPriceForm key={plan.id} plan={plan} />
           ))}
         </div>
+      )}
+      {data.plans.length > 1 && (
+        <section aria-labelledby="limits-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+          <h2 id="limits-heading" className="text-lg font-medium">
+            Limits within the month
+          </h2>
+          <p className="text-sm text-muted">
+            Like Claude: a small allowance that refills a few hours after the first question, and a weekly allowance counted
+            from the day the student paid. The monthly credits above stay the overall total. The Free plan is the 7-day trial.
+          </p>
+          <div className="grid gap-4 md:grid-cols-2">
+            {data.plans.map((plan) => (
+              <PlanLimitsForm key={plan.id} plan={plan} />
+            ))}
+          </div>
+        </section>
       )}
       <section aria-labelledby="costs-heading" className="flex flex-col gap-3 border-t border-line pt-6">
         <h2 id="costs-heading" className="text-lg font-medium">What each job costs</h2>

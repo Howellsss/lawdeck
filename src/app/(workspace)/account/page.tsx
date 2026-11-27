@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { Suspense } from "react";
 import { DeleteAccountForm } from "@/components/account/DeleteAccountForm";
 import { CampusForm } from "@/components/account/CampusForm";
@@ -52,6 +53,15 @@ async function Account() {
         </h2>
         <NameForm name={name} />
         <CampusForm campuses={campuses} campus={campus} />
+      </section>
+      <section aria-labelledby="plan-heading" className="flex flex-col gap-3 border-t border-line pt-6">
+        <h2 id="plan-heading" className="text-lg font-medium">
+          Plan
+        </h2>
+        <p className="text-sm text-muted">Your plan, and paying for another month.</p>
+        <Link href="/plans" className="self-start underline">
+          See plans and pay
+        </Link>
       </section>
       {speechConfigured() && (
         <section aria-labelledby="voice-heading" className="flex flex-col gap-3 border-t border-line pt-6">

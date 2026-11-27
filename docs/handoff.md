@@ -5,7 +5,7 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-24 (library: no duplicates, migration 71 pasted; public Drive files refused by the key now download).
+Last updated: 2026-11-27 (Flutterwave payments built, migration 73; new prices in the investor deck).
 
 ## In progress right now (2026-11-15) — read this first
 - **Library duplicates and Drive downloads (2026-11-24, migration 71, pasted by the founder):** pasted links skip files
@@ -25,9 +25,11 @@ Last updated: 2026-11-24 (library: no duplicates, migration 71 pasted; public Dr
   Lawdeck API workspace, no expiry) is in Vercel and the GitHub secret; founder tested an answer on the live site. The
   live site had been using `lawdeck production 2` in the Default workspace (outside the Lawdeck API spending limit); the
   new key is inside it. Old keys left to expire. Credit balance was $4.07: founder to top up and turn on auto-reload.
-- **Payments (launch task 15, docs/specs/payments.md):** founder chose Flutterwave, pay each month, ₦3,999 / ₦8,499 /
-  ₦13,999. Part 1 (migration 68: paid plans, credits, Admin → Plans) built; the founder pastes migration 68 before it
-  merges. Part 2 (Flutterwave checkout) needs the founder's Flutterwave test keys; part 3 reminders + Terms wording.
+- **Payments (launch task 15, docs/specs/payments.md):** founder chose Flutterwave, pay each month. Prices (founder,
+  2026-11-27, investor deck "Option 1"): Standard ₦4,999 / 70 credits, Pro ₦9,999 / 150, Max ₦14,999 / 230, set by the
+  founder on Admin → Plans. Part 1 (migration 68) live. Part 2 (migration 73: Plans page, Flutterwave checkout, notices)
+  built 2026-11-27; Pay buttons appear once FLUTTERWAVE_SECRET_KEY and FLUTTERWAVE_WEBHOOK_HASH are in Vercel. Part 3:
+  reminders + Terms wording. Migration 74 (same PR): 3-hour and weekly limits like Claude's, credits from the payment day, Free becomes a 7-day trial (30 credits, 7 per 3 hours), and the new prices set in the database.
 - **Voice mode hearing (2026-11-17):** Step 1 built (law-word correction, new-topic search, busy reply; docs/specs/voice.md).
   Founder tested by voice 2026-11-18: works well. Step 2 (Azure speech-to-text with a law phrase list) waits for the founder's decision: voice
   goes to Microsoft, ≈₦1,400/hour, new library.
@@ -63,7 +65,7 @@ Last updated: 2026-11-24 (library: no duplicates, migration 71 pasted; public Dr
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **72** (`20261124007200_library_list_counts.sql`, fast library list; 71 is no duplicate library files).
+  merge only after that. The latest is **74** (`20261127007400_plan_limits_and_trial.sql`, limits and the 7-day trial; 73 is Flutterwave payments).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full

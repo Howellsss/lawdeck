@@ -6,6 +6,7 @@ import {
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
 import { getAllowance } from "@/server/learn/allowance";
+import Link from "next/link";
 import { formatWat } from "@/lib/dates";
 import { getOwnAccessUntil } from "@/server/pilot/accessEnd";
 
@@ -27,7 +28,12 @@ export async function QuestionAllowance() {
       <p role="status" className="text-center text-sm text-warning">
         {ended && allowance.limit === 0
           ? `Your test access ended on ${formatWat(until)}. Thank you for testing Lawdeck.`
-          : limitReachedMessage(allowance)}
+          : limitReachedMessage(allowance)}{" "}
+        {!ended && (
+          <Link href="/plans" className="underline">
+            See plans
+          </Link>
+        )}
       </p>
     );
   }

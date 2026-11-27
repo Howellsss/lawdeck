@@ -27,8 +27,8 @@ grant execute on function test.free_price_refused() to authenticated;
 select test.as_user('a6800001-0000-0000-0000-000000000001');
 select test.check(
   (select array_agg(name || ':' || price_ngn order by position) from public.plans where on_sale)
-    = array['Standard:3999', 'Pro:8499', 'Max:13999'],
-  'three paid plans are on sale at the founder''s prices');
+    = array['Standard:4999', 'Pro:9999', 'Max:14999'],
+  'three paid plans are on sale at the founder''s prices (2026-11-27, migration 74)');
 select test.check((select credits from public.credit_costs where kind = 'problem') = 3, 'a student can read what each job costs');
 select test.refused($$update public.credit_costs set credits = 0$$, 'a student cannot change what jobs cost');
 select test.refused($$update public.plans set price_ngn = 1$$, 'a student cannot change a price');
@@ -109,7 +109,7 @@ select public.save_plan((select id from test.plan68 where name = 'Pro'), 8999, 2
 select test.check((select price_ngn = 8999 and monthly_message_limit = 200 from public.plans where name = 'Pro'),
   'an admin can change a plan''s price and credits');
 select test.check(test.free_price_refused(), 'the Free plan cannot be given a price');
-select public.save_plan((select id from test.plan68 where name = 'Pro'), 8499, 180);
+select public.save_plan((select id from test.plan68 where name = 'Pro'), 9999, 150);
 reset role;
 select test.check(
   (select count(*) from public.audit_log where action = 'plan_changed' and actor_id = 'a6800004-0000-0000-0000-000000000004') = 2,

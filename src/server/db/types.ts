@@ -217,6 +217,12 @@ export type Database = {
           // Migration 68: order on the Plans page, and whether students can buy it.
           position: number;
           on_sale: boolean;
+          // Migration 74: credits every few hours, a week, and the free trial.
+          window_credits: number | null;
+          window_hours: number;
+          weekly_credits: number | null;
+          trial_days: number | null;
+          trial_from: string | null;
           created_at: string;
         };
         Insert: never;
@@ -260,6 +266,23 @@ export type Database = {
           period_end: string | null;
           provider: string | null;
           provider_ref: string | null;
+        };
+        Insert: never;
+        Update: never;
+        Relationships: [];
+      };
+      // Flutterwave payments (migration 73). Written only through the database functions.
+      payments: {
+        Row: Timestamps & {
+          id: string;
+          owner_id: string;
+          plan_id: string;
+          amount_ngn: number;
+          tx_ref: string;
+          status: "pending" | "paid" | "failed";
+          provider_transaction_id: string | null;
+          subscription_id: string | null;
+          paid_at: string | null;
         };
         Insert: never;
         Update: never;
@@ -1613,8 +1636,24 @@ export type Database = {
           window_used: number | null;
           window_limit: number | null;
           window_resets_at: string | null;
+          // Migration 74: the weekly limit, when the paid month or trial ends, and the trial.
+          week_used?: number | null;
+          week_limit?: number | null;
+          week_resets_at?: string | null;
+          period_ends_at?: string | null;
+          trial?: boolean | null;
         }[];
       };
+      save_plan_limits: { Args: { plan: string; window_limit: number | null; weekly_limit: number | null }; Returns: undefined };
+      start_payment: {
+        Args: { plan: string };
+        Returns: { tx_ref: string; amount_ngn: number; plan_name: string }[];
+      };
+      record_payment: {
+        Args: { ref: string; provider_id: string; paid_amount: number; paid_currency: string };
+        Returns: { plan_name: string; period_end: string }[];
+      };
+      fail_payment: { Args: { ref: string }; Returns: undefined };
       my_plan: {
         Args: Record<string, never>;
         Returns: { plan_id: string; name: string; price_ngn: number | null; credits: number | null; period_end: string | null }[];
