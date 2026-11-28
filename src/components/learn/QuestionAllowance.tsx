@@ -29,7 +29,9 @@ export async function QuestionAllowance() {
         {ended && allowance.limit === 0
           ? `Your test access ended on ${formatWat(until)}. Thank you for testing Lawdeck.`
           : limitReachedMessage(allowance)}{" "}
-        {!ended && (
+        {/* During the free trial, plans are offered only once the trial or its credits run out,
+            not when the 3-hour allowance is used (founder, 2026-11-28). */}
+        {!ended && (!allowance.trial || allowance.limit === 0 || allowance.used >= allowance.limit) && (
           <Link href="/plans" className="underline">
             See plans
           </Link>

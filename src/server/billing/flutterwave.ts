@@ -15,6 +15,21 @@ import { createAdminClient } from "@/server/db/admin";
 const API = "https://api.flutterwave.com/v3";
 const TIMEOUT_MS = 15_000;
 
+// How students may pay on Flutterwave's page. Bank transfer is off for now (founder, 2026-11-28):
+// until Flutterwave finishes the account set-up, transfers showed another business's account name.
+// To switch it back on without a code change, set FLUTTERWAVE_PAYMENT_OPTIONS=card,banktransfer,ussd
+// in Vercel. Only Flutterwave's own option names are accepted; anything else falls back to the default.
+const PAYMENT_OPTIONS = new Set(["card", "banktransfer", "ussd", "account", "mobilemoneyghana", "barter", "nqr"]);
+export const DEFAULT_PAYMENT_OPTIONS = "card,ussd";
+
+export function paymentOptions(): string {
+  const chosen = (process.env.FLUTTERWAVE_PAYMENT_OPTIONS ?? "")
+    .split(",")
+    .map((option) => option.trim().toLowerCase())
+    .filter((option) => PAYMENT_OPTIONS.has(option));
+  return chosen.length > 0 ? [...new Set(chosen)].join(",") : DEFAULT_PAYMENT_OPTIONS;
+}
+
 export function flutterwaveConfigured(): boolean {
   return Boolean(process.env.FLUTTERWAVE_SECRET_KEY?.trim());
 }
@@ -48,7 +63,7 @@ export async function createCheckoutLink(input: {
         amount: input.amountNgn,
         currency: "NGN",
         redirect_url: input.redirectUrl,
-        payment_options: "card,banktransfer,ussd",
+        payment_options: paymentOptions(),
         customer: { email: input.email },
         customizations: { title: "Lawdeck", description: `Lawdeck ${input.planName}: one month` },
       }),
