@@ -14,7 +14,7 @@ export const TERMS_OF_SERVICE: Policy = {
       id: "what-lawdeck-is",
       heading: "1. What Lawdeck is, and what it is not",
       blocks: [
-        "Lawdeck is an AI study and drafting workspace for Nigerian law students, Law School students and young lawyers. It explains topics from a reviewed library, answers and marks practice questions, helps you remember what you learn, drafts documents from reviewed templates, and lets verified students study together in campus chat.",
+        "Lawdeck is an AI study and drafting workspace for Law School students and people preparing to enter the Nigerian Law School (final-year law students and Law School applicants), in Nigeria. It explains topics from a reviewed library, answers and marks practice questions, helps you remember what you learn, drafts documents from reviewed templates, and lets verified students study together in campus chat.",
         {
           list: [
             "Lawdeck is a study aid. It is not a law firm and does not give legal advice. Nothing on Lawdeck creates a lawyer-client relationship. Do not rely on Lawdeck for a real legal matter; consult a qualified legal practitioner.",
@@ -31,7 +31,8 @@ export const TERMS_OF_SERVICE: Policy = {
       blocks: [
         {
           list: [
-            "You must be at least 18 years old, or have the consent of a parent or guardian, to create an account.",
+            "You must be at least 18 years old to create an account.",
+            "Lawdeck is offered only to people in Nigeria.",
             "Give true information when you sign up, and keep your password private. You are responsible for what happens under your account. Tell us at once if you think someone else has used it.",
             "An account is for one person. Do not share it, sell it or let others use it.",
             "You can delete your account at any time from your Account page. Deletion is immediate and cannot be undone.",

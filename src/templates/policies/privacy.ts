@@ -5,9 +5,9 @@ import { POLICY_CONTACT_EMAIL as EMAIL, type Policy } from "./types";
 // request and update `updated`.
 export const PRIVACY_NOTICE: Policy = {
   title: "Privacy Notice",
-  updated: "2026-11-13",
+  updated: "2026-11-28",
   intro: [
-    "Lawdeck (mylawdeck.com) is an AI study and drafting workspace for Nigerian law students, Law School students and young lawyers. This notice explains, in plain words, what personal data Lawdeck collects, why, who it is shared with, how long it is kept, and the rights you have.",
+    "Lawdeck (mylawdeck.com) is an AI study and drafting workspace for Law School students and people preparing to enter the Nigerian Law School (final-year law students and Law School applicants), in Nigeria. This notice explains, in plain words, what personal data Lawdeck collects, why, who it is shared with, how long it is kept, and the rights you have.",
     "Lawdeck is run from Nigeria and follows the Nigeria Data Protection Act 2023 (NDPA) and the rules of the Nigeria Data Protection Commission (NDPC). For this notice, Lawdeck is the data controller of your personal data.",
   ],
   sections: [
@@ -168,7 +168,7 @@ export const PRIVACY_NOTICE: Policy = {
       id: "children",
       heading: "11. Age",
       blocks: [
-        "Lawdeck is meant for university law students, Law School students and lawyers. You must be at least 18 years old to create an account, or have the consent of a parent or guardian if you are younger (for example, a law aspirant). If we learn that someone under 18 has an account without that consent, we will delete it.",
+        "Lawdeck is meant for Law School students and people preparing to enter the Nigerian Law School (final-year law students and Law School applicants), in Nigeria. You must be at least 18 years old to create an account. If we learn that someone under 18 has an account, we will delete it and its data.",
       ],
     },
     {
