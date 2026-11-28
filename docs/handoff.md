@@ -11,7 +11,7 @@ Last updated: 2026-11-28 (payments live by card and USSD; trial banner; no-typin
 - **Launch state (2026-11-28):** Flutterwave live (V3 keys; card and USSD only: bank transfer hidden via
   FLUTTERWAVE_PAYMENT_OPTIONS until Flutterwave finishes the founder's set-up, which showed another business's
   account name). Founder still to make one real ₦4,999 card payment. 7-day trial shown on every page; students are
-  asked to pay only once the trial or its credits run out (first trials end about 4 Dec). Founder to clear the
+  asked to pay only once the trial or its credits run out (launch Mon 30 Nov 2026: older accounts' trials run 30 Nov to 7 Dec, migration 76). Founder to clear the
   short-period limit and monthly cap on Admin → Pilot so the trial gives 7 every 3 hours and 30 in all.
   Study recall questions need no typing (option A); option B (reviewed multiple choice for every recall question,
   ~$5–10 AI + re-reading 79 lessons + answer test) waits for Anthropic credit and "start B". Course topics have a
@@ -73,7 +73,7 @@ Last updated: 2026-11-28 (payments live by card and USSD; trial banner; no-typin
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **75** (`20261128007500_payment_attempts.sql`, failed payment attempts no longer count; 74 is limits and the trial).
+  merge only after that. The latest is **76** (`20261128007600_trial_from_launch.sql`, trials from launch day; 75 is failed payment attempts).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
