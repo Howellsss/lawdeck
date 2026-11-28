@@ -58,10 +58,9 @@ Last updated: 2026-11-28 (payments live by card and USSD; trial banner; no-typin
   **Micro (live size), 2026-11-17: 200 and 500 passed; 1,000 failed** (runs 44093755780, 44094420843, 44095164337).
   1,000 on Medium (run 44101849082): all answered but 15–30 s waits. Large 1,000 (run 44112182906): everyone served, 13–30 s waits; database no longer the limit, next Vercel Pro then
   re-test. Staging was set to Large for that run; **founder switched it back to Micro (2026-11-18)**. Recommendation given: Micro day to day, Medium for launch week, stagger announcements; Anthropic is Build tier (about 600 answers a minute on Sonnet, enough); its credit balance was $4.31 on 2026-11-17: founder to top up and turn on auto-reload.
-- **Policy fixes waiting on the founder:** Voyage training opt-out (email sent to Voyage support; update Privacy
-  Notice/questionnaire Q34–37, Q59 when they reply); contact email privacy@mylawdeck.com vs lawdeck01@gmail.com;
-  policies say "18+ or parental consent" and "university students and lawyers" but the founder said 18+ only, Law
-  School students and applicants, Nigeria only (fix unless they object).
+- **Policies (2026-11-28):** founder confirmed 18+ only, Nigeria only, for Law School students and those preparing to
+  enter (final-year students, applicants); contact privacy@mylawdeck.com (forwards to the Lawdeck Gmail). Terms and
+  Privacy updated (TERMS_VERSION 2026-11-28-2). Still open: Voyage training opt-out reply; lawyer review.
 - Data protection questionnaire answers (Word) were built outside the repo in the old session; regenerate from
   docs if needed.
 
