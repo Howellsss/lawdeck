@@ -395,3 +395,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-11-28: Failed payment attempts no longer use up the 10-an-hour limit (migration 75): a payment Flutterwave refused to open is marked failed; only waiting payments count.
 - 2026-11-28: The 7-day free trial is visible: a line at the top of every page (days and trial credits left, no card needed), a warning in the last 2 days, and 'Choose a plan' once it ends; the Plans page and sign-up page say so too. AI features already stop after the trial until the student pays.
 - 2026-11-28: Course topics: a search box above the list, and on phones the Study / Explain / MCQ buttons sit on one line under the topic name (slightly smaller).
+- 2026-11-28: Study recall questions need no typing: multiple choice is tapped; other questions are answered in the head, then Show answer and Got it / Partly / Missed it (option A; option B, turning all recall questions into reviewed multiple choice, to follow).

@@ -14,8 +14,11 @@ export const progressSchema = z.object({
 
 export const revealSchema = z.object({
   checkpointId: id("question"),
-  // An open question's answer is shown only after the student has written something, or skipped.
+  // An open question's answer is shown only after the student has tried: answered it in their
+  // head and pressed "Show answer" (founder, 2026-11-28: no typing while studying), written
+  // something, or skipped.
   answer: z.string().trim().max(4000).default(""),
+  recalled: z.boolean().default(false),
   skipped: z.boolean().default(false),
 });
 

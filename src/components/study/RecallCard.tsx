@@ -16,8 +16,9 @@ const OUTCOME_TEXT: Record<RecallOutcome, string> = {
 };
 
 // One recall question. The answer stays on the server until the student tries (founder's brief, 17):
-// multiple choice is marked by Lawdeck; for a written answer the student compares it with the
-// model answer and says how it went.
+// multiple choice is marked by Lawdeck; for other questions the student answers in their head,
+// taps "Show answer" and says how close they were. No typing, so studying keeps its flow
+// (founder, 2026-11-28).
 export function RecallCard({
   checkpoint,
   sessionId,
@@ -30,7 +31,6 @@ export function RecallCard({
   onDone?: (outcome: RecallOutcome) => void;
 }) {
   const [choice, setChoice] = useState<number | null>(null);
-  const [text, setText] = useState("");
   const [revealed, setRevealed] = useState<{ answer: string; explanation: string | null } | null>(null);
   const [result, setResult] = useState<Result | null>(null);
   const [busy, setBusy] = useState(false);
@@ -40,7 +40,7 @@ export function RecallCard({
   async function finish(input: { choice?: number | null; selfOutcome?: "correct" | "partly" | "incorrect"; skipped?: boolean }) {
     setBusy(true);
     setError(undefined);
-    const saved = await recordAnswer({ sessionId, checkpointId: checkpoint.id, context, answer: text, ...input });
+    const saved = await recordAnswer({ sessionId, checkpointId: checkpoint.id, context, ...input });
     setBusy(false);
     if (!saved.ok) return setError(saved.message);
     setResult(saved);
@@ -50,7 +50,7 @@ export function RecallCard({
   async function reveal() {
     setBusy(true);
     setError(undefined);
-    const shown = await revealAnswer({ checkpointId: checkpoint.id, answer: text });
+    const shown = await revealAnswer({ checkpointId: checkpoint.id, recalled: true });
     setBusy(false);
     if (!shown.ok) return setError(shown.message);
     setRevealed(shown);
@@ -81,21 +81,7 @@ export function RecallCard({
           })}
         </fieldset>
       ) : (
-        <>
-          <label htmlFor={`answer-${checkpoint.id}`} className="sr-only">
-            Your answer
-          </label>
-          <textarea
-            id={`answer-${checkpoint.id}`}
-            rows={3}
-            maxLength={4000}
-            value={text}
-            disabled={Boolean(revealed) || busy}
-            onChange={(event) => setText(event.target.value)}
-            placeholder="Answer from memory, then check"
-            className="rounded-xl border border-line bg-paper px-3 py-2 text-[15px]"
-          />
-        </>
+        !revealed && <p className="text-sm text-muted">Answer it in your head, then show the answer.</p>
       )}
 
       {(revealed || result) && (
@@ -126,13 +112,13 @@ export function RecallCard({
             </button>
           )}
           {!mcq && !revealed && (
-            <button type="button" disabled={busy || !text.trim()} onClick={() => void reveal()} className={compactPrimaryButton}>
-              Check my answer
+            <button type="button" disabled={busy} onClick={() => void reveal()} className={compactPrimaryButton}>
+              Show answer
             </button>
           )}
           {!mcq && revealed && (
             <>
-              <span className="w-full text-sm text-muted">How did your answer compare?</span>
+              <span className="w-full text-sm text-muted">How close were you?</span>
               <button type="button" disabled={busy} onClick={() => void finish({ selfOutcome: "correct" })} className={compactSecondaryButton}>
                 Got it
               </button>
