@@ -47,3 +47,7 @@ create function test.make_reviewable(title_pattern text) returns void language s
    where title like title_pattern;
 $$;
 grant execute on function test.make_reviewable(text) to authenticated, anon;
+
+-- Test set-up only: the free trial has already started for test accounts (migration 76 sets it to
+-- launch day; the trial tests set their own dates).
+update public.plans set trial_from = now() - interval '1 minute' where name = 'Free';

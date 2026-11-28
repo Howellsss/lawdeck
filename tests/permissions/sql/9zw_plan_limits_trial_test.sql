@@ -36,6 +36,16 @@ select test.check((select monthly_limit = 0 from public.question_allowance()), '
 reset role;
 update public.plans set trial_from = now() where name = 'Free';
 
+-- Migration 76: an account made before launch day gets its 7 days from launch day.
+insert into auth.users (id, email, created_at) values ('a7600001-0000-0000-0000-000000000001', 'early76@test.invalid', now() - interval '20 days');
+update public.plans set trial_from = now() + interval '2 days' where name = 'Free';
+select test.as_user('a7600001-0000-0000-0000-000000000001');
+select test.check(
+  (select trial and monthly_limit = 30 and period_ends_at between now() + interval '8 days 23 hours' and now() + interval '9 days 1 hour' from public.question_allowance()),
+  'an account made before launch gets its 7 days from launch day');
+reset role;
+update public.plans set trial_from = now() where name = 'Free';
+
 -- Paid: credits from the day of payment, the week and the 3-hour window ------------------------
 insert into public.usage_events (owner_id, kind, credits, created_at) values
   ('a7400002-0000-0000-0000-000000000002', 'explain', 1, now() - interval '12 days'),
