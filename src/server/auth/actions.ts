@@ -29,7 +29,7 @@ function logAuthFailure(action: string, code: string | undefined) {
   console.warn("auth action failed", { action, code: code ?? "unknown" });
 }
 
-// Sign-up, reset and resend: 5 per email and 20 per internet address an hour (rule K-02). Each
+// Sign-up, reset and resend: 5 per email and 300 per internet address an hour (rule K-02; migration 77). Each
 // request that goes ahead is counted.
 async function limit(kind: "sign_up" | "reset" | "resend", checkedEmail: string, typed: string): Promise<AuthFormState | null> {
   const wait = await waitSeconds(kind, checkedEmail);
