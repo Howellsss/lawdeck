@@ -74,10 +74,10 @@ type Revealed = { ok: true; answer: string; explanation: string | null; correctC
 
 // Shows an open question's model answer, only once the student has written an attempt or chosen
 // to skip (founder's brief: "never reveal the answer before the student attempts the question").
-export async function revealAnswer(input: { checkpointId: string; answer?: string; skipped?: boolean }): Promise<Revealed | Fail> {
+export async function revealAnswer(input: { checkpointId: string; answer?: string; recalled?: boolean; skipped?: boolean }): Promise<Revealed | Fail> {
   const parsed = revealSchema.safeParse(input);
   if (!parsed.success) return { ok: false, message: parsed.error.issues[0]?.message ?? "That question could not be found." };
-  if (!parsed.data.skipped && !parsed.data.answer) return { ok: false, message: "Write your answer first, or skip this question." };
+  if (!parsed.data.skipped && !parsed.data.recalled && !parsed.data.answer) return { ok: false, message: "Think of your answer first, or skip this question." };
   if (!(await getCurrentAccount())) return SIGN_IN;
   const db = await createSupabaseServerClient();
   const row = await db.from("lesson_checkpoints").select("answer, explanation, correct_choice").eq("id", parsed.data.checkpointId).maybeSingle();
