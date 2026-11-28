@@ -15,6 +15,13 @@ export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: 
   // Which button is working: "explain:<topic id>" or "mcq:<topic id>".
   const [busy, setBusy] = useState<string | null>(null);
   const [message, setMessage] = useState<string>();
+  // Search box above the list (founder, 2026-11-28): filters as the student types; numbers stay
+  // the course's teaching order.
+  const [query, setQuery] = useState("");
+  const words = query.toLowerCase().split(/\s+/).filter(Boolean);
+  const shown = topics
+    .map((topic, index) => ({ topic, number: index + 1 }))
+    .filter(({ topic }) => words.every((word) => topic.name.toLowerCase().includes(word)));
 
   if (topics.length === 0) {
     return (
@@ -39,19 +46,35 @@ export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: 
       <h2 id="topics" className="text-lg font-medium">
         Topics ({topics.length})
       </h2>
+      <label>
+        <span className="sr-only">Search topics</span>
+        <input
+          type="search"
+          value={query}
+          onChange={(event) => setQuery(event.target.value)}
+          placeholder="Search topics"
+          className="h-11 w-full rounded-full border border-line bg-surface px-4 text-[15px] placeholder:text-muted"
+        />
+      </label>
       {message && (
         <p role="alert" className="text-sm text-warning">
           {message}
         </p>
       )}
+      {shown.length === 0 ? (
+        <p role="status" className="rounded-2xl border border-dashed border-line px-4 py-6 text-center text-muted">
+          No topic matches “{query.trim()}”. Try another word, or ask about it from the home screen.
+        </p>
+      ) : (
       <ol className="flex flex-col divide-y divide-line rounded-2xl border border-line bg-surface">
-        {topics.map((topic, index) => (
-          <li key={topic.id} className="flex items-center justify-between gap-3 px-4 py-3">
+        {shown.map(({ topic, number }) => (
+          <li key={topic.id} className="flex flex-col gap-2 px-4 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3">
             <span className="min-w-0 break-words text-[15px]">
-              <span className="mr-2 text-muted">{index + 1}.</span>
+              <span className="mr-2 text-muted">{number}.</span>
               {topic.name}
             </span>
-            <span className="flex shrink-0 flex-wrap justify-end gap-2">
+            {/* One row of buttons: below the name on phones, beside it on wider screens. */}
+            <span className="flex shrink-0 flex-nowrap gap-1.5 sm:justify-end sm:gap-2">
               {topic.hasLesson && (
                 <Link href={`/study/${topic.id}`} className={`${topicButton} border-ink bg-ink text-on-ink no-underline hover:bg-ink`}>
                   Study
@@ -83,12 +106,14 @@ export function TopicList({ courseSlug, topics }: { courseSlug: string; topics: 
           </li>
         ))}
       </ol>
+      )}
     </section>
   );
 }
 
+// Slightly smaller on phones so Study, Explain and MCQ always fit on one line (founder, 2026-11-28).
 const topicButton =
-  "inline-flex items-center rounded-full border border-line px-4 py-2 text-sm font-medium hover:bg-pill disabled:opacity-60";
+  "inline-flex items-center whitespace-nowrap rounded-full border border-line px-3 py-1.5 text-[13px] font-medium hover:bg-pill disabled:opacity-60 sm:px-4 sm:py-2 sm:text-sm";
 
 function Working({ children }: { children: string }) {
   return (
