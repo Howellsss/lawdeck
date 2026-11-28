@@ -24,8 +24,11 @@ select public.record_auth_attempt('reset', email_a, ip_1) from test.hashes, gene
 select test.check((select public.auth_wait_seconds('reset', email_a, ip_2) from test.hashes) > 3000, 'five resets an hour for one email, then a wait');
 select test.check((select public.auth_wait_seconds('sign_up', email_a, ip_1) from test.hashes) = 0, 'each kind is counted separately');
 select public.record_auth_attempt('sign_up', md5(i::text) || md5(i::text), ip_2) from test.hashes, generate_series(1, 20) i;
+select test.check((select public.auth_wait_seconds('sign_up', email_b, ip_2) from test.hashes) = 0,
+  'twenty sign-ups an hour from one shared address are fine (migration 77)');
+select public.record_auth_attempt('sign_up', md5(i::text) || md5((i + 1)::text), ip_2) from test.hashes, generate_series(21, 300) i;
 select test.check((select public.auth_wait_seconds('sign_up', email_b, ip_2) from test.hashes) > 3000,
-  'twenty sign-ups an hour from one address, then a wait');
+  'three hundred sign-ups an hour from one address, then a wait');
 select test.check((select public.auth_wait_seconds('sign_up', email_b, ip_1) from test.hashes) = 0, 'other addresses are not affected');
 
 -- Nobody reads or writes the attempts directly --------------------------------------------------------------

@@ -72,7 +72,7 @@ Last updated: 2026-11-28 (payments live by card and USSD; trial banner; no-typin
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **76** (`20261128007600_trial_from_launch.sql`, trials from launch day; 75 is failed payment attempts).
+  merge only after that. The latest is **77** (`20261128007700_shared_address_sign_ups.sql`, 300 sign-ups an hour per shared address; 76 is trials from launch day).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full
