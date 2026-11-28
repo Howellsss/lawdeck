@@ -10,7 +10,9 @@ export const metadata: Metadata = { title: "Create your account · Lawdeck" };
 export default function SignUpPage() {
   return (
     <>
-      <AuthHero title="Create your account">Use an email address you can open now: we’ll send you a link to confirm it.</AuthHero>
+      <AuthHero title="Start your 7-day free trial">
+        No card needed. Use an email address you can open now: we’ll send you a link to confirm it.
+      </AuthHero>
       {isGoogleSignInEnabled() && (
         <div className="flex w-full flex-col gap-4">
           <GoogleButton />
