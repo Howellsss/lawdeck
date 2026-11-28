@@ -5,9 +5,17 @@ Claude session or account. Then read `CLAUDE.md` (the rules) and the last 30 lin
 `docs/progress.md` (the dated log). Update this file at the end of every piece of work, in the
 same pull request, so the next session always starts from the truth.
 
-Last updated: 2026-11-27 (Flutterwave payments built, migration 73; new prices in the investor deck).
+Last updated: 2026-11-28 (payments live by card and USSD; trial banner; no-typing recall; topic search).
 
 ## In progress right now (2026-11-15) — read this first
+- **Launch state (2026-11-28):** Flutterwave live (V3 keys; card and USSD only: bank transfer hidden via
+  FLUTTERWAVE_PAYMENT_OPTIONS until Flutterwave finishes the founder's set-up, which showed another business's
+  account name). Founder still to make one real ₦4,999 card payment. 7-day trial shown on every page; students are
+  asked to pay only once the trial or its credits run out (first trials end about 4 Dec). Founder to clear the
+  short-period limit and monthly cap on Admin → Pilot so the trial gives 7 every 3 hours and 30 in all.
+  Study recall questions need no typing (option A); option B (reviewed multiple choice for every recall question,
+  ~$5–10 AI + re-reading 79 lessons + answer test) waits for Anthropic credit and "start B". Course topics have a
+  search box. Investor deck and running-cost PDF: /home/user/lawdeck-proposal (not in the repo).
 - **Library duplicates and Drive downloads (2026-11-24, migration 71, pasted by the founder):** pasted links skip files
   already in the library (same Drive file, contents, or name and size). When Google refuses Lawdeck's key for a file shared
   "Anyone with the link" (the Professional Ethics folder), the import uses Google's ordinary download address instead.
