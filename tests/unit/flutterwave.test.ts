@@ -8,6 +8,7 @@ const {
   confirmPayment,
   createCheckoutLink,
   judgePayment,
+  paymentOptions,
   noticeIsGenuine,
   verifyTransaction,
 } = await import("@/server/billing/flutterwave");
@@ -66,6 +67,21 @@ describe("starting a payment", () => {
     expect(await createCheckoutLink(input)).toEqual({ ok: false, reason: "Flutterwave answered 401: Invalid authorization key" });
     vi.stubGlobal("fetch", vi.fn().mockResolvedValue(json({ status: "error", message: "Customer s@example.com card 5399830000000008 declined" }, 400)));
     expect(await createCheckoutLink(input)).toEqual({ ok: false, reason: "Flutterwave answered 400: Customer [email] card [number] declined" });
+  });
+});
+
+describe("how students may pay (founder, 2026-11-28: bank transfer off for now)", () => {
+  it("offers card and USSD by default, and only Flutterwave's own options when set", async () => {
+    expect(paymentOptions()).toBe("card,ussd");
+    vi.stubEnv("FLUTTERWAVE_PAYMENT_OPTIONS", "card, BankTransfer ,ussd,card");
+    expect(paymentOptions()).toBe("card,banktransfer,ussd");
+    vi.stubEnv("FLUTTERWAVE_PAYMENT_OPTIONS", "free-money");
+    expect(paymentOptions()).toBe("card,ussd");
+    vi.stubEnv("FLUTTERWAVE_PAYMENT_OPTIONS", "");
+    const fetchSpy = vi.fn().mockResolvedValue(json({ status: "success", data: { link: "https://checkout.flutterwave.com/v3/hosted/pay/abc" } }));
+    vi.stubGlobal("fetch", fetchSpy);
+    await createCheckoutLink({ txRef: REF, amountNgn: 4999, email: "s@example.com", planName: "Standard", redirectUrl: "https://mylawdeck.com/plans/done" });
+    expect(JSON.parse(fetchSpy.mock.calls[0][1].body).payment_options).toBe("card,ussd");
   });
 });
 

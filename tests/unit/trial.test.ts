@@ -11,10 +11,10 @@ describe("the 7-day free trial as the student sees it", () => {
     expect(trialBannerText(t!)).toBe("Free trial: 5 days left (ends Thu 3 Dec) · 18 of 30 trial credits left · no card needed.");
   });
 
-  it("warns in the last 2 days", () => {
+  it("says when the trial ends in the last 2 days, without asking for payment yet", () => {
     const t = trialStatus(trial({ periodEndsAt: "2026-11-29T08:00:00Z" }), now);
     expect(t).toMatchObject({ state: "ending", daysLeft: 1 });
-    expect(trialBannerText(t!)).toMatch(/ends within a day .* Choose a plan/);
+    expect(trialBannerText(t!)).toBe("Free trial: ends within a day (Sun 29 Nov) · 18 of 30 trial credits left.");
   });
 
   it("asks for a plan when the trial credits are used up or the 7 days are over", () => {

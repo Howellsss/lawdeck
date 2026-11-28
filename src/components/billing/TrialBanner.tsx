@@ -14,7 +14,9 @@ export async function TrialBanner() {
   // Read once per request, after the sign-in check.
   const trial = trialStatus(allowance, new Date());
   if (!trial) return null;
-  const urgent = trial.state !== "active";
+  // During the 7 days the line only informs; students are asked to pay once the trial (or its
+  // credits) has run out (founder, 2026-11-28: "let them just be prompted after the 7 days").
+  const urgent = trial.state === "ended" || trial.state === "used";
   return (
     <div
       role={urgent ? "status" : undefined}
@@ -27,11 +29,7 @@ export async function TrialBanner() {
         <Link href="/plans" className={`${compactPrimaryButton} self-start sm:self-auto`}>
           Choose a plan
         </Link>
-      ) : (
-        <Link href="/plans" className="shrink-0 underline">
-          See plans
-        </Link>
-      )}
+      ) : null}
     </div>
   );
 }

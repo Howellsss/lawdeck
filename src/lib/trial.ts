@@ -32,7 +32,7 @@ export function trialBannerText(t: TrialStatus): string {
     case "active":
       return `Free trial: ${t.daysLeft} days left (ends ${trialEndDay(t.endsAt)}) · ${t.creditsLeft} of ${t.credits} trial credits left · no card needed.`;
     case "ending":
-      return `Your free trial ends ${t.daysLeft === 1 ? "within a day" : "in 2 days"} (${trialEndDay(t.endsAt)}) · ${t.creditsLeft} of ${t.credits} trial credits left. Choose a plan to keep studying without a break.`;
+      return `Free trial: ends ${t.daysLeft === 1 ? "within a day" : "in 2 days"} (${trialEndDay(t.endsAt)}) · ${t.creditsLeft} of ${t.credits} trial credits left.`;
     case "used":
       return `You’ve used all ${t.credits} trial credits. Choose a plan to keep studying; your trial would have ended on ${trialEndDay(t.endsAt)}.`;
     case "ended":
