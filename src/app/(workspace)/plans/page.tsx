@@ -5,6 +5,9 @@ import { LoadingRows } from "@/components/ui/LoadingRows";
 import { SignInPrompt } from "@/components/ui/SignInPrompt";
 import { StateMessage } from "@/components/ui/StateMessage";
 import { formatWat } from "@/lib/dates";
+import { trialEndDay, trialStatus } from "@/lib/trial";
+import { createSupabaseServerClient } from "@/server/auth/supabase";
+import { getAllowance } from "@/server/learn/allowance";
 import { getCurrentAccount } from "@/server/auth/session";
 import { flutterwaveConfigured } from "@/server/billing/flutterwave";
 import { getPlansForStudent } from "@/server/billing/plans";
@@ -27,7 +30,11 @@ export default function StudentPlansPage() {
 
 async function Plans() {
   if (!(await getCurrentAccount())) return <SignInPrompt level={1} what="plans" returnTo="/plans" />;
-  const data = await getPlansForStudent().catch(() => null);
+  const [data, allowance] = await Promise.all([
+    getPlansForStudent().catch(() => null),
+    createSupabaseServerClient().then((db) => getAllowance(db)),
+  ]);
+  const trial = trialStatus(allowance, new Date());
   if (!data) return <StateMessage tone="warning" title="The plans could not be loaded">Please reload the page in a minute.</StateMessage>;
   const open = flutterwaveConfigured();
   const current = data.current;
@@ -39,7 +46,16 @@ async function Plans() {
           Each payment gives one month. Nothing renews by itself: pay again when you want another month. Paying before your
           month ends adds the new month on top, so you never lose days.
         </p>
-        {current && (
+        {trial && (
+          <p className={`text-sm ${trial.state === "active" ? "" : "text-warning"}`}>
+            {trial.state === "ended"
+              ? "Your 7-day free trial has ended. Choose a plan below to keep studying; your work so far is kept."
+              : trial.state === "used"
+                ? `You’ve used all ${trial.credits} trial credits. Choose a plan below to keep studying.`
+                : `You’re on the 7-day free trial until ${trialEndDay(trial.endsAt)}: ${trial.creditsLeft} of ${trial.credits} trial credits left. No card needed until you choose a plan.`}
+          </p>
+        )}
+        {current && !trial && (
           <p className="text-sm">
             You are on <span className="font-medium">{current.name}</span>
             {current.periodEnd ? ` until ${formatWat(current.periodEnd)}.` : "."}

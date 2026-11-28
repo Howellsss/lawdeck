@@ -7,6 +7,7 @@ import { RecentsSlot } from "@/components/shell/RecentsSlot";
 import { ChatNavSlot } from "@/components/shell/ChatNavSlot";
 import { StaffNavSlot } from "@/components/shell/StaffNavSlot";
 import { TermsGateSlot } from "@/components/account/TermsGateSlot";
+import { TrialBanner } from "@/components/billing/TrialBanner";
 
 export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
   return (
@@ -33,6 +34,9 @@ export default function WorkspaceLayout({ children }: LayoutProps<"/">) {
         </Suspense>
       }
     >
+      <Suspense fallback={null}>
+        <TrialBanner />
+      </Suspense>
       {children}
       <Suspense fallback={null}>
         <TermsGateSlot />

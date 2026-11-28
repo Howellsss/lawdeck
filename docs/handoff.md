@@ -65,7 +65,7 @@ Last updated: 2026-11-27 (Flutterwave payments built, migration 73; new prices i
   its own once every check is green (never with a failing or skipped check).
 - Migrations: the founder pastes each new file in `supabase/migrations/` into the Supabase SQL
   Editor (https://supabase.com/dashboard/project/vvidwaslcbmzbrcqvdyz/sql/new) and replies "done";
-  merge only after that. The latest is **74** (`20261127007400_plan_limits_and_trial.sql`, limits and the 7-day trial; 73 is Flutterwave payments).
+  merge only after that. The latest is **75** (`20261128007500_payment_attempts.sql`, failed payment attempts no longer count; 74 is limits and the trial).
 
 ## Where things stand (2026-11-06)
 - **Remembrance brief: complete.** Lessons for all 79 topics in the five courses, all read in full

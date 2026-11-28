@@ -5,7 +5,7 @@ import { siteOrigin } from "@/server/auth/origin";
 import { getStaffRole } from "@/server/auth/roles";
 import { getCurrentAccount } from "@/server/auth/session";
 import { createSupabaseServerClient } from "@/server/auth/supabase";
-import { createCheckoutLink, flutterwaveConfigured } from "./flutterwave";
+import { abandonPayment, createCheckoutLink, flutterwaveConfigured } from "./flutterwave";
 
 export type CheckoutResult = { ok: true; url: string } | { ok: false; message: string };
 
@@ -38,6 +38,7 @@ export async function startCheckout(input: { planId: string }): Promise<Checkout
     redirectUrl: `${await siteOrigin()}/plans/done`,
   });
   if (!link.ok) {
+    await abandonPayment(payment.tx_ref);
     // Admins see Flutterwave's own reason, so the set-up can be fixed; students see a plain message.
     const admin = (await getStaffRole()) === "admin";
     return {

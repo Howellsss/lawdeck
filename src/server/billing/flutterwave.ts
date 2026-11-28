@@ -136,6 +136,15 @@ export function judgePayment(verified: VerifiedPayment, expectedRef: string): Pa
   return "pending";
 }
 
+// A payment Flutterwave refused to open: marked failed so it never counts towards the student's
+// hourly limit (migration 75), and never gives anything.
+export async function abandonPayment(txRef: string): Promise<void> {
+  if (!txRefSchema.safeParse(txRef).success) return;
+  const admin = createAdminClient();
+  const result = await admin?.rpc("fail_payment", { ref: txRef });
+  if (!admin || result?.error) console.error("abandon payment failed", { txRef, code: result?.error?.code });
+}
+
 export type ConfirmResult =
   | { status: "paid"; planName: string; periodEnd: string }
   | { status: "failed" | "pending" | "error" };

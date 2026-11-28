@@ -4,6 +4,7 @@ const rpc = vi.fn();
 vi.mock("@/server/db/admin", () => ({ createAdminClient: () => ({ rpc }) }));
 
 const {
+  abandonPayment,
   confirmPayment,
   createCheckoutLink,
   judgePayment,
@@ -97,6 +98,17 @@ describe("confirming a payment", () => {
     expect(await confirmPayment(REF, "../../admin")).toEqual({ status: "error" });
     expect(await verifyTransaction("12; drop")).toBeNull();
     expect(fetchSpy).not.toHaveBeenCalled();
+  });
+});
+
+describe("a payment Flutterwave refused to open (migration 75)", () => {
+  it("is marked failed, so it never counts towards the hourly limit", async () => {
+    rpc.mockResolvedValue({ data: null, error: null });
+    await abandonPayment(REF);
+    expect(rpc).toHaveBeenCalledWith("fail_payment", { ref: REF });
+    rpc.mockReset();
+    await abandonPayment("not-a-reference");
+    expect(rpc).not.toHaveBeenCalled();
   });
 });
 
