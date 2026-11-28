@@ -399,3 +399,4 @@ Key: ✅ done · ⬜ not yet · ⚠️ blocked
 - 2026-11-28: Bank transfer hidden on Flutterwave's page (card and USSD only; FLUTTERWAVE_PAYMENT_OPTIONS switches it back on). During the 7-day trial students only see days and credits left; they are asked to choose a plan once the trial or its credits run out.
 - 2026-11-28: Launch day is Monday 30 November 2026 (founder). Migration 76: accounts made before it get their 7-day trial from launch day (ending 7 December); accounts made from then on start the day they join.
 - 2026-11-28: Terms and Privacy Notice: 18 and over only (no parental-consent route), Nigeria only, for Law School students and those preparing to enter; contact privacy@mylawdeck.com. Everyone accepts once more (version 2026-11-28-2).
+- 2026-11-28: Launch audit fix 1 (migration 77): sign-ups, resets and resent emails allowed 300 an hour per internet address (was 20), because mobile networks and campus Wi-Fi share addresses; per-email limits unchanged.
